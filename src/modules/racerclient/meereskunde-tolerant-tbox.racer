@@ -1,0 +1,387 @@
+;;##########################################################
+;;##                                                      ##
+;;##                Meereskunde-TBOX                      ##
+;;##                                                      ##
+;;##########################################################
+(full-reset)
+
+(in-tbox meereskunde)
+
+(define-primitive-role spatially-related)
+(define-primitive-role touches :parent spatially-related)
+(define-primitive-role is-next-to :parent spatially-related)
+(define-primitive-role is-far-away-from :parent spatially-related)
+
+(define-primitive-role has-direction) 
+(define-primitive-role has-velocity) 
+
+(equivalent direction (or north south west east northwest northeast southwest southeast))
+(disjoint north south west east northwest northeast southwest southeast)
+
+(equivalent velocity (or slow moderate high))
+(disjoint slow moderate high)
+
+;;Velocity rule-implications:
+;;touches relation
+(implies (some has-velocity slow) 
+   (all touches (all has-velocity slow-tp)))
+
+(implies (some has-velocity moderate) 
+   (all touches (all has-velocity moderate-tp)))
+
+(implies (some has-velocity high) 
+   (all touches (all has-velocity high-tp)))
+
+;;is-next-to relation
+(implies (some has-velocity slow) 
+   (all is-next-to (all has-velocity slow-np)))
+
+(implies (some has-velocity moderate) 
+   (all is-next-to (all has-velocity moderate-np)))
+
+(implies (some has-velocity high) 
+   (all is-next-to (all has-velocity high-np)))
+
+;is-far-away-from relation
+(implies (some has-velocity slow) 
+   (all is-far-away-from (all has-velocity slow-fp)))
+
+(implies (some has-velocity moderate) 
+   (all is-far-away-from (all has-velocity moderate-fp)))
+
+(implies (some has-velocity high) 
+   (all is-far-away-from (all has-velocity high-fp)))
+
+;;Velocity concepts w.r.t. spatial neighbourhood
+;;touches relation
+(equivalent touches-with-wrong-velocity 
+            (or (some has-velocity  (and slow high-tp))
+                (some has-velocity  (and slow moderate-tp))
+ 
+                (some has-velocity  (and moderate slow-tp))
+                (some has-velocity  (and moderate high-tp))
+ 
+                (some has-velocity  (and high slow-tp))
+                (some has-velocity  (and high moderate-tp))))
+
+;;is-next-to relation
+(equivalent is-next-to-wrong-velocity 
+            (or (some has-velocity  (and slow high-np))
+                (some has-velocity  (and slow moderate-np))
+ 
+                (some has-velocity  (and moderate slow-np))
+                (some has-velocity  (and moderate high-np))
+ 
+                (some has-velocity  (and high slow-np))
+                (some has-velocity  (and high moderate-np))))
+
+;;far-away-from relation
+(equivalent is-far-away-from-wrong-velocity 
+            (or (some has-velocity  (and slow high-fp))
+                (some has-velocity  (and slow moderate-fp))
+ 
+                (some has-velocity  (and moderate slow-fp))
+                (some has-velocity  (and moderate high-fp))
+ 
+                (some has-velocity  (and high slow-fp))
+                (some has-velocity  (and high moderate-fp))))
+                        
+;;Collect all spatial velocity errors:
+(equivalent spatially-related-with-wrong-velocity (or touches-with-wrong-velocity
+                                                       is-next-to-wrong-velocity 
+                                                       is-far-away-from-wrong-velocity))
+
+
+;;Direction rule-implications:
+;;touches relation
+(implies (some has-direction south) 
+   (all touches (all has-direction south-tp)))
+
+(implies (some has-direction north) 
+   (all touches (all has-direction north-tp)))
+
+(implies (some has-direction east) 
+   (all touches (all has-direction east-tp)))
+
+(implies (some has-direction west) 
+   (all touches (all has-direction west-tp)))
+
+(implies (some has-direction southwest) 
+   (all touches (all has-direction southwest-tp)))
+
+(implies (some has-direction southeast) 
+   (all touches (all has-direction southeast-tp)))
+
+(implies (some has-direction northwest) 
+   (all touches (all has-direction northwest-tp)))
+
+(implies (some has-direction northeast) 
+   (all touches (all has-direction northeast-tp)))
+   
+;;is-next-to relation
+(implies (some has-direction south) 
+   (all is-next-to (all has-direction south-np)))
+
+(implies (some has-direction north) 
+   (all is-next-to (all has-direction north-np)))
+
+(implies (some has-direction east) 
+   (all is-next-to (all has-direction east-np)))
+
+(implies (some has-direction west) 
+   (all is-next-to (all has-direction west-np)))
+
+(implies (some has-direction southwest) 
+   (all is-next-to (all has-direction southwest-np)))
+
+(implies (some has-direction southeast) 
+   (all is-next-to (all has-direction southeast-np)))
+
+(implies (some has-direction northwest) 
+   (all is-next-to (all has-direction northwest-np)))
+
+(implies (some has-direction northeast) 
+   (all is-next-to (all has-direction northeast-np)))
+   
+;;is-far-away-from relation
+(implies (some has-direction south) 
+   (all is-far-away-from (all has-direction south-fp)))
+
+(implies (some has-direction north) 
+   (all is-far-away-from (all has-direction north-fp)))
+
+(implies (some has-direction east) 
+   (all is-far-away-from (all has-direction east-fp)))
+
+(implies (some has-direction west) 
+   (all is-far-away-from (all has-direction west-fp)))
+
+(implies (some has-direction southwest) 
+   (all is-far-away-from (all has-direction southwest-fp)))
+
+(implies (some has-direction southeast) 
+   (all is-far-away-from (all has-direction southeast-fp)))
+
+(implies (some has-direction northwest) 
+   (all is-far-away-from (all has-direction northwest-fp)))
+
+(implies (some has-direction northeast) 
+   (all is-far-away-from (all has-direction northeast-fp)))
+
+;;Direction concepts w.r.t. spatial neighbourhood
+;;touches relation
+(equivalent touches-with-wrong-direction 
+            (or (some has-direction (and west south-tp))
+                (some has-direction (and east south-tp))
+                (some has-direction (and north south-tp))
+                (some has-direction (and northwest south-tp))
+                (some has-direction (and northeast south-tp))
+                        
+                (some has-direction (and west north-tp))
+                (some has-direction (and east north-tp))
+                (some has-direction (and south north-tp))
+                (some has-direction (and southeast north-tp))
+                (some has-direction (and southwest north-tp))
+                        
+                (some has-direction (and south west-tp))
+                (some has-direction (and east west-tp))
+                (some has-direction (and north west-tp))
+                (some has-direction (and northeast west-tp))
+                (some has-direction (and southeast west-tp))
+                        
+                (some has-direction (and south east-tp))
+                (some has-direction (and west east-tp))
+                (some has-direction (and north east-tp))
+                (some has-direction (and northwest east-tp))
+                (some has-direction (and southwest east-tp))
+
+                (some has-direction (and southwest southeast-tp))
+                (some has-direction (and west southeast-tp))
+                (some has-direction (and north southeast-tp))
+                (some has-direction (and northwest southeast-tp))
+                (some has-direction (and northeast southeast-tp))
+                        
+                (some has-direction (and west northeast-tp))
+                (some has-direction (and northwest northeast-tp))
+                (some has-direction (and south northeast-tp))
+                (some has-direction (and southwest northeast-tp))
+                (some has-direction (and south northeast-tp))
+     
+                (some has-direction (and east southwest-tp))
+                (some has-direction (and northwest southwest-tp))
+                (some has-direction (and north southwest-tp))
+                (some has-direction (and northeast southwest-tp))
+                (some has-direction (and southeast southwest-tp))
+                        
+                (some has-direction (and west southeast-tp))
+                (some has-direction (and northwest southeast-tp))
+                (some has-direction (and north souththeast-tp))
+                (some has-direction (and southwest southeast-tp))
+                (some has-direction (and northeast southeast-tp))))
+                        
+;;is-next-to relation
+(equivalent is-next-to-wrong-direction
+            (or (some has-direction (and west south-np))
+                (some has-direction (and east south-np))
+                (some has-direction (and north south-np))
+                (some has-direction (and northwest south-np))
+                (some has-direction (and northeast south-np))
+                        
+                (some has-direction (and west north-np))
+                (some has-direction (and east north-np))
+                (some has-direction (and south north-np))
+                (some has-direction (and southeast north-np))
+                (some has-direction (and southwest north-np))
+                        
+                (some has-direction (and south west-np))
+                (some has-direction (and east west-np))
+                (some has-direction (and north west-np))
+                (some has-direction (and northeast west-np))
+                (some has-direction (and southeast west-np))
+                        
+                (some has-direction (and south east-np))
+                (some has-direction (and west east-np))
+                (some has-direction (and north east-np))
+                (some has-direction (and northwest east-np))
+                (some has-direction (and southwest east-np))
+
+                (some has-direction (and southwest southeast-np))
+                (some has-direction (and west southeast-np))
+                (some has-direction (and north southeast-np))
+                (some has-direction (and northwest southeast-np))
+                (some has-direction (and northeast southeast-np))
+                        
+                (some has-direction (and west northeast-np))
+                (some has-direction (and northwest northeast-np))
+                (some has-direction (and south northeast-np))
+                (some has-direction (and southwest northeast-np))
+                (some has-direction (and south northeast-np))
+     
+                (some has-direction (and east southwest-np))
+                (some has-direction (and northwest southwest-np))
+                (some has-direction (and north southwest-np))
+                (some has-direction (and northeast southwest-np))
+                (some has-direction (and southeast southwest-np))
+                        
+                (some has-direction (and west southeast-np))
+                (some has-direction (and northwest southeast-np))
+                (some has-direction (and north souththeast-np))
+                (some has-direction (and southwest southeast-np))
+                (some has-direction (and northeast southeast-np))))
+                   
+;;is-far-away-from relation     
+(equivalent is-far-away-from-wrong-direction 
+            (or (some has-direction (and west south-fp))
+                (some has-direction (and east south-fp))
+                (some has-direction (and north south-fp))
+                (some has-direction (and northwest south-fp))
+                (some has-direction (and northeast south-fp))
+                        
+                (some has-direction (and west north-fp))
+                (some has-direction (and east north-fp))
+                (some has-direction (and south north-fp))
+                (some has-direction (and southeast north-fp))
+                (some has-direction (and southwest north-fp))
+                        
+                (some has-direction (and south west-fp))
+                (some has-direction (and east west-fp))
+                (some has-direction (and north west-fp))
+                (some has-direction (and northeast west-fp))
+                (some has-direction (and southeast west-fp))
+                        
+                (some has-direction (and south east-fp))
+                (some has-direction (and west east-fp))
+                (some has-direction (and north east-fp))
+                (some has-direction (and northwest east-fp))
+                (some has-direction (and southwest east-fp))
+
+                (some has-direction (and southwest southeast-fp))
+                (some has-direction (and west southeast-fp))
+                (some has-direction (and north southeast-fp))
+                (some has-direction (and northwest southeast-fp))
+                (some has-direction (and northeast southeast-fp))
+                        
+                (some has-direction (and west northeast-fp))
+                (some has-direction (and northwest northeast-fp))
+                (some has-direction (and south northeast-fp))
+                (some has-direction (and southwest northeast-fp))
+                (some has-direction (and south northeast-fp))
+     
+                (some has-direction (and east southwest-fp))
+                (some has-direction (and northwest southwest-fp))
+                (some has-direction (and north southwest-fp))
+                (some has-direction (and northeast southwest-fp))
+                (some has-direction (and southeast southwest-fp))
+                        
+                (some has-direction (and west southeast-fp))
+                (some has-direction (and northwest southeast-fp))
+                (some has-direction (and north souththeast-fp))
+                (some has-direction (and southwest southeast-fp))
+                (some has-direction (and northeast southeast-fp))))
+                        
+;;Collect all spatial direction errors:
+(equivalent spatially-related-with-wrong-direction (or touches-with-wrong-direction 
+                                                       is-next-to-wrong-direction 
+                                                       is-far-away-from-wrong-direction))
+
+
+;;Problem definitions derived by the errors and spatial relationshipos mentioned above
+;;1.a) Next to (or nearer) a ship-wake, it  might be a shipwake being a lookalike
+(equivalent shipwake-problem (and measuredcurrent (or (some touches shipwake)
+                                                      (some is-next-to shipwake))))
+
+;;1.b) Next to (or nearer) land, it might be a sediment structure being a lookalike too
+(equivalent coastal-problem (and measuredcurrent (or (some touches land)
+                                                     (some is-next-to land))))
+
+;;1. Collect both above for being lookalikes
+(equivalent lookalike-problem (or shipwake-problem coastal-problem))
+
+;;2.a) Next to (or nearer) a modelledcurrent, which points in a wrong direction
+(equivalent modelledcurrent-direction-problem (and measuredcurrent 
+                                                   (some spatially-related (and modelledcurrent
+                                                                                (or is-next-to-wrong-direction 
+                                                                                    touches-with-wrong-direction)))))
+
+;;2.b) Next to (or nearer) a modelledcurrent, which is of the wwrong velocity
+(equivalent modelledcurrent-velocity-problem (and measuredcurrent 
+                                                  (some spatially-related (and modelledcurrent
+                                                                               (or is-next-to-wrong-velocity 
+                                                                                   touches-with-wrong-velocity)))))
+
+;;2. Collect both above for being modelledcurrent-problems
+(equivalent modelledcurrent-problem (or modelledcurrent-velocity-problem modelledcurrent-direction-problem))
+
+;;3.a) Touching a measuredcurrent, which points in a wrong direction
+(equivalent currentsmoothness-direction-problem (and measuredcurrent 
+                                                   (some spatially-related (and measuredcurrent
+                                                                                touches-with-wrong-direction))))
+
+;;3.b) Touching a measuredcurrent, which is of the wrong velocity
+(equivalent currentsmoothness-velocity-problem (and measuredcurrent 
+                                                  (some spatially-related (and measuredcurrent
+                                                                               touches-with-wrong-velocity))))
+
+;;3. Collect both above for being modelledcurrent-problems
+(equivalent currentsmoothness-problem (or currentsmoothness-velocity-problem currentsmoothness-direction-problem))
+
+;;4. Somehow spatially related to a wind measurement, which points in a wrong direction
+;;   As the wind measurement can be taken far away, we cannot assume a similar velocity 
+;;   and thus - in this case - just relie on the direction similarity (so 3.a <=> 3.)
+(equivalent wind-problem (and measuredcurrent 
+                              (some spatially-related (and windcurrent
+                                                           spatially-related-with-wrong-direction))))
+;;AND FINALLY..... TADA.....
+;;5. Collect all of the above problems
+(equivalent problem (or lookalike-problem
+                        modelledcurrent-problem
+                        currentsmoothness-problem
+                        wind-problem))
+ 
+;;##########################################################
+;;##                                                      ##
+;;##         Meereskunde-ABOX for testing purpose         ##
+;;##                                                      ##
+;;##########################################################
+(in-abox meereskunde-test meereskunde)
+ 

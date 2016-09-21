@@ -1,0 +1,99 @@
+/************************************************************************/
+/*                                                                      */
+/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*       Cognitive Systems Group, University of Hamburg, Germany        */
+/*                                                                      */
+/*    This file is part of the GrAphical Image Processing Enviroment.   */
+/*    The GRAIPE Website may be found at:                               */
+/*        https://github.com/bseppke/graipe                             */
+/*    Please direct questions, bug reports, and contributions to        */
+/*    the GitHub page and use the methods provided there.               */
+/*                                                                      */
+/*    Permission is hereby granted, free of charge, to any person       */
+/*    obtaining a copy of this software and associated documentation    */
+/*    files (the "Software"), to deal in the Software without           */
+/*    restriction, including without limitation the rights to use,      */
+/*    copy, modify, merge, publish, distribute, sublicense, and/or      */
+/*    sell copies of the Software, and to permit persons to whom the    */
+/*    Software is furnished to do so, subject to the following          */
+/*    conditions:                                                       */
+/*                                                                      */
+/*    The above copyright notice and this permission notice shall be    */
+/*    included in all copies or substantial portions of the             */
+/*    Software.                                                         */
+/*                                                                      */
+/*    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND    */
+/*    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES   */
+/*    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND          */
+/*    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT       */
+/*    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,      */
+/*    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      */
+/*    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR     */
+/*    OTHER DEALINGS IN THE SOFTWARE.                                   */
+/*                                                                      */
+/************************************************************************/
+
+#ifndef GRAIPE_FEATUREDETECTION_DETECTSIFTFEATURES_HXX
+#define GRAIPE_FEATUREDETECTION_DETECTSIFTFEATURES_HXX
+
+//vigra components needed
+#include "vigra/stdimage.hxx"
+#include "vigra/edgedetection.hxx"
+#include "vigra/convolution.hxx"
+
+//GRAIPE Feature Types
+#include "features/features.h"
+
+#include "featuredetection/sift.hxx"
+
+#include <math.h>
+
+#include <QVector>
+
+namespace graipe {
+    
+/**
+ * This is just a simple wrapper to keep the STL & VIGRA part of the
+ * SIFT implementation away from the Qt and other stuff.
+ * The STL containers will be used and converted into GRAIPE's data structures.
+ *
+ * \param src The image, for which we want to compute SIFT features.
+ * \param sigma The sigma for one octave (sigma -> 2*sigma). Defaults to 1.
+ * \param octaves The count of octaves. If zero, the number will be estimated 
+ *        using the image size. Defaults to 0.
+ * \param octaves The count of intra-octave levels. Defaults to 3.
+ * \param contrast_threshold The minimal realtive contrast (0..1) of a feature point.
+ *        Defaults to 0.03.
+ * \param curvature_threshold The minimal curvature by means of and inner circle's 
+ *        radius in pixels. Defaults to 10.
+ * \param double_image_size If true, the lowest octave will start are 2*width, 2*height of the image.
+ * \param normalize_image If true, the image will be normalized to 0..1 for the further computations.
+ * \return A list of all detected SIFT features.
+ */
+ 
+ 
+
+template <class T>
+SIFTFeatureList2D* detectFeaturesUsingSIFT(const vigra::MultiArrayView<2,T>& src,
+                                          float sigma=1.0, unsigned int octaves=0, unsigned int levels=3,
+									      float contrast_threshold = 0.03, float curvature_threshold = 10.0, bool double_image_size=true, bool normalize_image=true)
+{
+	SIFTFeatureList2D * result = new SIFTFeatureList2D;
+    
+    std::vector<SIFTFeature> std_result = computeSIFTDescriptors(src, sigma, octaves, levels, contrast_threshold, curvature_threshold, double_image_size, normalize_image);
+        
+    for(const SIFTFeature& sift : std_result)
+    {
+        result->addFeature(SIFTFeatureList2D::PointType(sift.position[0], sift.position[1]),
+                           sift.contrast,
+                           sift.orientation,
+                           sift.scale,
+                           QVector<float>::fromStdVector(sift.descriptor));
+    }
+    
+    return result;
+}
+    
+} //end of namespace graipe
+
+#endif

@@ -1,0 +1,331 @@
+/************************************************************************/
+/*                                                                      */
+/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*       Cognitive Systems Group, University of Hamburg, Germany        */
+/*                                                                      */
+/*    This file is part of the GrAphical Image Processing Enviroment.   */
+/*    The GRAIPE Website may be found at:                               */
+/*        https://github.com/bseppke/graipe                             */
+/*    Please direct questions, bug reports, and contributions to        */
+/*    the GitHub page and use the methods provided there.               */
+/*                                                                      */
+/*    Permission is hereby granted, free of charge, to any person       */
+/*    obtaining a copy of this software and associated documentation    */
+/*    files (the "Software"), to deal in the Software without           */
+/*    restriction, including without limitation the rights to use,      */
+/*    copy, modify, merge, publish, distribute, sublicense, and/or      */
+/*    sell copies of the Software, and to permit persons to whom the    */
+/*    Software is furnished to do so, subject to the following          */
+/*    conditions:                                                       */
+/*                                                                      */
+/*    The above copyright notice and this permission notice shall be    */
+/*    included in all copies or substantial portions of the             */
+/*    Software.                                                         */
+/*                                                                      */
+/*    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND    */
+/*    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES   */
+/*    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND          */
+/*    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT       */
+/*    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,      */
+/*    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      */
+/*    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR     */
+/*    OTHER DEALINGS IN THE SOFTWARE.                                   */
+/*                                                                      */
+/************************************************************************/
+
+#include "core/parameters/parameter.hxx"
+#include "core/parameters/boolparameter.hxx"
+#include "core/model.hxx"
+
+#include <QtDebug>
+
+namespace graipe {
+
+/**
+ * Default constructor of the Parameter class
+ */
+Parameter::Parameter()
+{
+}
+
+/**
+ * More usable constructor of the Parameter class with a setting of the 
+ * most important values directly.
+ *
+ * \param name          The name (label) of this parameter.
+ * \param parent        If given (!= NULL), this parameter has a parent and will
+ *                      be enabled/disabled, if the parent is a BoolParameter.
+ * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
+ */
+Parameter::Parameter(const QString&  name, Parameter* parent, bool invert_parent)
+:	m_name(name), 
+    m_parent(parent),
+    m_invert_parent(invert_parent)
+{
+}
+
+/**
+ * (Of course virtual) Destructor of the Parameter class.
+ */
+Parameter::~Parameter()
+{
+    //Nothing to do here, since no widget was created earlier.
+}
+
+/**
+ * The (immutable) type name of this parameter class.
+ * Implemented to fullfil the Serializable interface.
+ *
+ * \return "Parameter".
+ */
+QString  Parameter::typeName() const
+{
+	return "Parameter";
+}
+
+/**
+ * The name of this parameter. This name is used a label for the parameter.
+ *
+ * \return The name of the parameter.
+ */
+QString Parameter::name() const
+{
+	return m_name;
+}
+
+/**
+ * Writer for the name/label of this parameter.
+ *
+ * \param name The new name of the parameter.
+ */
+void Parameter::setName(const QString& name)
+{
+	m_name = name; 
+}
+
+/**
+ * Potentially non-const access to the parent of this parameter. 
+ *
+ * \return The pointer to the parent parameter.
+ */
+Parameter*  Parameter::parent()
+{
+    return m_parent;
+}
+
+/**
+ * Is the parent's checked state linked to setEnabled slot of this parameter's
+ * widget delegate or is it inverted linked?
+ *
+ * \return True, if an inverted linkage is established.
+ */
+bool Parameter::invertParent() const
+{
+    return m_invert_parent;
+}
+
+/**
+ * The value converted to a QString. Please note, that this can vary from the 
+ * serialize() result, which also returns a QString. This is due to the fact,
+ * that serialize also may perform encoding of QStrings to avoid special chars.
+ *
+ * \return The value of the parameter converted to an QString
+ */
+QString  Parameter::valueText() const
+{
+	return "";
+}
+
+
+/**
+ * The magicID of this parameter class. 
+ * Implemented to fullfil the Serializable interface.
+ *
+ * \return The same as the typeName() function.
+ */
+QString Parameter::magicID() const
+{
+    return typeName();
+}
+
+/**
+ * Serialization of the parameter's state to a QString. Please note, that this can
+ * vary from the valueText() result, which also returns a QString. This is due to the fact,
+ * that serialize also may perform encoding of QStrings to avoid special chars.
+ * Implemented to fullfil the Serializable interface.
+ *
+ * \return The serialization of the parameter's state.
+ */
+void Parameter::serialize(QIODevice& out) const
+{
+    write_on_device(magicID(), out);
+}
+
+/**
+ * Deserialization of a parameter's state from a QString.
+ * Implemented to fullfil the Serializable interface.
+ *
+ * \param str The serialization of this parameter's state.
+ * \return True, if the deserialization was successful, else false.
+ */
+bool Parameter::deserialize(QIODevice & in)
+{
+    //Read the first bytes, needed for the magicID
+    QString id_str(in.read(magicID().size()));
+    
+    //read the ", " too!
+    in.read(2);
+    
+    if(id_str.trimmed() == magicID())
+    {
+        return true;
+    }
+    else
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << " but got: " << id_str.trimmed();
+        return false;
+    }
+}
+
+/**
+ * Const access to the model list, which is currently assigned to 
+ * this parameter.
+ *
+ * \return A pointer to the current model list.
+ */
+const std::vector<Model*> * Parameter::modelList() const
+{
+	return m_modelList;
+}
+
+/**
+ * Writing access to the model list, which may be used to assign a new
+ * or update the currently used model list of this parameter.
+ *
+ * \param new_model_list A pointer to the new model list.
+ */
+void Parameter::setModelList(const std::vector<Model*> * new_obj_stack)
+{
+	m_modelList = new_obj_stack;
+	refresh();
+}
+
+/**
+ * This method is called after each (re-)assignment of the model list
+ * e.g. after a call of the setModelList() function. It may be implemented
+ * by means of the subclasses to handle these updates.
+ */
+void Parameter::refresh()
+{
+}
+
+/**
+ * This function locks the parameters value. 
+ * This means, that after a lock() call, only const acess to the parameter is 
+ * possible until someone unlocks it. 
+ * To work properly, the inner parameter class has to be designed accordingly.
+ * As an example, you may look at the Model class, which supports locking and
+ * unlocking - so do the parameter classes based on models!
+ */
+void Parameter::lock()
+{
+}
+
+/**
+ * This function unlocks the parameters value.
+ * This means, that after a lock() call, only const acess to the parameter is 
+ * possible until someone unlocks it. 
+ * To work properly, the inner parameter class has to be designed accordingly.
+ * As an example, you may look at the Model class, which supports locking and
+ * unlocking - so do the parameter classes based on models!
+ */
+void Parameter::unlock()
+{
+}
+
+/**
+ * This function indicates whether the value of a parameter is valid or not.
+ *
+ * \return True, if the parameter's value is valid.
+ */
+bool Parameter::isValid() const
+{
+    return false;
+}
+
+/**
+ * Sets a parameter to be hidden. 
+ * Hidden parameters behave like visible parameters unless they are added to a
+ * parameter group, where their delegates will not be shown.
+ *
+ * \param hide If true, the parameter will be hidden in a parameter group.
+ */
+void Parameter::hide(bool hide)
+{
+    m_hide = hide;
+}
+
+/**
+ * Is a parameter marked as "hidden" with respect to a parameter group?
+ *
+ * \return True, if the parameter will be hidden in a parameter group.
+ */
+bool Parameter::isHidden() const
+{
+    return m_hide;
+}
+
+/**
+ * The delegate widget of this parameter. 
+ * Each parameter generates such a widget on demand, which refers to the
+ * first call of this function. This is needed due to the executability of
+ * classes using parameters (like the Algorithm class) in different threads.
+ *
+ * \return The delegate widget to control the values of this parameter.
+ */
+QWidget*  Parameter::delegate()
+{
+    return NULL;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void Parameter::updateValue()
+{
+    emit valueChanged();
+}
+
+/**
+ * Initializes the connections (signal<->slot) between the parameter class and
+ * the delegate widget. This will be done after the first call of the delegate()
+ * function, since the delegate is NULL until then.
+ */
+void Parameter::initConnections()
+{
+    if(parent()!=NULL && parent()->typeName()=="BoolParameter")
+    {
+        BoolParameter* parent_param = static_cast<BoolParameter*>(parent());
+        if(parent_param != NULL)
+        {
+            QCheckBox* parent_widget = static_cast<QCheckBox*> (parent_param->delegate());
+            if (parent_widget != NULL && delegate() != NULL)
+            {
+                if(m_invert_parent)
+                {
+                    connect(parent_widget, SIGNAL(clicked(bool)), delegate(), SLOT(setDisabled(bool)));
+                    delegate()->setEnabled(!parent_param->value());
+                    
+                }
+                else
+                {
+                    connect(parent_widget, SIGNAL(clicked(bool)), delegate(), SLOT(setEnabled(bool)));
+                    delegate()->setEnabled(parent_param->value());
+                }
+            }
+        }
+    }
+}
+
+} //end of namespace graipe

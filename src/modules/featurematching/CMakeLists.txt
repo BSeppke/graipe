@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.1)
+
+project(graipe_featurematching)
+
+set(SOURCES 
+	featurematchingmodule.cxx)
+
+set(HEADERS  
+	featurematching.h
+	matchpointfeatures.hxx
+	matchsiftfeatures.hxx)
+
+add_definitions(-DGRAIPE_FEATUREMATCHING_BUILD)
+
+# Tell CMake to create the library
+add_library(graipe_featurematching SHARED ${SOURCES} ${HEADERS})
+set_target_properties(graipe_featurematching PROPERTIES VERSION ${GRAIPE_VERSION} SOVERSION ${GRAIPE_SOVERSION})
+
+# Link library to other libs
+target_link_libraries(graipe_featurematching graipe_core graipe_features graipe_images  graipe_vectorfields ${FFTW_LIBRARIES} Qt5::Widgets)
