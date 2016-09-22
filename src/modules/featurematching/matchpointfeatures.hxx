@@ -111,13 +111,13 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
                                                        const vigra::MultiArrayView<2,T2>& src2,
                                                        PointFeatureList2D const & features,
                                                        MatchingFunctor &  func,
-                                                       int mask_width, int mask_height,
-                                                       int max_distance,
-                                                       int n_candidates,
+                                                       unsigned int mask_width, unsigned int mask_height,
+                                                       unsigned int max_distance,
+                                                       unsigned int n_candidates,
                                                        bool use_global,
                                                        vigra::Matrix<double>& mat,
                                                        double & rotation_correlation, double & translation_correlation,
-                                                       int & used_max_distance)
+                                                       unsigned int & used_max_distance)
 {
     vigra_precondition(src1.shape() == src2.shape(), "image shapes differ!");
     
@@ -146,8 +146,8 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
 	
 	used_max_distance = max(1, int(0.5 + max_distance - sqrt(mat(0,2)*mat(0,2) + mat(1,2)*mat(1,2))));
 	
-    int result_w = used_max_distance*2+mask_width+1,
-        result_h = used_max_distance*2+mask_height+1;
+    unsigned int result_w = used_max_distance*2+mask_width+1,
+			     result_h = used_max_distance*2+mask_height+1;
     
 	///Create result image (will be used / updated for each features correlation)
 	MultiArray<2,float>	result(result_w, result_h);
@@ -183,10 +183,10 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
                   result.subarray(Shape2(0,0), Shape2(search_w,search_h)));
 			
 			
-			int	result_w= search_right-search_left,
-				result_h= search_lower-search_upper,
-				max_x	= result_w/2,
-				max_y	= result_h/2;
+			unsigned int	result_w = search_right-search_left,
+							result_h = search_lower-search_upper,
+							max_x	 = result_w/2,
+							max_y	 = result_h/2;
             
 			typedef typename Vectorfield2D::PointType PointType;
 			vector<PointType>	directions(n_candidates);
@@ -194,43 +194,43 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
 			
             
                 qDebug() << "\nSource: (" << search_w<<", " << search_h<< ")";
-				for(int r_y=0; r_y<search_h; r_y++)
+				for(unsigned int r_y=0; r_y<search_h; r_y++)
 				{
                     qDebug() << "\n";
-					for(int r_x=0; r_x<search_w; r_x++)
+					for(unsigned int r_x=0; r_x<search_w; r_x++)
 					{
                         qDebug() << s2.subarray( Shape2(search_left, search_upper), Shape2(search_right, search_lower))(r_x,r_y) << ", ";
                     }
                 }
             
                 qDebug() << "\nMask (" << mask_width<<", " << mask_height<< ")";
-				for(int r_y=0; r_y<mask_height; r_y++)
+				for(unsigned int r_y=0; r_y<mask_height; r_y++)
 				{
                     qDebug() << "\n";
-					for(int r_x=0; r_x<mask_width; r_x++)
+					for(unsigned int r_x=0; r_x<mask_width; r_x++)
 					{
                         qDebug() <<  s1.subarray( Shape2(s1_x-mask_width/2, s1_y-mask_height/2),  Shape2(s1_x+mask_width/2+1, s1_y+mask_height/2+1))(r_x,r_y) << ", ";
                     }
                 }
             
                 qDebug()<< "\nResult:";
-				for(int r_y=0; r_y<result_h; r_y++)
+				for(unsigned int r_y=0; r_y<result_h; r_y++)
 				{
                     qDebug() << "\n";
-					for(int r_x=0; r_x<result_w; r_x++)
+					for(unsigned int r_x=0; r_x<result_w; r_x++)
 					{
                         qDebug() << result(r_x,r_y) << ", ";
                     }
                 }
             
 			//collect N local maxima from the result image
-			for(int c=0; c<n_candidates; c++)
+			for(unsigned int c=0; c<n_candidates; c++)
 			{
                 qDebug()<< "\n";
-				for(int r_y=0; r_y<result_h; r_y++)
+				for(unsigned int r_y=0; r_y<result_h; r_y++)
 				{
                     qDebug() << "\n";
-					for(int r_x=0; r_x<result_w; r_x++)
+					for(unsigned int r_x=0; r_x<result_w; r_x++)
 					{
                         qDebug() << result(r_x,r_y) << ", ";
 						if(	//	(r_x-result_w/2.0)*(r_x-result_w/2.0) + (r_y-result_h/2.0)*(r_y-result_h/2.0) < used_max_distance*used_max_distance
@@ -244,8 +244,8 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
 						}
 					}
 				}
-				int s2_x = search_left  + max_x,
-					s2_y = search_upper + max_y;
+				unsigned int s2_x = search_left  + max_x,
+							 s2_y = search_upper + max_y;
 				
 				//s2 is in s1's coordinate system --> transform bach to I2's coords
 				float	s2t_x = s2_x,//*mat(0,0) + s2_y*mat(0,1) + mat(0,2),
@@ -402,13 +402,13 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeatures(const vigra::MultiArra
                                                           PointFeatureList2D const & s1_features,
                                                           PointFeatureList2D const & s2_features,
                                                           MatchingFunctor & func,
-                                                          int mask_width, int mask_height,
-                                                          int max_distance,
-                                                          int n_candidates,
+                                                          unsigned int mask_width, unsigned int mask_height,
+                                                          unsigned int max_distance,
+                                                          unsigned int n_candidates,
                                                           bool use_global,
                                                           vigra::Matrix<double>& mat,
                                                           double & rotation_correlation, double & translation_correlation,
-                                                          int & used_max_distance)
+                                                          unsigned int & used_max_distance)
 {
     vigra_precondition(src1.shape() == src2.shape(), "image shapes differ!");
     
@@ -443,12 +443,12 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeatures(const vigra::MultiArra
 	for(unsigned int i=0 ; i < s1_features.size(); ++i)
 	{ 
         //Source image point coordinates
-        int s1_x = vigra::round(s1_features.position(i).x()),
-            s1_y = vigra::round(s1_features.position(i).y());
+        unsigned int s1_x = vigra::round(s1_features.position(i).x()),
+					 s1_y = vigra::round(s1_features.position(i).y());
 		
 		//check if feature is inside mask bounds
-		if(		s1_y > mask_height/2	&&	s1_y < work_h-mask_height/2	
-		   &&	s1_x > mask_width/2		&&	s1_x < work_w-mask_width/2)
+		if(		s1_y > mask_height/2	&&	s1_y < (unsigned int)work_h-mask_height/2	
+		   &&	s1_x > mask_width/2		&&	s1_x < (unsigned int)work_w-mask_width/2)
 		{
 			list<WeightedTarget2D>		candidates_list;
 			
@@ -491,14 +491,14 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeatures(const vigra::MultiArra
 				
 				
 				//initialize vectors
-				for(int c=0; c<n_candidates; ++c)
+				for(unsigned int c=0; c<n_candidates; ++c)
 				{
 					dirs[c] = PointType(0.0, 0.0);
 					weights[c] = 0.0;
 				}
 				
 				list<WeightedTarget2D>::iterator iter = candidates_list.begin();
-				for(int c=0; c<n_candidates && iter!= candidates_list.end(); ++c, ++iter)
+				for(unsigned int c=0; c<n_candidates && iter!= candidates_list.end(); ++c, ++iter)
 				{
 					dirs[c] = PointType(iter->x-s1_x, iter->y-s1_y);
 					weights[c] = iter->weight;
@@ -632,13 +632,13 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const
                                                                            const vigra::MultiArrayView<2,T2>& src2,
                                                                            PointFeatureList2D const & s1_features,
                                                                            PointFeatureList2D const & s2_features,
-                                                                           int mask_width, int mask_height,
-                                                                           int max_distance,
-                                                                           int n_candidates,
+                                                                           unsigned int mask_width, unsigned int mask_height,
+                                                                           unsigned int max_distance,
+                                                                           unsigned int n_candidates,
                                                                            bool use_global,
                                                                            vigra::Matrix<double>& mat,
                                                                            double & rotation_correlation, double & translation_correlation,
-                                                                           int & used_max_distance)
+                                                                           unsigned int & used_max_distance)
 {
     using namespace ::std;
     using namespace ::vigra;
@@ -662,8 +662,8 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const
 	//Create resulting vectorfield
 	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D;
 	
-	int max_radius = max(mask_width,mask_height)/2.0,
-		angle_bins = 8;
+	unsigned int max_radius = max(mask_width,mask_height)/2.0,
+			     angle_bins = 8;
 	
 	//1. step: build shape context
 	vector<vigra::MultiArray<2, unsigned int> >  shape_contexts1 = createShapeContexts(s1_features, max_radius, angle_bins),
@@ -714,14 +714,14 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const
 				
 				
 				 //initialize vectors
-				for(int c=0; c<n_candidates; ++c)
+				for(unsigned int c=0; c<n_candidates; ++c)
 				{
 					dirs[c] = PointType(0,0);
 					weights[c] = 0.0;
 				}
 				
 				list<WeightedTarget2D>::iterator iter = candidates_list.begin();
-				for(int c=0; c<n_candidates && iter!= candidates_list.end(); ++c, ++iter){
+				for(unsigned int c=0; c<n_candidates && iter!= candidates_list.end(); ++c, ++iter){
 					dirs[c] = PointType(iter->x-s1_x, iter->y-s1_y);
 					weights[c] = iter->weight;
 				}

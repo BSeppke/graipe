@@ -76,11 +76,11 @@ SparseWeightedMultiVectorfield2D* matchSIFTFeaturesUsingDistance(const vigra::Mu
                                                                  const SIFTFeatureList2D& points2,
                                                                  float max_descr_dist,
                                                                  float max_geo_dist,
-                                                                 int n_candidates,
+                                                                 unsigned int n_candidates,
                                                                  bool use_global,
                                                                  vigra::Matrix<double> & mat,
                                                                  double & rotation_correlation, double & translation_correlation,
-                                                                 int & used_max_distance)
+                                                                 unsigned int & used_max_distance)
 {
     using namespace ::std;
     using namespace ::vigra;
@@ -155,14 +155,14 @@ SparseWeightedMultiVectorfield2D* matchSIFTFeaturesUsingDistance(const vigra::Mu
             
             
             //initialize vectors
-            for(int c=0; c<n_candidates; ++c)
+            for(unsigned int c=0; c<n_candidates; ++c)
             {
                 dirs[c] = PointType(0,0);
                 weights[c] = 0.0;
             }
             
             list<WeightedTarget2D>::iterator iter = candidates_list.begin();
-            for(int c=0; c<n_candidates && iter!= candidates_list.end(); ++c, ++iter)
+            for(unsigned int c=0; c<n_candidates && iter!= candidates_list.end(); ++c, ++iter)
             {
                 dirs[c] = PointType(iter->x-points1.position(i).x(), iter->y-points1.position(i).y());
                 weights[c] = 1 - iter->weight;

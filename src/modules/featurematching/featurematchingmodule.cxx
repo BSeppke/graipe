@@ -114,7 +114,7 @@ class BlockWiseImageMatcher
                 
                 vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
                 double rotation_correlation=0, translation_correlation=0;
-                int used_distance = param_searchDistance->value();
+                unsigned int used_distance = param_searchDistance->value();
                                                                                            
                 MATCHING_FUNCTOR func;
                 
@@ -270,7 +270,7 @@ class FeatureToFeatureMatcher
                 
                 vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
                 double rotation_correlation=0, translation_correlation=0;
-                int used_distance = param_searchDistance->value();
+                unsigned int used_distance = param_searchDistance->value();
                 
                 MATCHING_FUNCTOR func;
                 
@@ -424,7 +424,7 @@ class FeatureToImageMatcher
             
                 vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
                 double rotation_correlation=0, translation_correlation=0;
-                int used_distance = param_searchDistance->value();
+                unsigned int used_distance = param_searchDistance->value();
                 
                 MATCHING_FUNCTOR func;
                 
@@ -580,7 +580,7 @@ class ShapeContextMatcher
                 
                 vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
                 double rotation_correlation=0, translation_correlation=0;
-                int used_distance = param_searchDistance->value();
+                unsigned int used_distance = param_searchDistance->value();
                 
                 QElapsedTimer timer;
                 timer.start();
@@ -722,7 +722,7 @@ class SIFTMatcher
                 
                 vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
                 double rotation_correlation=0, translation_correlation=0;
-                int used_distance = param_maxGeoDistance->value();
+                unsigned int used_distance = param_maxGeoDistance->value();
                 
                 QElapsedTimer timer;
                 timer.start();

@@ -62,10 +62,10 @@ namespace  graipe {
 static const QString version_name = QString("%1.%2").arg(version_major).arg(version_minor);
 static const QString full_version_name = QString("%1.%2.%3").arg(version_major).arg(version_minor).arg(version_patch);
 
-#ifdef GRAIPE_SVN_REVISION
-    static const QString svn_revision = GRAIPE_SVN_REVISION;
+#ifdef GRAIPE_GIT_VERSION
+    static const QString git_version = GRAIPE_GIT_VERSION;
 #else
-    static const QString svn_revision = "?";
+    static const QString git_version = "n/a";
 #endif
 
 #ifdef Q_OS_OSX

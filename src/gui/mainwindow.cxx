@@ -415,7 +415,8 @@ void MainWindow::about()
                 "<p><b>About the GrAphical Image Processing Environment<br/>"
                 "a.k.a. GRAIPE</b></p>"
                 "<p>Currently installed version: " + full_version_name + "<br/>"
-                "SVN revision (build): " + svn_revision + "</p>"
+                "GIT version (build): " + git_version + "<br />"
+				"Build timestamp: " + __TIMESTAMP__ + "</p>"
                 "<p>You may find more information about the currently loaded modules as well "
                 "as the log under the menu item: Help.</p>");
 }
