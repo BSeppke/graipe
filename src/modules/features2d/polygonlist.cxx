@@ -33,7 +33,7 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/polygonlist.hxx"
+#include "features2d/polygonlist.hxx"
 
 namespace graipe {
 

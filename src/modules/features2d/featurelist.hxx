@@ -39,7 +39,7 @@
 #include "core/model.hxx"
 #include "core/qt_ext/qpointfx.hxx"
 
-#include "features/config.hxx"
+#include "features2d/config.hxx"
 
 #include <QVector>
 

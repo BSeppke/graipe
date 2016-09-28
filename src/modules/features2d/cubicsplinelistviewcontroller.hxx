@@ -39,9 +39,9 @@
 #include "core/viewcontroller.hxx"
 #include "core/qt_ext/qlegend.hxx"
 
-#include "features/cubicsplinelist.hxx"
-#include "features/cubicsplineliststatistics.hxx"
-#include "features/config.hxx"
+#include "features2d/cubicsplinelist.hxx"
+#include "features2d/cubicsplineliststatistics.hxx"
+#include "features2d/config.hxx"
 
 namespace graipe {
     

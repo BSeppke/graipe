@@ -37,8 +37,8 @@
 #define GRAIPE_FEATURES_POLYGONLIST_HXX
 
 #include "core/model.hxx"
-#include "features/polygon.hxx"
-#include "features/config.hxx"
+#include "features2d/polygon.hxx"
+#include "features2d/config.hxx"
 
 #include <QVector>
 

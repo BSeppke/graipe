@@ -36,8 +36,8 @@
 #ifndef GRAIPE_FEATURES_CUBICSPLINE_HXX
 #define GRAIPE_FEATURES_CUBICSPLINE_HXX
 
-#include "features/config.hxx"
-#include "features/featurelist.hxx"
+#include "features2d/config.hxx"
+#include "features2d/featurelist.hxx"
 
 namespace graipe {
 

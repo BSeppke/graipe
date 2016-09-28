@@ -49,7 +49,7 @@
 #include <QList>
 #include <QMenu>
 #include <QString>
-#include <QScrollbar>
+#include <QScrollBar>
 
 
 namespace graipe {

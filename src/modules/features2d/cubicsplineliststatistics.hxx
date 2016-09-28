@@ -33,68 +33,80 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_POLYGON_HXX
-#define GRAIPE_FEATURES_POLYGON_HXX
+#ifndef GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
+#define GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
 
-#include "features/featurelist.hxx"
-#include "features/config.hxx"
+#include "core/basicstatistics.hxx"
+
+#include "features2d/cubicsplinelist.hxx"
+#include "features2d/config.hxx"
 
 namespace graipe {
-    
+
 /**
- * Extension of the QPolygonF class with respect to 
- * some additional features and measures
+ * Empty statistics mother class for 2D Cubic spline list.
+ * Note, that the bounding box of each spline is kept directly by
+ * means of each spline - so we need not statistics in this case.
  */
-class GRAIPE_FEATURES_EXPORT Polygon2D
-:   public QPolygonF
+class GRAIPE_FEATURES_EXPORT CubicSplineList2DStatistics
 {
-	public:
-        //The used point type
-		typedef QPointF PointType;
+    public:
+        /**
+         * Default constructor. Initializes the member with a NULL pointer.
+         */
+        CubicSplineList2DStatistics();
     
         /**
-         * Virtual destructor of this class, needed due to non-final QVector class.
+         * A more useful constructor.
+         * 
+         * \param spl The spline list, for which we want to generate the statistics.
          */
-        virtual ~Polygon2D();
-		
-        /**
-         * The typename of this Polygon2D class
-         *
-         * \return Always: "Polygon2D"
-         */
-        QString typeName() const;
-		
-        /**
-         * Check if the polygon is closed.
-         *
-         * \return true if the polygon is closed (first == last point)
-         */
-		virtual bool isClosed() const;
+        CubicSplineList2DStatistics(const CubicSplineList2D* spl);
     
+    protected:
+        //The 2D cubic spline list
+        const CubicSplineList2D* m_cubicsplines;
+};
+
+
+
+
+/**
+ * This class extends the empty mother class for weighted 2D cubic spline lists.
+ * It represents the weight statistics of all splines inside the list.
+ */
+class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2DStatistics
+:   public CubicSplineList2DStatistics
+{
+    public:
         /**
-         * Check if a point lies inside the polygon.
-         *
-         * \param p The point to be checked if inside this polygon.
-         * \return true if the given point is inside the polygon and the
-         *         polygon is closed.
+         * Default constructor. Initializes the member with a NULL pointer and the 
+         * weight statistics with default values.
          */
-		virtual bool isInside(const PointType& p) const;
+        WeightedCubicSplineList2DStatistics();
+        
+        /**
+         * A more useful constructor.
+         * 
+         * \param spl The weighted spline list, for which we want to generate the statistics.
+         */
+        WeightedCubicSplineList2DStatistics(const WeightedCubicSplineList2D* spl);
+	
+        /**
+         * Returns basic statistics of the weights of all 2D cubic splines inside the list.
+         *
+         * \return Basic statistics of the weights of all 2D cubic splines inside the list.
+         */
+        BasicStatistics<float> weightStats() const;
+	
+    protected:
+        //The weighted 2D cubic spline list
+        const WeightedCubicSplineList2D* m_cubicsplines;
     
-        /**
-         * The area included by the polygon.
-         *
-         * \return 0, if the polygon is not closed, else the area.
-         */
-		virtual float area() const;
-    
-        /**
-         * Add a point to the polygon
-         *
-         * \param p The point to be added to this polygon.
-         */
-		virtual void addPoint(const PointType& p);
+        //Weight statistics
+        BasicStatistics<float> m_weights;
 };
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_POLYGON_HXX
+#endif //GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX

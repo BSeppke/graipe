@@ -33,79 +33,68 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
-#define GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
+#ifndef GRAIPE_FEATURES_POLYGON_HXX
+#define GRAIPE_FEATURES_POLYGON_HXX
 
-#include "core/basicstatistics.hxx"
-
-#include "features/polygonlist.hxx"
-#include "features/config.hxx"
+#include "features2d/featurelist.hxx"
+#include "features2d/config.hxx"
 
 namespace graipe {
-
+    
 /**
- * Empty statistics mother class for polygon lists.
- * Note, that the bounding box of each polygon is kept directly by
- * means of each polygon - so we need not statistics in this case.
+ * Extension of the QPolygonF class with respect to 
+ * some additional features and measures
  */
-class GRAIPE_FEATURES_EXPORT PolygonList2DStatistics
+class GRAIPE_FEATURES_EXPORT Polygon2D
+:   public QPolygonF
 {
-    public:
-        /**
-         * Default constructor. Initializes the member with a NULL pointer.
-         */
-        PolygonList2DStatistics();
+	public:
+        //The used point type
+		typedef QPointF PointType;
     
         /**
-         * A more useful constructor.
-         * 
-         * \param pl The polygon list, for which we want to generate the statistics.
+         * Virtual destructor of this class, needed due to non-final QVector class.
          */
-        PolygonList2DStatistics(const PolygonList2D* pl);
-    
-    protected:
-        //The polygon list
-        const PolygonList2D* m_polygons;
-};
-
-
-
-
-/**
- * This class extends the empty mother class for weighted polygon lists.
- * It represents the weight statistics of all polygons inside the list.
- */
-class GRAIPE_FEATURES_EXPORT WeightedPolygonList2DStatistics
-	: public PolygonList2DStatistics
-{
-    public:
+        virtual ~Polygon2D();
+		
         /**
-         * Default constructor. Initializes the member with a NULL pointer.
-         */
-        WeightedPolygonList2DStatistics();
-        
-        /**
-         * A more useful constructor.
-         * 
-         * \param pl The weighted polygon list, for which we want to generate the statistics.
-         */
-        WeightedPolygonList2DStatistics(const WeightedPolygonList2D* pl);
-	
-         /**
-         * Returns basic statistics of the weights of all polygons inside the list.
+         * The typename of this Polygon2D class
          *
-         * \return Basic statistics of the weights of all polygons inside the list.
+         * \return Always: "Polygon2D"
          */
-         const BasicStatistics<float>& weightStats() const;
-	
-    protected:
-        //The weighted polygon list
-        const WeightedPolygonList2D* m_polygons;
+        QString typeName() const;
+		
+        /**
+         * Check if the polygon is closed.
+         *
+         * \return true if the polygon is closed (first == last point)
+         */
+		virtual bool isClosed() const;
     
-        //Weight statistics
-        BasicStatistics<float> m_weights;
+        /**
+         * Check if a point lies inside the polygon.
+         *
+         * \param p The point to be checked if inside this polygon.
+         * \return true if the given point is inside the polygon and the
+         *         polygon is closed.
+         */
+		virtual bool isInside(const PointType& p) const;
+    
+        /**
+         * The area included by the polygon.
+         *
+         * \return 0, if the polygon is not closed, else the area.
+         */
+		virtual float area() const;
+    
+        /**
+         * Add a point to the polygon
+         *
+         * \param p The point to be added to this polygon.
+         */
+		virtual void addPoint(const PointType& p);
 };
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
+#endif //GRAIPE_FEATURES_POLYGON_HXX

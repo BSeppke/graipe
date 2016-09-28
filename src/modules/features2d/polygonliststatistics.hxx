@@ -33,75 +33,74 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
-#define GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
+#ifndef GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
+#define GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
 
 #include "core/basicstatistics.hxx"
 
-#include "features/cubicsplinelist.hxx"
-#include "features/config.hxx"
+#include "features2d/polygonlist.hxx"
+#include "features2d/config.hxx"
 
 namespace graipe {
 
 /**
- * Empty statistics mother class for 2D Cubic spline list.
- * Note, that the bounding box of each spline is kept directly by
- * means of each spline - so we need not statistics in this case.
+ * Empty statistics mother class for polygon lists.
+ * Note, that the bounding box of each polygon is kept directly by
+ * means of each polygon - so we need not statistics in this case.
  */
-class GRAIPE_FEATURES_EXPORT CubicSplineList2DStatistics
+class GRAIPE_FEATURES_EXPORT PolygonList2DStatistics
 {
     public:
         /**
          * Default constructor. Initializes the member with a NULL pointer.
          */
-        CubicSplineList2DStatistics();
+        PolygonList2DStatistics();
     
         /**
          * A more useful constructor.
          * 
-         * \param spl The spline list, for which we want to generate the statistics.
+         * \param pl The polygon list, for which we want to generate the statistics.
          */
-        CubicSplineList2DStatistics(const CubicSplineList2D* spl);
+        PolygonList2DStatistics(const PolygonList2D* pl);
     
     protected:
-        //The 2D cubic spline list
-        const CubicSplineList2D* m_cubicsplines;
+        //The polygon list
+        const PolygonList2D* m_polygons;
 };
 
 
 
 
 /**
- * This class extends the empty mother class for weighted 2D cubic spline lists.
- * It represents the weight statistics of all splines inside the list.
+ * This class extends the empty mother class for weighted polygon lists.
+ * It represents the weight statistics of all polygons inside the list.
  */
-class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2DStatistics
-:   public CubicSplineList2DStatistics
+class GRAIPE_FEATURES_EXPORT WeightedPolygonList2DStatistics
+	: public PolygonList2DStatistics
 {
     public:
         /**
-         * Default constructor. Initializes the member with a NULL pointer and the 
-         * weight statistics with default values.
+         * Default constructor. Initializes the member with a NULL pointer.
          */
-        WeightedCubicSplineList2DStatistics();
+        WeightedPolygonList2DStatistics();
         
         /**
          * A more useful constructor.
          * 
-         * \param spl The weighted spline list, for which we want to generate the statistics.
+         * \param pl The weighted polygon list, for which we want to generate the statistics.
          */
-        WeightedCubicSplineList2DStatistics(const WeightedCubicSplineList2D* spl);
+        WeightedPolygonList2DStatistics(const WeightedPolygonList2D* pl);
 	
-        /**
-         * Returns basic statistics of the weights of all 2D cubic splines inside the list.
+         /**
+         * Returns basic statistics of the weights of all polygons inside the list.
          *
-         * \return Basic statistics of the weights of all 2D cubic splines inside the list.
+         * \return Basic statistics of the weights of all polygons inside the list.
          */
-        BasicStatistics<float> weightStats() const;
+         const BasicStatistics<float>& weightStats() const;
 	
     protected:
-        //The weighted 2D cubic spline list
-        const WeightedCubicSplineList2D* m_cubicsplines;
+        //The weighted polygon list
+        const WeightedPolygonList2D* m_polygons;
     
         //Weight statistics
         BasicStatistics<float> m_weights;
@@ -109,4 +108,4 @@ class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2DStatistics
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
+#endif //GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX

@@ -33,7 +33,7 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/cubicsplinelist.hxx"
+#include "features2d/cubicsplinelist.hxx"
 
 
 namespace graipe {

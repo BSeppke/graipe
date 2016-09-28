@@ -33,21 +33,92 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_H
-#define GRAIPE_FEATURES_H
+#include "features2d/cubicsplineliststatistics.hxx"
 
-#include "features/featurelist.hxx"
-#include "features/featureliststatistics.hxx"
-#include "features/featurelistviewcontroller.hxx"
+#include <vigra/numerictraits.hxx>
 
-#include "features/polygon.hxx"
-#include "features/polygonlist.hxx"
-#include "features/polygonliststatistics.hxx"
-#include "features/polygonlistviewcontroller.hxx"
+namespace graipe {
 
-#include "features/cubicspline.hxx"
-#include "features/cubicsplinelist.hxx"
-#include "features/cubicsplineliststatistics.hxx"
-#include "features/cubicsplinelistviewcontroller.hxx"
+/**
+ * Default constructor. Initializes the member with a NULL pointer.
+ */
+CubicSplineList2DStatistics::CubicSplineList2DStatistics()
+:   m_cubicsplines(NULL)
+{	
+}
+	
+/**
+ * A more useful constructor.
+ * 
+ * \param spl The spline list, for which we want to generate the statistics.
+ */
+CubicSplineList2DStatistics::CubicSplineList2DStatistics(const CubicSplineList2D* spl)
+:   m_cubicsplines(spl)
+{
 
-#endif //GRAIPE_FEATURES_H
+}
+
+
+
+
+/**
+ * Default constructor. Initializes the member with a NULL pointer and the
+ * weight statistics with default values.
+ */
+WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics()
+:   CubicSplineList2DStatistics()
+{
+    float min_val  = vigra::NumericTraits<float>::min();
+    float max_val  = vigra::NumericTraits<float>::max();
+    float zero_val = vigra::NumericTraits<float>::zero();
+    
+    m_weights.min    = max_val;
+    m_weights.max    = min_val;
+    m_weights.mean   = m_weights.stddev    =  zero_val;
+}
+
+/**
+ * A more useful constructor.
+ * 
+ * \param spl The weighted spline list, for which we want to generate the statistics.
+ */
+WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics(const WeightedCubicSplineList2D* spl)
+: CubicSplineList2DStatistics(spl)
+{
+    float min_val  = vigra::NumericTraits<float>::min();
+    float max_val  = vigra::NumericTraits<float>::max();
+    float zero_val = vigra::NumericTraits<float>::zero();
+    
+    m_weights.min    = max_val;
+    m_weights.max    = min_val;
+    m_weights.mean   = m_weights.stddev    =  zero_val;
+	
+	for (unsigned int i=0; i< spl->size(); ++i)
+	{
+		m_weights.min = std::min( spl->weight(i),m_weights.min);
+		m_weights.max = std::max( spl->weight(i),m_weights.max);
+		
+		
+		m_weights.mean += spl->weight(i);
+	}
+	
+	m_weights.mean /= spl->size();
+	
+	for (unsigned int i=0; i< spl->size(); ++i)
+	{
+		m_weights.stddev += pow(m_weights.mean - spl->weight(i),2.0f);
+	}	
+	m_weights.stddev = sqrt(m_weights.stddev/spl->size());
+}
+
+/**
+ * Returns basic statistics of the weights of all 2D cubic splines inside the list.
+ *
+ * \return Basic statistics of the weights of all 2D cubic splines inside the list.
+ */
+BasicStatistics<float> WeightedCubicSplineList2DStatistics::weightStats() const
+{
+	return m_weights;
+}
+    
+} //End of namespace graipe

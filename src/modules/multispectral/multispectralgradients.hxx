@@ -37,7 +37,7 @@
 #define GRAIPE_MULTISPECTRAL_MULTISPECTRALGRADIENTS_HXX
 
 //GRAIPE Feature and Image Types
-#include "features/features.h"
+#include "features2d/features2d.h"
 #include "images/images.h"
 
 //vigra components needed

@@ -35,7 +35,7 @@
 
 #include "images/images.h"
 #include "vectorfields/vectorfields.h"
-#include "features/features.h"
+#include "features2d/features2d.h"
 #include "core/core.h"
 
 #include "racerclient/racerconnection.hxx"

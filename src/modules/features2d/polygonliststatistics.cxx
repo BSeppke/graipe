@@ -33,79 +33,90 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/polygon.hxx"
+#include "features2d/polygonliststatistics.hxx"
+
+#include <vigra/numerictraits.hxx>
 
 namespace graipe {
-   
-/**
- * Virtual destructor of this class, needed due to non-final QVector class.
- */
-Polygon2D::~Polygon2D()
-{
-}
     
 /**
- * The typename of this Polygon2D class
- *
- * \return Always: "Polygon2D"
+ * Default constructor. Initializes the member with a NULL pointer.
  */
-QString Polygon2D::typeName() const
-{
-	return "Polygon2D";
+PolygonList2DStatistics::PolygonList2DStatistics()
+: m_polygons(NULL)
+{	
 }
 
 /**
- * Check if the polygon is closed.
- *
- * \return true if the polygon is closed (first == last point)
+ * A more useful constructor.
+ * 
+ * \param pl The polygon list, for which we want to generate the statistics.
  */
-bool Polygon2D::isClosed() const
+PolygonList2DStatistics::PolygonList2DStatistics(const PolygonList2D* pl)
+			: m_polygons(pl)
 {
-	return (front() == back());
+}
+
+
+
+
+/**
+ * Default constructor. Initializes the member with a NULL pointer.
+ */
+WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics()
+: PolygonList2DStatistics()
+{
+    float min_val  = vigra::NumericTraits<float>::min();
+    float max_val  = vigra::NumericTraits<float>::max();
+    float zero_val = vigra::NumericTraits<float>::zero();
+    
+    m_weights.min    = max_val;
+    m_weights.max    = min_val;
+    m_weights.mean   = m_weights.stddev    =  zero_val;
 }
 
 /**
- * Check if a point lies inside the polygon.
- *
- * \param p The point to be checked if inside this polygon.
- * \return true if the given point is inside the polygon and the
- *         polygon is closed.
+ * A more useful constructor.
+ * 
+ * \param pl The polygon list, for which we want to generate the statistics.
  */
-bool Polygon2D::isInside(const PointType& p) const
+WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics(const WeightedPolygonList2D* pl)
+: PolygonList2DStatistics(pl)
 {
-    return contains(p);
+    float min_val  = vigra::NumericTraits<float>::min();
+    float max_val  = vigra::NumericTraits<float>::max();
+    float zero_val = vigra::NumericTraits<float>::zero();
+    
+    m_weights.min    = max_val;
+    m_weights.max    = min_val;
+    m_weights.mean   = m_weights.stddev    =  zero_val;
+	
+	for (unsigned int i=0; i<pl->size(); ++i)
+	{
+		m_weights.min = std::min( pl->weight(i),m_weights.min);
+		m_weights.max = std::max( pl->weight(i),m_weights.max);
+		
+		
+		m_weights.mean += pl->weight(i);
+	}
+	
+	m_weights.mean /= pl->size();
+	
+	for (unsigned int i=0; i<pl->size(); ++i)
+	{
+		m_weights.stddev += pow(m_weights.mean - pl->weight(i),2.0f);
+	}	
+	m_weights.stddev = sqrt(m_weights.stddev/pl->size());
 }
 
 /**
- * The area included by the polygon.
+ * Returns basic statistics of the weights of all polygons inside the list.
  *
- * \return 0, if the polygon is not closed, else the area.
+ * \return Basic statistics of the weights of all polygons inside the list.
  */
-float Polygon2D::area() const
+const BasicStatistics<float>& WeightedPolygonList2DStatistics::weightStats() const
 {
-    double area=0.0;
-    unsigned int i, j=size()-1;
-    
-    if(!isClosed())
-        return 0;
-    
-    for (i=0; i<(unsigned int)size(); i++)
-    {
-        area+=(at(j).x() + at(i).x())*(at(j).y()-at(i).y());
-        j=i;
-    }
-    
-    return area*.5;
-}
-
-/**
- * Add a point to the polygon
- *
- * \param p The point to be added to this polygon.
- */
-void Polygon2D::addPoint(const PointType& new_p)
-{
-	*this << new_p;
+	return m_weights;
 }
     
 } //End of namespace graipe

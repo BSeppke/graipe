@@ -38,8 +38,8 @@
 
 #include "core/basicstatistics.hxx"
 
-#include "features/featurelist.hxx"
-#include "features/config.hxx"
+#include "features2d/featurelist.hxx"
+#include "features2d/config.hxx"
 
 namespace graipe {
 

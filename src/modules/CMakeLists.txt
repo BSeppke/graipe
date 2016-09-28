@@ -5,7 +5,7 @@ project(graipe)
 include(../../config/common.cmake)
 
 #First the model/types
-add_subdirectory(features)
+add_subdirectory(features2d)
 add_subdirectory(images)
 add_subdirectory(vectorfields)
 

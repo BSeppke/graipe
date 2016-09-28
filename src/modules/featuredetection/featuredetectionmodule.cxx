@@ -35,7 +35,7 @@
 
 #include "core/core.h"
 #include "images/images.h"
-#include "features/features.h"
+#include "features2d/features2d.h"
 #include "featuredetection/featuredetection.h"
 
 #include "vigra/convolution.hxx"

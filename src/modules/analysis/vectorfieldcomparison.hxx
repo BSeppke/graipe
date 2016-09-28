@@ -37,7 +37,7 @@
 #define GRAIPE_ANALYSIS_VECTORFIELDCOMPARISON_HXX
 
 #include "vectorfields/vectorfields.h"
-#include "features/features.h"
+#include "features2d/features2d.h"
 
 #include <vigra/splineimageview.hxx>
 

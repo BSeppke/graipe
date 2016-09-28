@@ -33,90 +33,21 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/polygonliststatistics.hxx"
+#ifndef GRAIPE_FEATURES_H
+#define GRAIPE_FEATURES_H
 
-#include <vigra/numerictraits.hxx>
+#include "features2d/featurelist.hxx"
+#include "features2d/featureliststatistics.hxx"
+#include "features2d/featurelistviewcontroller.hxx"
 
-namespace graipe {
-    
-/**
- * Default constructor. Initializes the member with a NULL pointer.
- */
-PolygonList2DStatistics::PolygonList2DStatistics()
-: m_polygons(NULL)
-{	
-}
+#include "features2d/polygon.hxx"
+#include "features2d/polygonlist.hxx"
+#include "features2d/polygonliststatistics.hxx"
+#include "features2d/polygonlistviewcontroller.hxx"
 
-/**
- * A more useful constructor.
- * 
- * \param pl The polygon list, for which we want to generate the statistics.
- */
-PolygonList2DStatistics::PolygonList2DStatistics(const PolygonList2D* pl)
-			: m_polygons(pl)
-{
-}
+#include "features2d/cubicspline.hxx"
+#include "features2d/cubicsplinelist.hxx"
+#include "features2d/cubicsplineliststatistics.hxx"
+#include "features2d/cubicsplinelistviewcontroller.hxx"
 
-
-
-
-/**
- * Default constructor. Initializes the member with a NULL pointer.
- */
-WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics()
-: PolygonList2DStatistics()
-{
-    float min_val  = vigra::NumericTraits<float>::min();
-    float max_val  = vigra::NumericTraits<float>::max();
-    float zero_val = vigra::NumericTraits<float>::zero();
-    
-    m_weights.min    = max_val;
-    m_weights.max    = min_val;
-    m_weights.mean   = m_weights.stddev    =  zero_val;
-}
-
-/**
- * A more useful constructor.
- * 
- * \param pl The polygon list, for which we want to generate the statistics.
- */
-WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics(const WeightedPolygonList2D* pl)
-: PolygonList2DStatistics(pl)
-{
-    float min_val  = vigra::NumericTraits<float>::min();
-    float max_val  = vigra::NumericTraits<float>::max();
-    float zero_val = vigra::NumericTraits<float>::zero();
-    
-    m_weights.min    = max_val;
-    m_weights.max    = min_val;
-    m_weights.mean   = m_weights.stddev    =  zero_val;
-	
-	for (unsigned int i=0; i<pl->size(); ++i)
-	{
-		m_weights.min = std::min( pl->weight(i),m_weights.min);
-		m_weights.max = std::max( pl->weight(i),m_weights.max);
-		
-		
-		m_weights.mean += pl->weight(i);
-	}
-	
-	m_weights.mean /= pl->size();
-	
-	for (unsigned int i=0; i<pl->size(); ++i)
-	{
-		m_weights.stddev += pow(m_weights.mean - pl->weight(i),2.0f);
-	}	
-	m_weights.stddev = sqrt(m_weights.stddev/pl->size());
-}
-
-/**
- * Returns basic statistics of the weights of all polygons inside the list.
- *
- * \return Basic statistics of the weights of all polygons inside the list.
- */
-const BasicStatistics<float>& WeightedPolygonList2DStatistics::weightStats() const
-{
-	return m_weights;
-}
-    
-} //End of namespace graipe
+#endif //GRAIPE_FEATURES_H

@@ -33,92 +33,79 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/cubicsplineliststatistics.hxx"
-
-#include <vigra/numerictraits.hxx>
+#include "features2d/polygon.hxx"
 
 namespace graipe {
-
+   
 /**
- * Default constructor. Initializes the member with a NULL pointer.
+ * Virtual destructor of this class, needed due to non-final QVector class.
  */
-CubicSplineList2DStatistics::CubicSplineList2DStatistics()
-:   m_cubicsplines(NULL)
-{	
-}
-	
-/**
- * A more useful constructor.
- * 
- * \param spl The spline list, for which we want to generate the statistics.
- */
-CubicSplineList2DStatistics::CubicSplineList2DStatistics(const CubicSplineList2D* spl)
-:   m_cubicsplines(spl)
+Polygon2D::~Polygon2D()
 {
-
 }
-
-
-
-
-/**
- * Default constructor. Initializes the member with a NULL pointer and the
- * weight statistics with default values.
- */
-WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics()
-:   CubicSplineList2DStatistics()
-{
-    float min_val  = vigra::NumericTraits<float>::min();
-    float max_val  = vigra::NumericTraits<float>::max();
-    float zero_val = vigra::NumericTraits<float>::zero();
     
-    m_weights.min    = max_val;
-    m_weights.max    = min_val;
-    m_weights.mean   = m_weights.stddev    =  zero_val;
-}
-
 /**
- * A more useful constructor.
- * 
- * \param spl The weighted spline list, for which we want to generate the statistics.
- */
-WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics(const WeightedCubicSplineList2D* spl)
-: CubicSplineList2DStatistics(spl)
-{
-    float min_val  = vigra::NumericTraits<float>::min();
-    float max_val  = vigra::NumericTraits<float>::max();
-    float zero_val = vigra::NumericTraits<float>::zero();
-    
-    m_weights.min    = max_val;
-    m_weights.max    = min_val;
-    m_weights.mean   = m_weights.stddev    =  zero_val;
-	
-	for (unsigned int i=0; i< spl->size(); ++i)
-	{
-		m_weights.min = std::min( spl->weight(i),m_weights.min);
-		m_weights.max = std::max( spl->weight(i),m_weights.max);
-		
-		
-		m_weights.mean += spl->weight(i);
-	}
-	
-	m_weights.mean /= spl->size();
-	
-	for (unsigned int i=0; i< spl->size(); ++i)
-	{
-		m_weights.stddev += pow(m_weights.mean - spl->weight(i),2.0f);
-	}	
-	m_weights.stddev = sqrt(m_weights.stddev/spl->size());
-}
-
-/**
- * Returns basic statistics of the weights of all 2D cubic splines inside the list.
+ * The typename of this Polygon2D class
  *
- * \return Basic statistics of the weights of all 2D cubic splines inside the list.
+ * \return Always: "Polygon2D"
  */
-BasicStatistics<float> WeightedCubicSplineList2DStatistics::weightStats() const
+QString Polygon2D::typeName() const
 {
-	return m_weights;
+	return "Polygon2D";
+}
+
+/**
+ * Check if the polygon is closed.
+ *
+ * \return true if the polygon is closed (first == last point)
+ */
+bool Polygon2D::isClosed() const
+{
+	return (front() == back());
+}
+
+/**
+ * Check if a point lies inside the polygon.
+ *
+ * \param p The point to be checked if inside this polygon.
+ * \return true if the given point is inside the polygon and the
+ *         polygon is closed.
+ */
+bool Polygon2D::isInside(const PointType& p) const
+{
+    return contains(p);
+}
+
+/**
+ * The area included by the polygon.
+ *
+ * \return 0, if the polygon is not closed, else the area.
+ */
+float Polygon2D::area() const
+{
+    double area=0.0;
+    unsigned int i, j=size()-1;
+    
+    if(!isClosed())
+        return 0;
+    
+    for (i=0; i<(unsigned int)size(); i++)
+    {
+        area+=(at(j).x() + at(i).x())*(at(j).y()-at(i).y());
+        j=i;
+    }
+    
+    return area*.5;
+}
+
+/**
+ * Add a point to the polygon
+ *
+ * \param p The point to be added to this polygon.
+ */
+void Polygon2D::addPoint(const PointType& new_p)
+{
+	*this << new_p;
 }
     
 } //End of namespace graipe

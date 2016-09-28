@@ -36,7 +36,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include "features/featurelistviewcontroller.hxx"
+#include "features2d/featurelistviewcontroller.hxx"
 
 
 #include <QMessageBox>

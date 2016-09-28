@@ -37,8 +37,8 @@
 #define GRAIPE_FEATURES_CUBICSPLINELIST_HXX
 
 #include "core/model.hxx"
-#include "features/cubicspline.hxx"
-#include "features/config.hxx"
+#include "features2d/cubicspline.hxx"
+#include "features2d/config.hxx"
 
 #include <QVector>
 

@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "images/images.h"
-#include "features/features.h"
+#include "features2d/features2d.h"
 
 #include "featurematching/featurematching.h"
 

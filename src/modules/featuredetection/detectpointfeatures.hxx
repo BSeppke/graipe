@@ -44,7 +44,7 @@
 #include <vigra/multi_localminmax.hxx>
 
 //GRAIPE Feature Types
-#include "features/features.h"
+#include "features2d/features2d.h"
 
 #include <cmath>
 #include <math.h>

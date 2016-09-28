@@ -33,7 +33,7 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/featurelist.hxx"
+#include "features2d/featurelist.hxx"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

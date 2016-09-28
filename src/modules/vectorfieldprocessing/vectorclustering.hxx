@@ -43,7 +43,7 @@
 #include <vigra/tinyvector.hxx>
 
 #include "vectorfields/vectorfields.h"
-#include "features/features.h"
+#include "features2d/features2d.h"
 
 namespace graipe {
     

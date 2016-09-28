@@ -39,9 +39,9 @@
 #include "core/viewcontroller.hxx"
 #include "core/qt_ext/qlegend.hxx"
 
-#include "features/polygonlist.hxx"
-#include "features/polygonliststatistics.hxx"
-#include "features/config.hxx"
+#include "features2d/polygonlist.hxx"
+#include "features2d/polygonliststatistics.hxx"
+#include "features2d/config.hxx"
 
 namespace graipe {
     

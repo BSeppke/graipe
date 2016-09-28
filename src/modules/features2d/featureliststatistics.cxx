@@ -33,7 +33,7 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "features/featureliststatistics.hxx"
+#include "features2d/featureliststatistics.hxx"
 
 #include <vigra/numerictraits.hxx>
 

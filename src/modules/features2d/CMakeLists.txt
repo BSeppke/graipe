@@ -11,7 +11,7 @@ set(SOURCES
 	featurelist.cxx
 	featureliststatistics.cxx
 	featurelistviewcontroller.cxx
-	featuresmodule.cxx
+	features2dmodule.cxx
 	polygon.cxx
 	polygonlist.cxx
 	polygonliststatistics.cxx
@@ -31,7 +31,7 @@ set(HEADERS
 	polygonlist.hxx
 	polygonliststatistics.hxx
 	polygonlistviewcontroller.hxx
-    features.h)
+    features2d.h)
 
 add_definitions(-DGRAIPE_FEATURES_BUILD)
 

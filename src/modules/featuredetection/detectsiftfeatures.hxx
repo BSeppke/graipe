@@ -42,7 +42,7 @@
 #include "vigra/convolution.hxx"
 
 //GRAIPE Feature Types
-#include "features/features.h"
+#include "features2d/features2d.h"
 
 #include "featuredetection/sift.hxx"
 

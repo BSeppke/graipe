@@ -42,7 +42,7 @@
 #include <vigra/affinegeometry.hxx>
 
 //GRAIPE components needed
-#include "features/features.h"
+#include "features2d/features2d.h"
 #include "vectorfields/vectorfields.h"
 #include "registration/registration.h"
 
