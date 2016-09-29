@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_POLYGONLISTVIEWCONTROLLER_HXX
-#define GRAIPE_FEATURES_POLYGONLISTVIEWCONTROLLER_HXX
+#ifndef GRAIPE_FEATURES2D_POLYGONLISTVIEWCONTROLLER_HXX
+#define GRAIPE_FEATURES2D_POLYGONLISTVIEWCONTROLLER_HXX
 
 #include "core/viewcontroller.hxx"
 #include "core/qt_ext/qlegend.hxx"
@@ -50,7 +50,7 @@ namespace graipe {
  * A class for viewing a 2D polygon list on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
-class GRAIPE_FEATURES_EXPORT PolygonList2DViewController
+class GRAIPE_FEATURES2D_EXPORT PolygonList2DViewController
 :	public ViewController
 {
     public:
@@ -121,7 +121,7 @@ class GRAIPE_FEATURES_EXPORT PolygonList2DViewController
  * A class for viewing a 2D weighted polygon list on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
-class GRAIPE_FEATURES_EXPORT WeightedPolygonList2DViewController
+class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
 :	public ViewController
 {
         
@@ -207,4 +207,4 @@ class GRAIPE_FEATURES_EXPORT WeightedPolygonList2DViewController
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_POLYGONLISTVIEW_HXX
+#endif //GRAIPE_FEATURES2D_POLYGONLISTVIEW_HXX

@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_POLYGONLIST_HXX
-#define GRAIPE_FEATURES_POLYGONLIST_HXX
+#ifndef GRAIPE_FEATURES2D_POLYGONLIST_HXX
+#define GRAIPE_FEATURES2D_POLYGONLIST_HXX
 
 #include "core/model.hxx"
 #include "features2d/polygon.hxx"
@@ -48,7 +48,7 @@ namespace graipe {
  * This class represents a list of polygons. It conformes to a
  * graipe::Model and may thus be widely used.
  */
-class GRAIPE_FEATURES_EXPORT PolygonList2D 
+class GRAIPE_FEATURES2D_EXPORT PolygonList2D 
 :	public Model
 {
 	public:
@@ -167,7 +167,7 @@ class GRAIPE_FEATURES_EXPORT PolygonList2D
  * For each polygon, it keeps an additional weight, which may indicate
  * a fitting error or anything else.
  */
-class GRAIPE_FEATURES_EXPORT WeightedPolygonList2D 
+class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D 
 :	public PolygonList2D
 {
     public:
@@ -278,4 +278,4 @@ class GRAIPE_FEATURES_EXPORT WeightedPolygonList2D
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_POLYGONLIST_HXX
+#endif //GRAIPE_FEATURES2D_POLYGONLIST_HXX

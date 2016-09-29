@@ -33,13 +33,11 @@ set(HEADERS
 	polygonlistviewcontroller.hxx
     features2d.h)
 
-add_definitions(-DGRAIPE_FEATURES_BUILD)
+add_definitions(-DGRAIPE_FEATURES2D_BUILD)
 
 # Tell CMake to create the library
-add_library(graipe_features SHARED ${SOURCES} ${HEADERS})
-set_target_properties(graipe_features PROPERTIES VERSION ${GRAIPE_VERSION} SOVERSION ${GRAIPE_SOVERSION})
+add_library(graipe_features2d SHARED ${SOURCES} ${HEADERS})
+set_target_properties(graipe_features2d PROPERTIES VERSION ${GRAIPE_VERSION} SOVERSION ${GRAIPE_SOVERSION})
 
 # Link library to other libs
-#
-#target_link_libraries(graipe_features graipe_core Qt5::Widgets)
-target_link_libraries(graipe_features graipe_core Qt5::Widgets)
+target_link_libraries(graipe_features2d graipe_core Qt5::Widgets)

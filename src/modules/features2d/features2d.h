@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_H
-#define GRAIPE_FEATURES_H
+#ifndef GRAIPE_FEATURES2D_H
+#define GRAIPE_FEATURES2D_H
 
 #include "features2d/featurelist.hxx"
 #include "features2d/featureliststatistics.hxx"
@@ -50,4 +50,4 @@
 #include "features2d/cubicsplineliststatistics.hxx"
 #include "features2d/cubicsplinelistviewcontroller.hxx"
 
-#endif //GRAIPE_FEATURES_H
+#endif //GRAIPE_FEATURES2D_H

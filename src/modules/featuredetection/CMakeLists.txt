@@ -19,4 +19,4 @@ set_target_properties(graipe_featuredetection PROPERTIES VERSION ${GRAIPE_VERSIO
 
 # Link library to other libs
 
-target_link_libraries(graipe_featuredetection graipe_core graipe_features graipe_images Qt5::Widgets)
+target_link_libraries(graipe_featuredetection graipe_core graipe_features2d graipe_images Qt5::Widgets)

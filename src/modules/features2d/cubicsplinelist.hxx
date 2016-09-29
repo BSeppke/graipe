@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_CUBICSPLINELIST_HXX
-#define GRAIPE_FEATURES_CUBICSPLINELIST_HXX
+#ifndef GRAIPE_FEATURES2D_CUBICSPLINELIST_HXX
+#define GRAIPE_FEATURES2D_CUBICSPLINELIST_HXX
 
 #include "core/model.hxx"
 #include "features2d/cubicspline.hxx"
@@ -48,7 +48,7 @@ namespace graipe {
  * This class represents a list of 2D cubic splines. It conformes to a
  * graipe::Model and may thus be widely used.
  */
-class GRAIPE_FEATURES_EXPORT CubicSplineList2D 
+class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D 
 :	public Model
 {
 	
@@ -169,7 +169,7 @@ class GRAIPE_FEATURES_EXPORT CubicSplineList2D
  * For each 2D cubic spline, it keeps an additional weight, which may indicate
  * a fitting error or anything else.
  */
-class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2D 
+class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D 
 :	public CubicSplineList2D
 {
     public:
@@ -281,4 +281,4 @@ class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2D
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_CUBICSPLINELIST_HXX
+#endif //GRAIPE_FEATURES2D_CUBICSPLINELIST_HXX

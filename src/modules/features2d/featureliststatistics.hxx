@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_FEATURELISTSTATISTICS_HXX
-#define GRAIPE_FEATURES_FEATURELISTSTATISTICS_HXX
+#ifndef GRAIPE_FEATURES2D_FEATURELISTSTATISTICS_HXX
+#define GRAIPE_FEATURES2D_FEATURELISTSTATISTICS_HXX
 
 #include "core/basicstatistics.hxx"
 
@@ -47,7 +47,7 @@ namespace graipe {
  * Statistics mother class for 2D feature lists.
  * It keeps the basic statistics over all features in the lists.
  */
-class GRAIPE_FEATURES_EXPORT PointFeatureList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DStatistics
 {
     public:
         /**
@@ -82,7 +82,7 @@ class GRAIPE_FEATURES_EXPORT PointFeatureList2DStatistics
  * This class extends the basic point feature statistics by
  * a statistics of the weights for weighted feature lists
  */
-class GRAIPE_FEATURES_EXPORT WeightedPointFeatureList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DStatistics
 	: public PointFeatureList2DStatistics
 {
     public:
@@ -120,7 +120,7 @@ class GRAIPE_FEATURES_EXPORT WeightedPointFeatureList2DStatistics
  * This class extends the weighted feature statistics by
  * a statistics of the orientation for edgel feature lists
  */
-class GRAIPE_FEATURES_EXPORT EdgelFeatureList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DStatistics
 	: public WeightedPointFeatureList2DStatistics
 {
     public:
@@ -159,7 +159,7 @@ class GRAIPE_FEATURES_EXPORT EdgelFeatureList2DStatistics
  * This class extends the edgel feature statistics by
  * a statistics of the scales for SIFT feature lists
  */
-class GRAIPE_FEATURES_EXPORT SIFTFeatureList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DStatistics
 	: public EdgelFeatureList2DStatistics
 {
     public:
@@ -194,4 +194,4 @@ class GRAIPE_FEATURES_EXPORT SIFTFeatureList2DStatistics
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_FEATURELISTSTATISTICS_HXX
+#endif //GRAIPE_FEATURES2D_FEATURELISTSTATISTICS_HXX

@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_POLYGON_HXX
-#define GRAIPE_FEATURES_POLYGON_HXX
+#ifndef GRAIPE_FEATURES2D_POLYGON_HXX
+#define GRAIPE_FEATURES2D_POLYGON_HXX
 
 #include "features2d/featurelist.hxx"
 #include "features2d/config.hxx"
@@ -45,7 +45,7 @@ namespace graipe {
  * Extension of the QPolygonF class with respect to 
  * some additional features and measures
  */
-class GRAIPE_FEATURES_EXPORT Polygon2D
+class GRAIPE_FEATURES2D_EXPORT Polygon2D
 :   public QPolygonF
 {
 	public:
@@ -97,4 +97,4 @@ class GRAIPE_FEATURES_EXPORT Polygon2D
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_POLYGON_HXX
+#endif //GRAIPE_FEATURES2D_POLYGON_HXX

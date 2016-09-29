@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_FEATURELIST_HXX
-#define GRAIPE_FEATURES_FEATURELIST_HXX
+#ifndef GRAIPE_FEATURES2D_FEATURELIST_HXX
+#define GRAIPE_FEATURES2D_FEATURELIST_HXX
 
 #include "core/model.hxx"
 #include "core/qt_ext/qpointfx.hxx"
@@ -49,7 +49,7 @@ namespace graipe {
  * Base class for collections for the different feature types.
  * This class provides the storage of an x,y tuple for each feature.
  */
-class GRAIPE_FEATURES_EXPORT PointFeatureList2D 
+class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D 
 :	public Model
 {
 	public:
@@ -175,7 +175,7 @@ class GRAIPE_FEATURES_EXPORT PointFeatureList2D
  * This class provides the storage of an assigned weight for each
  * point feature.
  */
-class GRAIPE_FEATURES_EXPORT WeightedPointFeatureList2D 
+class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D 
 :	public PointFeatureList2D
 {
 	
@@ -282,7 +282,7 @@ class GRAIPE_FEATURES_EXPORT WeightedPointFeatureList2D
  * This class provides the storage of an assigned orientation for each
  * weighted point feature.
  */
-class GRAIPE_FEATURES_EXPORT EdgelFeatureList2D 
+class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D 
 :	public WeightedPointFeatureList2D
 {
 		
@@ -414,7 +414,7 @@ class GRAIPE_FEATURES_EXPORT EdgelFeatureList2D
  * This class provides the storage of a scale and an assigned feature
  * descriptor for each edgel feature.
  */
-class GRAIPE_FEATURES_EXPORT SIFTFeatureList2D 
+class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D 
 :	public EdgelFeatureList2D
 {
 	public:
@@ -569,4 +569,4 @@ class GRAIPE_FEATURES_EXPORT SIFTFeatureList2D
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_FEATURELIST_HXX
+#endif //GRAIPE_FEATURES2D_FEATURELIST_HXX

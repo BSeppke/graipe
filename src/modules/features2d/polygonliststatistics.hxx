@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
-#define GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
+#ifndef GRAIPE_FEATURES2D_POLYGONLISTSTATISTICS_HXX
+#define GRAIPE_FEATURES2D_POLYGONLISTSTATISTICS_HXX
 
 #include "core/basicstatistics.hxx"
 
@@ -48,7 +48,7 @@ namespace graipe {
  * Note, that the bounding box of each polygon is kept directly by
  * means of each polygon - so we need not statistics in this case.
  */
-class GRAIPE_FEATURES_EXPORT PolygonList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT PolygonList2DStatistics
 {
     public:
         /**
@@ -75,7 +75,7 @@ class GRAIPE_FEATURES_EXPORT PolygonList2DStatistics
  * This class extends the empty mother class for weighted polygon lists.
  * It represents the weight statistics of all polygons inside the list.
  */
-class GRAIPE_FEATURES_EXPORT WeightedPolygonList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DStatistics
 	: public PolygonList2DStatistics
 {
     public:
@@ -108,4 +108,4 @@ class GRAIPE_FEATURES_EXPORT WeightedPolygonList2DStatistics
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_POLYGONLISTSTATISTICS_HXX
+#endif //GRAIPE_FEATURES2D_POLYGONLISTSTATISTICS_HXX

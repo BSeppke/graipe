@@ -33,19 +33,19 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_CONFIG_HXX
-#define GRAIPE_FEATURES_CONFIG_HXX
+#ifndef GRAIPE_FEATURES2D_CONFIG_HXX
+#define GRAIPE_FEATURES2D_CONFIG_HXX
 
 #include <QtCore/QtGlobal>
 
-#ifdef GRAIPE_FEATURES_BUILD
+#ifdef GRAIPE_FEATURES2D_BUILD
 	#if (defined(QT_DLL) || defined(QT_SHARED)) && !defined(QT_PLUGIN)
-		#define GRAIPE_FEATURES_EXPORT Q_DECL_EXPORT
+		#define GRAIPE_FEATURES2D_EXPORT Q_DECL_EXPORT
 	#else
-		#define GRAIPE_FEATURES_EXPORT
+		#define GRAIPE_FEATURES2D_EXPORT
 	#endif
 #else
-	#define GRAIPE_FEATURES_EXPORT Q_DECL_IMPORT
+	#define GRAIPE_FEATURES2D_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif //GRAIPE_FEATURES_CONFIG_HXX
+#endif //GRAIPE_FEATURES2D_CONFIG_HXX

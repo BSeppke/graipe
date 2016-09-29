@@ -170,11 +170,11 @@ class FeaturesModule
         /**
          * Returns the name of this Module.
          * 
-         * \return Always: "FeaturesModule"
+         * \return Always: "Features2DModule"
          */
 		QString name() const
         {
-            return "FeaturesModule";
+            return "Features2DModule";
         }
 	
     private:

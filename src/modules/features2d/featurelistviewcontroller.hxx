@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_FEATURELISTVIEWCONTROLLER_HXX
-#define GRAIPE_FEATURES_FEATURELISTVIEWCONTROLLER_HXX
+#ifndef GRAIPE_FEATURES2D_FEATURELISTVIEWCONTROLLER_HXX
+#define GRAIPE_FEATURES2D_FEATURELISTVIEWCONTROLLER_HXX
 
 #include "core/viewcontroller.hxx"
 #include "core/qt_ext/qlegend.hxx"
@@ -49,7 +49,7 @@ namespace graipe {
  * A class for viewing a 2D point feature list on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
-class GRAIPE_FEATURES_EXPORT PointFeatureList2DViewController
+class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
 :	public ViewController
 {
     public:
@@ -123,7 +123,7 @@ class GRAIPE_FEATURES_EXPORT PointFeatureList2DViewController
  * A class for viewing a 2D weighted feature list on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
-class GRAIPE_FEATURES_EXPORT WeightedPointFeatureList2DViewController
+class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
 :	public ViewController
 {
 	public:
@@ -221,7 +221,7 @@ class GRAIPE_FEATURES_EXPORT WeightedPointFeatureList2DViewController
  * A class for viewing a 2D edgel feature list on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
-class GRAIPE_FEATURES_EXPORT EdgelFeatureList2DViewController 
+class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController 
 :	public WeightedPointFeatureList2DViewController
 {
 	public:
@@ -281,7 +281,7 @@ class GRAIPE_FEATURES_EXPORT EdgelFeatureList2DViewController
  * A class for viewing a 2D SIFT feature list on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
-class GRAIPE_FEATURES_EXPORT SIFTFeatureList2DViewController 
+class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController 
 :	public EdgelFeatureList2DViewController
 {
 	public:
@@ -332,4 +332,4 @@ class GRAIPE_FEATURES_EXPORT SIFTFeatureList2DViewController
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_FEATURELISTVIEWCONTROLLER_HXX
+#endif //GRAIPE_FEATURES2D_FEATURELISTVIEWCONTROLLER_HXX

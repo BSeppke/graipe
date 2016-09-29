@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_CUBICSPLINE_HXX
-#define GRAIPE_FEATURES_CUBICSPLINE_HXX
+#ifndef GRAIPE_FEATURES2D_CUBICSPLINE_HXX
+#define GRAIPE_FEATURES2D_CUBICSPLINE_HXX
 
 #include "features2d/config.hxx"
 #include "features2d/featurelist.hxx"
@@ -45,7 +45,7 @@ namespace graipe {
  * This class represents a CubicSpline by means of a 1D interpolation
  * function over an arbitrary number of supporting (x,y)-values.
  */
-class GRAIPE_FEATURES_EXPORT CubicSpline1D
+class GRAIPE_FEATURES2D_EXPORT CubicSpline1D
 {
     public:
         //Internally used types
@@ -178,7 +178,7 @@ class GRAIPE_FEATURES_EXPORT CubicSpline1D
  * In addition, the first and last (first order) deriviatives become points containing
  * their partial derivatives in x- and y-direction.
  */
-class GRAIPE_FEATURES_EXPORT CubicSpline2D
+class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
 {
     public:
         //Internally used types
@@ -339,4 +339,4 @@ class GRAIPE_FEATURES_EXPORT CubicSpline2D
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_CUBICSPLINE_HXX
+#endif //GRAIPE_FEATURES2D_CUBICSPLINE_HXX

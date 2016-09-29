@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
-#define GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
+#ifndef GRAIPE_FEATURES2D_CUBICSPLINELISTSTATISTICS_HXX
+#define GRAIPE_FEATURES2D_CUBICSPLINELISTSTATISTICS_HXX
 
 #include "core/basicstatistics.hxx"
 
@@ -48,7 +48,7 @@ namespace graipe {
  * Note, that the bounding box of each spline is kept directly by
  * means of each spline - so we need not statistics in this case.
  */
-class GRAIPE_FEATURES_EXPORT CubicSplineList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT CubicSplineList2DStatistics
 {
     public:
         /**
@@ -75,7 +75,7 @@ class GRAIPE_FEATURES_EXPORT CubicSplineList2DStatistics
  * This class extends the empty mother class for weighted 2D cubic spline lists.
  * It represents the weight statistics of all splines inside the list.
  */
-class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2DStatistics
+class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DStatistics
 :   public CubicSplineList2DStatistics
 {
     public:
@@ -109,4 +109,4 @@ class GRAIPE_FEATURES_EXPORT WeightedCubicSplineList2DStatistics
     
 } //end of namespace graipe
 
-#endif //GRAIPE_FEATURES_CUBICSPLINELISTSTATISTICS_HXX
+#endif //GRAIPE_FEATURES2D_CUBICSPLINELISTSTATISTICS_HXX
