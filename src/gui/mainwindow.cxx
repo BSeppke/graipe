@@ -971,7 +971,7 @@ void MainWindow::saveWorkspace(const QString& dirname)
                         throw std::runtime_error("Model could not be saved to filesystem");
                     }
                     settings.setValue(QString("Model%1/name").arg(j), model->name());
-                    settings.setValue(QString("Model%1/filename").arg(j), dir.filePath(suggested_filename));
+                    settings.setValue(QString("Model%1/filename").arg(j), suggested_filename);
                     settings.setValue(QString("Model%1/current").arg(j),   model == currentModel());
                     j++;
                 }
@@ -998,7 +998,7 @@ void MainWindow::saveWorkspace(const QString& dirname)
                         throw std::runtime_error("ViewController could not be saved to filesystem");
                     }
                     settings.setValue(QString("ViewController%1/name").arg(j), viewController->name());
-                    settings.setValue(QString("ViewController%1/filename").arg(j), dir.filePath(suggested_filename));
+                    settings.setValue(QString("ViewController%1/filename").arg(j), suggested_filename);
                     settings.setValue(QString("ViewController%1/current").arg(j),  viewController == currentViewController());
                     settings.setValue(QString("ViewController%1/active").arg(j),   vc_item->checkState() == Qt::CheckState::Checked);
                     j++;
@@ -1095,7 +1095,7 @@ void MainWindow::restoreWorkspace(const QString& dirname)
         {
             QString model_filename = settings.value(QString("Model%1/filename").arg(i)).toString();
             bool current = settings.value(QString("Model%1/current").arg(i)).toBool();
-            loadModel(model_filename);
+            loadModel(dir.filePath(model_filename));
             
             if(current)
             {
@@ -1112,7 +1112,7 @@ void MainWindow::restoreWorkspace(const QString& dirname)
             QString vc_filename = settings.value(QString("ViewController%1/filename").arg(i)).toString();
             bool current = settings.value(QString("ViewController%1/current").arg(i)).toBool();
             bool active = settings.value(QString("ViewController%1/active").arg(i)).toBool();
-            loadViewController(vc_filename);
+            loadViewController(dir.filePath(vc_filename));
             
             if(current)
             {
