@@ -53,6 +53,7 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
 :	m_model(model),
     m_name(new StringParameter("Name", "")),
     m_description(new LongStringParameter("Description:", "ViewController of model", 20, 6, NULL)),
+    m_model_filename(new LongStringParameter("Model filename:", model->filename(), 20, 2, NULL)),
     m_showAxis(new BoolParameter("Show axis?")),
     m_axisLineWidth(new FloatParameter("Line width:", 0,100,1,m_showAxis)),
     m_axisLineColor(new ColorParameter("Line color:", Qt::black, m_showAxis)),
@@ -76,6 +77,10 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
     //Add the parameters to this view
     m_parameters->addParameter("name",m_name);
     m_parameters->addParameter("description",m_description);
+    
+    m_model_filename->hide(true);
+    m_parameters->addParameter("modelFilename",m_model_filename);
+    
     m_parameters->addParameter("showAx",m_showAxis);
     m_parameters->addParameter("axLineWidth", m_axisLineWidth);
     m_parameters->addParameter("axLineColor", m_axisLineColor);
@@ -383,6 +388,10 @@ void ViewController::updateView()
  */
 void ViewController::updateParameters(bool /*force_update*/)
 {
+    if(m_model)
+    {
+       m_model_filename->setValue(m_model->filename());
+    }
 }
 
 /**
@@ -415,7 +424,7 @@ QString ViewController::magicID() const
  */
 void ViewController::serialize(QIODevice& out) const
 {
-    write_on_device(magicID() + "\nmodel: "+ m_model->filename() + "\n", out);
+	write_on_device(magicID() + "\n", out);
     m_parameters->serialize(out);
 }
 
@@ -429,16 +438,14 @@ void ViewController::serialize(QIODevice& out) const
  */
 bool ViewController::deserialize(QIODevice& in)
 {
-    
     QString firstLine(in.readLine());
+    
     if(firstLine.trimmed() == magicID())
     {
-        //Models filename - we can ignore it here.
-        QString secondLine(in.readLine());
-        
         //Deserialize parameters beginning from the third line on...
         return m_parameters->deserialize(in);
     }
+    
     return false;
 }
 

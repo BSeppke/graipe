@@ -178,13 +178,6 @@ class GRAIPE_IMAGES_EXPORT Image
          * \return The timestamp of the Image.
          */
         const DateTime_Type& timestamp() const;
-    
-        /**
-         * Getter for the filename of an Image.
-         *
-         * \return The filename of the Image.
-         */
-		const String_Type& filename() const;
         
         /**
          * Getter for the comment of an Image.
@@ -213,14 +206,7 @@ class GRAIPE_IMAGES_EXPORT Image
          * \param timestamp The new timestamp of the Image.
          */
 		void setTimestamp(const DateTime_Type& timestamp);
-        
-        /**
-         * Setter for the filename of an Image.
-         *
-         * \param timestamp The new filename of the Image.
-         */
-		void setFilename(const String_Type& filename);
-        
+    
         /**
          * Setter for the comment of an Image.
          *

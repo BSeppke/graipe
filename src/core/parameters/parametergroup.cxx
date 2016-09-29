@@ -347,7 +347,11 @@ QWidget * ParameterGroup::delegate()
             {
                 param->delegate()->setMaximumSize(9999,9999);
                 param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-                m_layout->addRow(param->name(), param->delegate());
+                
+                if(!param->isHidden())
+                {
+                    m_layout->addRow(param->name(), param->delegate());
+                }
                 connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
             }
         }

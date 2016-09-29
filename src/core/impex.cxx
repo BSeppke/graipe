@@ -76,10 +76,7 @@ bool Impex::load(const QString & filename, Serializable * object, bool compress)
             }
         }
     }
-    if(success && object)
-    {
-        object->setFilename(filename);
-    }
+    
     return success;
 }
 
@@ -198,6 +195,8 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
 	{
 		QFile file(filename);
 		
+        object->setFilename(filename);
+        
 		if(compress)
 		{
 			QIOCompressor compressor(&file);
@@ -222,7 +221,6 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
     
     if(success && object)
     {
-        object->setFilename(filename);
     }
 	return success;
 }

@@ -1171,12 +1171,16 @@ void MainWindow::loadViewController(const QString& filename)
     QString vc_type = dict["type"];
     
     //2. find the associated model at the model_list (if it was already loaded)
-    QString model_filename =  dict["model"];
+    QString model_filename = dict["modelFilename"];
+    model_filename = model_filename.remove("LongStringParameter, ");
+    
     Model* vc_model = NULL;
     
     for(int i=0;  i < m_ui.listModels->count(); ++i)
     {
+    
         QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(i));
+        
         if(model_item && model_item->model() && model_item->model()->filename()==model_filename)
         {
             vc_model = model_item->model();
@@ -1185,6 +1189,7 @@ void MainWindow::loadViewController(const QString& filename)
     //If it was not found try to load it here
     if(vc_model==NULL)
     {
+        qDebug("Exception (first chance): Did not find a model for deserialization of the ViewController, try to reload the model from hdd.");
         loadModel(model_filename);
         //^ Throws an error, if model cannot be loaded
         
@@ -1404,7 +1409,7 @@ void MainWindow::loadModel(const QString& filename)
 	
     if(!QFile(filename).exists())
     {
-        throw std::runtime_error("File does not exists");
+        throw std::runtime_error("Loading model from " + filename.toStdString() + " failed. File does not exists");
     }
     
     //Try the import functions of every registered model:

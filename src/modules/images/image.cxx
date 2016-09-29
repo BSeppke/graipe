@@ -93,7 +93,7 @@ Image<T>::Image(const Image<T> & img)
  * \param numBand The image's band count.
  * \param timestamp The image's timestamp.
  * \param filename The image's filename (where it was loaded from).
- * \param comment The image's filename (where it was loaded from).
+ * \param comment The image's comment contents.
  * \param units The image's units (where it can be scaled to using the scale).
  * \param scale The image's scale (use it to get from pixels to units).
  */
@@ -107,7 +107,6 @@ Image<T>::Image(Size_Type size,
                 Scale_Type scale)
 
  :  RasteredModel(),
-    m_filename(filename),
     m_numBands(new IntParameter("Number of bands:",0,1000, numBands)),
     m_timestamp(new DateTimeParameter("Timestamp:", timestamp)),
     m_scale(new DoubleParameter("Scale (1 px = X m):", 0, 1000000000, scale)),
@@ -115,7 +114,7 @@ Image<T>::Image(Size_Type size,
     m_units(new StringParameter("Units:", units))
 {
     appendParameters();
-    
+    setFilename(filename);
     setWidth((unsigned int)size[0]);
     setHeight((unsigned int)size[1]);
     setNumBands(numBands);
@@ -276,17 +275,6 @@ const typename Image<T>::DateTime_Type& Image<T>::timestamp() const
 {
 	return m_timestamp->value();
 }
-
-/**
- * Getter for the filename of an Image.
- *
- * \return The filename of the Image.
- */
-template<class T>
-const typename Image<T>::String_Type& Image<T>::filename() const
-{
-	return m_filename;
-}
     
 /**
  * Getter for the comment of an Image.
@@ -333,21 +321,6 @@ void Image<T>::setTimestamp(const DateTime_Type& timestamp)
         return;
     
     m_timestamp->setValue(timestamp);
-    updateModel();
-}
-
-/**
- * Setter for the filename of an Image.
- *
- * \param timestamp The new filename of the Image.
- */
-template<class T>
-void Image<T>::setFilename(const String_Type& filename)
-{
-    if(locked())
-        return;
-    
-    m_filename = filename;
     updateModel();
 }
 
@@ -411,7 +384,6 @@ void Image<T>::copyMetadata(Model & other) const
         Image<T>& image_model = static_cast<Image<T>&>(other);
         
 		image_model.setTimestamp(timestamp());
-		image_model.setFilename(filename());
 		image_model.setComment(comment());
 		image_model.setUnits(units());
         image_model.setScale(scale());

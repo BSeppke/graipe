@@ -137,6 +137,20 @@ class GRAIPE_CORE_EXPORT Model
          * \param new_description The new description of the model.
          */
 		virtual void setDescription(const QString & new_description);
+	
+        /**
+         * Const accessor for the model filename QString.
+         *
+         * \return The filename of the model.
+         */
+		virtual QString filename() const;
+    
+        /**
+         * Set the model's filename to a new QString.
+         *
+         * \param new_filename The new filename of the model.
+         */
+		virtual void setFilename(const QString & new_filename);
     
 		/**
          * Const accessor for the left (x-coordinate) of a Model.
@@ -431,6 +445,7 @@ class GRAIPE_CORE_EXPORT Model
         //The parameters of this model:
         StringParameter	    * m_name;
         LongStringParameter	* m_description;
+        LongStringParameter	* m_save_filename;
         PointParameter	    * m_ul, * m_lr, * m_size;
         PointFParameter	    * m_global_ul, * m_global_lr;
     

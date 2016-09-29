@@ -123,7 +123,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * \return Pointer to the model of this view
          */
         Model * model();
-    
+        
         /**
          * Potentially non-const accessor to the parameters of this view
          */
@@ -256,6 +256,7 @@ class GRAIPE_CORE_EXPORT ViewController
         //The view's parameter
         StringParameter *m_name;
         LongStringParameter *m_description;
+        LongStringParameter *m_model_filename;
     
         BoolParameter	*m_showAxis;
         FloatParameter	*m_axisLineWidth;

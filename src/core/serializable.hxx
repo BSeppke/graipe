@@ -197,8 +197,8 @@ GRAIPE_CORE_EXPORT QString read_from_device_until(QIODevice& dev, const QString&
 class GRAIPE_CORE_EXPORT Serializable	
 {
     public:
-        const QString& filename() const;
-        void setFilename(const QString& new_filename);
+        virtual QString filename() const;
+        virtual void setFilename(const QString& new_filename);
     
         virtual QString typeName() const;
     

@@ -102,7 +102,7 @@ void LongStringParameter::setValue(const QString & value)
 {
     m_value = value;
     
-    if(m_txtDelegate != NULL)
+    if(m_txtDelegate != NULL && !isHidden())
     {
         m_txtDelegate->setPlainText(m_value);
     }

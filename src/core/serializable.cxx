@@ -241,7 +241,7 @@ QString read_from_device_until(QIODevice& dev, const QString& str, bool one_line
  *
  * \return the filename or an empty QString if none is assigned
  */
-const QString& Serializable::filename() const
+QString Serializable::filename() const
 {
     return m_filename;
 }

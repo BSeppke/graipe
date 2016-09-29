@@ -51,6 +51,7 @@ Model::Model()
     Serializable(),
     m_name(new StringParameter("Name:", "", 20, NULL)),
     m_description(new LongStringParameter("Description:", "", 20, 6, NULL)),
+    m_save_filename(new LongStringParameter("Filename:", "", 20, 3, NULL)),
     m_ul(new PointParameter("Local upper-left (px.):", QPoint(0,0), QPoint(100000,100000), QPoint(0,0), NULL)),
     m_lr(new PointParameter("Local lower-right (px.):", QPoint(0,0),QPoint(100000,100000), QPoint(0,0), NULL)),
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(0,0), NULL)),
@@ -62,6 +63,9 @@ Model::Model()
     
     m_parameters->addParameter("name", m_name);
     m_parameters->addParameter("descr", m_description);
+    
+    m_save_filename->hide(true);
+    m_parameters->addParameter("filename", m_save_filename);
     
     m_parameters->addParameter("ul", m_ul);
     m_parameters->addParameter("lr", m_lr);
@@ -82,6 +86,7 @@ Model::Model(const Model& model)
     Serializable(),
     m_name(new StringParameter("Name:", model.name(),20, NULL)),
     m_description(new LongStringParameter("Description:", model.description(), 20, 6, NULL)),
+    m_save_filename(new LongStringParameter("Filename:", model.filename(), 20, 3, NULL)),
     m_ul(new PointParameter("Local upper-left:", QPoint(0,0), QPoint(100000,100000), QPoint(model.left(), model.top()), NULL)),
     m_lr(new PointParameter("Local lower-right:", QPoint(0,0),QPoint(100000,100000), QPoint(model.right(), model.bottom()), NULL)),
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(model.globalLeft(), model.globalTop()), NULL)),
@@ -90,6 +95,9 @@ Model::Model(const Model& model)
 {
     m_parameters->addParameter("name", m_name);
     m_parameters->addParameter("descr", m_description);
+    
+    m_save_filename->hide(true);
+    m_parameters->addParameter("filename", m_save_filename);
     
     m_parameters->addParameter("ul", m_ul);
     m_parameters->addParameter("lr", m_lr);
@@ -150,6 +158,7 @@ void Model::setName (const QString& new_name)
     m_name->setValue(new_name);
     updateModel();
 }
+
 /**
  * Const accessor for the model description QString. 
  *
@@ -171,6 +180,32 @@ void Model::setDescription(const QString & new_description)
         return;
     
     m_description->setValue(new_description);
+    updateModel();
+}
+
+/**
+ * Const accessor for the model filename QString.
+ *
+ * \return The filename of the model.
+ */
+QString Model::filename() const
+{
+	return m_save_filename->value();
+}
+
+/**
+ * Set the model's filename to a new QString.
+ *
+ * \param new_filename The new filename of the model.
+ */
+void Model::setFilename(const QString & new_filename)
+{
+    if(locked())
+        return;
+    
+    m_save_filename->setValue(new_filename);
+    m_filename = new_filename;
+    
     updateModel();
 }
 
@@ -465,6 +500,7 @@ void Model::copyMetadata(Model& other) const
 		
 		other.setName(name());
 		other.setDescription(description());
+		other.setFilename(filename());
 	}
 }
 
