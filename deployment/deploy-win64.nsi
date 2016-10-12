@@ -2,16 +2,16 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Graipe"
-!define PRODUCT_VERSION "1.2"
+!define PRODUCT_VERSION "1.0"
 !define PRODUCT_PUBLISHER "Benjamin Seppke"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Graipe.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
 #lib-paths
-!define VSPKG_DIR "C:\vspkg\vc11\x64"
+!define VSPKG_DIR "C:\vspkg\vc14\x64"
 !define QT_DIR "${VSPKG_DIR}\qt5"
-!define VCR_DIR "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\redist\x64\Microsoft.VC110.CRT"
+!define VCR_DIR "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\x64\Microsoft.VC140.CRT"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -67,8 +67,8 @@ Section "Hauptgruppe" SEC01
   CreateShortCut "$DESKTOP\Graipe.lnk" "$INSTDIR\Graipe.exe"
 
   #vc runtime
-  File  "${VCR_DIR}\msvcp110.dll"
-  File  "${VCR_DIR}\msvcr110.dll"
+  File  "${VCR_DIR}\msvcp140.dll"
+  File  "${VCR_DIR}\vcruntime140.dll"
 
   #qt
   File "${QT_DIR}\bin\Qt5Core.dll"
@@ -76,27 +76,28 @@ Section "Hauptgruppe" SEC01
   File "${QT_DIR}\bin\Qt5Widgets.dll"
   File "${QT_DIR}\bin\Qt5PrintSupport.dll"
   File "${QT_DIR}\bin\Qt5Svg.dll"
+  File "${QT_DIR}\bin\Qt5Network.dll"
   File "${QT_DIR}\bin\libGLESV2.dll"
   
   CreateDirectory "$INSTDIR\platforms"
   File "/oname=$INSTDIR\platforms\qwindows.dll" "${QT_DIR}\plugins\platforms\qwindows.dll"
   
-  #gdal
-  File "${VSPKG_DIR}\bin\gdal19.dll"
+  #gdal & dependencies
+  File "${VSPKG_DIR}\bin\gdal201.dll"
+  File "${VSPKG_DIR}\bin\jpeg.dll"
+  File "${VSPKG_DIR}\bin\tiff.dll"
+  File "${VSPKG_DIR}\bin\zlib.dll"
   File "${VSPKG_DIR}\bin\hdf5.dll"
+  File "${VSPKG_DIR}\bin\libpng16.dll"
   
   #fftw
   File "${VSPKG_DIR}\bin\fftw-3.3.dll"
   File "${VSPKG_DIR}\bin\fftwf-3.3.dll"
   
-  #zlib
-  File "${VSPKG_DIR}\bin\zlib.dll"
-  File "${VSPKG_DIR}\bin\zlibwapi.dll"
-  
   
   #modules
   File "..\bin\graipe_core.dll"
-  File "..\bin\graipe_features.dll"
+  File "..\bin\graipe_features2d.dll"
   File "..\bin\graipe_images.dll"
   File "..\bin\graipe_vectorfields.dll"
   File "..\bin\graipe_analysis.dll"
@@ -143,8 +144,8 @@ Section Uninstall
   Delete "$INSTDIR\uninst.exe"
   
   #vc runtime
-  Delete  "$INSTDIR\msvcp110.dll"
-  Delete  "$INSTDIR\msvcr110.dll"
+  Delete  "$INSTDIR\msvcp140.dll"
+  Delete  "$INSTDIR\vcruntime140.dll"
   
   #qt
   Delete  "$INSTDIR\Qt5Core.dll"
@@ -152,26 +153,27 @@ Section Uninstall
   Delete  "$INSTDIR\Qt5Widgets.dll"
   Delete  "$INSTDIR\Qt5PrintSupport.dll"
   Delete  "$INSTDIR\Qt5Svg.dll"
+  Delete  "$INSTDIR\Qt5Network.dll"
   Delete  "$INSTDIR\libGLESV2.dll"
   
-  Delete "$INSTDIR\plugins\platforms\qwindows.dll"
+  Delete "$INSTDIR\platforms\qwindows.dll"
   RMDir  "$INSTDIR\platforms"
   
-  #gdal
-  Delete  "$INSTDIR\gdal19.dll"
-  Delete  "$INSTDIR\hdf5.dll"
+  #gdal & dependencies
+  Delete "$INSTDIR\gdal201.dll"
+  Delete "$INSTDIR\jpeg.dll"
+  Delete "$INSTDIR\tiff.dll"
+  Delete "$INSTDIR\zlib.dll"
+  Delete "$INSTDIR\hdf5.dll"
+  Delete "$INSTDIR\libpng16.dll"
   
   #fftw
   Delete  "$INSTDIR\fftw-3.3.dll"
   Delete  "$INSTDIR\fftwf-3.3.dll"
   
-  #zlib
-  Delete  "$INSTDIR\zlib.dll"
-  Delete  "$INSTDIR\zlibwapi.dll"
-  
   #modules
   Delete "$INSTDIR\graipe_core.dll"
-  Delete "$INSTDIR\graipe_features.dll"
+  Delete "$INSTDIR\graipe_features2d.dll"
   Delete "$INSTDIR\graipe_images.dll"
   Delete "$INSTDIR\graipe_vectorfields.dll"
   Delete "$INSTDIR\graipe_analysis.dll"
