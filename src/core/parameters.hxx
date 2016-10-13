@@ -38,6 +38,7 @@
 
 #include "core/parameters/boolparameter.hxx"
 #include "core/parameters/colorparameter.hxx"
+#include "core/parameters/colortableparameter.hxx"
 #include "core/parameters/datetimeparameter.hxx"
 #include "core/parameters/doubleparameter.hxx"
 #include "core/parameters/enumparameter.hxx"

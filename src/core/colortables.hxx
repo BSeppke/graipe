@@ -33,21 +33,21 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_CORE_H
-#define GRAIPE_CORE_H
+#ifndef GRAIPE_CORE_COLORTABLES_HXX
+#define GRAIPE_CORE_COLORTABLES_HXX
 
-#include "core/algorithm.hxx"
-#include "core/colortables.hxx"
-#include "core/impex.hxx"
-#include "core/logging.hxx"
-#include "core/model.hxx"
-#include "core/module.hxx"
-#include "core/parameters.hxx"
-#include "core/parameterselection.hxx"
-#include "core/qt_ext.hxx"
-#include "core/factories.hxx"
-#include "core/serializable.hxx"
-#include "core/updatechecker.hxx"
-#include "core/viewcontroller.hxx"
+#include <QVector>
+#include <QRgb>
 
-#endif //GRAIPE_CORE_H
+namespace graipe {
+
+namespace detail
+{
+    static QVector<QVector<QRgb> > colorTables;
+}
+
+QVector<QVector<QRgb> > colorTables();
+
+} //end of namespace graipe
+
+#endif //GRAIPE_CORE_COLORTABLES_HXX

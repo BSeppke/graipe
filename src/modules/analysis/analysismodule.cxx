@@ -33,8 +33,10 @@
 /*                                                                      */
 /************************************************************************/
 
+#include "images/images.h"
 #include "vectorfields/vectorfields.h"
 #include "analysis/analysis.h"
+#include <vigra/separableconvolution.hxx>
 
 #include "core/core.h"
 
@@ -443,7 +445,7 @@ class Vectorfield2DSeparation
                 }
                 
                 emit statusMessage(100.0, QString("finished computation"));
-                    emit finished();
+                emit finished();
             }
             catch(std::exception& e)
             {
@@ -465,6 +467,182 @@ class Vectorfield2DSeparation
 Algorithm* createVectorfield2DSeparation()
 {
 	return new Vectorfield2DSeparation;
+};
+
+
+
+
+/**
+ * This algorithm estimates the curl of a given dense vectorfield as an output image.
+ */
+class Vectorfield2DCurl
+:   public Algorithm
+{
+    public:
+        /**
+         * Default constructor. Initializes only one additional parameter, the vectorfield.
+         */
+        Vectorfield2DCurl()
+        {
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield",	NULL,  "DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
+        }
+        
+        /**
+         * Specialization of the running phase of this algorithm.
+         */
+        void run()
+        {
+            try
+            {
+                emit statusMessage(0.0, QString("started"));
+                
+                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                FloatParameter	* param_sigma = static_cast<FloatParameter*> ((*m_parameters)["sigma"]);
+                
+                emit statusMessage(1.0, QString("starting computation"));
+                
+                DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>(param_vf->value());
+                
+                unsigned int w = vf->width(),
+                             h = vf->height();
+                
+                Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1);
+                vf->copyGeometry(*img);
+                
+                vigra::Kernel1D<double> kernel;
+                kernel.initGaussianDerivative(param_sigma->value(),1);
+                
+                vigra::MultiArray<2,float>m_uy(w,h), m_vx(w,h), res(w,h);
+                
+                vigra::separableConvolveY(vf->u(), m_uy, kernel);
+                vigra::separableConvolveX(vf->v(), m_vx, kernel);
+                
+                for (unsigned int y=0 ; y < h; ++y)
+                {
+                    for (unsigned int x=0 ; x < w; ++x)
+                    {
+                        res(x,y)  = m_vx(x,y) - m_uy(x,y);
+                    }
+                }
+                
+                img->setBand(0,res);
+                img->setName("Scalar Curl of: " + vf->name());
+                img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
+                
+                m_results.push_back(img);
+                
+                emit statusMessage(100.0, QString("finished computation"));
+                emit finished();
+            }
+            catch(std::exception& e)
+            {
+                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+            }
+            catch(...)
+            {
+                emit errorMessage(QString("Non-explainable error occured"));		
+            }
+        }
+};
+
+/** 
+ * Creates one instance of the vectorfield curl extraction
+ * algorithm defined above.
+ *
+ * \return A new instance of the Vectorfield2DCurl.
+ */
+Algorithm* computeVectorfield2DCurl()
+{
+	return new Vectorfield2DCurl;
+};
+
+
+
+
+/**
+ * This algorithm estimates the divergence of a given dense vectorfield as an output image.
+ */
+class Vectorfield2DDiv
+:   public Algorithm
+{
+    public:
+        /**
+         * Default constructor. Initializes only one additional parameter, the vectorfield.
+         */
+        Vectorfield2DDiv()
+        {
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield",	NULL,  "DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
+        }
+        
+        /**
+         * Specialization of the running phase of this algorithm.
+         */
+        void run()
+        {
+            try
+            {
+                emit statusMessage(0.0, QString("started"));
+                
+                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                FloatParameter	* param_sigma = static_cast<FloatParameter*> ((*m_parameters)["sigma"]);
+                
+                emit statusMessage(1.0, QString("starting computation"));
+                
+                DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>(param_vf->value());
+                
+                unsigned int w = vf->width(),
+                             h = vf->height();
+                
+                Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1);
+                vf->copyGeometry(*img);
+                
+                vigra::Kernel1D<double> kernel;
+                kernel.initGaussianDerivative(param_sigma->value(),1);
+                
+                vigra::MultiArray<2,float> m_ux(w,h), m_vy(w,h), res(w,h);
+                
+                vigra::separableConvolveX(vf->u(), m_ux, kernel);
+                vigra::separableConvolveY(vf->v(), m_vy, kernel);
+                
+                for (unsigned int y=0 ; y < h; ++y)
+                {
+                    for (unsigned int x=0 ; x < w; ++x)
+                    {
+                        res(x,y)  = m_ux(x,y) + m_vy(x,y);
+                    }
+                }
+                
+                img->setBand(0,res);
+                img->setName("Divergence of: " + vf->name());
+                img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
+                
+                m_results.push_back(img);
+                
+                emit statusMessage(100.0, QString("finished computation"));
+                emit finished();
+            }
+            catch(std::exception& e)
+            {
+                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+            }
+            catch(...)
+            {
+                emit errorMessage(QString("Non-explainable error occured"));		
+            }
+        }
+};
+
+/** 
+ * Creates one instance of the vectorfield divergence extraction
+ * algorithm defined above.
+ *
+ * \return A new instance of the Vectorfield2DDiv.
+ */
+Algorithm* computeVectorfield2DDiv()
+{
+	return new Vectorfield2DDiv;
 };
 
 
@@ -542,6 +720,15 @@ class AnalysisModule
 			
 			alg_item.algorithm_name = "Create mean vectorfield";	
 			alg_item.algorithm_fptr = &createMeanVectorfield;
+			alg_factory.push_back(alg_item);
+            
+			alg_item.algorithm_name = "Compute curl of vectorfield";
+			alg_item.algorithm_fptr = &computeVectorfield2DCurl;
+			alg_factory.push_back(alg_item);
+			
+            
+			alg_item.algorithm_name = "Compute divergence of vectorfield";
+			alg_item.algorithm_fptr = &computeVectorfield2DDiv;
 			alg_factory.push_back(alg_item);
 			
 			return alg_factory;

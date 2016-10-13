@@ -5,12 +5,14 @@ project(graipe_core)
 #find . -type f -name \*.cxx | sed 's,^\./,,'
 set(SOURCES 
 	algorithm.cxx
+	colortables.cxx
 	impex.cxx
 	logging.cxx
 	model.cxx
 	module.cxx
 	parameters/boolparameter.cxx
 	parameters/colorparameter.cxx
+	parameters/colortableparameter.cxx
 	parameters/datetimeparameter.cxx
 	parameters/doubleparameter.cxx
 	parameters/enumparameter.cxx
@@ -40,6 +42,7 @@ set(HEADERS
 	algorithm.hxx
 	basicstatistics.hxx
 	config.hxx
+	colortables.hxx
 	factories.hxx
 	impex.hxx
 	logging.hxx
@@ -47,6 +50,7 @@ set(HEADERS
 	module.hxx
 	parameters/boolparameter.hxx
 	parameters/colorparameter.hxx
+	parameters/colortableparameter.hxx
 	parameters/datetimeparameter.hxx
 	parameters/doubleparameter.hxx
 	parameters/enumparameter.hxx
