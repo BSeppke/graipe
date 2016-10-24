@@ -767,9 +767,7 @@ void EdgelFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	features->shortName()
                                          +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
-                                         +	features_in_reach
-                                         +  QString("<b>ColorTable:</b>")
-                                         +  m_colorTable->valueText());
+                                         +	features_in_reach);
         }
     }
 }
