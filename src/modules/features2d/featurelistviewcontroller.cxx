@@ -301,9 +301,8 @@ WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewControll
     m_mode(NULL),
     m_radius(new FloatParameter("Radius:", 1.0e-6f, 1.0e+6f, 2)),
     m_minWeight(new FloatParameter("Min. weight:", 1.0e-6f, 1.0e+6f, 0)),
-    m_minColor(new ColorParameter("Color of min.:", Qt::yellow)),
     m_maxWeight(new FloatParameter("Max. weight:", 1.0e-6f, 1.0e+6f, 1)),
-    m_maxColor(new ColorParameter("Color of max.:", Qt::red)),
+    m_colorTable(new ColorTableParameter("Color:")),
     m_showWeightLegend(new BoolParameter("Show weight legend:", false)),
     m_legendCaption(new StringParameter("Legend Caption", "weights", 20, m_showWeightLegend)),
     m_legendTicks(new IntParameter("Legend ticks", 0, 1000, 10, m_showWeightLegend)),
@@ -325,9 +324,8 @@ WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewControll
     m_parameters->addParameter("mode", m_mode);
     m_parameters->addParameter("radius", m_radius);
     m_parameters->addParameter("minWeight", m_minWeight);
-    m_parameters->addParameter("minColor", m_minColor);
     m_parameters->addParameter("maxWeight", m_maxWeight);
-    m_parameters->addParameter("maxColor", m_maxColor);
+    m_parameters->addParameter("colorTable", m_colorTable);
     m_parameters->addParameter("showWeightLegend", m_showWeightLegend);
     m_parameters->addParameter("legendCaption", m_legendCaption);
     m_parameters->addParameter("legendTicks", m_legendTicks);
@@ -399,9 +397,7 @@ void WeightedPointFeatureList2DViewController::paint(QPainter *painter, const QS
 		{
 			float current_weight =		std::max(0.0f, std::min(1.0f,(features->weight(i)-m_minWeight->value())/(m_maxWeight->value() - m_minWeight->value())));
 			
-			painter->setBrush(QColor(m_minColor->value().red()  *(1.0-current_weight) + m_maxColor->value().red()  *current_weight,
-									 m_minColor->value().green()*(1.0-current_weight) + m_maxColor->value().green()*current_weight,
-									 m_minColor->value().blue() *(1.0-current_weight) + m_maxColor->value().blue() *current_weight));
+			painter->setBrush(QColor(m_colorTable->value().at(current_weight*255)));
             
             //Assuming PointType==QPointF
             const PointFeatureList2D::PointType& pos = features->position(i);
@@ -492,7 +488,7 @@ void WeightedPointFeatureList2DViewController::updateView()
 	ViewController::updateView();
     
 	//Underly colorful gradient of velocity to legend
-	m_weight_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+    m_weight_legend->setColorTable(m_colorTable->value());
     m_weight_legend->setValueRange(m_minWeight->value(), m_maxWeight->value());
     m_weight_legend->setCaption(m_legendCaption->value());
     m_weight_legend->setTicks(m_legendTicks->value());
@@ -684,9 +680,7 @@ void EdgelFeatureList2DViewController::paint(QPainter *painter, const QStyleOpti
 		{
 			float current_weight = std::max(0.0f, std::min(1.0f,(features->weight(i)-m_minWeight->value())/(m_maxWeight->value() - m_minWeight->value())));
 			
-			painter->setBrush(QColor(m_minColor->value().red()  *(1.0-current_weight) + m_maxColor->value().red()  *current_weight,
-									 m_minColor->value().green()*(1.0-current_weight) + m_maxColor->value().green()*current_weight,
-									 m_minColor->value().blue() *(1.0-current_weight) + m_maxColor->value().blue() *current_weight));
+			painter->setBrush(QColor(m_colorTable->value().at(current_weight*255)));
             
             const PointFeatureList2D::PointType& pos = features->position(i);
             
@@ -773,7 +767,9 @@ void EdgelFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	features->shortName()
                                          +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
-                                         +	features_in_reach);
+                                         +	features_in_reach
+                                         +  QString("<b>ColorTable:</b>")
+                                         +  m_colorTable->valueText());
         }
     }
 }
@@ -910,11 +906,9 @@ void SIFTFeatureList2DViewController::paint(QPainter *painter, const QStyleOptio
 		if(	(features->weight(i) >= m_minWeight->value()) &&  (features->weight(i) <= m_maxWeight->value()) )
 		{
 			float current_weight =		std::max(0.0f, std::min(1.0f,(features->weight(i)-m_minWeight->value())/(m_maxWeight->value() - m_minWeight->value())));
-			
-			painter->setBrush(QColor(m_minColor->value().red()  *(1.0-current_weight) + m_maxColor->value().red()  *current_weight,
-									 m_minColor->value().green()*(1.0-current_weight) + m_maxColor->value().green()*current_weight,
-									 m_minColor->value().blue() *(1.0-current_weight) + m_maxColor->value().blue() *current_weight,
-                                     128));
+			QColor col(m_colorTable->value().at(current_weight*255));
+            col.setAlpha(128);
+			painter->setBrush(col);
             
             const PointFeatureList2D::PointType& pos = features->position(i);
 			

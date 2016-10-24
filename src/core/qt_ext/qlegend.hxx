@@ -146,20 +146,6 @@ class GRAIPE_CORE_EXPORT QLegend
          * \param ticks The new tick division of the scale.
          */
         void setTicks(unsigned int ticks);
-		
-        /**
-         * Const accessor to the currently used QBrush of the scale of the QLegend.
-         *
-         * \return The currently used QBrush of the scale of the QLegend.
-         */
-		QBrush brush() const;
-    
-        /**
-         * Sets the brush of the scale to a new QBrush.
-         *
-         * \param brush The new QBrush of the scale.
-         */
-		void setBrush(const QBrush &  brush);
     
         /**
          * Const accessor to find out if the "true to scale" mode is enabled.
@@ -212,40 +198,19 @@ class GRAIPE_CORE_EXPORT QLegend
 		void setValueRange(float min_val, float max_val);
 		
         /**
-         * Const accessor to the color, which corresponds to the minimum value of the scale.
+         * Const accessor to the color table of the scale.
          *
-         * \return The color, which corresponds to the minimum value of the scale.
+         * \return The color table of the scale.
          */
-		QColor minColor() const;
-    
+        QVector<QRgb> colorTable() const;
+        
         /**
-         * Sets the color, which corresponds to the minimum value of the scale.
+         * Sets the color table (colors of minimum and maximum value) of the scale
          *
-         * \param col The color, which corresponds to the new minimum value of the scale.
+         * \param colorTable The new color table of the scale.
          */
-		void setMinColor(QColor col);
+        void setColorTable(QVector<QRgb> colorTable);
     
-        /**
-         * Const accessor to the color, which corresponds to the maximum value of the scale.
-         *
-         * \return The color, which corresponds to the maximum value of the scale.
-         */
-		QColor maxColor() const;
-    
-        /**
-         * Sets the color, which corresponds to the maximum value of the scale.
-         *
-         * \param col The color, which corresponds to the new maximum value of the scale.
-         */
-		void setMaxColor(QColor col);
-    
-        /**
-         * Sets the color range (colors of minimum and maximum value) of the scale
-         *
-         * \param min_col The new minimum color of the scale.
-         * \param max_col The new maximum color of the scale.
-         */
-		void setColorRange(QColor min_col, QColor max_col);
     
         /**
          * Overloaded function from QGraphicsResizableItem:
@@ -292,10 +257,10 @@ class GRAIPE_CORE_EXPORT QLegend
 		QFont m_caption_font;
 		
         //Min and max color
-		QColor m_min_color, m_max_color;
+		QVector<QRgb> m_ct;
     
-        //The Brush of the scale
-		QBrush m_brush;
+        //The background image of the scale
+		QPixmap* m_bg_pixmap;
 };
     
 }//end of namespace graipe

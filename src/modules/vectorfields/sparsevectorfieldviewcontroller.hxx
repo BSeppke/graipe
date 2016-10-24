@@ -129,9 +129,8 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
         FloatParameter  * m_lineWidth,
                         * m_headSize;
         FloatParameter  * m_minLength;
-        ColorParameter  * m_minColor;
         FloatParameter  * m_maxLength;
-        ColorParameter  * m_maxColor;
+        ColorTableParameter  * m_colorTable;
         BoolParameter   * m_normalizeLength;
         FloatParameter  * m_normalizedLength;
         EnumParameter   * m_displayMotionMode;

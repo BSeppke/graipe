@@ -230,6 +230,15 @@ QWidget*  ColorTableParameter::delegate()
  */
 void ColorTableParameter::updateValue()
 {
+    if(m_delegate)
+    {
+        int idx = m_delegate->currentIndex();
+    
+        if(idx >= 0 && idx < colorTables().size())
+        {
+            m_value = (colorTables()[idx]);
+        }
+    }
     Parameter::updateValue();
 }
 
@@ -240,7 +249,7 @@ void ColorTableParameter::updateValue()
  */
 void ColorTableParameter::initConnections()
 {
-    connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+    connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
     Parameter::initConnections();
 }
 

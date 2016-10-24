@@ -58,9 +58,8 @@ DenseVectorfield2DViewController::DenseVectorfield2DViewController(QGraphicsScen
     m_lineWidth(new FloatParameter("Line width:", 0,100000,1)),
     m_headSize(new FloatParameter("Head size:",0,100000,0.3f)),
     m_minLength(new FloatParameter("Min. length (px.):",0,10000,0)),
-    m_minColor(new ColorParameter("Min. color:",Qt::yellow)),
     m_maxLength(new FloatParameter("Max. length (px.):",0,10000,0)),
-    m_maxColor(new ColorParameter("Max. color:",Qt::red)),
+    m_colorTable(new ColorTableParameter("Color:")),
     m_normalizeLength(new BoolParameter("Fix vector length?",false)),
     m_normalizedLength(new FloatParameter("Fixed length:", 1.0e-6f, 1.0e6f, 10, m_normalizeLength)),
     m_displayMotionMode(NULL),
@@ -88,9 +87,8 @@ DenseVectorfield2DViewController::DenseVectorfield2DViewController(QGraphicsScen
     m_parameters->addParameter("lineWidth", m_lineWidth);
     m_parameters->addParameter("headSize", m_headSize);
     m_parameters->addParameter("minLength", m_minLength);
-    m_parameters->addParameter("minColor", m_minColor);
     m_parameters->addParameter("maxLength", m_maxLength);
-    m_parameters->addParameter("maxColor", m_maxColor);
+    m_parameters->addParameter("colorTable", m_colorTable);
     m_parameters->addParameter("normalizeLength", m_normalizeLength);
     m_parameters->addParameter("normalizedLength", m_normalizedLength);
     m_parameters->addParameter("displayMotionMode", m_displayMotionMode);
@@ -295,8 +293,7 @@ void DenseVectorfield2DViewController::updateView()
     
     m_vector_drawer.setLineWidth(m_lineWidth->value());
     m_vector_drawer.setHeadSize(m_headSize->value());
-    m_vector_drawer.setMinColor(m_minColor->value());
-    m_vector_drawer.setMaxColor(m_maxColor->value());
+    m_vector_drawer.setColorTable(m_colorTable->value());
     
     //Display arrows length scaled
     if(m_normalizeLength->value() && m_normalizeLength->value() != 0)
@@ -311,7 +308,7 @@ void DenseVectorfield2DViewController::updateView()
         {
             m_velocity_legend->setValueRange(m_minLength->value(), m_maxLength->value());
         }
-        m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+        m_velocity_legend->setColorTable(m_colorTable->value());
     }
     //Display arrows at original length
     else
@@ -331,7 +328,7 @@ void DenseVectorfield2DViewController::updateView()
             m_velocity_legend->setRect(QRectF(r_old.left(), r_old.top(), m_maxLength->value(), r_old.height()));
             m_velocity_legend->setValueRange(0, m_maxLength->value());
         }
-        m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+        m_velocity_legend->setColorTable(m_colorTable->value());
     }
     
     //set the caption of that legend
@@ -415,9 +412,8 @@ DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewControll
     m_timerInterval(new IntParameter("Timer interval (ms):", 1,1000,50)),
     m_slowDown(new FloatParameter("Slow down factor:",0,10000,1)),
     m_minLength(new FloatParameter("Min. length (px.):",0,10000,0)),
-    m_minColor(new ColorParameter("Min. color:",Qt::yellow)),
     m_maxLength(new FloatParameter("Max. length (px.):",0,10000,0)),
-    m_maxColor(new ColorParameter("Max. color:",Qt::red)),
+    m_colorTable(new ColorTableParameter("Color:")),
     m_displayMotionMode(NULL),
     m_showVelocityLegend(new BoolParameter("Show velocity legend?",false)),
     m_velocityLegendCaption(new StringParameter("Legend caption:","weights", 20, m_showVelocityLegend)),
@@ -438,9 +434,8 @@ DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewControll
     m_parameters->addParameter("interval", m_timerInterval);
     m_parameters->addParameter("slowDown", m_slowDown);
     m_parameters->addParameter("minLength", m_minLength);
-    m_parameters->addParameter("minColor", m_minColor);
     m_parameters->addParameter("maxLength", m_maxLength);
-    m_parameters->addParameter("maxColor", m_maxColor);
+    m_parameters->addParameter("colorTable", m_colorTable);
     m_parameters->addParameter("displayMotionMode", m_displayMotionMode);
     m_parameters->addParameter("showVelocityLegend", m_showVelocityLegend);
     m_parameters->addParameter("velocityLegendCaption", m_velocityLegendCaption);
@@ -530,9 +525,7 @@ void DenseVectorfield2DParticleViewController::paint(QPainter *painter, const QS
             
             float normalized_weight = std::min(1.0f,std::max(0.0f,(current_length - m_minLength->value())/(m_maxLength->value() - m_minLength->value())));
 
-            dotPen.setColor(QColor(m_minColor->value().red()  *(1-normalized_weight)	+ m_maxColor->value().red()  *normalized_weight,
-                                   m_minColor->value().green()*(1-normalized_weight)	+ m_maxColor->value().green()*normalized_weight,
-                                   m_minColor->value().blue() *(1-normalized_weight)	+ m_maxColor->value().blue() *normalized_weight));
+            dotPen.setColor(QColor(m_colorTable->value().at(normalized_weight*255)));
             painter->setPen(dotPen);
             painter->setBrush(dotPen.color());
             
@@ -628,7 +621,7 @@ void DenseVectorfield2DParticleViewController::updateView()
         m_velocity_legend->setValueRange(m_minLength->value(), m_maxLength->value());
     }
     
-    m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+    m_velocity_legend->setColorTable(m_colorTable->value());
     
     //set the caption of that legend
     m_velocity_legend->setCaption(m_velocityLegendCaption->value());
@@ -983,7 +976,7 @@ void DenseWeightedVectorfield2DViewController::updateView()
     //If the colors shall be used for weight coding
     if(m_useColorForWeight->value())
     {
-        m_weight_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+        m_weight_legend->setColorTable(m_colorTable->value());
         m_weight_legend->setValueRange(m_minWeight->value(), m_maxWeight->value());
         m_weight_legend->setCaption(m_weightLegendCaption->value());
         m_weight_legend->setTicks(m_weightLegendTicks->value());
@@ -1015,7 +1008,7 @@ void DenseWeightedVectorfield2DViewController::updateView()
                 }
                 
                 m_velocity_legend->setValueRange(0, m_maxLength->value());
-                m_velocity_legend->setColorRange(Qt::white, Qt::white);
+                m_velocity_legend->setColorTable(colorTables()[0]);
                 m_velocity_legend->setVisible(true);
             }			
         }
@@ -1177,9 +1170,7 @@ void DenseWeightedVectorfield2DParticleViewController::paint(QPainter *painter, 
                 float current_weight = m_dense_weighted_model->length(m_positions[i].x(),m_positions[i].y());
                 float normalized_weight = std::min(1.0f,std::max(0.0f,(current_weight - m_minWeight->value())/(m_maxWeight->value() - m_minWeight->value())));
                 
-                dotPen.setColor(QColor(m_minColor->value().red()  *(1-normalized_weight)	+ m_maxColor->value().red()  *normalized_weight,
-                                       m_minColor->value().green()*(1-normalized_weight)	+ m_maxColor->value().green()*normalized_weight,
-                                       m_minColor->value().blue() *(1-normalized_weight)	+ m_maxColor->value().blue() *normalized_weight));
+                dotPen.setColor(QColor(m_colorTable->value().at(normalized_weight*255)));
                 painter->setPen(dotPen);
                 painter->setBrush(dotPen.color());
                 
@@ -1197,9 +1188,7 @@ void DenseWeightedVectorfield2DParticleViewController::paint(QPainter *painter, 
                 float current_length = m_dense_weighted_model->length(m_positions[i].x(),m_positions[i].y());
                 float normalized_length = std::min(1.0f,std::max(0.0f,(current_length - m_minLength->value())/(m_maxLength->value() - m_minLength->value())));
                 
-                dotPen.setColor(QColor(m_minColor->value().red()  *(1-normalized_length)	+ m_maxColor->value().red()  *normalized_length,
-                                       m_minColor->value().green()*(1-normalized_length)	+ m_maxColor->value().green()*normalized_length,
-                                       m_minColor->value().blue() *(1-normalized_length)	+ m_maxColor->value().blue() *normalized_length));
+                dotPen.setColor(QColor(m_colorTable->value().at(normalized_length*255)));
                 painter->setPen(dotPen);
                 painter->setBrush(dotPen.color());
                 
@@ -1271,7 +1260,7 @@ void DenseWeightedVectorfield2DParticleViewController::updateView()
     //If the colors shall be used for weight coding
     if(m_useColorForWeight->value())
     {
-        m_weight_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+        m_weight_legend->setColorTable(m_colorTable->value());
         m_weight_legend->setValueRange(m_minWeight->value(), m_maxWeight->value());
         m_weight_legend->setCaption(m_weightLegendCaption->value());
         m_weight_legend->setTicks(m_weightLegendTicks->value());

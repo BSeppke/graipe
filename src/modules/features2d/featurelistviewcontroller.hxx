@@ -205,9 +205,8 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
         EnumParameter* m_mode;
         FloatParameter* m_radius;
         FloatParameter* m_minWeight;
-        ColorParameter * m_minColor;
         FloatParameter* m_maxWeight;
-        ColorParameter * m_maxColor;
+        ColorTableParameter* m_colorTable;
         BoolParameter * m_showWeightLegend;
         StringParameter* m_legendCaption;
         IntParameter* m_legendTicks;

@@ -124,9 +124,8 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DViewController
         FloatParameter  * m_lineWidth,
                         * m_headSize;
         FloatParameter  * m_minLength;
-        ColorParameter  * m_minColor;
         FloatParameter  * m_maxLength;
-        ColorParameter  * m_maxColor;
+        ColorTableParameter  * m_colorTable;
         BoolParameter   * m_normalizeLength;
         FloatParameter  * m_normalizedLength;
         EnumParameter   * m_displayMotionMode;
@@ -233,9 +232,8 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DParticleViewController
                         * m_timerInterval;
         FloatParameter  * m_slowDown;
         FloatParameter  * m_minLength;
-        ColorParameter  * m_minColor;
         FloatParameter  * m_maxLength;
-        ColorParameter  * m_maxColor;
+        ColorTableParameter  * m_colorTable;
         EnumParameter   * m_displayMotionMode;
         BoolParameter   * m_showVelocityLegend;
         StringParameter * m_velocityLegendCaption;

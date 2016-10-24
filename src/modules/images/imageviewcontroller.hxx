@@ -106,12 +106,11 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
         ImageStatistics<T>* m_stats;
     
         //Additional parameters
-        ColorParameter*  m_minColor;
         FloatParameter*  m_minValue;
         BoolParameter*   m_transparentBelowMin;
-        ColorParameter*  m_maxColor;
         FloatParameter*  m_maxValue;
         BoolParameter*   m_transparentAboveMax;
+        ColorTableParameter*  m_colorTable;
         EnumParameter*   m_scalingFunction;
         IntParameter*    m_bandId;
         BoolParameter*   m_showIntensityLegend;
@@ -128,7 +127,7 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
     
         //Qt image representation and used color table
         QImage m_image;
-        QVector<QRgb> m_colorTable;
+        QVector<QRgb> m_ct;
 };
 
 /**
@@ -191,10 +190,8 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
         
     private:
         //Aditional parameters
-        ColorParameter* m_minColor;
         FloatParameter* m_minValue;
         BoolParameter*  m_transparentBelowMin;
-        ColorParameter* m_maxColor;
         FloatParameter* m_maxValue;
         BoolParameter*  m_transparentAboveMax;
         EnumParameter*  m_scalingFunction;

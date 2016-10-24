@@ -51,12 +51,11 @@ template <class T>
 ImageSingleBandViewController<T>::ImageSingleBandViewController(QGraphicsScene* scene, Image<T>* img, int z_order)
 : ViewController(scene, img, z_order),
     m_stats(new ImageStatistics<T>(img)),
-    m_minColor(new ColorParameter("Min. color:",Qt::black)),
     m_minValue(new FloatParameter("Min. value:",-1e20f, 1e20f, 0)),
     m_transparentBelowMin(new BoolParameter("Transp. (< min):", false)),
-    m_maxColor(new ColorParameter("Max. color:",Qt::white)),
     m_maxValue(new FloatParameter("Max. value:",-1e20f, 1e20f, 255)),
     m_transparentAboveMax(new BoolParameter("Transp. (> max):", false)),
+    m_colorTable(new ColorTableParameter("Color:",colorTables()[2])),
     m_scalingFunction(NULL),
     m_bandId(new IntParameter("Show band:",0,img->numBands()-1,0)),
     m_showIntensityLegend(new BoolParameter("Show intensity legend:", false)),
@@ -71,17 +70,14 @@ ImageSingleBandViewController<T>::ImageSingleBandViewController(QGraphicsScene* 
 		scalingFunctions.append("square root");
     m_scalingFunction = new EnumParameter("Scaling function:", scalingFunctions,0);
     
-    m_parameters->addParameter("minColor", m_minColor);
     m_parameters->addParameter("minValue", m_minValue);
     m_parameters->addParameter("transMinColor", m_transparentBelowMin);
-    m_parameters->addParameter("maxColor", m_maxColor);
     m_parameters->addParameter("maxValue", m_maxValue);
     m_parameters->addParameter("transMaxColor", m_transparentAboveMax);
+    m_parameters->addParameter("colorTable", m_colorTable);
     m_parameters->addParameter("scaling", m_scalingFunction);
     
 	this->setZValue(z_order);
-    
-	m_colorTable = QVector<QRgb>(256);
 	   
     m_parameters->addParameter("bandId", m_bandId);
     m_parameters->addParameter("showIntensityLegend", m_showIntensityLegend);
@@ -169,23 +165,15 @@ void ImageSingleBandViewController<T>::updateView()
     m_minValue->setRange(floor(m_stats->intensityStats()[m_bandId->value()].min), ceil(m_stats->intensityStats()[m_bandId->value()].max));
     m_maxValue->setRange(floor(m_stats->intensityStats()[m_bandId->value()].min), ceil(m_stats->intensityStats()[m_bandId->value()].max));
     
-    QColor min_color = m_minColor->value();
-    QColor max_color = m_maxColor->value();
-    
-    for(int i=0; i< m_colorTable.size(); ++i)
-    {
-        m_colorTable[i]   = qRgb((255.0-i)/255.0* min_color.red()    + i/255.0*max_color.red(),
-                                 (255.0-i)/255.0* min_color.green()  + i/255.0*max_color.green(),
-                                 (255.0-i)/255.0* min_color.blue()   + i/255.0*max_color.blue());
-    }
+    m_ct = m_colorTable->value();
     
     if(m_transparentBelowMin->value())
     {
-        m_colorTable[0] = Qt::transparent;
+        m_ct[0] = Qt::transparent;
     }
     if(m_transparentAboveMax->value())
     {
-        m_colorTable[255] = Qt::transparent;
+        m_ct[255] = Qt::transparent;
     }
     
     const vigra::MultiArray<2,T>& band = m_img->band(m_bandId->value());
@@ -208,7 +196,7 @@ void ImageSingleBandViewController<T>::updateView()
     
     
     //Underly colorful gradient of velocity to legend
-    m_intensity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+    m_intensity_legend->setColorTable(m_colorTable->value());
     m_intensity_legend->setValueRange(func(m_minValue->value()), func(m_maxValue->value()));
     m_intensity_legend->setCaption(m_legendCaption->value());
     m_intensity_legend->setTicks(m_legendTicks->value());
@@ -236,7 +224,7 @@ void ImageSingleBandViewController<T>::updateView()
             p++;
         }
     }
-    m_image.setColorTable(m_colorTable);
+    m_image.setColorTable(m_ct);
     
     update();
 }
@@ -306,10 +294,8 @@ void ImageSingleBandViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent *
 template <class T>
 ImageRGBViewController<T>::ImageRGBViewController(QGraphicsScene* scene, Image<T>* img, int z_order)
 :   ViewController(scene, img, z_order),
-    m_minColor(new ColorParameter("Min. color:",Qt::black)),
     m_minValue(new FloatParameter("Min. value:", -1e20f, 1e20f, 0)),
     m_transparentBelowMin(new BoolParameter("Transp. (< min):", false)),
-    m_maxColor(new ColorParameter("Max. color:",Qt::white)),
     m_maxValue(new FloatParameter("Max. value:", -1e20f, 1e20f, 255)),
     m_transparentAboveMax(new BoolParameter("Transp. (> max):", false)),
     m_scalingFunction(NULL),
@@ -324,10 +310,8 @@ ImageRGBViewController<T>::ImageRGBViewController(QGraphicsScene* scene, Image<T
 		scalingFunctions.append("square root");
     m_scalingFunction = new EnumParameter("Scaling function:", scalingFunctions,0);
     
-    m_parameters->addParameter("minColor", m_minColor);
     m_parameters->addParameter("minValue", m_minValue);
     m_parameters->addParameter("transMinColor", m_transparentBelowMin);
-    m_parameters->addParameter("maxColor", m_maxColor);
     m_parameters->addParameter("maxValue", m_maxValue);
     m_parameters->addParameter("transMaxColor", m_transparentAboveMax);
     m_parameters->addParameter("scaling", m_scalingFunction);

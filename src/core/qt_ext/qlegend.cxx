@@ -34,6 +34,7 @@
 /************************************************************************/
 
 #include "qlegend.hxx"
+#include "colortables.hxx"
 
 #include <QFont>
 
@@ -51,8 +52,8 @@ QLegend::QLegend(QGraphicsItem* parent)
 	m_ticks(10), 
 	m_digits(1), 
 	m_fixed_scale(false),
-	m_min_color(Qt::white), 
-	m_max_color(Qt::white)
+	m_ct(colorTables()[0]),
+    m_bg_pixmap(NULL)
 {
     if (parent != NULL)
     {
@@ -79,8 +80,8 @@ QLegend::QLegend(QRectF rect, float lower_val, float upper_val, int ticks, bool 
 	m_ticks(ticks),
 	m_digits(1), 
 	m_fixed_scale(fixed_scale),
-	m_min_color(Qt::white), 
-	m_max_color(Qt::white)
+	m_ct(colorTables()[0]),
+    m_bg_pixmap(NULL)
 {
     if (parent != NULL)
     {
@@ -110,8 +111,8 @@ QLegend::QLegend(float rect_left, float rect_top, float rect_width, float rect_h
 	m_ticks(ticks), 
 	m_digits(1), 
 	m_fixed_scale(fixed_scale),
-	m_min_color(Qt::white), 
-	m_max_color(Qt::white)
+	m_ct(colorTables()[0]),
+    m_bg_pixmap(NULL)
 {
     if (parent != NULL)
     {
@@ -134,17 +135,15 @@ void QLegend::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 	painter->save();
     
     painter->setPen(m_pen);
-    painter->setBrush(m_brush);
 	painter->setFont(m_scale_font);
     
-	QLinearGradient linearGrad(m_scale_rect.topLeft(), m_scale_rect.bottomRight());
-	linearGrad.setColorAt(0, m_min_color);
-	linearGrad.setColorAt(1, m_max_color);
-	
-	painter->setBrush(linearGrad);
-	
 	//First draw rectangle
-	painter->drawRect(m_scale_rect);
+    if(m_bg_pixmap != NULL)
+    {
+        painter->drawPixmap(m_scale_rect.left(), m_scale_rect.top(),
+                            m_bg_pixmap->scaled(m_scale_rect.width()+1, m_scale_rect.height()+1));
+	}
+    painter->drawRect(m_scale_rect);
     
     painter->setFont(m_scale_font);
     QFontMetrics fm_scale(m_scale_font);
@@ -246,26 +245,7 @@ void QLegend::setTicks(unsigned int ticks)
 {
     m_ticks = ticks;
 }
-
-/**
- * Const accessor to the currently used QBrush of the scale of the QLegend.
- *
- * \return The currently used QBrush of the scale of the QLegend.
- */
-QBrush QLegend::brush() const
-{
-	return m_brush;
-}
-/**
- * Sets the brush of the scale to a new QBrush.
- *
- * \param brush The new QBrush of the scale.
- */
-void QLegend::setBrush(const QBrush &  brush)
-{
-	m_brush = brush;
-}
-            
+    
 /**
  * Const accessor to find out if the "true to scale" mode is enabled.
  *
@@ -343,55 +323,46 @@ void QLegend::setValueRange(float min_val, float max_val)
 }
 
 /**
- * Const accessor to the color, which corresponds to the minimum value of the scale.
+ * Const accessor to the color table of the scale.
  *
- * \return The color, which corresponds to the minimum value of the scale.
+ * \return The color table of the scale.
  */
-QColor QLegend::minColor() const
+QVector<QRgb> QLegend::colorTable() const
 {
-	return m_min_color;
+    return m_ct;
 }
 
 /**
- * Sets the color, which corresponds to the minimum value of the scale.
+ * Sets the color table (colors of minimum and maximum value) of the scale
  *
- * \param col The color, which corresponds to the new minimum value of the scale.
+ * \param colorTable The new color table of the scale.
  */
-void QLegend::setMinColor(QColor col)
+void QLegend::setColorTable(QVector<QRgb> colorTable)
 {
-	m_min_color=col;
-}
+    m_ct = colorTable;
 
-/**
- * Const accessor to the color, which corresponds to the maximum value of the scale.
- *
- * \return The color, which corresponds to the maximum value of the scale.
- */
-QColor QLegend::maxColor() const
-{
-	return m_max_color;
-}
+    unsigned int w=256, h=1;
+    
+    QImage background_img = QImage(w, h, QImage::Format_Indexed8);
+    background_img.setColorCount(256);
+    
+    for(unsigned int y=0; y<h; ++y)
+    {
+        for(unsigned int x=0; x<w; ++x)
+        {
+            background_img.setPixel(x,y, w/256.0*x);
+        }
+    }
+    background_img.setColorTable(m_ct);
+    
+    if(m_bg_pixmap)
+    {
+        delete m_bg_pixmap;
+        m_bg_pixmap = NULL;
+    }
+    m_bg_pixmap = new QPixmap;
+    m_bg_pixmap->convertFromImage(background_img);
 
-/**
- * Sets the color, which corresponds to the maximum value of the scale.
- *
- * \param col The color, which corresponds to the new maximum value of the scale.
- */
-void QLegend::setMaxColor(QColor col)
-{
-	m_max_color=col;
-}
-
-/**
- * Sets the color range (colors of minimum and maximum value) of the scale
- *
- * \param min_col The new minimum color of the scale.
- * \param max_col The new maximum color of the scale.
- */
-void QLegend::setColorRange(QColor min_col, QColor max_col)
-{
-	setMinColor(min_col);
-	setMaxColor(max_col);
 }
 
 /**
@@ -425,6 +396,7 @@ void QLegend::updateRect(const QRectF& new_rect)
     
     float caption_pts = 0.9*std::min(float(rect().width()/caption_w), float(rect().height()/3.0)/caption_h);
     m_caption_font = QFont(QString("Arial"), caption_pts);
+    
 }
 
 /**

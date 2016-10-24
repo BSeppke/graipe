@@ -54,9 +54,8 @@ SparseVectorfield2DViewController::SparseVectorfield2DViewController(QGraphicsSc
     m_lineWidth(new FloatParameter("Arrow width:", 0,100000,1)),
     m_headSize(new FloatParameter("Head size:",0,100000,0.3f)),
     m_minLength(new FloatParameter("Min. length (px.):",0,10000,0)),
-    m_minColor(new ColorParameter("Min. color:",Qt::yellow)),
     m_maxLength(new FloatParameter("Max. length (px.):",0,10000,0)),
-    m_maxColor(new ColorParameter("Max. color:",Qt::red)),
+    m_colorTable(new ColorTableParameter("Color:")),
     m_normalizeLength(new BoolParameter("Fix vector length?",false)),
     m_normalizedLength(new FloatParameter("Fixed length:", 1.0e-6f, 1.0e6f, 10, m_normalizeLength)),
     m_displayMotionMode(NULL),
@@ -90,9 +89,8 @@ SparseVectorfield2DViewController::SparseVectorfield2DViewController(QGraphicsSc
     m_parameters->addParameter("arrowWidth", m_lineWidth);
     m_parameters->addParameter("headSize", m_headSize);
     m_parameters->addParameter("minLength", m_minLength);
-    m_parameters->addParameter("minColor", m_minColor);
     m_parameters->addParameter("maxLength", m_maxLength);
-    m_parameters->addParameter("maxColor", m_maxColor);
+    m_parameters->addParameter("colorTable", m_colorTable);
     m_parameters->addParameter("normalizeLength", m_normalizeLength);
     m_parameters->addParameter("normalizedLength", m_normalizedLength);
     m_parameters->addParameter("displayMotionMode", m_displayMotionMode);
@@ -290,8 +288,7 @@ void SparseVectorfield2DViewController::updateView()
     
     m_vector_drawer.setLineWidth(m_lineWidth->value());
     m_vector_drawer.setHeadSize(m_headSize->value());
-    m_vector_drawer.setMinColor(m_minColor->value());
-    m_vector_drawer.setMaxColor(m_maxColor->value());
+    m_vector_drawer.setColorTable(m_colorTable->value());
     
 	SparseVectorfield2D * vf = static_cast<SparseVectorfield2D*> (model());
     
@@ -308,7 +305,7 @@ void SparseVectorfield2DViewController::updateView()
 		{
 			m_velocity_legend->setValueRange(m_minLength->value(), m_maxLength->value());
 		}
-		m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+		m_velocity_legend->setColorTable(m_colorTable->value());
 	} 
 	//Display arrows at original length
 	else
@@ -328,7 +325,7 @@ void SparseVectorfield2DViewController::updateView()
 			m_velocity_legend->setRect(QRectF(r_old.left(), r_old.top(), m_maxLength->value(), r_old.height()));
 			m_velocity_legend->setValueRange(0, m_maxLength->value());
 		}
-		m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+		m_velocity_legend->setColorTable(m_colorTable->value());
 	}
 	
 	//set the caption of that legend
@@ -662,7 +659,7 @@ void SparseWeightedVectorfield2DViewController::updateView()
 	//If the colors shall be used for weight coding
 	if(m_useColorForWeight->value())
 	{
-		m_weight_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+		m_weight_legend->setColorTable(m_colorTable->value());
 		m_weight_legend->setValueRange(m_minWeight->value(), m_maxWeight->value());
         m_weight_legend->setCaption(m_weightLegendCaption->value());
         m_weight_legend->setTicks(m_weightLegendTicks->value());
@@ -694,7 +691,7 @@ void SparseWeightedVectorfield2DViewController::updateView()
 				}
 				
 				m_velocity_legend->setValueRange(0, m_maxLength->value());
-				m_velocity_legend->setColorRange(Qt::white, Qt::white);
+				m_velocity_legend->setColorTable(colorTables()[0]);
 				m_velocity_legend->setVisible(true);
 			}			
 		}
@@ -1003,8 +1000,7 @@ void SparseMultiVectorfield2DViewController::updateView()
     
     m_vector_drawer.setLineWidth(m_lineWidth->value());
     m_vector_drawer.setHeadSize(m_headSize->value());
-    m_vector_drawer.setMinColor(m_minColor->value());
-    m_vector_drawer.setMaxColor(m_maxColor->value());
+    m_vector_drawer.setColorTable(m_colorTable->value());
     
 	SparseVectorfield2D * vf = static_cast<SparseVectorfield2D*> (model());
     
@@ -1021,7 +1017,7 @@ void SparseMultiVectorfield2DViewController::updateView()
 		{
 			m_velocity_legend->setValueRange(m_minLength->value(), m_maxLength->value());
 		}
-		m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+		m_velocity_legend->setColorTable(m_colorTable->value());
 	} 
 	//Display arrows at original length
 	else
@@ -1041,7 +1037,7 @@ void SparseMultiVectorfield2DViewController::updateView()
 			m_velocity_legend->setRect(QRectF(r_old.left(), r_old.top(), m_maxLength->value(), r_old.height()));
 			m_velocity_legend->setValueRange(0, m_maxLength->value());
 		}
-		m_velocity_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+		m_velocity_legend->setColorTable(m_colorTable->value());
 	}
 	
 	//set the caption of that legend
@@ -1373,7 +1369,7 @@ void SparseWeightedMultiVectorfield2DViewController::updateView()
 	//If the colors shall be used for weight coding
 	if(m_useColorForWeight->value())
     {
-        m_weight_legend->setColorRange(m_minColor->value(), m_maxColor->value());
+        m_weight_legend->setColorTable(m_colorTable->value());
         m_weight_legend->setValueRange(m_minWeight->value(), m_maxWeight->value());
         m_weight_legend->setCaption(m_weightLegendCaption->value());
         m_weight_legend->setTicks(m_weightLegendTicks->value());
@@ -1405,7 +1401,7 @@ void SparseWeightedMultiVectorfield2DViewController::updateView()
 					m_velocity_legend->setRect(QRectF(r_old.left(), r_old.top(), m_maxLength->value(), r_old.height()));
 					m_velocity_legend->setValueRange(0, m_maxLength->value());
 				}
-				m_velocity_legend->setColorRange(Qt::white, Qt::white);
+				m_velocity_legend->setColorTable(colorTables()[0]);
 				m_velocity_legend->setVisible(true);
 			}
 		}

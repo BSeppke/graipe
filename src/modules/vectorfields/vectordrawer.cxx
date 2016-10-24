@@ -37,13 +37,12 @@
 
 namespace graipe {
     
-VectorDrawer::VectorDrawer(float line_width, float head_size, QColor min_color, QColor max_color)
- : m_arrow_brush(max_color)
+VectorDrawer::VectorDrawer(float line_width, float head_size, QVector<QRgb> colorTable)
+: m_arrow_brush(colorTable[0])
 {
     setLineWidth(line_width);
     setHeadSize(head_size);
-    setMinColor(min_color);
-    setMaxColor(max_color);
+    setColorTable(colorTable);
 }
 
 void VectorDrawer::setLineWidth(float new_line_width)
@@ -67,31 +66,18 @@ float VectorDrawer::headSize() const
     return m_head_size;
 }
 
-void VectorDrawer::setMinColor(const QColor& new_min_color)
+QVector<QRgb> VectorDrawer::colorTable() const
 {
-    m_min_color = new_min_color;
+    return m_colorTable;
 }
-const QColor& VectorDrawer::minColor() const
+void VectorDrawer::setColorTable(QVector<QRgb> colorTable)
 {
-    return m_min_color;
+    m_colorTable = colorTable;
 }
-
-void VectorDrawer::setMaxColor(const QColor& new_max_color)
-{
-    m_max_color = new_max_color;
-}
-
-const QColor& VectorDrawer::maxColor() const
-{
-    return m_max_color;
-}
-
 
 void VectorDrawer::paint(QPainter * painter, const QPointFX& origin, const QPointFX& target, float normalized_weight)
 {
-    QColor current_color =  QColor(m_min_color.red()  *(1-normalized_weight)	+ m_max_color.red()  *normalized_weight,
-                                   m_min_color.green()*(1-normalized_weight)	+ m_max_color.green()*normalized_weight,
-                                   m_min_color.blue() *(1-normalized_weight)	+ m_max_color.blue() *normalized_weight);
+    QColor current_color =  QColor(m_colorTable[normalized_weight*255]);
     
     painter->setPen(QPen());
     painter->setBrush(QBrush());

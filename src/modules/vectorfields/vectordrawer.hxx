@@ -38,6 +38,7 @@
 
 #include "vectorfields/config.hxx"
 #include "core/qt_ext/qpointfx.hxx"
+#include "core/colortables.hxx"
 
 #include <QBrush>
 #include <QColor>
@@ -50,7 +51,7 @@ namespace graipe {
 class GRAIPE_VECTORFIELDS_EXPORT VectorDrawer
 {
 public:
-    VectorDrawer(float line_width=0, float head_size=1, QColor min_color=Qt::white, QColor max_color = Qt::black);
+    VectorDrawer(float line_width=0, float head_size=1, QVector<QRgb> colorTable = colorTables()[0]);
 
     void setLineWidth(float new_line_width);
     float lineWidth() const;
@@ -58,12 +59,8 @@ public:
     void setHeadSize(float new_head_size);
     float headSize() const;
     
-    void setMinColor(const QColor& new_min_color);
-    const QColor& minColor() const;
-    
-    void setMaxColor(const QColor& new_max_color);
-    const QColor& maxColor() const;
-    
+    QVector<QRgb> colorTable() const;
+    void setColorTable(QVector<QRgb> colorTable);
     
     void paint(QPainter * painter, const QPointFX& origin, const QPointFX& target, float normalized_weight);
     
@@ -77,8 +74,7 @@ private:
     
     QPolygonF m_triangle;
     
-    QColor m_min_color;
-    QColor m_max_color;
+    QVector<QRgb>  m_colorTable;
 };
 
 } //end of namespace graipe
