@@ -377,6 +377,13 @@ void QLegend::updateRect(const QRectF& new_rect)
 {
     QGraphicsResizableItem::updateRect(new_rect);
     
+    float zoom_factor = (new_rect.width()-20)/m_scale_rect.width();
+    if(fixedScale())
+    {
+        float range = m_upper_val - m_lower_val;
+        m_upper_val = m_lower_val + range*zoom_factor;
+    }
+    
     m_scale_rect.setLeft(rect().left()+10);
     m_scale_rect.setWidth(rect().width()-20);
     m_scale_rect.setTop(rect().top());
