@@ -69,7 +69,7 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          *                      be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
          */
-        ColorTableParameter(const QString& name, QVector<QRgb> value=colorTables()[0], Parameter* parent=NULL, bool invert_parent=false);
+        ColorTableParameter(const QString& name, QVector<QRgb> value=(colorTables()[0]), Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * The destructor of the ColorTableParameter class.
@@ -96,6 +96,13 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          * \param value The new value of this parameter.
          */
         void setValue(const QVector<QRgb>& value);
+    
+        /**
+         * Add another (user defined) color table to this parameter.
+         *
+         * \param ct The new user defined ct of this parameter.
+         */
+        void addCustomColorTable(const QVector<QRgb>& ct);
             
         /**
          * The value converted to a QString. Please note, that this can vary from the 
@@ -161,6 +168,12 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
     
         //The color (value)
         QVector<QRgb> m_value;
+    
+        //The index of the ColorTable (to make this parameter work without a widget
+        unsigned int m_colorTable_id;
+    
+        //The starage of extra color tables
+        QVector<QVector<QRgb> > m_extra_tables;
 };
 
 } //end of namespace graipe

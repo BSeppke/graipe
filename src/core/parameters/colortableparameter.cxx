@@ -35,6 +35,7 @@
 
 #include "core/parameters/colortableparameter.hxx"
 
+#include <QColorDialog>
 #include <QtDebug>
 
 namespace graipe {
@@ -52,7 +53,8 @@ namespace graipe {
 ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_delegate(NULL),
-    m_value(value)
+    m_value(value),
+    m_colorTable_id(0)
 {
 }
 
@@ -95,21 +97,88 @@ const QVector<QRgb>& ColorTableParameter::value() const
  */
 void ColorTableParameter::setValue(const QVector<QRgb>& value)
 {
+    bool found = false;
+    
+    //search in std. color tables
     for(unsigned int ct=0; ct != colorTables().size(); ++ct)
     {
-        if (colorTables()[ct] == value)
+        if(colorTables()[ct] == value)
         {
+            found=true;
             m_value = value;
-            
-            if(m_delegate!= NULL)
-            {
-                m_delegate->setCurrentIndex(ct);
-            }
+            m_colorTable_id = ct;
             break;
         }
     }
+    
+    //search in extra (user defined) color tables
+    for(unsigned int extra_ct=0; extra_ct != m_extra_tables.size(); ++extra_ct)
+    {
+        if(m_extra_tables[extra_ct] == value)
+        {
+            found=true;
+            m_value = value;
+            m_colorTable_id = colorTables().size()+extra_ct;
+            break;
+        }
+    }
+    
+    //if not found, add a new one
+    if(!found)
+    {
+        addCustomColorTable(value);
+        m_colorTable_id = colorTables().size() + m_extra_tables.size() - 1;
+    }
+    
+    //if delegate is available, update index
+    if(m_delegate!= NULL)
+    {
+        m_delegate->setCurrentIndex(m_colorTable_id);
+    }
 }
 
+/**
+ * Add another (user defined) color table to this parameter.
+ *
+ * \param ct The new user defined ct of this parameter.
+ */
+void ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
+{
+    if(ct.size()==256)
+    {
+        m_extra_tables.push_back(ct);
+        m_value = ct;
+        m_colorTable_id = colorTables().size() + m_extra_tables.size() - 1;
+        
+        if(m_delegate != NULL)
+        {
+            //Remove last entry (Create custom ct)
+            m_delegate->removeItem(m_delegate->count()-1);
+            
+            //Add this (new) color table
+            unsigned int w=256, h=16;
+            m_delegate->setIconSize(QSize(w, h));
+        
+            QImage img(w, h, QImage::Format_Indexed8);
+            img.setColorCount(256);
+        
+            for(unsigned int y=0; y<h; ++y)
+            {
+                for(unsigned int x=0; x<w; ++x)
+                {
+                    img.setPixel(x,y, w/256.0*x);
+                }
+            }
+            img.setColorTable(ct);
+            m_delegate->addItem(QPixmap::fromImage(img),"");
+            
+            //Finally add the custom entry again
+            m_delegate->addItem("Add new");
+            
+            m_delegate->setCurrentIndex(m_colorTable_id);
+        }
+    }
+}
 /**
  * The value converted to a QString. Please note, that this can vary from the 
  * serialize() result, which also returns a QString. This is due to the fact,
@@ -120,14 +189,13 @@ void ColorTableParameter::setValue(const QVector<QRgb>& value)
  */
 QString  ColorTableParameter::valueText() const
 {
-    if(m_delegate != NULL)
+    QString str = QString::number(m_value[0]);
+    for(unsigned int i=1; i<m_value.size(); ++i)
     {
-        return QString::number(m_delegate->currentIndex());
+        str += ", " + QString::number(m_value[i]);
     }
-    else
-    {
-        return "0";
-    }
+    
+    return str;
 }
 
 /**
@@ -156,19 +224,27 @@ bool ColorTableParameter::deserialize(QIODevice& in)
         return false;
     }
     
-    
     QString content(in.readLine().trimmed());
-    
+    QStringList content_list = split_string(content, ", ");
     try
     {
-        unsigned int ct = content.toUInt();
-        setValue(colorTables()[ct]);
+        if(content_list.size() != 256)
+        {
+            throw std::runtime_error("Error: Did not find 256 entries");
+        }
+        
+        QVector<QRgb> ct(256);
+        for(unsigned int i=0; i<ct.size(); ++i)
+        {
+            ct[i] = content_list[i].toUInt();
+        }
+        setValue(ct);
         
         return true;
     }
     catch (...)
     {
-        qDebug() << "ColorTableParameter deserialize: value has to be an integer in file, but found: " << content;
+        qDebug() << "ColorTableParameter deserialize: value has to be an integer list in file, but found: " << content;
     }
     return false;
 }
@@ -217,6 +293,14 @@ QWidget*  ColorTableParameter::delegate()
             m_delegate->addItem(QPixmap::fromImage(img),"");
         
         }
+        
+        for( QVector<QRgb> ct : m_extra_tables)
+        {
+            img.setColorTable(ct);
+            m_delegate->addItem(QPixmap::fromImage(img),"");
+        
+        }
+        m_delegate->addItem("Add new");
         setValue(m_value);
         initConnections();
     }
@@ -237,6 +321,22 @@ void ColorTableParameter::updateValue()
         if(idx >= 0 && idx < colorTables().size())
         {
             m_value = (colorTables()[idx]);
+            m_colorTable_id = idx;
+        }
+        else if(idx >= colorTables().size() && idx < m_delegate->count()-1)
+        {
+            m_value = m_extra_tables[idx-colorTables().size()];
+            m_colorTable_id = idx;
+        }
+        else if(idx == m_delegate->count()-1)
+        {
+            QColor col = QColorDialog::getColor(Qt::red, m_delegate, name());
+        
+            if(col.isValid())
+            {
+                QVector<QRgb> ct(256, qRgb(col.red(), col.green(), col.blue()));
+                setValue(ct);
+            }
         }
     }
     Parameter::updateValue();

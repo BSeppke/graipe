@@ -132,11 +132,7 @@ void LongStringParameter::serialize(QIODevice& out) const
 {
     Parameter::serialize(out);
     
-    QString encoded_str = encode_string(value());
-    
-    qDebug() << "LongStringParameter::serialize: value()= " << value();
-    qDebug() << "LongStringParameter::serialize: Will write: " << encoded_str;
-    
+    QString encoded_str = encode_string(value());    
     write_on_device(", " + encoded_str, out);
 }
 
