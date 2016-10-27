@@ -265,7 +265,7 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
             double w = vectorfield->weight(j);
             
             mean_direction	+= w*g*(vectorfield->direction(j)); 
-            sum_wg			+= w*g;
+            //sum_wg			+= w*g;
             sum_g           += g;
             
 			if (useAllCandidates)
@@ -288,7 +288,7 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 		{
 			//save the new vector at current step
 			mean_direction	/= sum_wg;
-			sum_wg			/= sum_g;
+			//sum_wg			/= sum_g;
 		
 			//Instead of smoothing the current vector -> select best alternative
 			//result_vectorfield->setDirection(i, mean_direction);
@@ -367,7 +367,7 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 				double w = work_vectorfield->weight(j);
 				
 				mean_direction	+= w*g*(work_vectorfield->direction(j)); 
-				sum_wg			+= w*g;
+				//sum_wg			+= w*g;
 				sum_g           += g;
 			}
 			
@@ -380,7 +380,7 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 					
 				//save the new vector at current step
 				mean_direction	/= sum_wg;
-				sum_wg			/= sum_g;
+				//sum_wg			/= sum_g;
 				
 				//find best fitting vector out of the candidates
 				int best_idx=0;

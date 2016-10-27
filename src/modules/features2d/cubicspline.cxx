@@ -165,7 +165,7 @@ float CubicSpline1D::derive(float x) const
     int n = m_points.size();
     
     int klo, khi, k;
-    float a, b, c, d, h;
+    float a, b, h;//c, d;
     
     klo = 0;
     khi = n - 1;
@@ -192,8 +192,8 @@ float CubicSpline1D::derive(float x) const
     
     a = (m_points[khi].x() - x)/h;
     b = (x - m_points[klo].x())/h;
-    c = (a*a*a-a)*(h*h) / 6.0;
-    d = (b*b*b-b)*(h*h) / 6.0;
+    //c = (a*a*a-a)*(h*h) / 6.0;
+    //d = (b*b*b-b)*(h*h) / 6.0;
     
     return  -1.0/h*m_points[klo].y() + 1.0/h*m_points[khi].y() + (-3.0*a*a+1.0)*h/6.0*m_y2[klo] + (3.0*b*b-1.0)*h/6.0*m_y2[khi];
     /*      da/dx                    db/dx                 '------ db/dx -----'                '------ db/dx -----'      */
@@ -210,7 +210,7 @@ float CubicSpline1D::derive2(float x) const
     int n = m_points.size();
     
     int klo, khi, k;
-    float a, b, c, d, h;
+    float a, b, h;//c, d;
     
     klo = 0;
     khi = n - 1;
@@ -237,8 +237,8 @@ float CubicSpline1D::derive2(float x) const
     
     a = (m_points[khi].x() - x)/h;
     b = (x - m_points[klo].x())/h;
-    c = (a*a*a-a)*(h*h) / 6.0;
-    d = (b*b*b-b)*(h*h) / 6.0;
+    //c = (a*a*a-a)*(h*h) / 6.0;
+    //d = (b*b*b-b)*(h*h) / 6.0;
     
     return a*m_y2[klo] + b*m_y2[khi];
 }

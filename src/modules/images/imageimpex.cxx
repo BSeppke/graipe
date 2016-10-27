@@ -115,7 +115,11 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
                     file_ext  = filename.mid(found_ext+1);
 			
 			//Initialize Image Metrics and log
-			float global_left, global_top, global_right, global_bottom;
+			float global_left = 0,
+                  global_top = 0,
+                  global_right = 1,
+                  global_bottom = -1;
+            
 			typename Image<T>::Units_Type units = "px";
 			
             qInfo() << "Trying to load file '" << filename << "' from FS\n";
@@ -167,12 +171,14 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 						<< "        " << poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME ) << "\n";
 				
 				//First try: The projection is saved directly at the dataset
-				if( poDataset->GetProjectionRef() != NULL && strcmp(poDataset->GetProjectionRef(),"") != 0 ){
+				if( poDataset->GetProjectionRef() != NULL && strcmp(poDataset->GetProjectionRef(),"") != 0 )
+                {
 					qInfo() << "Projection is directly saved inside the dataset:\n"
 						<< "    " << poDataset->GetProjectionRef() << "\n";
 				
 					//Check if there is a proper Geometrical transformation matrix
-					if(	poDataset->GetGeoTransform( adfGeoTransform ) == CE_None ){
+					if(	poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
+                    {
 						char* ang_unitnames, *lin_unitnames;
 						OGRSpatialReference  	spaRef(  poDataset->GetProjectionRef() );
 						double ang = spaRef.GetAngularUnits (&ang_unitnames);
@@ -223,10 +229,12 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 						y_w = y_p = adfGeoTransform[3]+adfGeoTransform[4]*x_i+adfGeoTransform[5]*y_i;
 						
 						
-						if( poCT == NULL || !poCT->Transform( 1, &x_w, &y_w ) ){
+						if( poCT == NULL || !poCT->Transform( 1, &x_w, &y_w ) )
+                        {
 							qInfo() << "Calculation of transformation chain failed.\n";
 						}
-						else{
+						else
+                        {
 							qInfo() << "Transformation chain (for lower right pixel):\n"
 								<< "    [ "<< x_i <<" "<< y_i <<" ]  -- c.proj.--> [ "<< x_p <<" "<< y_p <<" ] -- w.proj.--> [  "<< x_w <<" "<< y_w <<" ]\n";
 							
@@ -236,7 +244,8 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 					}
 				}
 				//Second try: maybe there are GCPs given to calculate the projection
-				else if(poDataset->GetGCPProjection() != NULL && strcmp(poDataset->GetGCPProjection(),"") != 0 ){
+				else if(poDataset->GetGCPProjection() != NULL && strcmp(poDataset->GetGCPProjection(),"") != 0 )
+                {
 					qInfo() << "Projection is not directly saved  inside the dataset!\n\n"
 					    << "GCP Projection is: \n"
 						<< "    " << poDataset->GetGCPProjection() << "\n"
@@ -250,7 +259,8 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 					}
 				
 					//Checking Geometrical transformation matrix
-					if(	GDALGCPsToGeoTransform( poDataset->GetGCPCount(), poDataset->GetGCPs(), adfGeoTransform, 0) == CE_None) {
+					if(	GDALGCPsToGeoTransform( poDataset->GetGCPCount(), poDataset->GetGCPs(), adfGeoTransform, 0) == CE_None)
+                    {
 						char* ang_unitnames, *lin_unitnames;
 						OGRSpatialReference  	spaRef( poDataset->GetGCPProjection() );
 						double ang = spaRef.GetAngularUnits (&ang_unitnames);

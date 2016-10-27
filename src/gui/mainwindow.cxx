@@ -630,20 +630,22 @@ void MainWindow::layerPositionChange()
 	for(int i=0; i< m_ui.listViews->count(); ++i)
 	{
 		QListWidgetViewControllerItem* vc_item = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->item(i));
-		if(vc_item)
+		if(vc_item != NULL)
 		{
 			ViewController * viewController = vc_item->viewController();
 		
-			if (viewController)
+			if (viewController != NULL)
+            {
 				viewController->setZValue(i);
 		
-			if(vc_item->checkState()==Qt::Checked)
-			{
-                viewController->show();
-			}
-            else
-			{
-            	viewController->hide();
+                if(vc_item->checkState()==Qt::Checked)
+                {
+                    viewController->show();
+                }
+                else
+                {
+                    viewController->hide();
+                }
             }
         }
 	}

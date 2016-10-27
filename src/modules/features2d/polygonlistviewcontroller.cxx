@@ -366,6 +366,10 @@ void WeightedPolygonList2DViewController::updateParameters(bool force_update)
         m_minWeight->setRange(floor(new_stats->weightStats().min), ceil(new_stats->weightStats().max));
         m_maxWeight->setRange(floor(new_stats->weightStats().min), ceil(new_stats->weightStats().max));
     }
+    else
+    {
+        delete new_stats;
+    }
 }
 
 /**
