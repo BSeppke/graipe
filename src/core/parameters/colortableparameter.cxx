@@ -35,6 +35,10 @@
 
 #include "core/parameters/colortableparameter.hxx"
 
+#include "core/parameters/colorparameter.hxx"
+#include "core/parameters/boolparameter.hxx"
+#include "core/parameterselection.hxx"
+
 #include <QColorDialog>
 #include <QtDebug>
 
@@ -271,7 +275,7 @@ QWidget*  ColorTableParameter::delegate()
 {
     if(m_delegate == NULL)
     {
-        m_delegate = new QComboBox();
+        m_delegate = new QComboBox;
         
         unsigned int w=256, h=16;
         m_delegate->setIconSize(QSize(w, h));
@@ -330,13 +334,68 @@ void ColorTableParameter::updateValue()
         }
         else if(idx == m_delegate->count()-1)
         {
-            QColor col = QColorDialog::getColor(Qt::red, m_delegate, name());
+            ParameterGroup* custom_ct_params = new ParameterGroup("Custom color table");
+
+            //Prepare parameter selection for individual ColorTable creations:
+            //Select up to three color parameters (color, start, end)
+            ColorParameter* param_start_color = new ColorParameter("Start color", Qt::yellow);
+            
+            BoolParameter*  param_use_mid_color= new BoolParameter("Use mid color");
+            ColorParameter* param_mid_color = new ColorParameter("Mid color", Qt::green, param_use_mid_color);
+            
+            BoolParameter*  param_use_end_color= new BoolParameter("Use end color");
+            ColorParameter* param_end_color = new ColorParameter("End color", Qt::red, param_use_end_color);
+            
+            //Note: Ownership gows to m_custom_color_params on addition:
+            custom_ct_params->addParameter("start_color",   param_start_color);
+            custom_ct_params->addParameter("use_mid_color", param_use_mid_color);
+            custom_ct_params->addParameter("mid_color",     param_mid_color);
+            custom_ct_params->addParameter("use_end_color", param_use_end_color);
+            custom_ct_params->addParameter("end_color",     param_end_color);
+            
+            ParameterSelection custom_ct_selection(NULL, custom_ct_params);
         
-            if(col.isValid())
+            if(custom_ct_selection.exec())
             {
-                QVector<QRgb> ct(256, qRgb(col.red(), col.green(), col.blue()));
+                //Get results
+                QColor start_color = param_start_color->value();
+                QColor mid_color = param_mid_color->value();
+                QColor end_color = param_end_color->value();
+                
+                bool use_mid_color = param_use_mid_color->value();
+                bool use_end_color = param_use_end_color->value();
+                
+                //Generate 0, 0.5 and 1 color assignment
+                QColor col1 = start_color,
+                       col2 = start_color,
+                       col3 = start_color;
+                
+                if(use_end_color)
+                {
+                    col3 = end_color;
+                    
+                    if(use_mid_color)
+                    {
+                        col2 = mid_color;
+                    }
+                    else
+                    {
+                        col2 = QColor(  (col1.red()  +col3.red())/2,
+                                        (col1.green()+col3.green())/2,
+                                        (col1.blue() +col3.blue())/2);
+                    }
+                }
+                else if(use_mid_color)
+                {
+                    col2 = col3 =mid_color;
+                }
+                QVector<QRgb> ct = createColorTableFrom3Colors(col1, col2, col3);
+                
+                disconnect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
                 setValue(ct);
+                connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
             }
+            delete custom_ct_params;
         }
     }
     Parameter::updateValue();

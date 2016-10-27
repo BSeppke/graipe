@@ -58,12 +58,13 @@ namespace graipe {
  * \param param  The parameter, for which the selection shall be generated.
  */
 ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
-:	QDialog(parent)
+:	QDialog(parent),
+    m_widget(param->delegate())
 {
     this->setWindowTitle(QString("Selection for: ") + param->name());
     
     QVBoxLayout* verticalLayout = new QVBoxLayout(this);
-    verticalLayout->addWidget(param->delegate());
+    verticalLayout->addWidget(m_widget);
     
     QHBoxLayout* horizontalLayout = new QHBoxLayout;
     QSpacerItem* horizontalSpacer = new QSpacerItem(148, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -85,6 +86,17 @@ ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
     
     connect(btnOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
+}
+
+/**
+ * Destructor of the parameter selection. This destructor returns the
+ * ownership of the parameter's widget back to the caller. 
+ * Thus, it's widget(s) is(are) not destroyed here!
+ *
+ */
+ParameterSelection::~ParameterSelection()
+{
+    m_widget->setParent(NULL);
 }
 
 /**

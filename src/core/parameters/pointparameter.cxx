@@ -70,15 +70,10 @@ PointParameter::~PointParameter()
 {
     if(m_delegate != NULL)
     {
-        delete m_spbXDelegate;
-        m_spbXDelegate=NULL;
-        
-        delete m_spbYDelegate;
-        m_spbYDelegate=NULL;
-        
+        //Also deletes other widget, since they are owned
+        //by the assigned layout.
         delete m_delegate;
-        m_delegate=NULL;
-        
+        m_delegate=NULL;        
     }
 }
 
@@ -287,9 +282,9 @@ QWidget*  PointParameter::delegate()
         m_spbYDelegate->setMaximumSize(9999,9999);
         m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
         
-        QHBoxLayout * layout = new QHBoxLayout;
-        m_delegate->setLayout(layout);
+        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
         
+        layout->setContentsMargins(0,0,0,0);
         layout->addWidget(new QLabel("x:"));
         layout->addWidget(m_spbXDelegate);
         layout->addWidget(new QLabel("y:"));

@@ -68,12 +68,8 @@ FilenameParameter::~FilenameParameter()
 {
     if(m_delegate != NULL)
     {
-        delete m_lneDelegate;
-        m_lneDelegate=NULL;
-        
-        delete m_btnDelegate;
-        m_btnDelegate=NULL;
-        
+        //Also deletes other widget, since they are owned
+        //by the assigned layout.
         delete m_delegate;
         m_delegate=NULL;
     }
@@ -184,14 +180,14 @@ QWidget*  FilenameParameter::delegate()
     if(m_delegate == NULL)
     {
         m_delegate = new QWidget;
-        m_lneDelegate = new QLineEdit(m_delegate);
-        m_btnDelegate = new QPushButton("Browse", m_delegate);
+        m_lneDelegate = new QLineEdit;
+        m_btnDelegate = new QPushButton("Browse");
         
-        QHBoxLayout * buttonsLayout = new QHBoxLayout;
-        m_delegate->setLayout(buttonsLayout);
-    
-        buttonsLayout->addWidget(m_lneDelegate);
-        buttonsLayout->addWidget(m_btnDelegate);
+        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
+        
+        layout->setContentsMargins(0,0,0,0);
+        layout->addWidget(m_lneDelegate);
+        layout->addWidget(m_btnDelegate);
     
         initConnections();
     }

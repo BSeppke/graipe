@@ -37,6 +37,33 @@
 
 namespace graipe {
 
+QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & col2, const QColor & col3)
+{
+    QVector<QRgb> ct(256);
+
+    //Fill from start to mid
+    for(unsigned int i=0; i<128; i++)
+    {
+        float factor = i/128.0;
+        
+        ct[i] = qRgb(col1.red()*(1-factor)  + col2.red()*factor,
+                     col1.green()*(1-factor)+ col2.green()*factor,
+                     col1.blue()*(1-factor) + col2.blue()*factor);
+    }
+
+    //Fill from mid to end
+    for(unsigned int i=128; i<256; i++)
+    {
+        float factor = (i-128)/127.0;
+        
+        ct[i] = qRgb(col2.red()*(1-factor)  + col3.red()*factor,
+                     col2.green()*(1-factor)+ col3.green()*factor,
+                     col2.blue()*(1-factor) + col3.blue()*factor);
+    }
+    
+    return ct;
+}
+
 QVector<QVector<QRgb> > colorTables()
 {
     if(detail::colorTables.size()==22)

@@ -60,12 +60,8 @@ ImageBandParameterBase::~ImageBandParameterBase()
 {
     if(m_delegate != NULL)
     {
-        delete m_cmbImage;
-        m_cmbImage=NULL;
-        
-        delete m_spbBand;
-        m_spbBand=NULL;
-        
+        //Also deletes other widget, since they are owned
+        //by the assigned layout.
         delete m_delegate;
         m_delegate=NULL;
     }
@@ -97,11 +93,9 @@ QWidget* ImageBandParameterBase::delegate()
         m_cmbImage = new QComboBox;
         m_spbBand  = new QSpinBox;
     
-        QHBoxLayout *layout = new QHBoxLayout;
-        layout->setContentsMargins ( 0,0,0,0);
+        QHBoxLayout *layout = new QHBoxLayout(m_delegate);
     
-        m_delegate->setLayout(layout);
-
+        layout->setContentsMargins(0,0,0,0);
         layout->addWidget(m_cmbImage);
         layout->addWidget(m_spbBand);
         

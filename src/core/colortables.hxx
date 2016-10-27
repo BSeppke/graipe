@@ -38,6 +38,7 @@
 
 #include <QVector>
 #include <QRgb>
+#include <QColor>
 
 namespace graipe {
 
@@ -46,6 +47,7 @@ namespace detail
     static QVector<QVector<QRgb> > colorTables;
 }
 
+QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & col2, const QColor & col3);
 QVector<QVector<QRgb> > colorTables();
 
 } //end of namespace graipe

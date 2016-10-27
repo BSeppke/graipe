@@ -70,13 +70,8 @@ PointFParameter::~PointFParameter()
 {
     if(m_delegate != NULL)
     {
-        
-        delete m_dsbXDelegate;
-        m_dsbXDelegate=NULL;
-        
-        delete m_dsbYDelegate;
-        m_dsbYDelegate=NULL;
-        
+        //Also deletes other widget, since they are owned
+        //by the assigned layout.
         delete m_delegate;
         m_delegate=NULL;
     }
@@ -284,9 +279,10 @@ QWidget*  PointFParameter::delegate()
         m_dsbYDelegate->setValue(m_value.y());
         m_dsbYDelegate->setMaximumSize(9999,9999);
         m_dsbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        QHBoxLayout * layout = new QHBoxLayout;
-        m_delegate->setLayout(layout);
         
+        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
+        
+        layout->setContentsMargins(0,0,0,0);
         layout->addWidget(new QLabel("x:"));
         layout->addWidget(m_dsbXDelegate);
         layout->addWidget(new QLabel("y:"));

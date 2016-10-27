@@ -66,10 +66,8 @@ TransformParameter::~TransformParameter()
 {
     if(m_delegate != NULL)
     {
-        delete m_lne11; m_lne11=NULL;    delete m_lne12; m_lne12=NULL;    delete m_lne13; m_lne13=NULL;
-        delete m_lne21; m_lne21=NULL;    delete m_lne22; m_lne22=NULL;    delete m_lne23; m_lne23=NULL;
-        delete m_lne31; m_lne31=NULL;    delete m_lne32; m_lne32=NULL;    delete m_lne33; m_lne33=NULL;
-        
+        //Also deletes other widget, since they are owned
+        //by the assigned layout.
         delete m_delegate;
         m_delegate=NULL;
     }
@@ -210,6 +208,7 @@ bool TransformParameter::isValid() const
  *
  * \return The delegate widget to control the values of this parameter.
  */
+
 QWidget*  TransformParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -222,6 +221,7 @@ QWidget*  TransformParameter::delegate()
         
         QGridLayout * layout = new QGridLayout(m_delegate);
         
+        layout->setContentsMargins(0,0,0,0);
         layout->addWidget(m_lne11, 0,0); layout->addWidget(m_lne12, 0,1); layout->addWidget(m_lne13, 0,2);
         layout->addWidget(m_lne21, 1,0); layout->addWidget(m_lne22, 1,1); layout->addWidget(m_lne23, 1,2);
         layout->addWidget(m_lne31, 2,0); layout->addWidget(m_lne32, 2,1); layout->addWidget(m_lne33, 2,2);

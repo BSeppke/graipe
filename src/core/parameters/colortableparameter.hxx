@@ -38,6 +38,7 @@
 
 #include "core/colortables.hxx"
 #include "core/parameters/parameter.hxx"
+#include "core/parameters/parametergroup.hxx"
 
 #include <QComboBox>
 
@@ -52,6 +53,8 @@
 
 
 namespace graipe {
+
+class ParameterSelection;
 
 class GRAIPE_CORE_EXPORT ColorTableParameter
 :   public Parameter

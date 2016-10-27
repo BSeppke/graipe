@@ -74,6 +74,20 @@ public:
      * \param param  The parameter, for which the selection shall be generated.
      */
     ParameterSelection(QWidget *parent, Parameter* param);
+    
+
+    /**
+     * Destructor of the parameter selection. This destructor returns the
+     * ownership of the parameter's widget back to the caller. 
+     * Thus, it's widget(s) is(are) not destroyed here!
+     *
+     */
+    ~ParameterSelection();
+    
+protected:
+    //The  delegate of the parameter (temporary owned by the layout of this selection)
+    QWidget* m_widget;
+
 };
 
 
