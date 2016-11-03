@@ -54,13 +54,30 @@ namespace graipe {
  */
 PointParameter::PointParameter(const QString& name, QPoint low, QPoint upp, QPoint value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_delegate(NULL),
-    m_spbXDelegate(NULL),
-    m_spbYDelegate(NULL),
-    m_value(value),
-    m_min(low),
-    m_max(upp)
+    m_delegate(new QWidget),
+    m_spbXDelegate(new QSpinBox),
+    m_spbYDelegate(new QSpinBox)
 {
+    setRange(low, upp);
+    setValue(value);
+    
+    m_spbXDelegate->setMaximumSize(9999,9999);
+    m_spbXDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+    
+    m_spbYDelegate->setMaximumSize(9999,9999);
+    m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+        
+    QHBoxLayout * layout = new QHBoxLayout(m_delegate);
+    
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(new QLabel("x:"));
+    layout->addWidget(m_spbXDelegate);
+    layout->addWidget(new QLabel("y:"));
+    layout->addWidget(m_spbYDelegate);
+    
+    connect(m_spbXDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
+    connect(m_spbYDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -68,13 +85,10 @@ PointParameter::PointParameter(const QString& name, QPoint low, QPoint upp, QPoi
  */
 PointParameter::~PointParameter()
 {
-    if(m_delegate != NULL)
-    {
-        //Also deletes other widget, since they are owned
-        //by the assigned layout.
-        delete m_delegate;
-        m_delegate=NULL;        
-    }
+    //Also deletes other widget, since they are owned
+    //by the assigned layout.
+    delete m_delegate;
+    m_delegate=NULL;
 }
 
 /**
@@ -92,9 +106,9 @@ QString  PointParameter::typeName() const
  *
  * \return The minimal value of this parameter.
  */
-const QPoint& PointParameter::lowerBound() const
+QPoint PointParameter::lowerBound() const
 {
-    return m_min;
+    return QPoint(m_spbXDelegate->minimum(), m_spbYDelegate->minimum());
 }
 
 /**
@@ -104,13 +118,8 @@ const QPoint& PointParameter::lowerBound() const
  */
 void PointParameter::setLowerBound(const QPoint& value)
 {
-    m_min = value;
-    
-    if(m_delegate != NULL)
-    {
-        m_spbXDelegate->setMinimum(value.x());
-        m_spbYDelegate->setMinimum(value.y());
-    }
+    m_spbXDelegate->setMinimum(value.x());
+    m_spbYDelegate->setMinimum(value.y());
 }
 
 /**
@@ -118,9 +127,9 @@ void PointParameter::setLowerBound(const QPoint& value)
  *
  * \return The maximal value of this parameter.
  */
-const QPoint& PointParameter::upperBound() const
+QPoint PointParameter::upperBound() const
 {
-    return m_max;
+    return QPoint(m_spbXDelegate->maximum(), m_spbYDelegate->maximum());
 }
 
 /**
@@ -130,13 +139,8 @@ const QPoint& PointParameter::upperBound() const
  */
 void PointParameter::setUpperBound(const QPoint& value)
 {
-    m_max = value;
-    
-    if(m_delegate != NULL)
-    {
-        m_spbXDelegate->setMaximum(value.x());
-        m_spbYDelegate->setMaximum(value.y());
-    }
+    m_spbXDelegate->setMaximum(value.x());
+    m_spbYDelegate->setMaximum(value.y());
 }
 
 /**
@@ -156,9 +160,9 @@ void PointParameter::setRange(const QPoint& min_value, const QPoint& max_value)
  *
  * \return The value of this parameter.
  */
-const QPoint& PointParameter::value() const
+QPoint PointParameter::value() const
 {
-    return m_value;
+    return QPoint(m_spbXDelegate->value(), m_spbYDelegate->value());
 }
 
 /**
@@ -168,17 +172,9 @@ const QPoint& PointParameter::value() const
  */
 void PointParameter::setValue(const QPoint& value)
 {
-    if(   (value.x() >= lowerBound().x() && value.y() >= lowerBound().y())
-       && (value.x() <  upperBound().x() && value.y() <  upperBound().y()))
-    {
-        m_value =  value;
-        
-        if(m_delegate != NULL)
-        {
-            m_spbXDelegate->setValue(value.x());
-            m_spbYDelegate->setValue(value.y());
-        }
-    }
+    m_spbXDelegate->setValue(value.x());
+    m_spbYDelegate->setValue(value.y());
+    Parameter::updateValue();
 }
 
 /**
@@ -191,7 +187,7 @@ void PointParameter::setValue(const QPoint& value)
  */
 QString  PointParameter::valueText() const
 {
-    return QString("(%1x%2)").arg(m_value.x()).arg(m_value.y());
+    return QString("(%1x%2)").arg(value().x()).arg(value().y());
 }
 
 /**
@@ -264,62 +260,7 @@ bool PointParameter::isValid() const
  */
 QWidget*  PointParameter::delegate()
 {
-    if(m_delegate == NULL)
-    {
-        m_delegate = new QWidget;
-        m_spbXDelegate = new QSpinBox;
-        m_spbYDelegate = new QSpinBox;
-        
-        m_spbXDelegate->setMinimum(m_min.x());
-        m_spbXDelegate->setMaximum(m_max.x());
-        m_spbXDelegate->setValue(m_value.x());
-        m_spbXDelegate->setMaximumSize(9999,9999);
-        m_spbXDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        
-        m_spbYDelegate->setMinimum(m_min.y());
-        m_spbYDelegate->setMaximum(m_max.y());
-        m_spbYDelegate->setValue(m_value.y());
-        m_spbYDelegate->setMaximumSize(9999,9999);
-        m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        
-        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
-        
-        layout->setContentsMargins(0,0,0,0);
-        layout->addWidget(new QLabel("x:"));
-        layout->addWidget(m_spbXDelegate);
-        layout->addWidget(new QLabel("y:"));
-        layout->addWidget(m_spbYDelegate);
-        
-        initConnections();
-    }
     return m_delegate;
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void PointParameter::updateValue()
-{
-    if(m_delegate != NULL)
-    {
-        m_value.setX(m_spbXDelegate->value());
-        m_value.setY(m_spbYDelegate->value());
-        
-        Parameter::updateValue();
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void PointParameter::initConnections()
-{
-    connect(m_spbXDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
-    connect(m_spbYDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 } //end of namespace graipe

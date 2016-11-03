@@ -176,30 +176,10 @@ class GRAIPE_CORE_EXPORT FloatParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
-
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-        
-    protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
     
+    protected:
         //The delegate widget
         QDoubleSpinBox* m_dsbDelegate;
-    
-        //The float value
-        float m_value;
-    
-        //The value's boundaries
-        float m_min, m_max;
 };
 
 } //end of namespace graipe

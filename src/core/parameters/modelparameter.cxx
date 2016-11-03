@@ -52,11 +52,15 @@ namespace graipe {
  */
 ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * rs_object_stack, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_cmbDelegate(NULL),
-    m_type_filter(type_filter),
-    m_value(value)
+    m_cmbDelegate(new QComboBox),
+    m_type_filter(type_filter)
 {
-	m_modelList = rs_object_stack;
+
+    setModelList(rs_object_stack);
+	refresh();
+    
+    connect(m_cmbDelegate, SIGNAL(currentIndexChanged()), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -64,11 +68,8 @@ ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * 
  */
 ModelParameter::~ModelParameter()
 {
-    if(m_cmbDelegate != NULL)
-    {
-        delete m_cmbDelegate;
-        m_cmbDelegate=NULL;
-    }
+    delete m_cmbDelegate;
+    m_cmbDelegate=NULL;
 }
 
 /**
@@ -87,8 +88,19 @@ QString  ModelParameter::typeName() const
  * \return The value of this parameter.
  */
 Model* ModelParameter::value() const
-{ 
-	return  m_value;
+{
+    int idx = m_cmbDelegate->currentIndex();
+        
+    if(idx >=0)
+    {
+        unsigned int u_idx = (unsigned int) idx;
+        
+        if(u_idx < m_allowed_values.size())
+        {
+            return m_allowed_values[u_idx];
+        }
+    }
+    return NULL;
 }
 
 /**
@@ -105,13 +117,10 @@ void ModelParameter::setValue(Model* value)
     {
         if (allowed == value)
         {
-            m_value = value;
-            
-            if(m_cmbDelegate != NULL)
-            {
-                m_cmbDelegate->setCurrentIndex(i);
-            }
+            m_cmbDelegate->setCurrentIndex(i);
             found = true;
+            Parameter::updateValue();
+            break;
         }
     }
     
@@ -159,8 +168,7 @@ void ModelParameter::refresh()
         
         if(m_allowed_values.size())
         {
-            m_value = m_allowed_values[0];
-            m_cmbDelegate->setCurrentIndex(0);
+            setValue(m_allowed_values[0]);
         }
 	}
 }
@@ -200,12 +208,7 @@ bool ModelParameter::deserialize(QIODevice& in)
     {
         if (allowed->filename() == decode_string(content))
         {
-            m_value = allowed;
-            
-            if(m_cmbDelegate != NULL)
-            {
-                m_cmbDelegate->setCurrentIndex(i);
-            }
+            setValue(allowed);
             found = true;
         }
         i++;
@@ -228,10 +231,10 @@ bool ModelParameter::deserialize(QIODevice& in)
  * unlocking - so do the parameter classes based on models!
  */
 void ModelParameter::lock()
-{	
-    if(m_value)
+{
+    if(value())
     {
-        m_lock = m_value->lock();
+        m_lock = value()->lock();
     }
 }
 
@@ -245,9 +248,9 @@ void ModelParameter::lock()
  */
 void ModelParameter::unlock()
 {
-    if(m_value)
+    if(value())
     {
-        m_value->unlock(m_lock);
+        value()->unlock(m_lock);
     }
 }
 
@@ -271,42 +274,8 @@ bool ModelParameter::isValid() const
  */
 QWidget*  ModelParameter::delegate()
 {
-	if(m_cmbDelegate==NULL)
-	{
-        m_cmbDelegate = new QComboBox;
-		refresh();
-        initConnections();
-    }
     return m_cmbDelegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void ModelParameter::updateValue()
-{
-    if(m_cmbDelegate != NULL)
-    {
-        unsigned int idx = m_cmbDelegate->currentIndex();
-        
-        if(idx<m_allowed_values.size())
-        {
-            m_value = m_allowed_values[m_cmbDelegate->currentIndex()];
-            Parameter::updateValue();
-        }
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void ModelParameter::initConnections()
-{
-    connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
-}
 
 } //end of namespace graipe

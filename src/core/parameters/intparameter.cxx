@@ -53,11 +53,13 @@ namespace graipe {
  */
 IntParameter::IntParameter(const QString& name, int low, int upp, int value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_spbDelegate(NULL),
-	m_value(value),
-    m_min(low),
-    m_max(upp)
+    m_spbDelegate(new QSpinBox)
 {
+    setRange(low, upp);
+    setValue(value);
+    
+    connect(m_spbDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -65,11 +67,7 @@ IntParameter::IntParameter(const QString& name, int low, int upp, int value, Par
  */
 IntParameter::~IntParameter()
 {
-    if(m_spbDelegate != NULL)
-    {
-        delete m_spbDelegate;
-        m_spbDelegate=NULL;
-    }
+    delete m_spbDelegate;
 }
 
 /**
@@ -89,7 +87,7 @@ QString  IntParameter::typeName() const
  */
 int IntParameter::lowerBound() const
 {
-    return m_min;
+    return m_spbDelegate->minimum();
 }
 
 /**
@@ -99,12 +97,7 @@ int IntParameter::lowerBound() const
  */
 void IntParameter::setLowerBound(int value)
 {
-    m_min = value;
-    
-    if(m_spbDelegate != NULL)
-    {
-        m_spbDelegate->setMinimum(value);
-    }
+    m_spbDelegate->setMinimum(value);
 }
 
 /**
@@ -114,7 +107,7 @@ void IntParameter::setLowerBound(int value)
  */
 int IntParameter::upperBound() const
 {
-    return m_max;
+    return m_spbDelegate->maximum();
 }
 
 /**
@@ -124,12 +117,7 @@ int IntParameter::upperBound() const
  */
 void IntParameter::setUpperBound(int value)
 {
-    m_max = value;
-    
-    if(m_spbDelegate != NULL)
-    {
-        m_spbDelegate->setMaximum(value);
-    }
+    m_spbDelegate->setMaximum(value);
 }
 
 /**
@@ -140,8 +128,7 @@ void IntParameter::setUpperBound(int value)
  */
 void IntParameter::setRange(int min_value, int max_value)
 {
-    setLowerBound(min_value);
-    setUpperBound(max_value);
+    m_spbDelegate->setRange(min_value, max_value);
 }
 
 /**
@@ -151,7 +138,7 @@ void IntParameter::setRange(int min_value, int max_value)
  */
 int IntParameter::value() const
 {
-    return m_value;
+    return m_spbDelegate->value();
 }
 
 /**
@@ -161,15 +148,7 @@ int IntParameter::value() const
  */
 void IntParameter::setValue(int value)
 {
-	if(value >= lowerBound() && value <= upperBound()) 
-	{
-		m_value = value;
-        
-        if(m_spbDelegate != NULL)
-        {
-            m_spbDelegate->setValue(value);
-        }
-	}
+	m_spbDelegate->setValue(value);
 }
 
 /**
@@ -248,40 +227,7 @@ bool IntParameter::isValid() const
  */
 QWidget*  IntParameter::delegate()
 {
-    if(m_spbDelegate == NULL)
-    {
-        m_spbDelegate = new QSpinBox;
-    
-        m_spbDelegate->setRange(m_min, m_max);
-        m_spbDelegate->setValue(m_value);
-    
-        initConnections();
-    }
     return m_spbDelegate;
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void IntParameter::updateValue()
-{
-    if(m_spbDelegate != NULL)
-    {
-        m_value = m_spbDelegate->value();
-        Parameter::updateValue();
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void IntParameter::initConnections()
-{
-    connect(m_spbDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 } //end of namespace graipe

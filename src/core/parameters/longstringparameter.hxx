@@ -55,9 +55,7 @@ namespace graipe {
 
 class GRAIPE_CORE_EXPORT LongStringParameter
 :   public Parameter
-{   
-    Q_OBJECT
-    
+{
     public:
         /**
          * Default constructor of the LongStringParameter class with a setting of the
@@ -71,7 +69,7 @@ class GRAIPE_CORE_EXPORT LongStringParameter
          *                      be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
          */
-        LongStringParameter(const QString& name, QString value="", unsigned int columns=20, unsigned int lines=4, Parameter* parent=NULL, bool invert_parent=false);
+        LongStringParameter(const QString& name, const QString& value="", unsigned int columns=20, unsigned int lines=4, Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * Destructor of the LongString parameter class.
@@ -90,7 +88,7 @@ class GRAIPE_CORE_EXPORT LongStringParameter
          *
          * \return The value of this parameter.
          */
-        const QString& value() const;
+        QString value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -142,21 +140,8 @@ class GRAIPE_CORE_EXPORT LongStringParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
-        
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
   
     protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
     
         //The (char) columns
         unsigned int m_columns;
@@ -166,9 +151,6 @@ class GRAIPE_CORE_EXPORT LongStringParameter
     
         //The text editing delegate
         QPlainTextEdit* m_txtDelegate;
-
-        //The instrinsic value
-        QString m_value;
     
 };
 

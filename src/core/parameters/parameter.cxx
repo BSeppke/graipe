@@ -289,8 +289,9 @@ QWidget*  Parameter::delegate()
 }
 
 /**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
+ * This slot is called everytime, the delegate has changed. It may be used to synchronize
+ * the internal value of the parameter with the current delegate's value. 
+ * For the base class, it simply emits the valueChanged() signal.
  */
 void Parameter::updateValue()
 {

@@ -255,7 +255,6 @@ AlgorithmParameterSelection::AlgorithmParameterSelection(QWidget *parent, Algori
  */
 void AlgorithmParameterSelection::updateResults()
 {
-    
     if(m_algorithm->results().size() != 0)
     {
         QString res_QString("<b>Algorithm results:</b>\n<ol>");

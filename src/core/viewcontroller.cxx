@@ -390,7 +390,8 @@ void ViewController::updateParameters(bool /*force_update*/)
 {
     if(m_model)
     {
-       m_model_filename->setValue(m_model->filename());
+       //TODO: Check if neccessary
+       //m_model_filename->setValue(m_model->filename());
     }
 }
 

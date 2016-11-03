@@ -54,11 +54,17 @@ namespace graipe {
  */
 FilenameParameter::FilenameParameter(const QString& name, QString value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_delegate(NULL),
-    m_lneDelegate(NULL),
-    m_btnDelegate(NULL),
-    m_value(value)
+    m_delegate(new QWidget),
+    m_lneDelegate(new QLineEdit),
+    m_btnDelegate(new QPushButton("Browse"))
 {
+    QHBoxLayout * layout = new QHBoxLayout(m_delegate);
+        
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(m_lneDelegate);
+    layout->addWidget(m_btnDelegate);
+    
+    initConnections();
 }
 
 /**
@@ -66,13 +72,9 @@ FilenameParameter::FilenameParameter(const QString& name, QString value, Paramet
  */
 FilenameParameter::~FilenameParameter()
 {
-    if(m_delegate != NULL)
-    {
-        //Also deletes other widget, since they are owned
-        //by the assigned layout.
-        delete m_delegate;
-        m_delegate=NULL;
-    }
+    //Also deletes other widget, since they are owned
+    //by the assigned layout.
+    delete m_delegate;
 }
 
 /**
@@ -90,9 +92,9 @@ QString  FilenameParameter::typeName() const
  *
  * \return The value of this parameter (For filename: QString).
  */
-const QString& FilenameParameter::value()  const
+QString FilenameParameter::value()  const
 {
-    return m_value;
+    return m_lneDelegate->text();
 }
 
 /**
@@ -102,12 +104,8 @@ const QString& FilenameParameter::value()  const
  */
 void FilenameParameter::setValue(const QString & value)
 {
-    m_value = value;
-    
-    if(m_delegate != NULL)
-    {
-        m_lneDelegate->setText(value);
-    }
+    m_lneDelegate->setText(value);
+    Parameter::updateValue();
 }
 
 /**
@@ -162,7 +160,7 @@ bool FilenameParameter::deserialize(QIODevice& in)
  */
 bool FilenameParameter::isValid() const
 {
-    QFile file(m_value);
+    QFile file(value());
     
     return file.exists();
 }
@@ -177,21 +175,6 @@ bool FilenameParameter::isValid() const
  */
 QWidget*  FilenameParameter::delegate()
 {
-    if(m_delegate == NULL)
-    {
-        m_delegate = new QWidget;
-        m_lneDelegate = new QLineEdit;
-        m_btnDelegate = new QPushButton("Browse");
-        
-        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
-        
-        layout->setContentsMargins(0,0,0,0);
-        layout->addWidget(m_lneDelegate);
-        layout->addWidget(m_btnDelegate);
-    
-        initConnections();
-    }
-    
     return m_delegate;
 }
 
@@ -199,30 +182,13 @@ QWidget*  FilenameParameter::delegate()
  * This slot is called if the user pressed the file-selection button. It is mainly
  * used to present the file selection dialog to the user.
  */
-void FilenameParameter::selectFilename()
-{
-    if(m_delegate != NULL)
-    {
-        QString file = QFileDialog::getOpenFileName(m_delegate, name());
-    
-        if(file.size())
-        {
-            m_lneDelegate->setText(file);
-            updateValue();
-        }
-    }
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void FilenameParameter::updateValue()
 {
-    if(m_lneDelegate != NULL)
+    QString file = QFileDialog::getOpenFileName(m_delegate, name());
+    
+    if(file.size())
     {
-        m_value = m_lneDelegate->text();
-        Parameter::updateValue();
+        setValue(file);
     }
 }
 
@@ -233,8 +199,7 @@ void FilenameParameter::updateValue()
  */
 void FilenameParameter::initConnections()
 {
-    connect(m_btnDelegate,  SIGNAL(clicked()),             this, SLOT(selectFilename()));
-    connect(m_lneDelegate,  SIGNAL(textChanged(QString)),  this, SLOT(updateValue()));
+    connect(m_btnDelegate,  SIGNAL(clicked()), this, SLOT(updateValue()));
     Parameter::initConnections();
 }
 

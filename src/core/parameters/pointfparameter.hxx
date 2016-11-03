@@ -54,8 +54,6 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT PointFParameter
 :   public Parameter
 {
-    Q_OBJECT
-    
     public:
         /**
          * Default constructor of the PointFParameter class with a setting of the
@@ -81,12 +79,13 @@ class GRAIPE_CORE_EXPORT PointFParameter
          * \return "PointFParameter".
          */
         QString typeName() const;
+    
         /**
          * The lowest possible value of this parameter.
          *
          * \return The minimal value of this parameter.
          */
-        const QPointF& lowerBound() const;
+        QPointF lowerBound() const;
     
         /**
          * Writing accessor of the minimum value of this parameter.
@@ -100,7 +99,7 @@ class GRAIPE_CORE_EXPORT PointFParameter
          *
          * \return The maximal value of this parameter.
          */
-        const QPointF& upperBound() const;
+        QPointF upperBound() const;
     
         /**
          * Writing accessor of the maximum value of this parameter.
@@ -122,7 +121,7 @@ class GRAIPE_CORE_EXPORT PointFParameter
          *
          * \return The value of this parameter.
          */
-        const QPointF& value() const;
+        QPointF value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -175,32 +174,13 @@ class GRAIPE_CORE_EXPORT PointFParameter
          */
         QWidget * delegate();
         
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
-    protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
+    protected:    
         //The parent delegate widget
         QWidget* m_delegate;
     
         //Thes child widgets for x,y control
-        QDoubleSpinBox* m_dsbXDelegate, * m_dsbYDelegate;
-    
-        //The value
-        QPointF m_value;
-        
-        //The min and max range values
-        QPointF m_min, m_max;
+        QDoubleSpinBox  * m_dsbXDelegate,
+                        * m_dsbYDelegate;
 };
 
 } //end of namespace graipe

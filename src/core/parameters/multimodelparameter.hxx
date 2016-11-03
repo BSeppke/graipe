@@ -91,7 +91,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \return The value of this parameter.
          */
-        const std::vector<Model*>& value() const;
+        std::vector<Model*> value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -171,29 +171,12 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          */
         QWidget * delegate();
         
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
     protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-
         //The delegate list widget
         QListWidget* m_lstDelegate;
     
         //A vector of all allowed models (listed)
         std::vector<Model*>	m_allowed_values;
-    
-        //A vector of all selected models (marked in list)
-        std::vector<Model*>	m_selected_values;
     
         //The currently used type-filter
         QString m_type_filter;

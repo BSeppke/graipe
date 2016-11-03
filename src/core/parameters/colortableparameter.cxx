@@ -41,6 +41,7 @@
 
 #include <QColorDialog>
 #include <QtDebug>
+#include <QObject>
 
 namespace graipe {
 
@@ -56,10 +57,39 @@ namespace graipe {
  */
 ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_delegate(NULL),
-    m_value(value),
-    m_colorTable_id(0)
+    m_delegate(new QComboBox)
 {
+    unsigned int w=256, h=12;
+    m_delegate->setIconSize(QSize(w, h));
+    
+    QImage img(w, h, QImage::Format_Indexed8);
+    img.setColorCount(256);
+    
+    for(unsigned int y=0; y<h; ++y)
+    {
+        for(unsigned int x=0; x<w; ++x)
+        {
+            img.setPixel(x,y, w/256.0*x);
+        }
+    }
+    
+    for( QVector<QRgb> ct : colorTables())
+    {
+        img.setColorTable(ct);
+        m_delegate->addItem(QPixmap::fromImage(img),"");
+    
+    }
+    
+    for( QVector<QRgb> ct : m_extra_tables)
+    {
+        img.setColorTable(ct);
+        m_delegate->addItem(QPixmap::fromImage(img),"");
+    
+    }
+    m_delegate->addItem("Add new");
+    setValue(value);
+    
+    initConnections();
 }
 
 /**
@@ -67,11 +97,7 @@ ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> valu
  */
 ColorTableParameter::~ColorTableParameter()
 {
-    if(m_delegate != NULL)
-    {
-        delete m_delegate;
-        m_delegate=NULL;
-    }
+    delete m_delegate;
 }
     
 /**
@@ -89,9 +115,57 @@ QString ColorTableParameter::typeName() const
  *
  * \return The value of this parameter.
  */
-const QVector<QRgb>& ColorTableParameter::value() const
+QVector<QRgb> ColorTableParameter::value() const
 {
-    return m_value;
+    int idx = m_delegate->currentIndex();
+
+    if(idx >= 0 && idx < colorTables().size())
+    {
+       return colorTables()[idx];
+    }
+    else if(idx >= colorTables().size() && idx < m_delegate->count()-1)
+    {
+        return m_extra_tables[idx-colorTables().size()];
+    }
+    else
+    {
+        return QVector<QRgb>(256);
+    }
+}
+
+/**
+ * Gives information if a colortable is already knwon or not,
+ * either in the system-wide colorTables or in the extraTables
+ *
+ * \param ct The color table to be checked for.
+ * \return Positive index, if the color table is either in colorTables() or in m_extra_tables.
+ *         The index corresponds to the comboBox index. Else, -1
+ */
+int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
+{
+    int colorTable_id=-1;
+    
+    //search in std. color tables
+    for(unsigned int i=0; i != colorTables().size(); ++i)
+    {
+        if(colorTables()[i] == ct)
+        {
+            colorTable_id = i;
+            break;
+        }
+    }
+    
+    //search in extra (user defined) color tables
+    for(unsigned int i=0; i != m_extra_tables.size(); ++i)
+    {
+        if(m_extra_tables[i] == ct)
+        {
+            colorTable_id = colorTables().size()+i;
+            break;
+        }
+    }
+    
+    return colorTable_id;
 }
 
 /**
@@ -101,43 +175,16 @@ const QVector<QRgb>& ColorTableParameter::value() const
  */
 void ColorTableParameter::setValue(const QVector<QRgb>& value)
 {
-    bool found = false;
+    int colorTable_id = colorTableIndex(value);
     
-    //search in std. color tables
-    for(unsigned int ct=0; ct != colorTables().size(); ++ct)
+    if(colorTable_id>=0)
     {
-        if(colorTables()[ct] == value)
-        {
-            found=true;
-            m_value = value;
-            m_colorTable_id = ct;
-            break;
-        }
+        m_delegate->setCurrentIndex(colorTable_id);
+        Parameter::updateValue();
     }
-    
-    //search in extra (user defined) color tables
-    for(unsigned int extra_ct=0; extra_ct != m_extra_tables.size(); ++extra_ct)
+    else
     {
-        if(m_extra_tables[extra_ct] == value)
-        {
-            found=true;
-            m_value = value;
-            m_colorTable_id = colorTables().size()+extra_ct;
-            break;
-        }
-    }
-    
-    //if not found, add a new one
-    if(!found)
-    {
-        addCustomColorTable(value);
-        m_colorTable_id = colorTables().size() + m_extra_tables.size() - 1;
-    }
-    
-    //if delegate is available, update index
-    if(m_delegate!= NULL)
-    {
-        m_delegate->setCurrentIndex(m_colorTable_id);
+        qDebug("ColorTableParameter::setValue: Could not find value to set in colortables");
     }
 }
 
@@ -146,23 +193,25 @@ void ColorTableParameter::setValue(const QVector<QRgb>& value)
  *
  * \param ct The new user defined ct of this parameter.
  */
-void ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
+int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
 {
     if(ct.size()==256)
     {
-        m_extra_tables.push_back(ct);
-        m_value = ct;
-        m_colorTable_id = colorTables().size() + m_extra_tables.size() - 1;
+        int colorTable_id = colorTableIndex(ct);
         
-        if(m_delegate != NULL)
+        //Already known?
+        if(colorTable_id>=0)
         {
-            //Remove last entry (Create custom ct)
-            m_delegate->removeItem(m_delegate->count()-1);
+            return colorTable_id;
+        }
+        else
+        {
+            m_extra_tables.push_back(ct);
             
             //Add this (new) color table
             unsigned int w=256, h=16;
             m_delegate->setIconSize(QSize(w, h));
-        
+            
             QImage img(w, h, QImage::Format_Indexed8);
             img.setColorCount(256);
         
@@ -174,13 +223,14 @@ void ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
                 }
             }
             img.setColorTable(ct);
-            m_delegate->addItem(QPixmap::fromImage(img),"");
+            m_delegate->insertItem(m_delegate->count()-1, QPixmap::fromImage(img),"");
             
-            //Finally add the custom entry again
-            m_delegate->addItem("Add new");
-            
-            m_delegate->setCurrentIndex(m_colorTable_id);
+            return m_delegate->count()-2;
         }
+    }
+    else
+    {
+        return -1;
     }
 }
 /**
@@ -193,10 +243,12 @@ void ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
  */
 QString  ColorTableParameter::valueText() const
 {
-    QString str = QString::number(m_value[0]);
-    for(unsigned int i=1; i<m_value.size(); ++i)
+    QVector<QRgb> ct = value();
+    
+    QString str = QString::number(ct[0]);
+    for(unsigned int i=1; i<ct.size(); ++i)
     {
-        str += ", " + QString::number(m_value[i]);
+        str += ", " + QString::number(ct[i]);
     }
     
     return str;
@@ -273,42 +325,6 @@ bool ColorTableParameter::deserialize(QIODevice& in)
  */
 QWidget*  ColorTableParameter::delegate()
 {
-    if(m_delegate == NULL)
-    {
-        m_delegate = new QComboBox;
-        
-        unsigned int w=256, h=16;
-        m_delegate->setIconSize(QSize(w, h));
-        
-        QImage img(w, h, QImage::Format_Indexed8);
-        img.setColorCount(256);
-        
-        for(unsigned int y=0; y<h; ++y)
-        {
-            for(unsigned int x=0; x<w; ++x)
-            {
-                img.setPixel(x,y, w/256.0*x);
-            }
-        }
-        
-        for( QVector<QRgb> ct : colorTables())
-        {
-            img.setColorTable(ct);
-            m_delegate->addItem(QPixmap::fromImage(img),"");
-        
-        }
-        
-        for( QVector<QRgb> ct : m_extra_tables)
-        {
-            img.setColorTable(ct);
-            m_delegate->addItem(QPixmap::fromImage(img),"");
-        
-        }
-        m_delegate->addItem("Add new");
-        setValue(m_value);
-        initConnections();
-    }
-    
     return m_delegate;
 }
 
@@ -318,85 +334,72 @@ QWidget*  ColorTableParameter::delegate()
  */
 void ColorTableParameter::updateValue()
 {
-    if(m_delegate)
+    if(m_delegate->currentIndex() == m_delegate->count()-1)
     {
-        int idx = m_delegate->currentIndex();
-    
-        if(idx >= 0 && idx < colorTables().size())
-        {
-            m_value = (colorTables()[idx]);
-            m_colorTable_id = idx;
-        }
-        else if(idx >= colorTables().size() && idx < m_delegate->count()-1)
-        {
-            m_value = m_extra_tables[idx-colorTables().size()];
-            m_colorTable_id = idx;
-        }
-        else if(idx == m_delegate->count()-1)
-        {
-            ParameterGroup* custom_ct_params = new ParameterGroup("Custom color table");
+        ParameterGroup* custom_ct_params = new ParameterGroup("Custom color table");
 
-            //Prepare parameter selection for individual ColorTable creations:
-            //Select up to three color parameters (color, start, end)
-            ColorParameter* param_start_color = new ColorParameter("Start color", Qt::yellow);
-            
-            BoolParameter*  param_use_mid_color= new BoolParameter("Use mid color");
-            ColorParameter* param_mid_color = new ColorParameter("Mid color", Qt::green, param_use_mid_color);
-            
-            BoolParameter*  param_use_end_color= new BoolParameter("Use end color");
-            ColorParameter* param_end_color = new ColorParameter("End color", Qt::red, param_use_end_color);
-            
-            //Note: Ownership gows to m_custom_color_params on addition:
-            custom_ct_params->addParameter("start_color",   param_start_color);
-            custom_ct_params->addParameter("use_mid_color", param_use_mid_color);
-            custom_ct_params->addParameter("mid_color",     param_mid_color);
-            custom_ct_params->addParameter("use_end_color", param_use_end_color);
-            custom_ct_params->addParameter("end_color",     param_end_color);
-            
-            ParameterSelection custom_ct_selection(NULL, custom_ct_params);
+        //Prepare parameter selection for individual ColorTable creations:
+        //Select up to three color parameters (color, start, end)
+        ColorParameter* param_start_color = new ColorParameter("Start color", Qt::yellow);
         
-            if(custom_ct_selection.exec())
+        BoolParameter*  param_use_mid_color= new BoolParameter("Use mid color");
+        ColorParameter* param_mid_color = new ColorParameter("Mid color", Qt::green, param_use_mid_color);
+        
+        BoolParameter*  param_use_end_color= new BoolParameter("Use end color");
+        ColorParameter* param_end_color = new ColorParameter("End color", Qt::red, param_use_end_color);
+        
+        //Note: Ownership gows to m_custom_color_params on addition:
+        custom_ct_params->addParameter("start_color",   param_start_color);
+        custom_ct_params->addParameter("use_mid_color", param_use_mid_color);
+        custom_ct_params->addParameter("mid_color",     param_mid_color);
+        custom_ct_params->addParameter("use_end_color", param_use_end_color);
+        custom_ct_params->addParameter("end_color",     param_end_color);
+        
+        ParameterSelection custom_ct_selection(NULL, custom_ct_params);
+    
+        if(custom_ct_selection.exec())
+        {
+            //Get results
+            QColor start_color = param_start_color->value();
+            QColor mid_color = param_mid_color->value();
+            QColor end_color = param_end_color->value();
+            
+            bool use_mid_color = param_use_mid_color->value();
+            bool use_end_color = param_use_end_color->value();
+            
+            //Generate 0, 0.5 and 1 color assignment
+            QColor col1 = start_color,
+                   col2 = start_color,
+                   col3 = start_color;
+            
+            if(use_end_color)
             {
-                //Get results
-                QColor start_color = param_start_color->value();
-                QColor mid_color = param_mid_color->value();
-                QColor end_color = param_end_color->value();
+                col3 = end_color;
                 
-                bool use_mid_color = param_use_mid_color->value();
-                bool use_end_color = param_use_end_color->value();
-                
-                //Generate 0, 0.5 and 1 color assignment
-                QColor col1 = start_color,
-                       col2 = start_color,
-                       col3 = start_color;
-                
-                if(use_end_color)
+                if(use_mid_color)
                 {
-                    col3 = end_color;
-                    
-                    if(use_mid_color)
-                    {
-                        col2 = mid_color;
-                    }
-                    else
-                    {
-                        col2 = QColor(  (col1.red()  +col3.red())/2,
-                                        (col1.green()+col3.green())/2,
-                                        (col1.blue() +col3.blue())/2);
-                    }
+                    col2 = mid_color;
                 }
-                else if(use_mid_color)
+                else
                 {
-                    col2 = col3 =mid_color;
+                    col2 = QColor(  (col1.red()  +col3.red())/2,
+                                    (col1.green()+col3.green())/2,
+                                    (col1.blue() +col3.blue())/2);
                 }
-                QVector<QRgb> ct = createColorTableFrom3Colors(col1, col2, col3);
-                
-                disconnect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
-                setValue(ct);
-                connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
             }
-            delete custom_ct_params;
+            else if(use_mid_color)
+            {
+                col2 = col3 =mid_color;
+            }
+            QVector<QRgb> ct = createColorTableFrom3Colors(col1, col2, col3);
+            int idx = addCustomColorTable(ct);
+            
+            if(idx >= 0)
+            {
+                m_delegate->setCurrentIndex(idx);
+            }
         }
+        delete custom_ct_params;
     }
     Parameter::updateValue();
 }

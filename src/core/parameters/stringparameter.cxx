@@ -50,12 +50,16 @@ namespace graipe {
  *                      be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
  */
-StringParameter::StringParameter(const QString& name, QString value, unsigned int columns, Parameter* parent, bool invert_parent)
+StringParameter::StringParameter(const QString& name, const QString& value, unsigned int columns, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_columns(columns),
-    m_lneDelegate(NULL),
-    m_value(value)
+    m_lneDelegate(new QLineEdit)
 {
+    m_lneDelegate->setMinimumWidth(m_columns * m_lneDelegate->fontMetrics().width("X"));
+    m_lneDelegate->setText(value);
+        
+    connect(m_lneDelegate, SIGNAL(textChanged(const QString&)), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -86,9 +90,9 @@ QString  StringParameter::typeName() const
  *
  * \return The value of this parameter.
  */
-const QString& StringParameter::value()  const
+QString StringParameter::value()  const
 {
-	return m_value;
+	return m_lneDelegate->text();
 }
 
 /**
@@ -98,12 +102,8 @@ const QString& StringParameter::value()  const
  */
 void StringParameter::setValue(const QString & value)
 { 
-    m_value = value;
-    
-    if(m_lneDelegate != NULL)
-    {
-        m_lneDelegate->setText(value);
-    }
+    m_lneDelegate->setText(value);
+    Parameter::updateValue();
 }
 
 /**
@@ -174,38 +174,10 @@ QWidget*  StringParameter::delegate()
 {
     if(m_lneDelegate == NULL)
     {
-        m_lneDelegate = new QLineEdit;
-        
-        m_lneDelegate->setMinimumWidth(m_columns * m_lneDelegate->fontMetrics().width("X"));
-        m_lneDelegate->setText(value());
-        
-        initConnections();
+
     }
     return m_lneDelegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void StringParameter::updateValue()
-{
-    if(m_lneDelegate != NULL)
-    {
-        m_value = m_lneDelegate->text();
-        Parameter::updateValue();
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void StringParameter::initConnections()
-{
-    connect(m_lneDelegate, SIGNAL(textChanged(QString)), this, SLOT(updateValue()));
-    Parameter::initConnections();
-}
 
 } //end of namespace graipe

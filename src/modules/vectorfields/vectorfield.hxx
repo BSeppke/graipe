@@ -97,8 +97,8 @@ class GRAIPE_VECTORFIELDS_EXPORT Vectorfield2D
          *
          * \return The global motion by means of an affine matrix.
          */
-        const QTransform& globalMotion() const;
-        
+        QTransform globalMotion() const;
+    
         /**
          * Setter for the global motion of a vectorfield. Note that the
          * vectors are still containing the *complete* motion after setting

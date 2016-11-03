@@ -51,9 +51,12 @@ namespace graipe {
  */
 BoolParameter::BoolParameter(const QString& name, bool value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-	m_chkDelegate(NULL),
-	m_value(value)
+	m_chkDelegate(new QCheckBox)
 {
+    setValue(value);
+    
+    connect(m_chkDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+    Parameter::initConnections();
 }
 
 /**
@@ -61,11 +64,7 @@ BoolParameter::BoolParameter(const QString& name, bool value, Parameter* parent,
  */
 BoolParameter::~BoolParameter()
 {
-    if (m_chkDelegate != NULL)
-    {
-        delete m_chkDelegate;
-        m_chkDelegate=NULL;
-    }
+    delete m_chkDelegate;
 }
 
 /**
@@ -85,7 +84,7 @@ QString BoolParameter::typeName() const
  */
 bool BoolParameter::value()  const
 {
-	return m_value;
+	return m_chkDelegate->isChecked();
 }
 
 /**
@@ -95,12 +94,8 @@ bool BoolParameter::value()  const
  */
 void BoolParameter::setValue(bool value)
 { 
-	m_value = value;
-    
-    if(m_chkDelegate != NULL)
-    {
-        m_chkDelegate->setChecked(value);
-    }
+	m_chkDelegate->setChecked(value);
+    Parameter::updateValue();
 }
 
 /**
@@ -176,38 +171,7 @@ bool BoolParameter::isValid() const
  */
 QWidget*  BoolParameter::delegate()
 {
-    if(m_chkDelegate == NULL)
-    {
-        m_chkDelegate = new QCheckBox;
-        m_chkDelegate->setChecked(value());
-        initConnections();
-    }
-    
     return m_chkDelegate;
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void BoolParameter::updateValue()
-{
-    if(m_chkDelegate != NULL)
-    {
-        m_value = m_chkDelegate->isChecked();
-        Parameter::updateValue();
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void BoolParameter::initConnections()
-{
-    connect(m_chkDelegate, SIGNAL(stateChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 } //end of namespace graipe

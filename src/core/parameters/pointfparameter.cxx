@@ -54,13 +54,31 @@ namespace graipe {
  */
 PointFParameter::PointFParameter(const QString& name, QPointF low, QPointF upp, QPointF value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_delegate(NULL),
-    m_dsbXDelegate(NULL),
-    m_dsbYDelegate(NULL),
-    m_value(value),
-    m_min(low),
-    m_max(upp)
+    m_delegate(new QWidget),
+    m_dsbXDelegate(new QDoubleSpinBox),
+    m_dsbYDelegate(new QDoubleSpinBox)
 {
+        setRange(low, upp);
+        setValue(value);
+    
+        m_dsbXDelegate->setMaximumSize(9999,9999);
+        m_dsbXDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+
+        m_dsbYDelegate->setMaximumSize(9999,9999);
+        m_dsbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+        
+        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
+        
+        layout->setContentsMargins(0,0,0,0);
+        layout->addWidget(new QLabel("x:"));
+        layout->addWidget(m_dsbXDelegate);
+        layout->addWidget(new QLabel("y:"));
+        layout->addWidget(m_dsbYDelegate);
+    
+        
+        connect(m_dsbXDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_dsbYDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        initConnections();
 }
 
 /**
@@ -68,13 +86,9 @@ PointFParameter::PointFParameter(const QString& name, QPointF low, QPointF upp, 
  */
 PointFParameter::~PointFParameter()
 {
-    if(m_delegate != NULL)
-    {
-        //Also deletes other widget, since they are owned
-        //by the assigned layout.
-        delete m_delegate;
-        m_delegate=NULL;
-    }
+    //Also deletes other widget, since they are owned
+    //by the assigned layout.
+    delete m_delegate;
 }
 
 /**
@@ -91,9 +105,9 @@ QString  PointFParameter::typeName() const
  *
  * \return The minimal value of this parameter.
  */
-const QPointF& PointFParameter::lowerBound() const
+QPointF PointFParameter::lowerBound() const
 {
-    return m_min;
+    return QPointF(m_dsbXDelegate->minimum(), m_dsbYDelegate->minimum());
 }
 
 /**
@@ -103,13 +117,9 @@ const QPointF& PointFParameter::lowerBound() const
  */
 void PointFParameter::setLowerBound(const QPointF& value)
 {
-    m_min = value;
-    
-    if(m_delegate != NULL)
-    {
-        m_dsbXDelegate->setMinimum(value.x());
-        m_dsbYDelegate->setMinimum(value.y());
-    }
+    m_dsbXDelegate->setMinimum(value.x());
+    m_dsbYDelegate->setMinimum(value.y());
+
 }
 
 /**
@@ -117,9 +127,9 @@ void PointFParameter::setLowerBound(const QPointF& value)
  *
  * \return The maximal value of this parameter.
  */
-const QPointF& PointFParameter::upperBound() const
+QPointF PointFParameter::upperBound() const
 {
-    return m_max;
+    return QPointF(m_dsbXDelegate->maximum(), m_dsbYDelegate->maximum());
 }
 
 /**
@@ -129,13 +139,8 @@ const QPointF& PointFParameter::upperBound() const
  */
 void PointFParameter::setUpperBound(const QPointF& value)
 {
-    m_max = value;
-    
-    if(m_delegate != NULL)
-    {
-        m_dsbXDelegate->setMaximum(value.x());
-        m_dsbYDelegate->setMaximum(value.y());
-    }
+    m_dsbXDelegate->setMaximum(value.x());
+    m_dsbYDelegate->setMaximum(value.y());
 }
 
 /**
@@ -155,9 +160,9 @@ void PointFParameter::setRange(const QPointF& min_value, const QPointF& max_valu
  *
  * \return The value of this parameter.
  */
-const QPointF& PointFParameter::value() const
+QPointF PointFParameter::value() const
 {
-    return m_value;
+    return QPointF(m_dsbXDelegate->value(), m_dsbYDelegate->value());
 }
 
 /**
@@ -167,17 +172,9 @@ const QPointF& PointFParameter::value() const
  */
 void PointFParameter::setValue(const QPointF& value)
 {
-    if(   (value.x() >= lowerBound().x() && value.y() >= lowerBound().y())
-       && (value.x() <  upperBound().x() && value.y() <  upperBound().y()))
-    {
-        m_value = value;
-        
-        if(m_delegate != NULL)
-        {
-            m_dsbXDelegate->setValue(value.x());
-            m_dsbYDelegate->setValue(value.y());
-        }
-    }
+    m_dsbXDelegate->setValue(value.x());
+    m_dsbYDelegate->setValue(value.y());
+    Parameter::updateValue();
 }
 
 /**
@@ -190,7 +187,7 @@ void PointFParameter::setValue(const QPointF& value)
  */
 QString  PointFParameter::valueText() const
 {
-    return QString("(") + QString::number(m_value.x(),'g', 10) + "x" + QString::number(m_value.y(),'g', 10) + ")";
+    return QString("(") + QString::number(value().x(),'g', 10) + "x" + QString::number(value().y(),'g', 10) + ")";
 }
 /**
  * Serialization of the parameter's state to a QString. Please note, that this can
@@ -262,61 +259,7 @@ bool PointFParameter::isValid() const
  */
 QWidget*  PointFParameter::delegate()
 {
-    if(m_delegate == NULL)
-    {
-        m_delegate = new QWidget;
-        m_dsbXDelegate = new QDoubleSpinBox;
-        m_dsbYDelegate = new QDoubleSpinBox;
-        
-        m_dsbXDelegate->setMinimum(m_min.x());
-        m_dsbXDelegate->setMaximum(m_max.x());
-        m_dsbXDelegate->setValue(m_value.x());
-        m_dsbXDelegate->setMaximumSize(9999,9999);
-        m_dsbXDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        
-        m_dsbYDelegate->setMinimum(m_min.y());
-        m_dsbYDelegate->setMaximum(m_max.y());
-        m_dsbYDelegate->setValue(m_value.y());
-        m_dsbYDelegate->setMaximumSize(9999,9999);
-        m_dsbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        
-        QHBoxLayout * layout = new QHBoxLayout(m_delegate);
-        
-        layout->setContentsMargins(0,0,0,0);
-        layout->addWidget(new QLabel("x:"));
-        layout->addWidget(m_dsbXDelegate);
-        layout->addWidget(new QLabel("y:"));
-        layout->addWidget(m_dsbYDelegate);
-        
-        initConnections();
-    }
     return m_delegate;
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void PointFParameter::updateValue()
-{
-    if(m_delegate != NULL)
-    {
-        m_value.setX(m_dsbXDelegate->value());
-        m_value.setY(m_dsbYDelegate->value());
-        
-        Parameter::updateValue();
-    }
-}
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void PointFParameter::initConnections()
-{
-    connect(m_dsbXDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_dsbYDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 } //end of namespace graipe

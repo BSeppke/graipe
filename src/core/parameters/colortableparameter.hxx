@@ -91,7 +91,17 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          *
          * \return The value of this parameter.
          */
-        const QVector<QRgb>& value() const;
+        QVector<QRgb> value() const;
+    
+        /**
+         * Gives information if a colortable is already knwon or not,
+         * either in the system-wide colorTables or in the extraTables
+         *
+         * \param ct The color table to be checked for.
+         * \return Positive index, if the color table is either in colorTables() or in m_extra_tables.
+         *         The index corresponds to the comboBox index. Else, -1
+         */
+        int colorTableIndex(const QVector<QRgb> & ct) const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -104,8 +114,9 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          * Add another (user defined) color table to this parameter.
          *
          * \param ct The new user defined ct of this parameter.
+         * \return The new ComboBox id of the inserted or found ct. 
          */
-        void addCustomColorTable(const QVector<QRgb>& ct);
+        int addCustomColorTable(const QVector<QRgb>& ct);
             
         /**
          * The value converted to a QString. Please note, that this can vary from the 
@@ -168,12 +179,6 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
     
         //The delegate
         QComboBox* m_delegate;
-    
-        //The color (value)
-        QVector<QRgb> m_value;
-    
-        //The index of the ColorTable (to make this parameter work without a widget
-        unsigned int m_colorTable_id;
     
         //The starage of extra color tables
         QVector<QVector<QRgb> > m_extra_tables;

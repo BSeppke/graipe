@@ -54,8 +54,6 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT BoolParameter
 :   public Parameter
 {
-    Q_OBJECT
-    
     public:
         /**
          * Default constructor of the BoolParameter class with a setting of the
@@ -138,27 +136,10 @@ class GRAIPE_CORE_EXPORT BoolParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
-
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
     
     protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
         //The delegate widget for booleans
         QCheckBox* m_chkDelegate;
-    
-        //The boolean value itself
-        bool m_value;
 };
 
 } //end of namespace graipe

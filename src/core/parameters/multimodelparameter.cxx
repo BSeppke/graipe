@@ -53,10 +53,15 @@ namespace graipe {
  */
 MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<Model*> * allowed_values, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_lstDelegate(NULL),
+    m_lstDelegate(new QListWidget),
     m_allowed_values(*allowed_values),
 	m_type_filter(type_filter)
 {
+    m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
+    refresh();
+    
+    connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -64,11 +69,7 @@ MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<
  */
 MultiModelParameter::~MultiModelParameter()
 {
-    if(m_lstDelegate != NULL)
-    {
-        delete m_lstDelegate;
-        m_lstDelegate=NULL;
-    }
+    delete m_lstDelegate;
 }
 
 /**
@@ -86,9 +87,21 @@ QString  MultiModelParameter::typeName() const
  *
  * \return The value of this parameter.
  */
-const std::vector<Model*>& MultiModelParameter::value() const
-{ 
-	return m_selected_values;	
+std::vector<Model*> MultiModelParameter::value() const
+{
+    std::vector<Model*> selected_models;
+    
+    unsigned int i=0;
+    
+    foreach(Model* allowed_model, m_allowed_values)
+    {
+        if( m_lstDelegate->item(i)->isSelected())
+        {
+            selected_models.push_back(allowed_model);
+        }
+        i++;
+    }
+    return selected_models;
 }
 
 /**
@@ -98,33 +111,26 @@ const std::vector<Model*>& MultiModelParameter::value() const
  */
 void MultiModelParameter::setValue(const std::vector<Model*>& values)
 {
-	m_selected_values.clear();
     
-	foreach( Model* model, values )
-	{
-		bool found = false;
-		unsigned int i=0;
-		
-		foreach(Model* allowed_model, m_allowed_values)
-		{
-			
-			if (model == allowed_model)
-			{
-				found = true;
-				break;
-			}
-			++i;
-		}
-		
-		if (found)
-		{
-			m_selected_values.push_back(model);
-            if(m_lstDelegate != NULL)
+    unsigned int i=0;
+    
+    foreach(Model* allowed_model, m_allowed_values)
+    {
+        bool found = false;
+        
+        foreach(Model* model, values)
+        {
+            if( allowed_model == model)
             {
-                m_lstDelegate->item(i)->setSelected(true);
+                found=true;
+                break;
             }
-		}
+        }
+        
+        m_lstDelegate->item(i)->setSelected(found);
+        i++;
     }
+    Parameter::updateValue();
 }
 
 /**
@@ -138,7 +144,7 @@ void MultiModelParameter::setValue(const std::vector<Model*>& values)
 QString MultiModelParameter::valueText() const
 { 
 	QString res;
-	foreach(Model* model, m_selected_values)
+	foreach(Model* model, value())
 	{
 		res += model->name() +", "; 
 	}
@@ -166,7 +172,6 @@ void MultiModelParameter::refresh()
 				m_allowed_values.push_back(model);
 			}
 		}
-		m_selected_values.clear();
 	}
 }
 
@@ -181,7 +186,7 @@ void MultiModelParameter::serialize(QIODevice& out) const
 {
     Parameter::serialize(out);
     
-    foreach(Model* model, m_selected_values)
+    foreach(Model* model, value())
     {
         write_on_device(", " + encode_string(model->filename()), out);
     }
@@ -199,42 +204,26 @@ bool MultiModelParameter::deserialize(QIODevice& in)
     {
         return false;
     }
-    
-    m_selected_values.clear();
 
     QString content(in.readLine().trimmed());
     
     QStringList model_filenames = content.split(", ");
+
+    unsigned int i=0;
     
-    foreach( QString model_filename, model_filenames )
+    foreach(Model* allowed_model, m_allowed_values)
     {
         bool found = false;
-        unsigned int i=0;
-        
-        foreach(Model* allowed_model, m_allowed_values)
+        foreach(QString model_filename, model_filenames)
         {
-            
             if (decode_string(model_filename) == allowed_model->filename())
             {
                 found = true;
                 break;
             }
-            ++i;
         }
-        
-        if (found)
-        {
-            m_selected_values.push_back(m_allowed_values[i]);
-            if(m_lstDelegate != NULL)
-            {
-                m_lstDelegate->item(i)->setSelected(true);
-            }
-        }
-        else
-        {
-            qDebug("MultiModelParameter deserialize: not found");
-            return false;
-        }
+        m_lstDelegate->item(i)->setSelected(found);
+        ++i;
     }
     return true;
 }
@@ -251,7 +240,7 @@ void MultiModelParameter::lock()
 {	
     m_locks.clear();
     
-	foreach( Model* model, m_selected_values )
+	foreach( Model* model, value())
 	{
         unsigned int model_lock = model->lock();
         m_locks.push_back(model_lock);
@@ -267,10 +256,13 @@ void MultiModelParameter::lock()
  * unlocking - so do the parameter classes based on models!
  */
 void MultiModelParameter::unlock()
-{	
-	for( unsigned int i=0; i < (unsigned int)m_selected_values.size(); ++i)
+{
+    unsigned int i=0;
+
+	foreach( Model* model, value())
 	{
-        m_selected_values[i]->unlock(m_locks[i]);
+        model->unlock(m_locks[i]);
+        ++i;
     }
 }
 
@@ -282,7 +274,7 @@ void MultiModelParameter::unlock()
     
 bool MultiModelParameter::isValid() const
 {
-	return m_lstDelegate && m_lstDelegate->isEnabled() && !m_selected_values.empty();
+	return m_lstDelegate && m_lstDelegate->isEnabled() && !m_allowed_values.empty();
 }
 
 /**
@@ -295,47 +287,7 @@ bool MultiModelParameter::isValid() const
  */
 QWidget*  MultiModelParameter::delegate()
 {
-    if(m_lstDelegate == NULL)
-    {
-        m_lstDelegate = new QListWidget;
-        m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
-	
-        refresh();
-        initConnections();
-	}
     return m_lstDelegate;
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void MultiModelParameter::updateValue()
-{
-    if(m_lstDelegate != NULL)
-    {
-        m_selected_values.clear();
-
-        for( unsigned int i=0; i < (unsigned int)m_lstDelegate->count(); ++i)
-        {
-            if (m_lstDelegate->item(i)->isSelected())
-            {
-                m_selected_values.push_back(m_allowed_values[i]);
-            }
-        }
-        Parameter::updateValue();
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void MultiModelParameter::initConnections()
-{
-    connect(m_lstDelegate, SIGNAL(itemSelectionChanged()), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 } //end of namespace graipe

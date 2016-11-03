@@ -54,8 +54,6 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT DateTimeParameter
 :   public Parameter
 {
-    Q_OBJECT
-    
     public:
         /**
          * Default constructor of the DateTimeParameter class with a setting of the
@@ -86,7 +84,7 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
          *
          * \return The value of this parameter.
          */
-        const QDateTime& value() const;
+        QDateTime value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -138,27 +136,10 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
-        
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
-    protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
+
+    protected:    
         //The delegate widget
         QDateTimeEdit* m_dteDelegate;
-    
-        //The value (of a date&time compound in Qt)
-        QDateTime m_value;
 };
 
 } //end of namespace graipe

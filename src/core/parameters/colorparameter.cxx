@@ -36,6 +36,7 @@
 #include "core/parameters/colorparameter.hxx"
 
 #include <QtDebug>
+#include <QObject>
 
 namespace graipe {
 
@@ -51,9 +52,12 @@ namespace graipe {
  */
 ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_delegate(NULL),
+    m_delegate(new QPushButton("")),
     m_value(value)
 {
+    setValue(value);
+    
+    initConnections();
 }
 
 /**
@@ -61,11 +65,7 @@ ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* par
  */
 ColorParameter::~ColorParameter()
 {
-    if(m_delegate != NULL)
-    {
-        delete m_delegate;
-        m_delegate=NULL;
-    }
+    delete m_delegate;
 }
     
 /**
@@ -95,14 +95,12 @@ const QColor& ColorParameter::value() const
  */
 void ColorParameter::setValue(const QColor& value)
 {
-    m_value = value;
+    QPixmap p(32, 32);
+    p.fill(value);
+    m_delegate->setIcon(QIcon(p));
     
-    if(m_delegate!= NULL)
-    {
-        QPixmap p(32, 32);
-        p.fill(value);
-        m_delegate->setIcon(QIcon(p));
-    }
+    m_value = value;
+    Parameter::updateValue();
 }
 
 /**
@@ -181,14 +179,6 @@ bool ColorParameter::deserialize(QIODevice& in)
  */
 QWidget*  ColorParameter::delegate()
 {
-    if(m_delegate == NULL)
-    {
-        m_delegate = new QPushButton(""),
-    
-        setValue(m_value);
-        initConnections();
-    }
-    
     return m_delegate;
 }
 
@@ -197,29 +187,15 @@ QWidget*  ColorParameter::delegate()
  * presents the color selection dialog. Then the user can select between
  * the different colors.
  */
-void ColorParameter::selectColor()
-{
-    if(m_delegate!= NULL)
-    {
-        QColor col = QColorDialog::getColor(m_value, m_delegate, name());
-        
-        if(col.isValid())
-        {
-            m_value = col;
-            updateValue();
-        }
-    }
-}
-    
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void ColorParameter::updateValue()
 {
-    Parameter::updateValue();
+    QColor col = QColorDialog::getColor(m_value, m_delegate, name());
+        
+    if(col.isValid())
+    {
+       setValue(col);
+    }
 }
-
 /**
  * Initializes the connections (signal<->slot) between the parameter class and
  * the delegate widget. This will be done after the first call of the delegate()
@@ -227,7 +203,7 @@ void ColorParameter::updateValue()
  */
 void ColorParameter::initConnections()
 {
-    connect(m_delegate, SIGNAL(clicked()), this, SLOT(selectColor()));
+    connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
     Parameter::initConnections();
 }
 

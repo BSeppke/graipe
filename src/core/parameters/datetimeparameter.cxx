@@ -51,9 +51,13 @@ namespace graipe {
  */
 DateTimeParameter::DateTimeParameter(const QString& name, QDateTime value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_dteDelegate(NULL),
-    m_value(value)
+    m_dteDelegate(new QDateTimeEdit)
 {
+    setValue(value);
+    m_dteDelegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+    
+    connect(m_dteDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -61,11 +65,7 @@ DateTimeParameter::DateTimeParameter(const QString& name, QDateTime value, Param
  */
 DateTimeParameter::~DateTimeParameter()
 {
-    if(m_dteDelegate != NULL)
-    {
-        delete m_dteDelegate;
-        m_dteDelegate = NULL;
-    }
+    delete m_dteDelegate;
 }
 
 /**
@@ -83,9 +83,9 @@ QString  DateTimeParameter::typeName() const
  *
  * \return The value of this parameter.
  */
-const QDateTime& DateTimeParameter::value()  const
+QDateTime DateTimeParameter::value()  const
 {
-    return m_value;
+    return m_dteDelegate->dateTime();
 }
 
 /**
@@ -95,12 +95,7 @@ const QDateTime& DateTimeParameter::value()  const
  */
 void DateTimeParameter::setValue(const QDateTime& value)
 {
-    m_value = value;
-    
-    if(m_dteDelegate != NULL)
-    {
-        m_dteDelegate->setDateTime(value);
-    }
+    m_dteDelegate->setDateTime(value);
 }
 
 /**
@@ -113,7 +108,7 @@ void DateTimeParameter::setValue(const QDateTime& value)
  */
 QString DateTimeParameter::valueText() const
 {
-    return m_value.toString("dd.MM.yyyy hh:mm:ss");
+    return value().toString("dd.MM.yyyy hh:mm:ss");
 }
 
 /**
@@ -178,39 +173,7 @@ bool DateTimeParameter::isValid() const
  */
 QWidget*  DateTimeParameter::delegate()
 {
-    if(m_dteDelegate == NULL)
-    {
-        m_dteDelegate = new QDateTimeEdit;
-        
-        m_dteDelegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
-        m_dteDelegate->setDateTime(m_value);
-        initConnections();
-    }
     return m_dteDelegate;
-}
-
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void DateTimeParameter::updateValue()
-{
-    if(m_dteDelegate != NULL)
-    {
-        m_value =  m_dteDelegate->dateTime();
-        Parameter::updateValue();
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void DateTimeParameter::initConnections()
-{
-    connect(m_dteDelegate, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 

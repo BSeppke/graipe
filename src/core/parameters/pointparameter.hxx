@@ -53,9 +53,7 @@ namespace graipe {
 
 class GRAIPE_CORE_EXPORT PointParameter
 :   public Parameter
-{  
-    Q_OBJECT
-      
+{
     public:
         /**
          * Default constructor of the PointParameter class with a setting of the
@@ -88,7 +86,7 @@ class GRAIPE_CORE_EXPORT PointParameter
          *
          * \return The minimal value of this parameter.
          */
-        const QPoint& lowerBound() const;
+        QPoint lowerBound() const;
     
         /**
          * Writing accessor of the minimum value of this parameter.
@@ -102,7 +100,7 @@ class GRAIPE_CORE_EXPORT PointParameter
          *
          * \return The maximal value of this parameter.
          */
-        const QPoint& upperBound() const;
+        QPoint upperBound() const;
     
         /**
          * Writing accessor of the maximum value of this parameter.
@@ -124,7 +122,7 @@ class GRAIPE_CORE_EXPORT PointParameter
          *
          * \return The value of this parameter.
          */
-        const QPoint& value() const;
+        QPoint value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -177,32 +175,13 @@ class GRAIPE_CORE_EXPORT PointParameter
          */
         QWidget * delegate();
         
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
-    protected:    
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
+    protected:
         //The parent delegate widget
         QWidget* m_delegate;
     
         //Thes child widgets for x,y control
-        QSpinBox* m_spbXDelegate, * m_spbYDelegate;
-    
-        //The value
-        QPoint m_value;
-    
-        //The min and max range values
-        QPoint m_min, m_max;
+        QSpinBox* m_spbXDelegate,
+                * m_spbYDelegate;
 };
 
 } //end of namespace graipe

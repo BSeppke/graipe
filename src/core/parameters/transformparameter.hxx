@@ -54,8 +54,6 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT TransformParameter
 :   public Parameter
 {
-    Q_OBJECT
-    
     public:
         /**
          * Default constructor of the TransformParameter class with a setting of the
@@ -86,7 +84,7 @@ class GRAIPE_CORE_EXPORT TransformParameter
          *
          * \return The value of this parameter.
          */
-        const QTransform& value() const;
+        QTransform value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -105,6 +103,14 @@ class GRAIPE_CORE_EXPORT TransformParameter
          */
         QString valueText() const;
     
+        /**
+         * Static function to convert a transformation into a list
+         * of numbers with 10 digit precision. The order is as follows:
+         * m11, m12, m13, m21, m22, m23, m31, m32, m33.
+         *
+         * \param trans The QTransform
+         * \return A comma separated tring w.r.t. the order given above.
+         */
         static QString valueText(const QTransform& trans);
             
         /**
@@ -141,21 +147,7 @@ class GRAIPE_CORE_EXPORT TransformParameter
          */
         QWidget * delegate();
         
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
     protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
         //parent delegate
         QWidget * m_delegate;
     
@@ -163,9 +155,6 @@ class GRAIPE_CORE_EXPORT TransformParameter
         QLineEdit   * m_lne11, * m_lne12, * m_lne13,
                     * m_lne21, * m_lne22, * m_lne23,
                     * m_lne31, * m_lne32, * m_lne33;
-    
-        //The value: a QTransform
-        QTransform m_value;
 };
 
 } //end of namespace graipe

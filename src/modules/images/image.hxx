@@ -177,21 +177,21 @@ class GRAIPE_IMAGES_EXPORT Image
          *
          * \return The timestamp of the Image.
          */
-        const DateTime_Type& timestamp() const;
+        DateTime_Type timestamp() const;
         
         /**
          * Getter for the comment of an Image.
          *
          * \return The comment of the Image.
          */
-		const Comment_Type& comment() const;
+		Comment_Type comment() const;
         
         /**
          * Getter for the units of an Image.
          *
          * \return The units of the Image.
          */
-		const Units_Type& units() const;
+		Units_Type units() const;
     
         /**
          * Getter for the scale of an Image.

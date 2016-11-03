@@ -53,10 +53,6 @@ DenseVectorfield2DStatistics::DenseVectorfield2DStatistics()
     m_length.min    = max_val;
     m_length.max    = min_val;
     m_length.mean   = m_length.stddev    = zero_val;
-    
-    m_curl.min    = max_val;
-    m_curl.max    = min_val;
-    m_curl.mean   = m_curl.stddev    =  zero_val;
 }
 
 DenseVectorfield2DStatistics::DenseVectorfield2DStatistics(const DenseVectorfield2D* vf)
@@ -106,51 +102,6 @@ DenseVectorfield2DStatistics::DenseVectorfield2DStatistics(const DenseVectorfiel
     m_direction.stddev.setY(sqrt(m_direction.stddev.y()));
     
     m_length.stddev = sqrt(m_length.stddev/vf->size());
-    
-    
-    
-    
-    //---------------------------------------------------------------------------
-    //Curl statistics
-    m_curl.min    = max_val;
-    m_curl.max    = min_val;
-    m_curl.mean   = m_curl.stddev    =  zero_val;
-    
-    
-    unsigned int size =  vf->size();
-    
-    unsigned int w = vf->width(), h = vf->height();
-    
-    vigra::Kernel1D<double> kernel;
-    kernel.initGaussianDerivative(1.0,1);
-    
-    vigra::MultiArray<2,float>m_uy(w,h), m_vx(w,h), res(w,h);
-    
-    vigra::separableConvolveY(vf->u(), m_uy, kernel);
-    vigra::separableConvolveX(vf->v(), m_vx, kernel);
-        
-    for (unsigned int y=0 ; y < h; ++y)
-    {
-        for (unsigned int x=0 ; x < w; ++x)
-        {
-            res(x,y) = m_vx(x,y) - m_uy(x,y);
-            m_curl.max = std::max(m_curl.max, (double)res(x,y));
-            m_curl.min = std::min(m_curl.min, (double)res(x,y));
-            
-            m_curl.mean += res(x,y);
-        }
-    }
-    
-    m_curl.mean /= size;
-    
-    for (unsigned int y=0 ; y < h; ++y)
-    {
-        for (unsigned int x=0 ; x < w; ++x)
-        {
-            m_curl.stddev += pow(m_curl.mean - res(x,y),2.0);
-        }
-    }
-    m_curl.stddev = sqrt(m_curl.stddev/size);
 }
 
 
@@ -163,13 +114,6 @@ const BasicStatistics<double>& DenseVectorfield2DStatistics::lengthStats() const
 {	
 	return m_length;
 }
-
-const BasicStatistics<double>& DenseVectorfield2DStatistics::curlStats() const
-{	
-	return m_curl;
-}
-
-
 
 DenseWeightedVectorfield2DStatistics::DenseWeightedVectorfield2DStatistics()
 : DenseVectorfield2DStatistics()

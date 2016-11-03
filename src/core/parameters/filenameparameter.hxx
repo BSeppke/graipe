@@ -88,7 +88,7 @@ class GRAIPE_CORE_EXPORT FilenameParameter
          *
          * \return The value of this parameter (For filename: QString).
          */
-        const QString& value() const;
+        QString value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -146,12 +146,6 @@ class GRAIPE_CORE_EXPORT FilenameParameter
          * This slot is called if the user pressed the file-selection button. It is mainly
          * used to present the file selection dialog to the user.
          */
-        void selectFilename();
-    
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
         void updateValue();
         
    protected:
@@ -168,9 +162,6 @@ class GRAIPE_CORE_EXPORT FilenameParameter
         //The children delegates inside the parent
         QLineEdit* m_lneDelegate;
         QPushButton* m_btnDelegate;
-    
-        //The filename (as a QString)
-        QString m_value;
 };
 
 } //end of namespace graipe

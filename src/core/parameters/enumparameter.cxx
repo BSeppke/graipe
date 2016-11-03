@@ -52,10 +52,17 @@ namespace graipe {
  */
 EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names, unsigned int value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_cmbDelegate(NULL),
-    m_enum_names(enum_names),
-    m_value(value)
+    m_cmbDelegate(new QComboBox)
 {
+    for(unsigned int v=0; v<(unsigned int)enum_names.size(); ++v)
+    {
+        m_cmbDelegate->addItem(enum_names[v]);
+    }
+    
+    setValue(value);
+    
+    connect(m_cmbDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+    initConnections();
 }
 
 /**
@@ -63,11 +70,7 @@ EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names
  */
 EnumParameter::~EnumParameter()
 {
-    if(m_cmbDelegate != NULL)
-    {
-        delete m_cmbDelegate;
-        m_cmbDelegate=NULL;
-    }
+    delete m_cmbDelegate;
 }
 
 /**
@@ -83,11 +86,11 @@ QString  EnumParameter::typeName() const
 /** 
  * The current value of this parameter in the correct, most special type.
  *
- * \return The value of this parameter.
+ * \return The value of this parameter. (-1 on error)
  */
-unsigned int EnumParameter::value() const
+int EnumParameter::value() const
 {
-	return m_value;
+	return m_cmbDelegate->currentIndex();
 }
     
 /**
@@ -97,16 +100,8 @@ unsigned int EnumParameter::value() const
  */
 void EnumParameter::setValue(unsigned int value)
 {
-	if(value < (unsigned int)m_enum_names.size())
-	{
-		m_value = value;
-		m_value_text = m_enum_names[value];
-        
-        if(m_cmbDelegate != NULL)
-        {
-            m_cmbDelegate->setCurrentIndex(value);
-        }
-    }
+	m_cmbDelegate->setCurrentIndex(value);
+    Parameter::updateValue();
 }
 
 /**
@@ -119,7 +114,7 @@ void EnumParameter::setValue(unsigned int value)
  */
 QString EnumParameter::valueText() const
 { 
-	return m_value_text;
+	return m_cmbDelegate->currentText();
 }
 
 /**
@@ -132,7 +127,7 @@ QString EnumParameter::valueText() const
 void EnumParameter::serialize(QIODevice& out) const
 {
     Parameter::serialize(out);
-    write_on_device(", " + QString("%1").arg(m_value), out);
+    write_on_device(", " + QString("%1").arg(value()), out);
 }
 
 /**
@@ -172,7 +167,7 @@ bool EnumParameter::deserialize(QIODevice& in)
  */
 bool EnumParameter::isValid() const
 {
-    return value() < (unsigned int)m_enum_names.size() && m_enum_names.size();
+    return m_cmbDelegate->count() && (value() != -1);
 }
 
 /**
@@ -185,51 +180,8 @@ bool EnumParameter::isValid() const
  */
 QWidget*  EnumParameter::delegate()
 {
-    if(m_cmbDelegate == NULL)
-    {
-        m_cmbDelegate = new QComboBox;
-        
-        for(unsigned int v=0; v<(unsigned int)m_enum_names.size(); ++v)
-        {
-            m_cmbDelegate->addItem(m_enum_names[v]);
-        }
-    
-        m_cmbDelegate->setCurrentIndex(m_value);
-        initConnections();
-    }
-    
     return m_cmbDelegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
-void EnumParameter::updateValue()
-{
-    if(m_cmbDelegate != NULL)
-    {
-        unsigned int value = m_cmbDelegate->currentIndex();
-        
-        if(value < (unsigned int)m_enum_names.size())
-        {
-            m_value = value;
-            m_value_text = m_enum_names[value];
-            
-            Parameter::updateValue();
-        }
-    }
-}
-
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void EnumParameter::initConnections()
-{
-    connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
-}
 
 } //end of namespace graipe

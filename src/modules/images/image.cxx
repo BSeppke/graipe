@@ -271,7 +271,7 @@ void Image<T>::setNumBands( unsigned int bands)
  * \return The timestamp of the Image.
  */
 template<class T>
-const typename Image<T>::DateTime_Type& Image<T>::timestamp() const
+typename Image<T>::DateTime_Type Image<T>::timestamp() const
 {
 	return m_timestamp->value();
 }
@@ -282,7 +282,7 @@ const typename Image<T>::DateTime_Type& Image<T>::timestamp() const
  * \return The comment of the Image.
  */
 template<class T>
-const typename Image<T>::Comment_Type& Image<T>::comment() const
+typename Image<T>::Comment_Type Image<T>::comment() const
 {
 	return m_comment->value();
 }
@@ -293,7 +293,7 @@ const typename Image<T>::Comment_Type& Image<T>::comment() const
  * \return The units of the Image.
  */
 template<class T>
-const typename Image<T>::Units_Type& Image<T>::units() const
+typename Image<T>::Units_Type Image<T>::units() const
 {
 	return m_units->value();
 }

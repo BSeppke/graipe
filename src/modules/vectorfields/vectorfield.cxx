@@ -107,7 +107,7 @@ void Vectorfield2D::setScale(double scale)
  *
  * \return The global motion by means of an affine matrix.
  */
-const QTransform& Vectorfield2D::globalMotion() const
+QTransform Vectorfield2D::globalMotion() const
 {
 	return m_global_motion->value();
 }

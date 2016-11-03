@@ -55,9 +55,7 @@ namespace graipe {
 
 class GRAIPE_CORE_EXPORT ModelParameter
 :   public Parameter
-{	
-    Q_OBJECT
-    
+{
     public:
         /**
          * Default constructor of the ModelParameter class with a setting of the
@@ -170,21 +168,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
          */
         QWidget * delegate();
         
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
     protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
         //The model's delegate widget
         QComboBox* m_cmbDelegate;
     
@@ -193,9 +177,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
     
         //A type filter to show only a subset of models (filtered by their typeName())
         QString m_type_filter;
-    
-        //The currently selected model
-        Model* m_value;
+
     
         //The lock (if locked)
         unsigned int m_lock;

@@ -86,12 +86,6 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DStatistics
          * \return Statistics of the lengths of this vectorfield.
          */
         const BasicStatistics<double>& lengthStats() const;
-        /**
-         * Returns statistics of the curls of this vectorfield.
-         *
-         * \return Statistics of the curls of this vectorfield.
-         */
-        const BasicStatistics<double>& curlStats() const;
     
     protected:
         //Pointer to the vectorfield
@@ -99,7 +93,6 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DStatistics
         //Statistics storages
         BasicStatistics<PointType> m_direction;
         BasicStatistics<double> m_length;
-        BasicStatistics<double> m_curl;
 };
     
 class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DStatistics

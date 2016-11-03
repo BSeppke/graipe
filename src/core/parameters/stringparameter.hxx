@@ -56,8 +56,6 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT StringParameter
 :   public Parameter
 {
-    Q_OBJECT
-    
     public:
         /**
          * Default constructor of the StringParameter class with a setting of the
@@ -70,7 +68,7 @@ class GRAIPE_CORE_EXPORT StringParameter
          *                      be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
          */
-        StringParameter(const QString& name, QString value="", unsigned int columns=20, Parameter* parent=NULL, bool invert_parent=false);
+        StringParameter(const QString& name, const QString& value="", unsigned int columns=20, Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * Destructor of the StringParameter class.
@@ -89,7 +87,7 @@ class GRAIPE_CORE_EXPORT StringParameter
          *
          * \return The value of this parameter.
          */
-        const QString& value() const;
+        QString value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -142,29 +140,12 @@ class GRAIPE_CORE_EXPORT StringParameter
          */
         QWidget * delegate();
         
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
-    protected:    
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
+    protected:
         //The width of the textfield (in lines)
         unsigned int m_columns;
     
         //The delegate widget
         QLineEdit* m_lneDelegate;
-  
-        //The value itself
-        QString m_value;
 };
 
 } //end of namespace graipe

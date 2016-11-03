@@ -85,9 +85,9 @@ class GRAIPE_CORE_EXPORT EnumParameter
         /** 
          * The current value of this parameter in the correct, most special type.
          *
-         * \return The value of this parameter.
+         * \return The value of this parameter (-1 on fail).
          */
-        unsigned int value() const;
+        int value() const;
     
         /**
          * Writing accessor of the current value of this parameter.
@@ -139,22 +139,8 @@ class GRAIPE_CORE_EXPORT EnumParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
-        
-    protected slots:
-        /**
-         * This slot is called everytime, the delegate has changed. It has to synchronize
-         * the internal value of the parameter with the current delegate's value
-         */
-        void updateValue();
-  
-    protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
     
+    protected:
         //The delegate widget
         QComboBox* m_cmbDelegate;
     

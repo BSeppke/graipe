@@ -54,10 +54,29 @@ namespace graipe {
 ParameterGroup::ParameterGroup(const QString&  name, storage_type items, QFormLayout::RowWrapPolicy policy, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_parameters(items),
-    m_delegate(NULL),
-    m_layout(NULL),
+    m_delegate(new QWidget),
+    m_layout(new QFormLayout(m_delegate)),
     m_policy(policy)
 {
+    m_layout->setRowWrapPolicy(m_policy);
+    m_layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+        
+    for( QString id : m_parameter_order)
+    {
+        Parameter* param = m_parameters.at(id);
+        
+        if(param->delegate())
+        {
+            param->delegate()->setMaximumSize(9999,9999);
+            param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+            
+            if(!param->isHidden())
+            {
+                m_layout->addRow(param->name(), param->delegate());
+            }
+            connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
+        }
+    }
 }
 /**
  * Destructor of the ParameterGroup class. 
@@ -68,11 +87,7 @@ ParameterGroup::~ParameterGroup()
 {
     for(item_type item: m_parameters)
     {
-        if (item.second != NULL)
-        {
-            delete item.second;
-            item.second=NULL;
-        }
+         delete item.second;
     }
 }
 
@@ -331,32 +346,6 @@ void ParameterGroup::refresh()
  */
 QWidget * ParameterGroup::delegate()
 {
-    if(m_delegate == NULL)
-    {
-        m_delegate = new QWidget;
-        m_layout = new QFormLayout(m_delegate);
-        
-        m_layout->setRowWrapPolicy(m_policy);
-        m_layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
-        
-        for( QString id : m_parameter_order)
-        {
-            Parameter* param = m_parameters.at(id);
-            
-            if(param->delegate())
-            {
-                param->delegate()->setMaximumSize(9999,9999);
-                param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-                
-                if(!param->isHidden())
-                {
-                    m_layout->addRow(param->name(), param->delegate());
-                }
-                connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
-            }
-        }
-    }
-    
     return m_delegate;
 }
 
