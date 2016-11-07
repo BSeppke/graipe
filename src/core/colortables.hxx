@@ -36,6 +36,8 @@
 #ifndef GRAIPE_CORE_COLORTABLES_HXX
 #define GRAIPE_CORE_COLORTABLES_HXX
 
+#include "core/config.hxx"
+
 #include <QVector>
 #include <QRgb>
 #include <QColor>
@@ -47,8 +49,8 @@ namespace detail
     static QVector<QVector<QRgb> > colorTables;
 }
 
-QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & col2, const QColor & col3);
-QVector<QVector<QRgb> > colorTables();
+GRAIPE_CORE_EXPORT QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & col2, const QColor & col3);
+GRAIPE_CORE_EXPORT QVector<QVector<QRgb> > colorTables();
 
 } //end of namespace graipe
 
