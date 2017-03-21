@@ -159,6 +159,22 @@ class VectorfieldsModule
 		AlgorithmFactory algorithmFactory() const
         {
             AlgorithmFactory alg_factory;
+		
+			AlgorithmFactoryItem alg_item;
+			alg_item.topic_name = "Import";
+			
+			//Import dense vectorfields
+			alg_item.algorithm_name = "Import dense vectorfield (.flo)";
+			alg_item.algorithm_fptr =  &createDenseVectorfieldImporter;
+			alg_factory.push_back(alg_item);
+			
+			alg_item.topic_name = "Export";
+			
+			//Import dense vectorfields
+			alg_item.algorithm_name = "Export dense vectorfield (.flo)";
+			alg_item.algorithm_fptr =  &createDenseVectorfieldExporter;
+			alg_factory.push_back(alg_item);
+			
 			return alg_factory;
 		}
     
@@ -365,6 +381,25 @@ class VectorfieldsModule
                 return new DenseWeightedVectorfield2DParticleViewController(scene, static_cast<DenseWeightedVectorfield2D*> (model), z_order);
             }
             return NULL;
+        }
+        /**
+         * Creates a new algorithm for dense vectorfields import.
+         *
+         * \return A new DenseVectorfieldImporter.
+         */
+        static Algorithm* createDenseVectorfieldImporter()
+        {
+            return new DenseVectorfieldImporter;
+        }
+
+        /**
+         * Creates a new algorithm for dense vectorfields export.
+         *
+         * \return A new DenseVectorfieldExporter.
+         */
+        static Algorithm* createDenseVectorfieldExporter()
+        {
+            return new DenseVectorfieldExporter;
         }
 };
 

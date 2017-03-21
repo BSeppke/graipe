@@ -7,6 +7,7 @@ set(SOURCES
 	densevectorfield.cxx
 	densevectorfieldstatistics.cxx
 	densevectorfieldviewcontroller.cxx
+	densevectorfieldimpex.cxx
 	sparsevectorfield.cxx
 	sparsevectorfieldstatistics.cxx
 	sparsevectorfieldviewcontroller.cxx
@@ -20,6 +21,7 @@ set(HEADERS
 	densevectorfield.hxx
 	densevectorfieldstatistics.hxx
 	densevectorfieldviewcontroller.hxx
+	densevectorfieldimpex.hxx
 	sparsevectorfield.hxx
 	sparsevectorfieldstatistics.hxx
 	sparsevectorfieldviewcontroller.hxx

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -33,17 +33,81 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_VECTORFIELDS_H
-#define GRAIPE_VECTORFIELDS_H
+#ifndef GRAIPE_VECTORFIELDS_DENSEVECTORFIELDIMPEX_HXX
+#define GRAIPE_VECTORFIELDS_DENSEVECTORFIELDIMPEX_HXX
 
-#include "vectorfields/vectordrawer.hxx"
-#include "vectorfields/vectorfield.hxx"
-#include "vectorfields/sparsevectorfield.hxx"
-#include "vectorfields/sparsevectorfieldstatistics.hxx"
-#include "vectorfields/sparsevectorfieldviewcontroller.hxx"
 #include "vectorfields/densevectorfield.hxx"
-#include "vectorfields/densevectorfieldstatistics.hxx"
-#include "vectorfields/densevectorfieldviewcontroller.hxx"
-#include "vectorfields/densevectorfieldimpex.hxx"
+#include "vectorfields/config.hxx"
 
-#endif //GRAIPE_VECTORFIELDS_H
+namespace graipe {
+    
+/**
+ * The ImageImpex class is just a frame for two static template functions, which
+ * are using GDAL/OGR to import or export images into the graipe-format.
+ */
+class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfieldImpex
+{
+    public:
+
+        /**
+         * Imports a dense vectorfield from the .flo-Format into the graipe format.
+         *
+         * \param filename The filename of the .flo file to be loaded.
+         * \param vf the dense vectorfield, which we fill using the data on harddisk.
+         * \return true, if the import was successful, else otherwise.
+         */
+        static bool importVectorfield(const QString & filename, DenseVectorfield2D & vf);
+
+        /**
+         * Exports a dense vectorfield from the graipe format as a .flo-file onto harddisk. 
+         *
+         * \param vf the dense vectorfield, which we want so store as .flo-file on harddisk
+         * \param filename The filename of the image.
+         * \return true, if the export was successful, else otherwise.
+         */
+        static bool exportVectorfield(const DenseVectorfield2D & vf, const QString& filename);
+};
+
+    
+/**
+ * Dense vectorfield import implemented by means of algorithm.
+ * This class implements an algorithm to import images.
+ */
+class DenseVectorfieldImporter
+:   public Algorithm
+{
+    public:
+        /**
+         * Default constructor for the dense vectorfield importer class.
+         */
+        DenseVectorfieldImporter();
+    
+        /**
+         * Specialization of the running phase of this algorithm.
+         */
+        void run();
+};
+
+    
+/**
+ * Image export implemented by means of algorithm.
+ * This class implements an algorithm to export images.
+ */
+class DenseVectorfieldExporter
+:   public Algorithm
+{
+    public:
+        /**
+         * Default constructor for the dense vectorfield exporter class.
+         */
+        DenseVectorfieldExporter();
+    
+        /**
+         * Specialization of the running phase of this algorithm.
+         */
+        void run();
+};
+
+} //end of namespace graipe
+
+#endif //GRAIPE_VECTORFIELDS_DENSEVECTORFIELDIMPEX_HXX
