@@ -39,6 +39,7 @@
 #include "core/parameters/parameter.hxx"
 #include "core/model.hxx"
 
+#include <QPointer>
 #include <QComboBox>
 
 
@@ -56,6 +57,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT ModelParameter
 :   public Parameter
 {
+    Q_OBJECT
+    
     public:
         /**
          * Default constructor of the ModelParameter class with a setting of the
@@ -168,9 +171,19 @@ class GRAIPE_CORE_EXPORT ModelParameter
          */
         QWidget * delegate();
         
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
+        
     protected:
+        //The storage for the value of this parameter (index in m_allowed_models)
+        int m_model_idx;
+    
         //The model's delegate widget
-        QComboBox* m_cmbDelegate;
+        QPointer<QComboBox> m_cmbDelegate;
     
         //The allowed model pointers
         std::vector<Model*>	m_allowed_values;

@@ -51,36 +51,18 @@ namespace graipe {
  */
 TransformParameter::TransformParameter(const QString& name, QTransform value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_delegate(new QWidget),
-    m_lne11(new QLineEdit(QString::number(value.m11()), m_delegate)),
-    m_lne12(new QLineEdit(QString::number(value.m12()), m_delegate)),
-    m_lne13(new QLineEdit(QString::number(value.m13()), m_delegate)),
-    m_lne21(new QLineEdit(QString::number(value.m21()), m_delegate)),
-    m_lne22(new QLineEdit(QString::number(value.m22()), m_delegate)),
-    m_lne23(new QLineEdit(QString::number(value.m23()), m_delegate)),
-    m_lne31(new QLineEdit(QString::number(value.m31()), m_delegate)),
-    m_lne32(new QLineEdit(QString::number(value.m32()), m_delegate)),
-    m_lne33(new QLineEdit(QString::number(value.m33()), m_delegate))
+    m_value(value),
+    m_delegate(NULL),
+    m_lne11(NULL),
+    m_lne12(NULL),
+    m_lne13(NULL),
+    m_lne21(NULL),
+    m_lne22(NULL),
+    m_lne23(NULL),
+    m_lne31(NULL),
+    m_lne32(NULL),
+    m_lne33(NULL)
 {
-
-    QGridLayout * layout = new QGridLayout(m_delegate);
-        
-    layout->setContentsMargins(0,0,0,0);
-    
-    layout->addWidget(m_lne11, 0,0); layout->addWidget(m_lne12, 0,1); layout->addWidget(m_lne13, 0,2);
-    layout->addWidget(m_lne21, 1,0); layout->addWidget(m_lne22, 1,1); layout->addWidget(m_lne23, 1,2);
-    layout->addWidget(m_lne31, 2,0); layout->addWidget(m_lne32, 2,1); layout->addWidget(m_lne33, 2,2);
-        
-    connect(m_lne11, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne12, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne13, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne21, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne22, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne23, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne31, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne32, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    connect(m_lne33, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -90,7 +72,8 @@ TransformParameter::~TransformParameter()
 {
     //Also deletes other widget, since they are owned
     //by the assigned layout.
-    delete m_delegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -110,12 +93,7 @@ QString  TransformParameter::typeName() const
  */
 QTransform TransformParameter::value() const
 {
-    QTransform trans;
-    trans.setMatrix(m_lne11->text().toDouble(), m_lne12->text().toDouble(), m_lne13->text().toDouble(),
-                    m_lne21->text().toDouble(), m_lne22->text().toDouble(), m_lne23->text().toDouble(),
-                    m_lne31->text().toDouble(), m_lne32->text().toDouble(), m_lne33->text().toDouble());
-    
-    return trans;
+    return m_value;
 }
 
 /**
@@ -125,11 +103,16 @@ QTransform TransformParameter::value() const
  */
 void TransformParameter::setValue(const QTransform& value)
 {
-    m_lne11->setText(QString::number(value.m11())); m_lne12->setText(QString::number(value.m12())), m_lne13->setText(QString::number(value.m13()));
-    m_lne21->setText(QString::number(value.m21())); m_lne22->setText(QString::number(value.m22())), m_lne23->setText(QString::number(value.m23()));
-    m_lne31->setText(QString::number(value.m31())); m_lne32->setText(QString::number(value.m32())), m_lne33->setText(QString::number(value.m33()));
+    m_value = value;
+    
+    if(m_delegate != NULL)
+    {
+        m_lne11->setText(QString::number(value.m11())); m_lne12->setText(QString::number(value.m12())), m_lne13->setText(QString::number(value.m13()));
+        m_lne21->setText(QString::number(value.m21())); m_lne22->setText(QString::number(value.m22())), m_lne23->setText(QString::number(value.m23()));
+        m_lne31->setText(QString::number(value.m31())); m_lne32->setText(QString::number(value.m32())), m_lne33->setText(QString::number(value.m33()));
 
-    Parameter::updateValue();
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -241,7 +224,56 @@ bool TransformParameter::isValid() const
 
 QWidget*  TransformParameter::delegate()
 {
+    if(m_delegate == NULL)
+    {
+        m_delegate = new QWidget;
+        m_lne11 = new QLineEdit(QString::number(value().m11()), m_delegate);
+        m_lne12 = new QLineEdit(QString::number(value().m12()), m_delegate);
+        m_lne13 = new QLineEdit(QString::number(value().m13()), m_delegate);
+        m_lne21 = new QLineEdit(QString::number(value().m21()), m_delegate);
+        m_lne22 = new QLineEdit(QString::number(value().m22()), m_delegate);
+        m_lne23 = new QLineEdit(QString::number(value().m23()), m_delegate);
+        m_lne31 = new QLineEdit(QString::number(value().m31()), m_delegate);
+        m_lne32 = new QLineEdit(QString::number(value().m32()), m_delegate);
+        m_lne33 = new QLineEdit(QString::number(value().m33()), m_delegate);
+        
+        QGridLayout * layout = new QGridLayout(m_delegate);
+        
+        layout->setContentsMargins(0,0,0,0);
+        layout->addWidget(m_lne11, 0,0); layout->addWidget(m_lne12, 0,1); layout->addWidget(m_lne13, 0,2);
+        layout->addWidget(m_lne21, 1,0); layout->addWidget(m_lne22, 1,1); layout->addWidget(m_lne23, 1,2);
+        layout->addWidget(m_lne31, 2,0); layout->addWidget(m_lne32, 2,1); layout->addWidget(m_lne33, 2,2);
+        
+        connect(m_lne11, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne12, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne13, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne21, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne22, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne23, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne31, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne32, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_lne33, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        
+        Parameter::initConnections();
+    }
     return m_delegate;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void TransformParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_delegate != NULL)
+    {
+        m_value.setMatrix(
+            m_lne11->text().toDouble(), m_lne12->text().toDouble(), m_lne13->text().toDouble(),
+            m_lne21->text().toDouble(), m_lne22->text().toDouble(), m_lne23->text().toDouble(),
+            m_lne31->text().toDouble(), m_lne32->text().toDouble(), m_lne33->text().toDouble());
+        Parameter::updateValue();
+    }
 }
 
 } //end of namespace graipe

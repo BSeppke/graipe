@@ -50,19 +50,12 @@ namespace graipe {
  *                      be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
  */
-EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names, unsigned int value, Parameter* parent, bool invert_parent)
+EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names, int value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_cmbDelegate(new QComboBox)
+    m_enum_names(enum_names),
+    m_value(value),
+    m_cmbDelegate(NULL)
 {
-    for(unsigned int v=0; v<(unsigned int)enum_names.size(); ++v)
-    {
-        m_cmbDelegate->addItem(enum_names[v]);
-    }
-    
-    setValue(value);
-    
-    connect(m_cmbDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -70,7 +63,8 @@ EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names
  */
 EnumParameter::~EnumParameter()
 {
-    delete m_cmbDelegate;
+    if(m_cmbDelegate != NULL)
+        delete m_cmbDelegate;
 }
 
 /**
@@ -90,7 +84,7 @@ QString  EnumParameter::typeName() const
  */
 int EnumParameter::value() const
 {
-	return m_cmbDelegate->currentIndex();
+	return m_value;// m_cmbDelegate->currentIndex();
 }
     
 /**
@@ -98,10 +92,15 @@ int EnumParameter::value() const
  *
  * \param value The new value of this parameter.
  */
-void EnumParameter::setValue(unsigned int value)
+void EnumParameter::setValue(int value)
 {
-	m_cmbDelegate->setCurrentIndex(value);
-    Parameter::updateValue();
+    m_value = value;
+    
+    if(m_cmbDelegate != NULL)
+    {
+    	m_cmbDelegate->setCurrentIndex(value);
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -113,8 +112,11 @@ void EnumParameter::setValue(unsigned int value)
  * \return The value of the parameter converted to an QString.
  */
 QString EnumParameter::valueText() const
-{ 
-	return m_cmbDelegate->currentText();
+{
+    if (isValid())
+    	return m_enum_names[value()];
+    else
+        return "";
 }
 
 /**
@@ -167,7 +169,7 @@ bool EnumParameter::deserialize(QIODevice& in)
  */
 bool EnumParameter::isValid() const
 {
-    return m_cmbDelegate->count() && (value() != -1);
+    return value() > -1 && value() < m_enum_names.size();
 }
 
 /**
@@ -180,8 +182,33 @@ bool EnumParameter::isValid() const
  */
 QWidget*  EnumParameter::delegate()
 {
+    if(m_cmbDelegate == NULL)
+    {
+        m_cmbDelegate = new QComboBox;
+        for(int v=0; v<m_enum_names.size(); ++v)
+        {
+            m_cmbDelegate->addItem(m_enum_names[v]);
+        }
+        m_cmbDelegate->setCurrentIndex(m_value);
+    
+        connect(m_cmbDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_cmbDelegate;
 }
 
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void EnumParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_cmbDelegate != NULL)
+    {
+        m_value = m_cmbDelegate->currentIndex();
+        Parameter::updateValue();
+    }
+}
 
 } //end of namespace graipe

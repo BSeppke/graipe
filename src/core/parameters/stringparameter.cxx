@@ -52,14 +52,10 @@ namespace graipe {
  */
 StringParameter::StringParameter(const QString& name, const QString& value, unsigned int columns, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
+    m_value(value),
     m_columns(columns),
-    m_lneDelegate(new QLineEdit)
+    m_lneDelegate(NULL)
 {
-    m_lneDelegate->setMinimumWidth(m_columns * m_lneDelegate->fontMetrics().width("X"));
-    m_lneDelegate->setText(value);
-        
-    connect(m_lneDelegate, SIGNAL(textChanged(const QString&)), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -67,12 +63,8 @@ StringParameter::StringParameter(const QString& name, const QString& value, unsi
  */
 StringParameter::~StringParameter()
 {
-   //Do never ever delete the widgets here.
-   //They will be auto-destroyed by Qt as long as we are a Q_OBJECT!
    if(m_lneDelegate != NULL)
-   {
         delete m_lneDelegate;
-   }
 }
 
 /**
@@ -92,7 +84,7 @@ QString  StringParameter::typeName() const
  */
 QString StringParameter::value()  const
 {
-	return m_lneDelegate->text();
+	return m_value;
 }
 
 /**
@@ -101,9 +93,14 @@ QString StringParameter::value()  const
  * \param value The new value of this parameter.
  */
 void StringParameter::setValue(const QString & value)
-{ 
-    m_lneDelegate->setText(value);
-    Parameter::updateValue();
+{
+    m_value = value;
+    
+    if(m_lneDelegate != NULL)
+    {
+        m_lneDelegate->setText(value);
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -174,10 +171,29 @@ QWidget*  StringParameter::delegate()
 {
     if(m_lneDelegate == NULL)
     {
-
+        m_lneDelegate = new QLineEdit;
+        m_lneDelegate->setMinimumWidth(m_columns * m_lneDelegate->fontMetrics().width("X"));
+        m_lneDelegate->setText(value());
+        
+        connect(m_lneDelegate, SIGNAL(textChanged(const QString&)), this, SLOT(updateValue()));
+        Parameter::initConnections();
     }
     return m_lneDelegate;
 }
 
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void StringParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_lneDelegate != NULL)
+    {
+        m_value = m_lneDelegate->text();
+        Parameter::updateValue();
+    }
+}
 
 } //end of namespace graipe

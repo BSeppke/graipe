@@ -52,8 +52,8 @@ namespace graipe {
  */
 ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_delegate(new QPushButton("")),
-    m_value(value)
+    m_value(value),
+    m_delegate(new QPushButton(""))
 {
     setValue(value);
     
@@ -65,7 +65,8 @@ ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* par
  */
 ColorParameter::~ColorParameter()
 {
-    delete m_delegate;
+    if(m_delegate!=NULL)
+        delete m_delegate;
 }
     
 /**
@@ -179,6 +180,17 @@ bool ColorParameter::deserialize(QIODevice& in)
  */
 QWidget*  ColorParameter::delegate()
 {
+    if (m_delegate == NULL)
+    {
+        m_delegate = new QPushButton("");
+        
+        QPixmap p(32, 32);
+        p.fill(value());
+        m_delegate->setIcon(QIcon(p));
+    
+        connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_delegate;
 }
 
@@ -195,16 +207,6 @@ void ColorParameter::updateValue()
     {
        setValue(col);
     }
-}
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void ColorParameter::initConnections()
-{
-    connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 } //end of namespace graipe

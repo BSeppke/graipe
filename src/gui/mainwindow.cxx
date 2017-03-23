@@ -564,17 +564,18 @@ void MainWindow::currentModelChanged(QListWidgetItem * item)
 	if(model_item)
 	{
         Model * model = model_item->model();
+        
         if(model)
         {
             QWidget * model_parameter_widget = model->parameters()->delegate();
         
             if(model_parameter_widget != NULL)
             {
-                model_parameter_widget->setEnabled(!model->locked());
-                model_parameter_widget->update();
-            
                 m_ui.scrModelParameters->takeWidget();
                 m_ui.dockModelParameters->setWindowTitle(model->parameters()->name());
+                
+                model_parameter_widget->setEnabled(!model->locked());
+                model_parameter_widget->update();
                 m_ui.scrModelParameters->setWidget(model_parameter_widget);
             }
         }
@@ -950,7 +951,7 @@ void MainWindow::saveWorkspace(const QString& dirname)
             //0. If dir is not empty: delete all files inside it
             dir.setNameFilters(QStringList() << "*.*");
             dir.setFilter(QDir::Files);
-            foreach(QString dirFile, dir.entryList())
+            for(QString dirFile: dir.entryList())
             {
                 dir.remove(dirFile);
             }
@@ -1438,7 +1439,7 @@ void MainWindow::loadModel(const QString& filename)
     }
     if (!model)	
     {
-        throw std::runtime_error("Failed to load file");
+        throw std::runtime_error("Failed to load file '"  + filename.toStdString() + "' although it was found as a file!");
     }
 }
 
@@ -1696,7 +1697,7 @@ void MainWindow::addModelItemToList(Model* model)
 		m_ui.listModels->addItem(model_item);
 		connect(model, SIGNAL(modelChanged()), this, SLOT(refreshModelNames()));
         
-        m_ui.listModels->setCurrentItem(model_item);
+        //m_ui.listModels->setCurrentItem(model_item);
         updateMemoryUsage();
         
 	}

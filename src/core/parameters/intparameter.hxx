@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QSpinBox>
 
 
@@ -54,6 +55,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT IntParameter
 :   public Parameter
 {
+    Q_OBJECT
+    
     public:
         /**
          * Default constructor of the IntParameter class with a setting of the
@@ -173,10 +176,23 @@ class GRAIPE_CORE_EXPORT IntParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
+        
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
 
-    protected:    
+    protected:   
+        //The storage for the value of this parameter
+        int m_value;
+    
+        //The value range for this parameter
+        int m_min_value, m_max_value;
+    
         //The delegate widget
-        QSpinBox* m_spbDelegate;
+        QPointer<QSpinBox> m_spbDelegate;
 };
 
 } //end of namespace graipe

@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QPlainTextEdit>
 
 
@@ -56,6 +57,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT LongStringParameter
 :   public Parameter
 {
+    Q_OBJECT
+    
     public:
         /**
          * Default constructor of the LongStringParameter class with a setting of the
@@ -140,8 +143,17 @@ class GRAIPE_CORE_EXPORT LongStringParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
+        
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
   
-    protected:
+    protected:    
+        //The storage for the value of this parameter
+        QString m_value;
     
         //The (char) columns
         unsigned int m_columns;
@@ -150,7 +162,7 @@ class GRAIPE_CORE_EXPORT LongStringParameter
         unsigned int m_lines;
     
         //The text editing delegate
-        QPlainTextEdit* m_txtDelegate;
+        QPointer<QPlainTextEdit> m_txtDelegate;
     
 };
 

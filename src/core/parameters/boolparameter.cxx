@@ -51,12 +51,9 @@ namespace graipe {
  */
 BoolParameter::BoolParameter(const QString& name, bool value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-	m_chkDelegate(new QCheckBox)
-{
-    setValue(value);
-    
-    connect(m_chkDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
-    Parameter::initConnections();
+    m_value(value),
+	m_delegate(NULL)
+{    
 }
 
 /**
@@ -64,7 +61,8 @@ BoolParameter::BoolParameter(const QString& name, bool value, Parameter* parent,
  */
 BoolParameter::~BoolParameter()
 {
-    delete m_chkDelegate;
+    if(m_delegate!=NULL)
+        delete m_delegate;
 }
 
 /**
@@ -84,7 +82,7 @@ QString BoolParameter::typeName() const
  */
 bool BoolParameter::value()  const
 {
-	return m_chkDelegate->isChecked();
+	return m_value;
 }
 
 /**
@@ -93,8 +91,12 @@ bool BoolParameter::value()  const
  * \param value The new value of this parameter.
  */
 void BoolParameter::setValue(bool value)
-{ 
-	m_chkDelegate->setChecked(value);
+{
+    m_value = value;
+    
+    if(m_delegate!=NULL)
+        m_delegate->setChecked(value);
+   
     Parameter::updateValue();
 }
 
@@ -171,7 +173,30 @@ bool BoolParameter::isValid() const
  */
 QWidget*  BoolParameter::delegate()
 {
-    return m_chkDelegate;
+    if (m_delegate == NULL)
+    {
+        m_delegate = new QCheckBox;
+        m_delegate->setChecked(value());
+        
+        connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
+    
+    return m_delegate;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void BoolParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_delegate != NULL)
+    {
+        m_value = m_delegate->isChecked();
+        Parameter::updateValue();
+    }
 }
 
 } //end of namespace graipe

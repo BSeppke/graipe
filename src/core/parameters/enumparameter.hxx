@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QComboBox>
 
 
@@ -68,7 +69,7 @@ class GRAIPE_CORE_EXPORT EnumParameter
          *                      be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
          */
-        EnumParameter(const QString& name, const QStringList & enum_names, unsigned int value=0, Parameter* parent=NULL, bool invert_parent=false);
+        EnumParameter(const QString& name, const QStringList & enum_names, int value=0, Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * Destructor of the EnumParameter class
@@ -94,7 +95,7 @@ class GRAIPE_CORE_EXPORT EnumParameter
          *
          * \param value The new value of this parameter.
          */
-        void setValue(unsigned int value);
+        void setValue(int value);
     
         /**
          * The value converted to a QString. Please note, that this can vary from the 
@@ -139,19 +140,24 @@ class GRAIPE_CORE_EXPORT EnumParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
+        
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
     
     protected:
-        //The delegate widget
-        QComboBox* m_cmbDelegate;
-    
         //The enum names
         QStringList m_enum_names;
     
         //The current value (in index space)
-        unsigned int m_value;
+        int m_value;
     
-        //The current value (in name space)
-        QString m_value_text;
+        //The delegate widget
+        QPointer<QComboBox> m_cmbDelegate;
+    
 };
 
 } //end of namespace graipe

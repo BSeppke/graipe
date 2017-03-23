@@ -53,15 +53,11 @@ namespace graipe {
  */
 FloatParameter::FloatParameter(const QString& name, float low, float upp, float value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_dsbDelegate(new QDoubleSpinBox)
+    m_value(value),
+    m_min_value(low),
+    m_max_value(upp),
+    m_dsbDelegate(NULL)
 {
-    setRange(low, upp);
-    setValue(value);
-    
-    m_dsbDelegate->setDecimals(3);
-    
-    connect(m_dsbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -69,7 +65,8 @@ FloatParameter::FloatParameter(const QString& name, float low, float upp, float 
  */
 FloatParameter::~FloatParameter()
 {
-    delete m_dsbDelegate;
+    if(m_dsbDelegate != NULL)
+        delete m_dsbDelegate;
 }
 
 /**
@@ -89,7 +86,7 @@ QString  FloatParameter::typeName() const
  */
 float FloatParameter::lowerBound() const
 {
-    return m_dsbDelegate->minimum();
+    return m_min_value;
 }
 
 /**
@@ -99,7 +96,10 @@ float FloatParameter::lowerBound() const
  */
 void FloatParameter::setLowerBound(float value)
 {
-    m_dsbDelegate->setMinimum(value);
+    m_min_value = value;
+    
+    if(m_dsbDelegate != NULL)
+        m_dsbDelegate->setMinimum(value);
 }
 
 /**
@@ -109,7 +109,7 @@ void FloatParameter::setLowerBound(float value)
  */
 float FloatParameter::upperBound() const
 {
-    return m_dsbDelegate->maximum();
+    return m_max_value;
 }
 
 /**
@@ -119,7 +119,10 @@ float FloatParameter::upperBound() const
  */
 void FloatParameter::setUpperBound(float value)
 {
-    m_dsbDelegate->setMaximum(value);
+    m_max_value = value;
+    
+    if(m_dsbDelegate != NULL)
+        m_dsbDelegate->setMaximum(value);
 }
 
 /**
@@ -130,7 +133,8 @@ void FloatParameter::setUpperBound(float value)
  */
 void FloatParameter::setRange(float min_value, float max_value)
 {
-    m_dsbDelegate->setRange(min_value, max_value);
+    setLowerBound(min_value);
+    setUpperBound(max_value);
 }
 
 /**
@@ -140,7 +144,7 @@ void FloatParameter::setRange(float min_value, float max_value)
  */
 float FloatParameter::value() const
 {
-    return m_dsbDelegate->value();
+    return m_value;//m_dsbDelegate->value();
 }
 
 /**
@@ -150,7 +154,13 @@ float FloatParameter::value() const
  */
 void FloatParameter::setValue(float value)
 {
-	 m_dsbDelegate->setValue(value);
+    m_value = value;
+    
+    if(m_dsbDelegate != NULL)
+    {
+        m_dsbDelegate->setValue(value);
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -216,7 +226,7 @@ bool FloatParameter::deserialize(QIODevice& in)
  */
 bool FloatParameter::isValid() const
 {
-    return true;
+    return value() >= lowerBound() && value() <= upperBound();
 }
 
 /**
@@ -229,7 +239,32 @@ bool FloatParameter::isValid() const
  */
 QWidget*  FloatParameter::delegate()
 {
+    if(m_dsbDelegate == NULL)
+    {
+        m_dsbDelegate = new QDoubleSpinBox;
+   
+        m_dsbDelegate->setDecimals(3);
+        m_dsbDelegate->setRange(lowerBound(), upperBound());
+        m_dsbDelegate->setValue(value());
+        
+        connect(m_dsbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_dsbDelegate;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void FloatParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_dsbDelegate != NULL)
+    {
+        m_value = m_dsbDelegate->value();
+        Parameter::updateValue();
+    }
 }
 
 } //end of namespace graipe

@@ -52,15 +52,15 @@ namespace graipe {
  */
 ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * rs_object_stack, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_cmbDelegate(new QComboBox),
+    m_cmbDelegate(NULL),
     m_type_filter(type_filter)
 {
 
     setModelList(rs_object_stack);
 	refresh();
     
-    connect(m_cmbDelegate, SIGNAL(currentIndexChanged()), this, SLOT(updateValue()));
-    initConnections();
+    setValue(value);
+    
 }
 
 /**
@@ -68,8 +68,8 @@ ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * 
  */
 ModelParameter::~ModelParameter()
 {
-    delete m_cmbDelegate;
-    m_cmbDelegate=NULL;
+    if(m_cmbDelegate != NULL)
+        delete m_cmbDelegate;
 }
 
 /**
@@ -89,18 +89,14 @@ QString  ModelParameter::typeName() const
  */
 Model* ModelParameter::value() const
 {
-    int idx = m_cmbDelegate->currentIndex();
-        
-    if(idx >=0)
+    if(isValid())
     {
-        unsigned int u_idx = (unsigned int) idx;
-        
-        if(u_idx < m_allowed_values.size())
-        {
-            return m_allowed_values[u_idx];
-        }
+        return m_allowed_values[m_model_idx];
     }
-    return NULL;
+    else
+    {
+        return NULL;
+    }
 }
 
 /**
@@ -111,17 +107,21 @@ Model* ModelParameter::value() const
 void ModelParameter::setValue(Model* value)
 {
     bool found = false;
-    unsigned int i=0;
     
-    foreach(Model* allowed, m_allowed_values)
+    for(int i=0; i<m_allowed_values.size(); ++i)
     {
-        if (allowed == value)
+        if(m_allowed_values[i] == value)
         {
-            m_cmbDelegate->setCurrentIndex(i);
             found = true;
-            Parameter::updateValue();
+            m_model_idx=i;
             break;
         }
+    }
+    
+    if (found && m_cmbDelegate != NULL)
+    {
+        m_cmbDelegate->setCurrentIndex(m_model_idx);
+        Parameter::updateValue();
     }
     
     if (!found)
@@ -150,27 +150,32 @@ QString ModelParameter::valueText() const
  */
 void ModelParameter::refresh()
 {
-	if(m_modelList && m_cmbDelegate)
+	if(m_modelList)
 	{
 		m_allowed_values.clear();
-		m_cmbDelegate->clear();
 		
-		foreach( Model* model, *m_modelList)
+		for(Model * model: *m_modelList)
 		{
             
 			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
 			{
-				m_cmbDelegate->addItem(model->shortName());
-				m_cmbDelegate->setItemData(m_cmbDelegate->count()-1, model->description(), Qt::ToolTipRole);
 				m_allowed_values.push_back(model);
 			}
 		}
-        
-        if(m_allowed_values.size())
-        {
-            setValue(m_allowed_values[0]);
-        }
 	}
+    
+    if(m_cmbDelegate)
+	{
+		m_cmbDelegate->clear();
+		
+		for(Model * model: m_allowed_values)
+		{
+			m_cmbDelegate->addItem(model->shortName());
+            m_cmbDelegate->setItemData(m_cmbDelegate->count()-1, model->description(), Qt::ToolTipRole);
+		}
+    }
+    
+    setValue(value());
 }
 
 /**
@@ -204,7 +209,7 @@ bool ModelParameter::deserialize(QIODevice& in)
     
     QString content(in.readLine().trimmed());
     
-    foreach(Model* allowed, m_allowed_values)
+    for(Model* allowed: m_allowed_values)
     {
         if (allowed->filename() == decode_string(content))
         {
@@ -261,7 +266,7 @@ void ModelParameter::unlock()
  */
 bool ModelParameter::isValid() const
 {
-    return m_allowed_values.size();
+    return (m_model_idx >= 0 && m_model_idx < m_allowed_values.size());
 }
 
 /**
@@ -274,7 +279,29 @@ bool ModelParameter::isValid() const
  */
 QWidget*  ModelParameter::delegate()
 {
+    if(m_cmbDelegate == NULL)
+    {
+        m_cmbDelegate = new QComboBox;
+        refresh();
+    
+        connect(m_cmbDelegate, SIGNAL(currentIndexChanged()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_cmbDelegate;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void ModelParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_cmbDelegate != NULL)
+    {
+        m_model_idx = m_cmbDelegate->currentIndex();
+        Parameter::updateValue();
+    }
 }
 
 

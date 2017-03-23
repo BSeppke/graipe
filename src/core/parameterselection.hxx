@@ -40,10 +40,12 @@
 #include "core/parameters/parameter.hxx"
 #include "core/algorithm.hxx"
 
+#include <QPointer>
 #include <QDialog>
 #include <QLabel>
 #include <QRadioButton>
 #include <QCheckBox>
+#include <QScrollArea>
 
 
 /**
@@ -75,7 +77,6 @@ public:
      */
     ParameterSelection(QWidget *parent, Parameter* param);
     
-
     /**
      * Destructor of the parameter selection. This destructor returns the
      * ownership of the parameter's widget back to the caller. 
@@ -86,7 +87,9 @@ public:
     
 protected:
     //The  delegate of the parameter (temporary owned by the layout of this selection)
-    QWidget* m_widget;
+    QPointer<QWidget> m_widget;
+    //The main layout of the parameter selection
+    QVBoxLayout* m_verticalLayout;
 
 };
 
@@ -111,6 +114,14 @@ public:
      * \param modelList The modelList of all models to copy the parameters from.
      */
     ModelParameterSelection(QWidget *parent, Model* model, const std::vector<Model*> * modelList);
+
+    /**
+     * Destructor of the parameter selection. This destructor returns the
+     * ownership of the parameter's widget back to the caller. 
+     * Thus, it's widget(s) is(are) not destroyed here!
+     *
+     */
+    ~ModelParameterSelection();
     
     /**
      * Indicates, whether an existing Model* should be used to copy the 
@@ -129,10 +140,14 @@ public:
     bool cloneOtherModel() const;
     
 protected:
+    //RadioButton to find out if the metadata shall be newly set
+    QPointer<QRadioButton>   m_radNewParameters;
     //RadioButton to find out if the metadata shall be copied from another Model
-    QRadioButton*   m_radCopyParameters;
+    QPointer<QRadioButton>   m_radCopyParameters;
     //CheckBox to indicate if the complete metadata shall be copied, too.
-    QCheckBox*      m_chkCloneOtherModel;
+    QPointer<QCheckBox>      m_chkCloneOtherModel;
+    //The scrollarea, where the parameter selection will be shown.
+    QPointer<QScrollArea> m_scrParameters;
     //The (not-owned) pointer to the Model to copy the metadata (and maybe data) from.
     ModelParameter* m_otherModel;
 };
@@ -162,6 +177,14 @@ public:
      */
     AlgorithmParameterSelection(QWidget *parent, Algorithm* alg);
 
+    /**
+     * Destructor of the parameter selection. This destructor returns the
+     * ownership of the parameter's widget back to the caller. 
+     * Thus, it's widget(s) is(are) not destroyed here!
+     *
+     */
+    ~AlgorithmParameterSelection();
+    
 public slots:
     /**
      * Since the results of an algorithm may depend on the "input" parameter's
@@ -173,7 +196,7 @@ public slots:
     
 protected:
     //The label, where the result type are presented
-    QLabel * m_lblResults;
+    QPointer<QLabel> m_lblResults;
     //Pointer to the algorithm (not owned)
     Algorithm * m_algorithm;
 };

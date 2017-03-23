@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QLineEdit>
 #include <QPushButton>
 
@@ -148,20 +149,16 @@ class GRAIPE_CORE_EXPORT FilenameParameter
          */
         void updateValue();
         
-   protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
+   protected:    
+        //The storage for the value of this parameter
+        QString m_value;
     
         //The parent delegate widget
-        QWidget * m_delegate;
+        QPointer<QWidget> m_delegate;
     
         //The children delegates inside the parent
-        QLineEdit* m_lneDelegate;
-        QPushButton* m_btnDelegate;
+        QPointer<QLineEdit> m_lneDelegate;
+        QPointer<QPushButton> m_btnDelegate;
 };
 
 } //end of namespace graipe

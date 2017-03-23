@@ -61,7 +61,7 @@ MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<
     refresh();
     
     connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
-    initConnections();
+    Parameter::initConnections();
 }
 
 /**
@@ -69,7 +69,8 @@ MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<
  */
 MultiModelParameter::~MultiModelParameter()
 {
-    delete m_lstDelegate;
+    if(m_lstDelegate != NULL)
+        delete m_lstDelegate;
 }
 
 /**
@@ -93,7 +94,7 @@ std::vector<Model*> MultiModelParameter::value() const
     
     unsigned int i=0;
     
-    foreach(Model* allowed_model, m_allowed_values)
+    for(Model* allowed_model: m_allowed_values)
     {
         if( m_lstDelegate->item(i)->isSelected())
         {
@@ -114,11 +115,11 @@ void MultiModelParameter::setValue(const std::vector<Model*>& values)
     
     unsigned int i=0;
     
-    foreach(Model* allowed_model, m_allowed_values)
+    for(const Model* allowed_model: m_allowed_values)
     {
         bool found = false;
         
-        foreach(Model* model, values)
+        for(const Model* model: values)
         {
             if( allowed_model == model)
             {
@@ -144,7 +145,8 @@ void MultiModelParameter::setValue(const std::vector<Model*>& values)
 QString MultiModelParameter::valueText() const
 { 
 	QString res;
-	foreach(Model* model, value())
+    
+    for(const Model* model: value())
 	{
 		res += model->name() +", "; 
 	}
@@ -163,7 +165,7 @@ void MultiModelParameter::refresh()
 		m_allowed_values.clear();
 		m_lstDelegate->clear();
 		
-		foreach( Model* model, *m_modelList)
+		for(Model* model: *m_modelList)
 		{
 			if( m_type_filter.contains(model->typeName()))
 			{
@@ -186,7 +188,7 @@ void MultiModelParameter::serialize(QIODevice& out) const
 {
     Parameter::serialize(out);
     
-    foreach(Model* model, value())
+    for(const Model* model: value())
     {
         write_on_device(", " + encode_string(model->filename()), out);
     }
@@ -211,10 +213,10 @@ bool MultiModelParameter::deserialize(QIODevice& in)
 
     unsigned int i=0;
     
-    foreach(Model* allowed_model, m_allowed_values)
+    for(const Model* allowed_model: m_allowed_values)
     {
         bool found = false;
-        foreach(QString model_filename, model_filenames)
+        for(QString model_filename: model_filenames)
         {
             if (decode_string(model_filename) == allowed_model->filename())
             {
@@ -240,7 +242,7 @@ void MultiModelParameter::lock()
 {	
     m_locks.clear();
     
-	foreach( Model* model, value())
+	for(Model* model: value())
 	{
         unsigned int model_lock = model->lock();
         m_locks.push_back(model_lock);
@@ -259,7 +261,7 @@ void MultiModelParameter::unlock()
 {
     unsigned int i=0;
 
-	foreach( Model* model, value())
+	for(Model* model: value())
 	{
         model->unlock(m_locks[i]);
         ++i;
@@ -289,5 +291,28 @@ QWidget*  MultiModelParameter::delegate()
 {
     return m_lstDelegate;
 }
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void MultiModelParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_lstDelegate != NULL)
+    {
+        m_model_idxs.clear();
+        
+        for(int i=0; i<m_lstDelegate->count(); ++i)
+        {
+            if(m_lstDelegate->item(i)->isSelected())
+            {
+                m_model_idxs.push_back(i);
+            }
+        }
+        Parameter::updateValue();
+    }
+}
+
 
 } //end of namespace graipe

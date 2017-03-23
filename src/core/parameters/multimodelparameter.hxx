@@ -39,6 +39,7 @@
 #include "core/parameters/parameter.hxx"
 #include "core/model.hxx"
 
+#include <QPointer>
 #include <QListWidget>
 
 
@@ -171,9 +172,19 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          */
         QWidget * delegate();
         
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
+        
     protected:
+        //The storage for the value of this parameter (list of idxs in m_allowed_models)
+        std::vector<int> m_model_idxs;
+    
         //The delegate list widget
-        QListWidget* m_lstDelegate;
+        QPointer<QListWidget> m_lstDelegate;
     
         //A vector of all allowed models (listed)
         std::vector<Model*>	m_allowed_values;

@@ -86,6 +86,13 @@ bool DenseVectorfieldImpex::importVectorfield(const QString & filename, DenseVec
                     if(width == 0 || height == 0)
                         return false;
                     
+                    vf.clear();
+                    
+                    vf.setTop(0);
+                    vf.setLeft(0);
+                    vf.setBottom(height);
+                    vf.setRight(width);
+                    
                     DenseVectorfield2D::ArrayType u(width, height);
                     DenseVectorfield2D::ArrayType v(width, height);
                     
@@ -108,6 +115,10 @@ bool DenseVectorfieldImpex::importVectorfield(const QString & filename, DenseVec
                         }
                     }
                     file.close();
+                    
+                    vf.setU(u);
+                    vf.setV(v);
+                    
                     return true;
                 }
                 else
@@ -225,7 +236,9 @@ void DenseVectorfieldImporter::run()
         
         FilenameParameter	* param_filename = static_cast<FilenameParameter*> ((*m_parameters)["filename"]);
         
-        if(DenseVectorfieldImpex::importVectorfield(param_filename->value(), *static_cast<DenseVectorfield2D*>(m_results[0])))
+        QString filename = param_filename->value();
+        
+        if(DenseVectorfieldImpex::importVectorfield(filename, *static_cast<DenseVectorfield2D*>(m_results[0])))
         {
             emit statusMessage(100.0, QString("finished computation"));
             emit finished();

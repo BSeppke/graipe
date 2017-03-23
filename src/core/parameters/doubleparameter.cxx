@@ -53,15 +53,11 @@ namespace graipe {
  */
 DoubleParameter::DoubleParameter(const QString& name, double low, double upp, double value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_dsbDelegate(new QDoubleSpinBox)
+    m_value(value),
+    m_min_value(low),
+    m_max_value(upp),
+    m_dsbDelegate(NULL)
 {
-    setRange(low, upp);
-    setValue(value);
-    
-    m_dsbDelegate->setDecimals(3);
-    
-    connect(m_dsbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -69,7 +65,8 @@ DoubleParameter::DoubleParameter(const QString& name, double low, double upp, do
  */
 DoubleParameter::~DoubleParameter()
 {
-    delete m_dsbDelegate;
+    if(m_dsbDelegate == NULL)
+        delete m_dsbDelegate;
 }
 
 /**
@@ -89,7 +86,7 @@ QString  DoubleParameter::typeName() const
  */
 double DoubleParameter::lowerBound() const
 {
-    return m_dsbDelegate->minimum();
+    return m_min_value;//m_dsbDelegate->minimum();
 }
 
 /**
@@ -99,7 +96,10 @@ double DoubleParameter::lowerBound() const
  */
 void DoubleParameter::setLowerBound(double value)
 {
-    m_dsbDelegate->setMinimum(value);
+    m_min_value = value;
+    
+    if(m_dsbDelegate != NULL)
+        m_dsbDelegate->setMinimum(value);
 }
 
 /**
@@ -109,7 +109,7 @@ void DoubleParameter::setLowerBound(double value)
  */
 double DoubleParameter::upperBound() const
 {
-    return m_dsbDelegate->maximum();;
+    return m_max_value;//m_dsbDelegate->maximum();
 }
 
 /**
@@ -119,7 +119,10 @@ double DoubleParameter::upperBound() const
  */
 void DoubleParameter::setUpperBound(double value)
 {
-    m_dsbDelegate->setMaximum(value);
+    m_max_value = value;
+    
+    if(m_dsbDelegate != NULL)
+        m_dsbDelegate->setMaximum(value);
 }
 
 /**
@@ -130,7 +133,8 @@ void DoubleParameter::setUpperBound(double value)
  */
 void DoubleParameter::setRange(double min_value, double max_value)
 {
-    m_dsbDelegate->setRange(min_value, max_value);
+    setLowerBound(min_value);
+    setUpperBound(max_value);
 }
 
 /**
@@ -140,7 +144,7 @@ void DoubleParameter::setRange(double min_value, double max_value)
  */
 double DoubleParameter::value() const
 {
-    return m_dsbDelegate->value();
+    return m_value;//m_dsbDelegate->value();
 }
 
 /**
@@ -150,8 +154,13 @@ double DoubleParameter::value() const
  */
 void DoubleParameter::setValue(double value)
 {
-    m_dsbDelegate->setValue(value);
-    Parameter::updateValue();
+    m_value = value;
+    
+    if(m_dsbDelegate != NULL)
+    {
+        m_dsbDelegate->setValue(value);
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -216,7 +225,7 @@ bool DoubleParameter::deserialize(QIODevice& in)
  */
 bool DoubleParameter::isValid() const
 {
-    return true;
+    return value() >= lowerBound() && value() <= upperBound();
 }
 
 /**
@@ -229,8 +238,32 @@ bool DoubleParameter::isValid() const
  */
 QWidget*  DoubleParameter::delegate()
 {
-
+    if(m_dsbDelegate == NULL)
+    {
+        m_dsbDelegate = new QDoubleSpinBox;
+    
+        m_dsbDelegate->setDecimals(3);
+        m_dsbDelegate->setRange(lowerBound(),upperBound());
+        m_dsbDelegate->setValue(value());
+        
+        connect(m_dsbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_dsbDelegate;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void DoubleParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_dsbDelegate != NULL)
+    {
+        m_value = m_dsbDelegate->value();
+        Parameter::updateValue();
+    }
 }
 
 } //end of namespace graipe

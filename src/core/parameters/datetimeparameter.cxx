@@ -51,13 +51,9 @@ namespace graipe {
  */
 DateTimeParameter::DateTimeParameter(const QString& name, QDateTime value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_dteDelegate(new QDateTimeEdit)
+    m_value(value),
+    m_dteDelegate(NULL)
 {
-    setValue(value);
-    m_dteDelegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
-    
-    connect(m_dteDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -65,7 +61,8 @@ DateTimeParameter::DateTimeParameter(const QString& name, QDateTime value, Param
  */
 DateTimeParameter::~DateTimeParameter()
 {
-    delete m_dteDelegate;
+    if(m_dteDelegate != NULL)
+        delete m_dteDelegate;
 }
 
 /**
@@ -85,7 +82,7 @@ QString  DateTimeParameter::typeName() const
  */
 QDateTime DateTimeParameter::value()  const
 {
-    return m_dteDelegate->dateTime();
+    return m_value;
 }
 
 /**
@@ -95,7 +92,12 @@ QDateTime DateTimeParameter::value()  const
  */
 void DateTimeParameter::setValue(const QDateTime& value)
 {
-    m_dteDelegate->setDateTime(value);
+    m_value = value;
+    
+    if (m_dteDelegate != NULL)
+        m_dteDelegate->setDateTime(value);
+    
+    Parameter::updateValue();
 }
 
 /**
@@ -173,8 +175,32 @@ bool DateTimeParameter::isValid() const
  */
 QWidget*  DateTimeParameter::delegate()
 {
+    if(m_dteDelegate == NULL)
+    {
+        m_dteDelegate = new QDateTimeEdit;
+        
+        m_dteDelegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+        m_dteDelegate->setDateTime(value());
+        
+        connect(m_dteDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
+    
     return m_dteDelegate;
 }
 
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void DateTimeParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_dteDelegate != NULL)
+    {
+        m_value = m_dteDelegate->dateTime();
+        Parameter::updateValue();
+    }
+}
 
 } //end of namespace graipe

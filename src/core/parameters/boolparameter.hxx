@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QCheckBox>
 
 
@@ -54,6 +55,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT BoolParameter
 :   public Parameter
 {
+    Q_OBJECT
+    
     public:
         /**
          * Default constructor of the BoolParameter class with a setting of the
@@ -136,10 +139,20 @@ class GRAIPE_CORE_EXPORT BoolParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
+        
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
     
-    protected:
+    protected:    
+        //The storage for the value of this parameter
+        bool m_value;
+        
         //The delegate widget for booleans
-        QCheckBox* m_chkDelegate;
+        QPointer<QCheckBox> m_delegate;
 };
 
 } //end of namespace graipe

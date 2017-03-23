@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QPushButton>
 #include <QColorDialog>
 
@@ -149,19 +150,13 @@ class GRAIPE_CORE_EXPORT ColorParameter
          */
         void updateValue();
         
-    protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
-    
-        //The delegate
-        QPushButton* m_delegate;
-    
-        //The color (value)
+    protected:    
+        //The storage for the value of this parameter
         QColor m_value;
+        
+        //The delegate
+        QPointer<QPushButton> m_delegate;
+    
 };
 
 } //end of namespace graipe

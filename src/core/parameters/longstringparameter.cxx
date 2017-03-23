@@ -54,17 +54,11 @@ namespace graipe {
  */
 LongStringParameter::LongStringParameter(const QString& name, const QString& value, unsigned int columns, unsigned int lines, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
+    m_value(value),
     m_columns(columns),
     m_lines(lines),
-    m_txtDelegate(new QPlainTextEdit)
+    m_txtDelegate(NULL)
 {
-    setValue(value);
-    
-    m_txtDelegate->setMinimumWidth(m_columns * m_txtDelegate->fontMetrics().width("X"));
-    m_txtDelegate->setMinimumHeight(m_lines * m_txtDelegate->fontMetrics().lineSpacing());
-    
-    connect(m_txtDelegate, SIGNAL(textChanged()), this, SLOT(updateValue()));
-    initConnections();
 }
 
 /**
@@ -72,7 +66,8 @@ LongStringParameter::LongStringParameter(const QString& name, const QString& val
  */
 LongStringParameter::~LongStringParameter()
 {
-    delete m_txtDelegate;
+    if(m_txtDelegate != NULL)
+        delete m_txtDelegate;
 }
 
 /**
@@ -92,7 +87,7 @@ QString  LongStringParameter::typeName() const
  */
 QString LongStringParameter::value()  const
 {
-    return m_txtDelegate->toPlainText();
+    return m_value;
 }
 
 /**
@@ -102,7 +97,12 @@ QString LongStringParameter::value()  const
  */
 void LongStringParameter::setValue(const QString & value)
 {
-   m_txtDelegate->setPlainText(value);
+    m_value = value;
+    
+    if(m_txtDelegate != NULL)
+    {
+        m_txtDelegate->setPlainText(value);
+    }
 }
 
 /**
@@ -172,7 +172,32 @@ bool LongStringParameter::isValid() const
  */
 QWidget*  LongStringParameter::delegate()
 {
+    if(m_txtDelegate == NULL)
+    {
+        m_txtDelegate = new QPlainTextEdit;
+    
+        m_txtDelegate->setMinimumWidth(m_columns * m_txtDelegate->fontMetrics().width("X"));
+        m_txtDelegate->setMinimumHeight(m_lines * m_txtDelegate->fontMetrics().lineSpacing());
+        m_txtDelegate->setPlainText(m_value);
+    
+        connect(m_txtDelegate, SIGNAL(textChanged()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_txtDelegate;
+}
+
+/**
+ * This slot is called everytime, the delegate has changed. It has to synchronize
+ * the internal value of the parameter with the current delegate's value
+ */
+void LongStringParameter::updateValue()
+{
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_txtDelegate != NULL)
+    {
+        m_value = m_txtDelegate->toPlainText();
+        Parameter::updateValue();
+    }
 }
 
 } //end of namespace graipe

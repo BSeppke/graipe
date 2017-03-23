@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QDateTimeEdit>
 
 
@@ -54,6 +55,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT DateTimeParameter
 :   public Parameter
 {
+    Q_OBJECT
+    
     public:
         /**
          * Default constructor of the DateTimeParameter class with a setting of the
@@ -137,9 +140,19 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
          */
         QWidget * delegate();
 
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
+    
     protected:    
+        //The storage for the value of this parameter
+        QDateTime m_value;
+    
         //The delegate widget
-        QDateTimeEdit* m_dteDelegate;
+        QPointer<QDateTimeEdit> m_dteDelegate;
 };
 
 } //end of namespace graipe

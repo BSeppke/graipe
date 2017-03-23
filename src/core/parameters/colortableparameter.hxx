@@ -169,16 +169,12 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          */
         void updateValue();
         
-    protected:
-        /**
-         * Initializes the connections (signal<->slot) between the parameter class and
-         * the delegate widget. This will be done after the first call of the delegate()
-         * function, since the delegate is NULL until then.
-         */
-        void initConnections();
+    protected:    
+        //The storage for the value of this parameter (index of ct)
+        int m_ct_idx;
     
         //The delegate
-        QComboBox* m_delegate;
+        QPointer<QComboBox> m_delegate;
     
         //The starage of extra color tables
         QVector<QVector<QRgb> > m_extra_tables;

@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QLineEdit>
 
 
@@ -56,6 +57,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT StringParameter
 :   public Parameter
 {
+    Q_OBJECT
+
     public:
         /**
          * Default constructor of the StringParameter class with a setting of the
@@ -140,12 +143,22 @@ class GRAIPE_CORE_EXPORT StringParameter
          */
         QWidget * delegate();
         
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
+        
     protected:
+        //The storage for the value of this parameter
+        QString m_value;
+        
         //The width of the textfield (in lines)
         unsigned int m_columns;
     
         //The delegate widget
-        QLineEdit* m_lneDelegate;
+        QPointer<QLineEdit> m_lneDelegate;
 };
 
 } //end of namespace graipe

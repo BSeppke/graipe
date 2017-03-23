@@ -159,7 +159,8 @@ PointFeatureList2D sortPointListAngular(const PointFeatureList2D& points)
 		
 		//create final feature list:
 		sorted_features.addFeature(points.position(min_idx));
-		foreach (PointFeatureList2D::PointType p, sorted_list)
+		
+        for(PointFeatureList2D::PointType p: sorted_list)
 		{
 			sorted_features.addFeature(p+points.position(min_idx));
 		}
@@ -221,7 +222,7 @@ Polygon2D polygonFromPointList(const PointFeatureList2D& points, bool convex = t
 						stack.pop_back();
 				}
 			}	
-			foreach (Polygon2D::PointType p, stack)
+			for(Polygon2D::PointType p: stack)
 			{
 				result.addPoint(p);
 			}

@@ -283,7 +283,7 @@ void ImageBandParameter<T>::refresh()
 		
         Image<T> temp;
 		
-        foreach( Model* model, *m_modelList)
+        for(Model* model : *m_modelList)
 		{
         	if(model->typeName() == temp.typeName())
 			{
@@ -342,7 +342,7 @@ bool ImageBandParameter<T>::deserialize(QIODevice & in)
         QString filename = decode_string(fname_bandId[0]);
         unsigned int bandId = fname_bandId[1].toUInt();
     
-        foreach(Image<T>* image, m_allowed_images)
+        for(Image<T>* image: m_allowed_images)
         {
             if(image->filename() == filename && image->numBands() > bandId)
             {

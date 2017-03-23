@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QFormLayout>
 
 
@@ -61,7 +62,7 @@ namespace graipe {
 
 class GRAIPE_CORE_EXPORT ParameterGroup
 :   public Parameter
-{    
+{
     Q_OBJECT
     
     public:
@@ -233,7 +234,7 @@ class GRAIPE_CORE_EXPORT ParameterGroup
         QStringList m_parameter_order;
     
         //The delegate widget
-        QWidget* m_delegate;
+        QPointer<QWidget> m_delegate;
     
         //The layout of the widget
         QFormLayout * m_layout;

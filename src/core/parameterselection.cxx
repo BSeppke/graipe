@@ -59,12 +59,13 @@ namespace graipe {
  */
 ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
 :	QDialog(parent),
-    m_widget(param->delegate())
+    m_widget(param->delegate()),
+    m_verticalLayout(NULL)
 {
     this->setWindowTitle(QString("Selection for: ") + param->name());
     
-    QVBoxLayout* verticalLayout = new QVBoxLayout(this);
-    verticalLayout->addWidget(m_widget);
+    m_verticalLayout = new QVBoxLayout(this);
+    m_verticalLayout->addWidget(m_widget);
     
     QHBoxLayout* horizontalLayout = new QHBoxLayout;
     QSpacerItem* horizontalSpacer = new QSpacerItem(148, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -82,7 +83,7 @@ ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
     horizontalLayout->addWidget(btnCancel);
     horizontalLayout->addWidget(btnOk);
     
-    verticalLayout->addLayout(horizontalLayout);
+    m_verticalLayout->addLayout(horizontalLayout);
     
     connect(btnOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
@@ -96,7 +97,7 @@ ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
  */
 ParameterSelection::~ParameterSelection()
 {
-    m_widget->setParent(NULL);
+    m_verticalLayout->removeWidget(m_widget);
 }
 
 /**
@@ -111,29 +112,31 @@ ParameterSelection::~ParameterSelection()
  */
 ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model, const std::vector<Model*> * modelList)
 :	QDialog(parent),
+    m_radNewParameters(NULL),
     m_radCopyParameters(NULL),
     m_chkCloneOtherModel(NULL),
+    m_scrParameters(NULL),
     m_otherModel(NULL)
 {
     QVBoxLayout* verticalLayout = new QVBoxLayout(this);
     
-    QRadioButton * radNewParameters = new QRadioButton("Select parameters by hand:", this);
-    radNewParameters->setChecked(true);
-    verticalLayout->addWidget(radNewParameters);
+    m_radNewParameters = new QRadioButton("Select parameters by hand:", this);
+    m_radNewParameters->setChecked(true);
+    verticalLayout->addWidget(m_radNewParameters);
     
-    QScrollArea * scrParameters = new QScrollArea(this);
-    scrParameters->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scrParameters->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrParameters->setWidget(model->parameters()->delegate());
-    scrParameters->setWidgetResizable(true);
+    m_scrParameters = new QScrollArea(this);
+    m_scrParameters->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    m_scrParameters->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_scrParameters->setWidget(model->parameters()->delegate());
+    m_scrParameters->setWidgetResizable(true);
     
-    verticalLayout->addWidget(scrParameters);
+    verticalLayout->addWidget(m_scrParameters);
     
     m_radCopyParameters = new QRadioButton("Copy parameters from other model:", this);
     verticalLayout->addWidget(m_radCopyParameters);
     
-    connect(radNewParameters, SIGNAL(toggled(bool)), scrParameters, SLOT(setEnabled(bool)));
-    connect(m_radCopyParameters, SIGNAL(toggled(bool)), scrParameters, SLOT(setDisabled(bool)));
+    connect(m_radNewParameters, SIGNAL(toggled(bool)), m_scrParameters, SLOT(setEnabled(bool)));
+    connect(m_radCopyParameters, SIGNAL(toggled(bool)), m_scrParameters, SLOT(setDisabled(bool)));
     
     m_otherModel = new ModelParameter("Model:", modelList, model->typeName());
     
@@ -170,6 +173,17 @@ ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model, 
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
+
+/**
+ * Destructor of the parameter selection. This destructor returns the
+ * ownership of the parameter's widget back to the caller. 
+ * Thus, it's widget(s) is(are) not destroyed here!
+ *
+ */
+ModelParameterSelection::~ModelParameterSelection()
+{
+    m_scrParameters->takeWidget();
+}
 /**
  * Indicates, whether an existing Model* should be used to copy the 
  * metadata from.
@@ -245,6 +259,17 @@ AlgorithmParameterSelection::AlgorithmParameterSelection(QWidget *parent, Algori
     connect(btnOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
     
+}
+
+/**
+ * Destructor of the parameter selection. This destructor returns the
+ * ownership of the parameter's widget back to the caller. 
+ * Thus, it's widget(s) is(are) not destroyed here!
+ *
+ */
+AlgorithmParameterSelection::~AlgorithmParameterSelection()
+{
+    m_algorithm->parameters()->delegate()->setParent(NULL);
 }
 
 /**

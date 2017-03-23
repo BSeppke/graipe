@@ -446,7 +446,7 @@ class GRAIPE_CORE_EXPORT Model
         StringParameter	    * m_name;
         LongStringParameter	* m_description;
         LongStringParameter	* m_save_filename;
-        PointParameter	    * m_ul, * m_lr, * m_size;
+        PointParameter	    * m_ul, * m_lr;
         PointFParameter	    * m_global_ul, * m_global_lr;
     
         //A group for collecting all

@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QLineEdit>
 
 
@@ -54,6 +55,8 @@ namespace graipe {
 class GRAIPE_CORE_EXPORT TransformParameter
 :   public Parameter
 {
+    Q_OBJECT
+    
     public:
         /**
          * Default constructor of the TransformParameter class with a setting of the
@@ -147,14 +150,24 @@ class GRAIPE_CORE_EXPORT TransformParameter
          */
         QWidget * delegate();
         
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
+        
     protected:
+        //The value of this parameter
+        QTransform m_value;
+    
         //parent delegate
-        QWidget * m_delegate;
+        QPointer<QWidget> m_delegate;
     
         //the child delegates (3x3) for matrix
-        QLineEdit   * m_lne11, * m_lne12, * m_lne13,
-                    * m_lne21, * m_lne22, * m_lne23,
-                    * m_lne31, * m_lne32, * m_lne33;
+        QPointer<QLineEdit> m_lne11, m_lne12, m_lne13,
+                    m_lne21, m_lne22, m_lne23,
+                    m_lne31, m_lne32, m_lne33;
 };
 
 } //end of namespace graipe

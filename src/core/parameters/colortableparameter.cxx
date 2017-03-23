@@ -89,7 +89,8 @@ ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> valu
     m_delegate->addItem("Add new");
     setValue(value);
     
-    initConnections();
+    connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
+    Parameter::initConnections();
 }
 
 /**
@@ -404,15 +405,5 @@ void ColorTableParameter::updateValue()
     Parameter::updateValue();
 }
 
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
-void ColorTableParameter::initConnections()
-{
-    connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
-}
 
 } //end of namespace graipe

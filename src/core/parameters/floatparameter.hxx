@@ -38,6 +38,7 @@
 
 #include "core/parameters/parameter.hxx"
 
+#include <QPointer>
 #include <QDoubleSpinBox>
 
 
@@ -176,10 +177,23 @@ class GRAIPE_CORE_EXPORT FloatParameter
          * \return The delegate widget to control the values of this parameter.
          */
         QWidget * delegate();
+        
+    protected slots:    
+        /**
+         * This slot is called everytime, the delegate has changed. It has to synchronize
+         * the internal value of the parameter with the current delegate's value
+         */
+        void updateValue();
     
     protected:
+        //The storage for the value of this parameter
+        float m_value;
+    
+        //The value range for this parameter
+        float m_min_value, m_max_value;
+    
         //The delegate widget
-        QDoubleSpinBox* m_dsbDelegate;
+        QPointer<QDoubleSpinBox> m_dsbDelegate;
 };
 
 } //end of namespace graipe
