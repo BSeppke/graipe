@@ -92,16 +92,11 @@ std::vector<Model*> MultiModelParameter::value() const
 {
     std::vector<Model*> selected_models;
     
-    unsigned int i=0;
-    
-    for(Model* allowed_model: m_allowed_values)
+    for(int i : m_model_idxs)
     {
-        if( m_lstDelegate->item(i)->isSelected())
-        {
-            selected_models.push_back(allowed_model);
-        }
-        i++;
+        selected_models.push_back(m_allowed_values[i]);
     }
+    
     return selected_models;
 }
 
@@ -112,6 +107,7 @@ std::vector<Model*> MultiModelParameter::value() const
  */
 void MultiModelParameter::setValue(const std::vector<Model*>& values)
 {
+   m_model_idxs.clear();
     
     unsigned int i=0;
     
@@ -127,11 +123,17 @@ void MultiModelParameter::setValue(const std::vector<Model*>& values)
                 break;
             }
         }
-        
-        m_lstDelegate->item(i)->setSelected(found);
+        m_model_idxs.push_back(i);
+        if(m_lstDelegate != NULL)
+        {
+            m_lstDelegate->item(i)->setSelected(found);
+        }
         i++;
     }
-    Parameter::updateValue();
+    if(m_lstDelegate != NULL)
+    {
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -160,19 +162,27 @@ QString MultiModelParameter::valueText() const
  */
 void MultiModelParameter::refresh()
 {
-	if(m_modelList && m_lstDelegate)
+	if(m_modelList != NULL)
 	{
 		m_allowed_values.clear();
-		m_lstDelegate->clear();
 		
 		for(Model* model: *m_modelList)
 		{
 			if( m_type_filter.contains(model->typeName()))
 			{
-				m_lstDelegate->addItem(model->shortName());
-				m_lstDelegate->item(m_lstDelegate->count()-1)->setToolTip(model->description());
 				m_allowed_values.push_back(model);
 			}
+		}
+	}
+    
+	if(m_lstDelegate != NULL)
+	{
+		m_lstDelegate->clear();
+		
+		for(Model* model: m_allowed_values)
+		{
+			m_lstDelegate->addItem(model->shortName());
+            m_lstDelegate->item(m_lstDelegate->count()-1)->setToolTip(model->description());
 		}
 	}
 }
@@ -276,7 +286,7 @@ void MultiModelParameter::unlock()
     
 bool MultiModelParameter::isValid() const
 {
-	return m_lstDelegate && m_lstDelegate->isEnabled() && !m_allowed_values.empty();
+	return true;
 }
 
 /**
@@ -289,6 +299,16 @@ bool MultiModelParameter::isValid() const
  */
 QWidget*  MultiModelParameter::delegate()
 {
+    if(m_lstDelegate == NULL)
+    {
+        m_lstDelegate = new QListWidget;
+        
+        m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
+        refresh();
+    
+        connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_lstDelegate;
 }
 
