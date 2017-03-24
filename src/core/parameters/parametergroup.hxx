@@ -51,7 +51,7 @@ namespace graipe {
  * an std::map is used. This makes it very easy to access the
  * collected parameters by their ids/keys, which need to be provided on insert.
  *
- * ATTENTION: When adding a parameter to a group it ownerchip changes to this group!
+ * ATTENTION: When adding a parameter to a group it ownership changes to this group!
  *            Thus, on deletion of the group, the item will be deleted, too!
  *
  * Further, since every single parameter is (de-)serializable, we also provide one

@@ -233,7 +233,7 @@ class GRAIPE_CORE_EXPORT Parameter
          */
         virtual QWidget * delegate();
         
-    protected slots:
+    public slots:
         /**
          * This slot is called everytime, the delegate has changed. It may be used to synchronize
          * the internal value of the parameter with the current delegate's value. 

@@ -242,7 +242,7 @@ QWidget*  IntParameter::delegate()
         m_spbDelegate->setRange(lowerBound(), upperBound());
         m_spbDelegate->setValue(value());
         
-        connect(m_spbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_spbDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     return m_spbDelegate;

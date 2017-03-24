@@ -137,7 +137,7 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
          */
         QWidget * delegate();
 
-    protected slots:    
+    public slots:    
         /**
          * This slot is called everytime, the delegate has changed. It has to synchronize
          * the internal value of the parameter with the current delegate's value

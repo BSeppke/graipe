@@ -57,40 +57,9 @@ namespace graipe {
  */
 ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_delegate(new QComboBox)
+    m_delegate(NULL)
 {
-    unsigned int w=256, h=12;
-    m_delegate->setIconSize(QSize(w, h));
-    
-    QImage img(w, h, QImage::Format_Indexed8);
-    img.setColorCount(256);
-    
-    for(unsigned int y=0; y<h; ++y)
-    {
-        for(unsigned int x=0; x<w; ++x)
-        {
-            img.setPixel(x,y, w/256.0*x);
-        }
-    }
-    
-    for( QVector<QRgb> ct : colorTables())
-    {
-        img.setColorTable(ct);
-        m_delegate->addItem(QPixmap::fromImage(img),"");
-    
-    }
-    
-    for( QVector<QRgb> ct : m_extra_tables)
-    {
-        img.setColorTable(ct);
-        m_delegate->addItem(QPixmap::fromImage(img),"");
-    
-    }
-    m_delegate->addItem("Add new");
     setValue(value);
-    
-    connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
-    Parameter::initConnections();
 }
 
 /**
@@ -118,15 +87,13 @@ QString ColorTableParameter::typeName() const
  */
 QVector<QRgb> ColorTableParameter::value() const
 {
-    int idx = m_delegate->currentIndex();
-
-    if(idx >= 0 && idx < colorTables().size())
+    if(m_ct_idx >= 0 && m_ct_idx < colorTables().size())
     {
-       return colorTables()[idx];
+       return colorTables()[m_ct_idx];
     }
-    else if(idx >= colorTables().size() && idx < m_delegate->count()-1)
+    else if(m_ct_idx - colorTables().size() < m_extra_tables.size())
     {
-        return m_extra_tables[idx-colorTables().size()];
+        return m_extra_tables[m_ct_idx - colorTables().size()];
     }
     else
     {
@@ -144,14 +111,14 @@ QVector<QRgb> ColorTableParameter::value() const
  */
 int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
 {
-    int colorTable_id=-1;
+    int ct_idx=-1;
     
     //search in std. color tables
     for(unsigned int i=0; i != colorTables().size(); ++i)
     {
         if(colorTables()[i] == ct)
         {
-            colorTable_id = i;
+            ct_idx = i;
             break;
         }
     }
@@ -161,12 +128,12 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
     {
         if(m_extra_tables[i] == ct)
         {
-            colorTable_id = colorTables().size()+i;
+            ct_idx = colorTables().size()+i;
             break;
         }
     }
     
-    return colorTable_id;
+    return ct_idx;
 }
 
 /**
@@ -176,12 +143,17 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
  */
 void ColorTableParameter::setValue(const QVector<QRgb>& value)
 {
-    int colorTable_id = colorTableIndex(value);
+    int ct_idx = colorTableIndex(value);
     
-    if(colorTable_id>=0)
+    if(ct_idx>=0)
     {
-        m_delegate->setCurrentIndex(colorTable_id);
-        Parameter::updateValue();
+        m_ct_idx = ct_idx;
+        
+        if(m_delegate != NULL)
+        {
+            m_delegate->setCurrentIndex(ct_idx);
+            Parameter::updateValue();
+        }
     }
     else
     {
@@ -198,34 +170,36 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
 {
     if(ct.size()==256)
     {
-        int colorTable_id = colorTableIndex(ct);
+        int ct_idx = colorTableIndex(ct);
         
         //Already known?
-        if(colorTable_id>=0)
+        if(ct_idx>=0)
         {
-            return colorTable_id;
+            return ct_idx;
         }
         else
         {
             m_extra_tables.push_back(ct);
             
-            //Add this (new) color table
-            unsigned int w=256, h=16;
-            m_delegate->setIconSize(QSize(w, h));
-            
-            QImage img(w, h, QImage::Format_Indexed8);
-            img.setColorCount(256);
-        
-            for(unsigned int y=0; y<h; ++y)
+            if(m_delegate != NULL)
             {
-                for(unsigned int x=0; x<w; ++x)
-                {
-                    img.setPixel(x,y, w/256.0*x);
-                }
-            }
-            img.setColorTable(ct);
-            m_delegate->insertItem(m_delegate->count()-1, QPixmap::fromImage(img),"");
+                //Add this (new) color table
+                unsigned int w=256, h=16;
+                m_delegate->setIconSize(QSize(w, h));
             
+                QImage img(w, h, QImage::Format_Indexed8);
+                img.setColorCount(256);
+        
+                for(unsigned int y=0; y<h; ++y)
+                {
+                    for(unsigned int x=0; x<w; ++x)
+                    {
+                        img.setPixel(x,y, w/256.0*x);
+                    }
+                }
+                img.setColorTable(ct);
+                m_delegate->insertItem(m_delegate->count()-1, QPixmap::fromImage(img),"");
+            }
             return m_delegate->count()-2;
         }
     }
@@ -325,6 +299,43 @@ bool ColorTableParameter::deserialize(QIODevice& in)
  */
 QWidget*  ColorTableParameter::delegate()
 {
+    if(m_delegate == NULL)
+    {
+        m_delegate = new QComboBox;
+        
+        unsigned int w=256, h=12;
+        m_delegate->setIconSize(QSize(w, h));
+    
+        QImage img(w, h, QImage::Format_Indexed8);
+        img.setColorCount(256);
+        
+        for(unsigned int y=0; y<h; ++y)
+        {
+            for(unsigned int x=0; x<w; ++x)
+            {
+                img.setPixel(x,y, w/256.0*x);
+            }
+        }
+        
+        for( QVector<QRgb> ct : colorTables())
+        {
+            img.setColorTable(ct);
+            m_delegate->addItem(QPixmap::fromImage(img),"");
+        
+        }
+        
+        for( QVector<QRgb> ct : m_extra_tables)
+        {
+            img.setColorTable(ct);
+            m_delegate->addItem(QPixmap::fromImage(img),"");
+        
+        }
+        m_delegate->addItem("Add new");
+        setValue(value());
+        
+        connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
+        Parameter::initConnections();
+    }
     return m_delegate;
 }
 
@@ -334,7 +345,12 @@ QWidget*  ColorTableParameter::delegate()
  */
 void ColorTableParameter::updateValue()
 {
-    if(m_delegate->currentIndex() == m_delegate->count()-1)
+    if(m_delegate->currentIndex() < m_delegate->count()-1)
+    {
+        m_ct_idx = m_delegate->currentIndex();
+    }
+    //Last index clicked -> add new ct!
+    else if(m_delegate->currentIndex() == m_delegate->count()-1)
     {
         ParameterGroup* custom_ct_params = new ParameterGroup("Custom color table");
 
@@ -355,10 +371,12 @@ void ColorTableParameter::updateValue()
         custom_ct_params->addParameter("use_end_color", param_use_end_color);
         custom_ct_params->addParameter("end_color",     param_end_color);
         
-        ParameterSelection custom_ct_selection(NULL, custom_ct_params);
+        ParameterSelection* custom_ct_selection = new ParameterSelection(NULL, custom_ct_params);
     
-        if(custom_ct_selection.exec())
+        if(custom_ct_selection->exec())
         {
+            custom_ct_selection->hide();
+            
             //Get results
             QColor start_color = param_start_color->value();
             QColor mid_color = param_mid_color->value();
@@ -392,14 +410,18 @@ void ColorTableParameter::updateValue()
                 col2 = col3 =mid_color;
             }
             QVector<QRgb> ct = createColorTableFrom3Colors(col1, col2, col3);
+            
+            disconnect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
             int idx = addCustomColorTable(ct);
             
             if(idx >= 0)
             {
-                m_delegate->setCurrentIndex(idx);
+                setValue(ct);
             }
+            connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         }
         delete custom_ct_params;
+        delete custom_ct_selection;
     }
     Parameter::updateValue();
 }

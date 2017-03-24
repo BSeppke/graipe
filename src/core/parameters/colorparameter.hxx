@@ -139,7 +139,7 @@ class GRAIPE_CORE_EXPORT ColorParameter
          */
         QWidget * delegate();
         
-    protected slots:
+    public slots:
         /**
          * This slot is called on every button click on the color button. It mainly 
          * presents the color selection dialog. Then the user can select between

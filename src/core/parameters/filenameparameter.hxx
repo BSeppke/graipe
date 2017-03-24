@@ -139,7 +139,7 @@ class GRAIPE_CORE_EXPORT FilenameParameter
          */
         QWidget * delegate();
         
-    protected slots:
+    public slots:
         /**
          * This slot is called if the user pressed the file-selection button. It is mainly
          * used to present the file selection dialog to the user.

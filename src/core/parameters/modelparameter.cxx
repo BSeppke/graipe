@@ -168,14 +168,16 @@ void ModelParameter::refresh()
 	{
 		m_cmbDelegate->clear();
 		
+        int i=0;
+        
 		for(Model * model: m_allowed_values)
 		{
 			m_cmbDelegate->addItem(model->shortName());
-            m_cmbDelegate->setItemData(m_cmbDelegate->count()-1, model->description(), Qt::ToolTipRole);
+            m_cmbDelegate->setItemData(i++, model->description(), Qt::ToolTipRole);
 		}
     }
-    
-    setValue(value());
+    if(m_allowed_values.size() != 0)
+        setValue(m_allowed_values[0]);
 }
 
 /**
@@ -281,9 +283,10 @@ QWidget*  ModelParameter::delegate()
     if(m_cmbDelegate == NULL)
     {
         m_cmbDelegate = new QComboBox;
+        m_cmbDelegate->update();
         refresh();
     
-        connect(m_cmbDelegate, SIGNAL(currentIndexChanged()), this, SLOT(updateValue()));
+        connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     return m_cmbDelegate;
