@@ -42,18 +42,16 @@
 #include <QPlainTextEdit>
 
 
+namespace graipe {
+
 /**
- * This file defines the LongStringParameter class.
+ * This is the LongStringParameter class.
  * It inherits from the Parameter base class to:
  * - hold a QString value, and
  * - provide editing facilities by means of a QPlainTextEdit.
  * This is especially helpful, when dealing with very long QStrings. For
  * shorter QStrings, you may want to use the StringParameter class.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT LongStringParameter
 :   public Parameter
 {
@@ -111,21 +109,20 @@ class GRAIPE_CORE_EXPORT LongStringParameter
         QString valueText() const;
         
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Basically, just: "LongStringParameter, " + encode_string(value())
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -152,16 +149,16 @@ class GRAIPE_CORE_EXPORT LongStringParameter
         void updateValue();
   
     protected:    
-        //The storage for the value of this parameter
+        /** The storage for the value of this parameter **/
         QString m_value;
     
-        //The (char) columns
+        /** The (char) columns **/
         unsigned int m_columns;
     
-        //The height hint of the delegate widget
+        /** The height hint of the delegate widget **/
         unsigned int m_lines;
     
-        //The text editing delegate
+        /** The text editing delegate **/
         QPointer<QPlainTextEdit> m_txtDelegate;
     
 };

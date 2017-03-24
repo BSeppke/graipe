@@ -105,7 +105,7 @@ std::vector<Model*> MultiModelParameter::value() const
  *
  * \param value The new value of this parameter.
  */
-void MultiModelParameter::setValue(const std::vector<Model*>& values)
+void MultiModelParameter::setValue(const std::vector<Model*>& value)
 {
    m_model_idxs.clear();
     
@@ -115,7 +115,7 @@ void MultiModelParameter::setValue(const std::vector<Model*>& values)
     {
         bool found = false;
         
-        for(const Model* model: values)
+        for(const Model* model: value)
         {
             if( allowed_model == model)
             {
@@ -188,11 +188,12 @@ void MultiModelParameter::refresh()
 }
 
 /**
- * Serialization of the parameter's state to a QString. Please note, that this can 
- * vary from the valueText() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars.
+ * Serialization of the parameter's state to an output device.
+ * Writes comman-separated model list the output device, containing the filename
+ * for each model, like:
+ * "MultModelParameter, file1.bla, file2.blubb"
  *
- * \return The serialization of the parameter's state.
+ * \param out The output device on which we serialize the parameter's state.
  */
 void MultiModelParameter::serialize(QIODevice& out) const
 {
@@ -205,9 +206,9 @@ void MultiModelParameter::serialize(QIODevice& out) const
 }
 
 /**
- * Deserialization of a parameter's state from a QString.
+ * Deserialization of a parameter's state from an input device.
  *
- * \param str The serialization of this parameter's state.
+ * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
 bool MultiModelParameter::deserialize(QIODevice& in)

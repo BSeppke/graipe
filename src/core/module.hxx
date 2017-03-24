@@ -40,18 +40,16 @@
 #include "core/factories.hxx"
 
 
+namespace graipe {
+
 /**
- * This file defines a module - the general extension structure of the
+ * This defines a module - the general extension structure of the
  * GRAIPE framework. You may extend the framework using:
  *  
  *     1. new models (with associated properties),
  *     2. new views  (with associated properties) and
  *     3. new algorithms.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT Module
 {	
     public:

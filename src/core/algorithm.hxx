@@ -45,6 +45,8 @@
 #include <QMutex>
 
 
+namespace graipe {
+
 /**
  * This class defines the concept of an algorithm within the GRAIPE
  * framework. An algorithm can best be described by a function,
@@ -68,10 +70,6 @@
  * During each run, the algorithm uses signals to report about the
  * current progress, errors and finshed state.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT Algorithm
 :	public QObject
 {
@@ -192,26 +190,26 @@ class GRAIPE_CORE_EXPORT Algorithm
         virtual void run();
 
 	signals:
-        //Neutral status message
+        /** Neutral status message **/
 		void statusMessage(float p, QString message);
-        //Message for the error case of an algorithm
+        /** Message for the error case of an algorithm **/
 		void errorMessage(QString message);
-        //Finished (correctly)
+        /** Finished (correctly) **/
 		void finished();
 
 	protected:
-        //The current phase of the algorithm
+        /** The current phase of the algorithm **/
 		unsigned int m_phase;
-        //The total number phases of the algorithm
+        /** The total number phases of the algorithm **/
         unsigned int m_phase_count;
 	
-        //The parameters
+        /** The parameters **/
 		ParameterGroup * m_parameters;
-		//The results
+		/** The results **/
         std::vector<Model*> m_results;
     
     private:
-        //The global algorithm mutex
+        /** The global algorithm mutex **/
         QMutex * m_global_algorithm_mutex;
 };
 

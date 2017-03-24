@@ -42,8 +42,10 @@
 #include <QFormLayout>
 
 
+namespace graipe {
+
 /**
- * This file defines ParameterGroup class, which inherits from the
+ * This is the ParameterGroup class, which inherits from the
  * Parameter base class to act like a parameter, but provide a
  * container for different parameters. As datastructure of the collection,
  * an std::map is used. This makes it very easy to access the
@@ -56,10 +58,6 @@
  * common (de-)serialization mechanism for a complete ParameterGroup, which
  * mainly reads/writes one Parameter "id: serial" per line.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT ParameterGroup
 :   public Parameter
 {
@@ -192,22 +190,25 @@ class GRAIPE_CORE_EXPORT ParameterGroup
          */
         QString magicID() const;
     
+
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * This serializes each parameter in the group by means of its name and its serialization,
+         * one per line, e.g. like:
+         * "param1: StringParameter, bla"
+         * "param2: PointParmaeter, ...."
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
     
         /**
          * This method is called after each (re-)assignment of the model list
@@ -227,19 +228,19 @@ class GRAIPE_CORE_EXPORT ParameterGroup
         QWidget * delegate();
         
     protected:
-        //The QString -> parameter pointer map
+        /** The QString -> parameter pointer map **/
         storage_type m_parameters;
     
-        //The order of the parameters, since maps are stricly ordered.
+        /** The order of the parameters, since maps are stricly ordered. **/
         QStringList m_parameter_order;
     
-        //The delegate widget
+        /** The delegate widget **/
         QPointer<QWidget> m_delegate;
     
-        //The layout of the widget
+        /** The layout of the widget **/
         QFormLayout * m_layout;
     
-        //The RowWrapPolicy (WrapLongRows by default)
+        /** The RowWrapPolicy (WrapLongRows by default) **/
         QFormLayout::RowWrapPolicy m_policy;
 };
 

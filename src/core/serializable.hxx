@@ -137,11 +137,11 @@ GRAIPE_CORE_EXPORT QDateTime qDateTimeFromNumberDateTime(const QString& str);
  * or:
  *    yyyyMMddhhmmssmicsec
  *
- * \param satellite_format_string The formatted DateTime QString
+ * \param str The formatted DateTime QString
  * 
  * \return QDateTime representation of this string. May be invalid, if conversion fails.
  */
-GRAIPE_CORE_EXPORT QDateTime qDateTimeFromSatelliteDateTime(const QString& iso_format_string);
+GRAIPE_CORE_EXPORT QDateTime qDateTimeFromSatelliteDateTime(const QString& str);
 
 /**
  * Writes a QString onto a QIODevice.
@@ -176,7 +176,8 @@ GRAIPE_CORE_EXPORT QString read_from_device(QIODevice& dev, int len);
 GRAIPE_CORE_EXPORT QString read_from_device_until(QIODevice& dev, const QString& str, bool one_line=true);
 
 
-/* The nearly pure interface of something that can be serialized
+/**
+ * The nearly pure interface of something that can be serialized
  *
  * The serialization is based on a header/content division of the data:
  * - the first Header Line will be used to determine the data type
@@ -192,23 +193,58 @@ GRAIPE_CORE_EXPORT QString read_from_device_until(QIODevice& dev, const QString&
  * - content deserialization using a QString
  * - check/export of the first header line signature
  */
- 
- 
 class GRAIPE_CORE_EXPORT Serializable	
 {
     public:
+        /**
+         * Getter for the filename of a serializable
+         *
+         * \return the filename or an empty QString if none is assigned
+         */
         virtual QString filename() const;
+    
+        /**
+         * Setter for the filename of a serializable
+         *
+         * \param new_filename  the new filename of this serializable
+         */
         virtual void setFilename(const QString& new_filename);
     
+        /**
+         * Since we want to identify, we assign the Serializable class an uid.
+         * Should be overwritten in iheriting classes.
+         *
+         * \return "Serializable" as a QString
+         */
         virtual QString typeName() const;
     
-        //The first header line
+        /**
+         * Returns the unique magic id of a Serializable instance. 
+         * Has to be specialized in inheriting classes.
+         *
+         * \return The unique magicID.
+         */
         virtual QString magicID() const = 0;
     
+        /**
+         * Deserialization from an input device.
+         * Has to be specialized in inheriting classes.
+         *
+         * \param in The input device.
+         * \return True, if the object could be successfully restored from the device.
+         */
         virtual bool deserialize(QIODevice& in) = 0;
+    
+        /**
+         * Serialization on to an output device.
+         * Has to be specialized in inheriting classes.
+         *
+         * \param out The output device.
+         */
         virtual void serialize(QIODevice& out) const = 0;
     
-    protected:    
+    protected:
+        /** the filename of this serializable instance **/
         QString m_filename;
 };
     

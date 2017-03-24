@@ -42,16 +42,14 @@
 #include <QLineEdit>
 
 
+namespace graipe {
+
 /**
- * This file defines the TransformParameter class.
+ * This is the TransformParameter class.
  * It inherits from the Parameter base class to:
  * - hold a QTransform value, and
  * - provide editing facilities by means of 3x3 QLineEdits.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT TransformParameter
 :   public Parameter
 {
@@ -115,23 +113,22 @@ class GRAIPE_CORE_EXPORT TransformParameter
          * \return A comma separated tring w.r.t. the order given above.
          */
         static QString valueText(const QTransform& trans);
-            
+
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Basically it's just: "TransformParameter, " + valueText()
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -158,13 +155,13 @@ class GRAIPE_CORE_EXPORT TransformParameter
         void updateValue();
         
     protected:
-        //The value of this parameter
+        /** The value of this parameter **/
         QTransform m_value;
     
-        //parent delegate
+        /** parent delegate **/
         QPointer<QWidget> m_delegate;
     
-        //the child delegates (3x3) for matrix
+        /** the child delegates (3x3) for matrix **/
         QPointer<QLineEdit> m_lne11, m_lne12, m_lne13,
                     m_lne21, m_lne22, m_lne23,
                     m_lne31, m_lne32, m_lne33;

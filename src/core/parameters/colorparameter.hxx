@@ -43,17 +43,15 @@
 #include <QColorDialog>
 
 
+namespace graipe {
+
 /**
- * This file defines the ColorParameter class.
+ * This is the ColorParameter class.
  * It inherits from the Parameter base class to:
  * - hold a QColor value, and
  * - provide editing facilities by means of a QPushButton 
  *   (with a color pixmap as label).
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT ColorParameter
 :   public Parameter
 {    
@@ -109,21 +107,20 @@ class GRAIPE_CORE_EXPORT ColorParameter
         QString valueText() const;
             
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Basically, just: "ColorParameter, " + value().rgba()
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
 
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -151,10 +148,10 @@ class GRAIPE_CORE_EXPORT ColorParameter
         void updateValue();
         
     protected:    
-        //The storage for the value of this parameter
+        /** The storage for the value of this parameter **/
         QColor m_value;
         
-        //The delegate
+        /** The delegate **/
         QPointer<QPushButton> m_delegate;
     
 };

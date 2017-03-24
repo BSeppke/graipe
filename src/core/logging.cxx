@@ -83,6 +83,7 @@ QTextStream* Logging::textStream()
  * Basic message handler for the QtDebug interface (static)
  *
  * \param type The type of the incoming message.
+ * \param context The context of the incoming message.
  * \param msg  The message itself.
  */
 void Logging::messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -124,6 +125,7 @@ Logging::Logging()
  * Basic message handler for the QtDebug interface (non-static)
  *
  * \param type The type of the incoming message.
+ * \param context The context of the incoming message.
  * \param msg  The message itself.
  */
 void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)

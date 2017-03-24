@@ -41,14 +41,14 @@
 #include <QObject>
 
 
+namespace graipe {
+
 /**
  * The UpdateChecker is supposed to run concurrently, in order to keep
  * processes free in their running, which the http[s] requests are being
  * performed. Thus is has to derive from QObject. It uses the current version
  * and the internet addresses given in <core/config.hxx>.
  * A typical call would look like:
- *
- *   #include "core/updatechecker.hxx"
  *
  *   //Check for updates in another thread
  *   UpdateChecker* checker = new UpdateChecker;
@@ -59,10 +59,6 @@
  *   connect(checker, SIGNAL(finished()), checkerThread, SLOT(quit()));
  *   checkerThread->start();
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT UpdateChecker
 :   public QObject
 {
@@ -73,7 +69,7 @@ public slots:
      * This method/slot checks for updates up to 1.0 (=10) higher than the currently
      * installed version. In addition, a minimal filesize need to be given (defaults to
      * 10 MB) If both is found, it presents a MsgBox, where the user  can either click
-     * on the <Download> link or simply ignore it.
+     * on the "Download" link or simply ignore it.
      *
      * \param max_version_jump Maximum version jump to search for: major_jump*10+minor_jump.
      * \param min_filesize Minimum size of the installer package, if found at search url.

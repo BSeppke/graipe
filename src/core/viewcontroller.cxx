@@ -417,11 +417,11 @@ QString ViewController::magicID() const
 }
 
 /**
- * This function serializes a complete ViewController to a QString.
+ * This function serializes a complete ViewController to an output device.
  * To do so, it serializes the magicID(), then the model denoted by the model's
  * filename and eventually the parameter set.
  *
- * \return The serialization (QString) of this View
+ * \param out The output device, where we serialize to.
  */
 void ViewController::serialize(QIODevice& out) const
 {
@@ -430,11 +430,11 @@ void ViewController::serialize(QIODevice& out) const
 }
 
 /**
- * This function deserailizes the ViewController by means of its parameter settings.
+ * This function deserializes the ViewController by means of its parameter settings.
  * The model needs to be reconstructed elsewhere, espacially before the construction of
  * a ViewController. This will be handled inside the GUI of GRAIPE
  *
- * \param  header_serial The serialization of this ViewController class.
+ * \param  in The input device, where we read the serialization of this ViewController class from.
  * \return True, if the parameters could be restored,
  */
 bool ViewController::deserialize(QIODevice& in)

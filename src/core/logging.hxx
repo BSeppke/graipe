@@ -45,15 +45,13 @@
 #include <QTextStream>
 
 
+namespace graipe {
+
 /**
- * This file defines everything, that is needed to add basic logging 
+ * This class defines everything, that is needed to add basic logging
  * facilities to Qt-Main-Apps. This class is also a Singleton, where all
  * public functions are static!
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT Logging
 { 
 	public:    
@@ -82,6 +80,7 @@ class GRAIPE_CORE_EXPORT Logging
          * Basic message handler for the QtDebug interface (static)
          *
          * \param type The type of the incoming message.
+         * \param context The context of the incoming message.
          * \param msg  The message itself.
          */
         static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -96,17 +95,18 @@ class GRAIPE_CORE_EXPORT Logging
          * Basic message handler for the QtDebug interface (non-static)
          *
          * \param type The type of the incoming message.
+         * \param context The context of the incoming message.
          * \param msg  The message itself.
          */
         void logMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg);
     
-        //The complete file* (also to return the name of the output file)
+        /** The complete file* (also to return the name of the output file) **/
         QFile* m_file;
         
-        //The textstream, where we write onto
+        /** The textstream, where we write onto **/
         QTextStream* m_textStream;
     
-        //Static pointer to this class's instance
+        /** Static pointer to this class's instance **/
         static Logging* m_this;
 };
 

@@ -42,18 +42,16 @@
 #include <QPointer>
 #include <QComboBox>
 
+namespace graipe {
+
 
 /**
- * This file defines the ModelParameter class.
+ * This is the ModelParameter class.
  * It inherits from the Parameter base class to:
  * - hold a Model pointer, and
  * - provide selection facilities by means of a QComboBox.
  * It also provides easy filtering of given Models by their typeName().
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT ModelParameter
 :   public Parameter
 {
@@ -118,21 +116,20 @@ class GRAIPE_CORE_EXPORT ModelParameter
         void refresh();
         
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Basically: "ModelParameter, " + model->fielname()
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
     
         /**
          * This function locks the parameters value. 
@@ -179,20 +176,20 @@ class GRAIPE_CORE_EXPORT ModelParameter
         void updateValue();
         
     protected:
-        //The storage for the value of this parameter (index in m_allowed_models)
+        /** The storage for the value of this parameter (index in m_allowed_models) **/
         int m_model_idx;
     
-        //The model's delegate widget
+        /** The model's delegate widget **/
         QPointer<QComboBox> m_cmbDelegate;
     
-        //The allowed model pointers
+        /** The allowed model pointers **/
         std::vector<Model*>	m_allowed_values;
     
-        //A type filter to show only a subset of models (filtered by their typeName())
+        /** A type filter to show only a subset of models (filtered by their typeName()) **/
         QString m_type_filter;
 
     
-        //The lock (if locked)
+        /** The lock (if locked) **/
         unsigned int m_lock;
 };
 

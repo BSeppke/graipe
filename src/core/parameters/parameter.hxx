@@ -46,20 +46,19 @@
 #include <QSizePolicy>
 
 
-/**
- * This file defines the base class of all Parameters.
- * Make sure to fullfil this base's api when impelementing own
- * (derived) Parameter classes.
- * To get an idea, how such specializations look like, you may refer
- * to the parameters already provided by GRAIPE
- */
-
-
 namespace graipe {
 
 //Forward declaration of Model class to resolve circular dependency
 class Model;
 
+
+/**
+ * This is the base class of all Parameters.
+ * Make sure to fullfil this base's api when impelementing own
+ * (derived) Parameter classes.
+ * To get an idea, how such specializations look like, you may refer
+ * to the parameters already provided by GRAIPE
+ */
 class GRAIPE_CORE_EXPORT Parameter
 :   public QObject,
     public Serializable
@@ -143,20 +142,17 @@ class GRAIPE_CORE_EXPORT Parameter
         QString magicID() const;
     
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
-         * Implemented to fullfil the Serializable interface.
+         * Serialization of the parameter's state to an output device.
+         * Just writes the magicID a.k.a. typeName() on the device.
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
-         * Implemented to fullfil the Serializable interface.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
         bool deserialize(QIODevice& in);
@@ -259,19 +255,19 @@ class GRAIPE_CORE_EXPORT Parameter
          */
         virtual void initConnections();
     
-        //The name/label of the parameter
+        /** The name/label of the parameter **/
         QString m_name;
     
-        //The parent of the parameter
+        /** The parent of the parameter **/
         Parameter* m_parent;
     
-        //Should the enabled/disabled by parent rule be inverted?
+        /** Should the enabled/disabled by parent rule be inverted? **/
         bool m_invert_parent;
     
-        //Shall the parameter be hidden inside a parameter group?
+        /** Shall the parameter be hidden inside a parameter group? **/
         bool m_hide;
     
-        //The list of all currently loaded models 
+        /** The list of all currently loaded models **/
         const std::vector<Model*> * m_modelList;
 };
 

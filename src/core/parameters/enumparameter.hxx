@@ -41,17 +41,15 @@
 #include <QPointer>
 #include <QComboBox>
 
+namespace graipe {
+
 
 /**
- * This file defines the EnumParameter class.
+ * This is the EnumParameter class.
  * It inherits from the Parameter base class to:
  * - hold an index value of an enum (given by a vector of QStrings), and
  * - provide editing facilities by means of a QComboBox.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT EnumParameter
 :   public Parameter
 {	
@@ -108,21 +106,20 @@ class GRAIPE_CORE_EXPORT EnumParameter
         QString valueText() const;
             
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Basically, just: "EnumParameter: " + Index of enum
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
         
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -149,13 +146,13 @@ class GRAIPE_CORE_EXPORT EnumParameter
         void updateValue();
     
     protected:
-        //The enum names
+        /** The enum names **/
         QStringList m_enum_names;
     
-        //The current value (in index space)
+        /** The current value (in index space) **/
         int m_value;
     
-        //The delegate widget
+        /** The delegate widget **/
         QPointer<QComboBox> m_cmbDelegate;
     
 };

@@ -44,6 +44,10 @@
 
 namespace graipe {
   
+/** 
+ * This class extends the floating point precise QPointF by means of comparison,
+ * ordering and arithmetic functions.
+ */
 class GRAIPE_CORE_EXPORT QPointFX
     : public QPointF
 {

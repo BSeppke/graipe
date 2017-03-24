@@ -86,9 +86,9 @@ public:
     ~ParameterSelection();
     
 protected:
-    //The  delegate of the parameter (temporary owned by the layout of this selection)
+    /** The  delegate of the parameter (temporary owned by the layout of this selection) **/
     QPointer<QWidget> m_widget;
-    //The main layout of the parameter selection
+    /** The main layout of the parameter selection **/
     QVBoxLayout* m_verticalLayout;
 
 };
@@ -140,15 +140,15 @@ public:
     bool cloneOtherModel() const;
     
 protected:
-    //RadioButton to find out if the metadata shall be newly set
+    /** RadioButton to find out if the metadata shall be newly set **/
     QPointer<QRadioButton>   m_radNewParameters;
-    //RadioButton to find out if the metadata shall be copied from another Model
+    /** RadioButton to find out if the metadata shall be copied from another Model **/
     QPointer<QRadioButton>   m_radCopyParameters;
-    //CheckBox to indicate if the complete metadata shall be copied, too.
+    /** CheckBox to indicate if the complete metadata shall be copied, too. **/
     QPointer<QCheckBox>      m_chkCloneOtherModel;
-    //The scrollarea, where the parameter selection will be shown.
+    /** The scrollarea, where the parameter selection will be shown. **/
     QPointer<QScrollArea> m_scrParameters;
-    //The (not-owned) pointer to the Model to copy the metadata (and maybe data) from.
+    /** The (not-owned) pointer to the Model to copy the metadata (and maybe data) from. **/
     ModelParameter* m_otherModel;
 };
 
@@ -195,9 +195,9 @@ public slots:
     void updateResults();
     
 protected:
-    //The label, where the result type are presented
+    /** The label, where the result type are presented **/
     QPointer<QLabel> m_lblResults;
-    //Pointer to the algorithm (not owned)
+    /** Pointer to the algorithm (not owned) **/
     Algorithm * m_algorithm;
 };
 

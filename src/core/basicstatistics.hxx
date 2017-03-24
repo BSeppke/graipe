@@ -41,6 +41,8 @@
 #include <QtDebug>
 
 
+namespace graipe  {
+
 /**
  * This file just contains a very basic data structure for the storage
  * of a simple statistic, w.r.t. minimum, maximum, mean and standard
@@ -51,25 +53,34 @@
  *
  * Since this a header only file, we need no export definitions here!
  */
-
-
-namespace graipe  {
-
 template <typename T>
 struct BasicStatistics
 {   
     public:
+        /**
+         * Comparison of Basic statistics.
+         * \param other other statistic to compare with
+         * \return true if both have equal min, max, mean and std. dev.
+         */
         bool operator==(const BasicStatistics<T>&  other) const
         {
             return min == other.min && max == other.max && mean == other.mean && stddev == other.stddev;
         };
-        
+    
+        /** minimum of the data **/
         T min;
+        /** maximum of the data **/
         T max;
+        /** mean of the data **/
         T mean;
+        /** standard deviation of the data **/
         T stddev;
 };
 
+/**
+ * Helper function to log BasicStatistics to the Debug log
+ * \param stats Statistics to be logged.
+ */
 template <typename T>
 void printStats(const BasicStatistics<T>& stats)
 {

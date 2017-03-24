@@ -40,6 +40,9 @@
 #include "core/qt_ext/qgraphicsresizableitem.hxx"
 
 
+
+namespace graipe {
+
 /**
  * Based upon the QGraphicsResizableItem, this class defines a legend for
  * various applications. The scale of legend can be set from min to max
@@ -53,10 +56,6 @@
  *    2. Not true to scale: The max value remains the same, the legend
  *       simply gets "stretched".
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT QLegend
 :	public QGraphicsResizableItem
 {

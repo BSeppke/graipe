@@ -374,9 +374,9 @@ void Model::setGlobalTop(float new_top)
 }
 
 /**
- * Set the global right (x-coordinate) of a Model to a given value.
+ * Const accessor for the global right (x-coordinate) of a Model.
  *
- * \param new_right The new global right boundary of the Model.
+ * \return The global right boundary of the Model.
  */
 float Model::globalRight() const
 {
@@ -540,13 +540,13 @@ QString Model::magicID() const
 }
 
 /**
- * This function serializes a complete Model to a QString.
+ * This function serializes a complete Model to an output device.
  * To do so, it serializes header first, then the content, like this:
  *      serialize_header()
  *      [Content]
  *      serialize_content();
  *
- * \return The serialization (QString) of this Model.
+ * \param out The output device for the serialization.
  */
 void Model::serialize(QIODevice& out) const
 {
@@ -558,7 +558,7 @@ void Model::serialize(QIODevice& out) const
 /**
  * This function deserializes the model by means of its header and content
  *
- * \param  serial The serialization of this model class.
+ * \param  in The input device.
  * \return True, if the Model could be restored,
  */
 bool Model::deserialize(QIODevice& in)
@@ -586,7 +586,7 @@ bool Model::deserialize(QIODevice& in)
  *      magicID()
  *      m_parameters->serialize()
  *
- * \return The serialization (QString) of this Model's header.
+ * \param out the output device.
  */
 void Model::serialize_header(QIODevice& out) const
 {
@@ -597,7 +597,7 @@ void Model::serialize_header(QIODevice& out) const
 /**
  * This function deserializes the Model's header.
  *
- * \param  header_serial The serialization of this Model's header.
+ * \param  in The input device.
  * \return True, if the Model's header could be restored,
  */
 bool Model::deserialize_header(QIODevice& in)
@@ -623,8 +623,9 @@ bool Model::deserialize_header(QIODevice& in)
 
 /**
  * This function serializes the content of a model.
+ * Has to be specialized, here always "none\n".
  *
- * \return Always "none\n".
+ * \param out the output device.
  */
 void Model::serialize_content(QIODevice& out) const
 {
@@ -634,7 +635,7 @@ void Model::serialize_content(QIODevice& out) const
 /**
  * This function deserializes the Model's content.
  *
- * \param  content_serial The serialization of this Model's content.
+ * \param  in The input device.
  * \return True, if the Model's content could be restored,
  */
 bool Model::deserialize_content(QIODevice& in)

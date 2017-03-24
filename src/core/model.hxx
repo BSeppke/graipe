@@ -46,8 +46,18 @@
 #include <QtDebug>
 
 
+namespace graipe {
+
+//Forward declaration of used parameter types:
+class Parameter;
+class ParameterGroup;
+class StringParameter;
+class LongStringParameter;
+class PointParameter;
+class PointFParameter;
+
 /**
- * This file defines  the base class of all objects we are working 
+ * This is the base class of all objects we are working
  * with in the GRAIPE environment. If you want to introduce your own
  * type into the framework, you have to inherit from this class or its
  * inheritants.
@@ -66,17 +76,6 @@
  * lock-request, the locker gets a random id, which he needs to pass for
  * a successful unlocking to the model.
  */
-
-
-namespace graipe {
-
-class Parameter;
-class ParameterGroup;
-class StringParameter;
-class LongStringParameter;
-class PointParameter;
-class PointFParameter;
-
 class GRAIPE_CORE_EXPORT Model
 :	public QObject,
 	public Serializable
@@ -347,14 +346,14 @@ class GRAIPE_CORE_EXPORT Model
          *      [Content]
          *      serialize_content();
          *
-         * \return The serialization (QString) of this Model.
+         * \param out The output device for the serialization.
          */
         void serialize(QIODevice& out) const;
     
         /**
          * This function deserializes the model by means of its header and content
          *
-         * \param  serial The serialization of this Model class.
+         * \param  in The input device.
          * \return True, if the Model could be restored,
          */
         bool deserialize(QIODevice& in);
@@ -364,29 +363,30 @@ class GRAIPE_CORE_EXPORT Model
          *      magicID()
          *      m_parameters->serialize()
          *
-         * \return The serialization (QString) of this Model's header.
+         * \param out the output device.
          */
         virtual void serialize_header(QIODevice& out) const;
     
         /**
          * This function deserializes the Model's header.
          *
-         * \param  header_serial The serialization of this Model's header.
+         * \param  in The input device.
          * \return True, if the Model's header could be restored,
          */
         virtual bool deserialize_header(QIODevice& in);
     
         /**
          * This function serializes the content of a model.
+         * Has to be specialized, here always "none\n".
          *
-         * \return Always "none\n".
+         * \param out the output device.
          */
         virtual void serialize_content(QIODevice& out) const;
     
         /**
          * This function deserializes the Model's content.
          *
-         * \param  content_serial The serialization of this Model's content.
+         * \param  in The input device.
          * \return True, if the Model's content could be restored,
          */
         virtual bool deserialize_content(QIODevice& in);
@@ -438,7 +438,7 @@ class GRAIPE_CORE_EXPORT Model
         virtual void updateModel();
     
 	signals:
-        //Emit a model change to others
+        /** Emit a model change to others **/
 		void modelChanged();
     
     protected:
@@ -457,83 +457,153 @@ class GRAIPE_CORE_EXPORT Model
         QVector<unsigned int> m_locks;
 };
 
+/**
+ * This class acts like a basic container of templated elements
+ * but fullfilles the Model interface
+ */
 template<class T>
 class GRAIPE_CORE_EXPORT ItemListModel
     : public Model
 {
     public:
-        //Typedefs
+        //Typedefs for convenience
         typedef T item_type;
         typedef QVector<T> container_type;
         typedef typename container_type::const_iterator const_iterator;
     
-        //Constructor & Destructor
+        /**
+         * Default Constructor
+         */
         ItemListModel()
         {
         }
     
+        /**
+         * Copy contructor (from another model)
+         * \param other The other model.
+         */
         ItemListModel(const ItemListModel<T>& other)
         : m_data(other.data())
         {
         }
     
+        /**
+         * Virtual destructor
+         */
         virtual ~ItemListModel()
         {
         }
 
+        /**
+         * The type of this model (same for every instance oif same templates).
+         *
+         * \return T::typeName() + "List"
+         */
         QString typeName() const
         {
             return T::typeName() + "List";
         }
     
+        /**
+         * Returns the element count of the internal item storage.
+         * \return The size of the element list.
+         */
         int size() const
         {
             return m_data.size();
         }
     
+        /**
+         * Clears all items in the list.
+         */
         void clear()
         {
             m_data.clear();
             updateModel();
         }
     
+        /**
+         * Const iterator access to the begin of the list.
+         *
+         * \return A const iterator the the begin of the element list.
+         */
         const_iterator begin() const
         {
             return m_data.begin();
         }
+        
+        /**
+         * Const iterator access to the end of the list.
+         *
+         * \return A const iterator the the end of the element list.
+         */
         const_iterator end() const
         {
             return m_data.end();
         }
     
+        /**
+         * Const access to the underlying data container a.k.a. the list of elements.
+         *
+         * \return Const reference to the data.
+         */
         const container_type& data() const
         {
             return m_data;
         }
 
+        /**
+         * Const access to a single item at a given index.
+         *
+         * \param idx The index of that item in the list
+         * \return Const item reference to the requested item.
+         */
         const item_type& item(unsigned int idx) const
         {
             return m_data[idx];
         }
     
+        /**
+         * Removal of an item at a given index in the list.
+         *
+         * \param idx Index of the item to be removed.
+         */
         void remove(unsigned int idx)
         {
             m_data.remove(idx);
             updateModel();
         }
-    
+     
+        /**
+         * Replacement of an item at a given index in the list.
+         *
+         * \param idx Index of the item to be replaced.
+         * \param item The new item at the given index.
+         */
         void replace(unsigned int idx, const item_type& item)
         {
             m_data.replace(idx,item);
             updateModel();
         }
     
+        /**
+         * Appending a new item at thje end of the list.
+         *
+         * \param item The new item, which will be appended.
+         */
         void append(const item_type& item)
         {
             m_data.append(item);
             updateModel();
         }
     
+        /**
+         * Content serialization. This class serializes its content in a CSV-like manner:
+         * Each item in the list is allowed to fill one line, line break will be inserted
+         * ater each.
+         *
+         * \param out The output device, where the serialization will take place.
+         */
         void serialize_content(QIODevice & out) const
         {
             write_on_device(T::headerCSV(), out);
@@ -544,6 +614,14 @@ class GRAIPE_CORE_EXPORT ItemListModel
             }
         }
     
+        /**
+         * Content deserialization. We assume, that this class serialized its content in a CSV-like manner:
+         * Each item in the list is allowed to fill one line. Thus line breaks are used
+         * to split the content into single items and deserialize them separately
+         *
+         * \param in The input device, where we read from.
+         ± \return true, if the complete content could be deserialized from the input device.
+         */
         bool deserialize_content(QIODevice& in)
         {
             if (locked())
@@ -577,9 +655,14 @@ class GRAIPE_CORE_EXPORT ItemListModel
         }
     
     protected:
+        /** The data storage **/
         QVector<T> m_data;
 };
 
+/**
+ * A rastered model extends the default model by the assumption of an underlying
+ * Raster of a given size.
+ */
 class GRAIPE_CORE_EXPORT RasteredModel
     : public Model
 {
@@ -684,7 +767,7 @@ class GRAIPE_CORE_EXPORT RasteredModel
         QString typeName() const;
     
     protected:
-        //The additional parameters of this model:
+        /** The additional parameters of this model: **/
         PointParameter * m_size;
 };
 

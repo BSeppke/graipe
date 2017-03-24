@@ -44,8 +44,10 @@
 #include <QGraphicsSceneMouseEvent>
 
 
+namespace graipe {
+
 /**
- * This file defines a 2D QGraphicsItem, which may be reseized 
+ * This is a 2D QGraphicsItem, which may be reseized
  * interactively by the user. This generally does not apply to the ViewController
  * of Models, which are indeed fixed in their geometry and thus size.
  *
@@ -57,10 +59,6 @@
  * horizontal or vertical scaling. Additionally, a resizable item may
  * also be dragged around by the user.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT QGraphicsResizableItem
 :	public QGraphicsRectItem
 {
@@ -157,19 +155,22 @@ class GRAIPE_CORE_EXPORT QGraphicsResizableItem
          */
          void mouseMoveEvent(QGraphicsSceneMouseEvent  * event);
 	
-        //holds the currently active handle
+        /** Holds the currently active handle **/
 		unsigned short m_handle;
     
-        //The position, where the drag started
+        /** The position, where the drag started **/
 		QPointF m_dragStart;
     
+        /** The drawing pen **/
         QPen m_pen;
 		
-        //The size of each handle in pixels
+        /** The size of each handle in pixels **/
 		unsigned int m_handle_size;
 		
-        //The protection settings for scaling
-		bool m_protect_h_scaling, m_protect_v_scaling;
+        /** The protection settings for horiontal scaling **/
+		bool m_protect_h_scaling;
+        /** The protection settings for vertical scaling **/
+        bool m_protect_v_scaling;
 };
     
 }//end of namespace graipe

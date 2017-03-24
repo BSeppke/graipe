@@ -43,18 +43,16 @@
 #include <QListWidget>
 
 
+namespace graipe {
+
+
 /**
- * This file defines the MultiModelParameter class.
+ * This is the MultiModelParameter class.
  * It inherits from the Parameter base class to:
  * - hold an std::vector of Model pointers, and
  * - provide selection facilities by means of a QListWidget.
  * It also provides easy filtering of given Models by their typeName().
  */
-
-
-namespace graipe {
-
-// Class for multiple Model* Parameters
 class GRAIPE_CORE_EXPORT MultiModelParameter
 :   public Parameter
 {
@@ -99,7 +97,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \param value The new value of this parameter.
          */
-        void setValue(const std::vector<Model*>& values);
+        void setValue(const std::vector<Model*>& value);
             
         /**
          * The value converted to a QString. Please note, that this can vary from the 
@@ -119,21 +117,22 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
         void refresh();
             
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Writes comman-separated model list the output device, containing the filename
+         * for each model, like:
+         * "MultModelParameter, file1.bla, file2.blubb"
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
     
         /**
          * This function locks the parameters value. 
@@ -180,19 +179,19 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
         void updateValue();
         
     protected:
-        //The storage for the value of this parameter (list of idxs in m_allowed_models)
+        /** The storage for the value of this parameter (list of idxs in m_allowed_models) **/
         std::vector<int> m_model_idxs;
     
-        //The delegate list widget
+        /** The delegate list widget **/
         QPointer<QListWidget> m_lstDelegate;
     
-        //A vector of all allowed models (listed)
+        /** A vector of all allowed models (listed) **/
         std::vector<Model*>	m_allowed_values;
     
-        //The currently used type-filter
+        /** The currently used type-filter **/
         QString m_type_filter;
     
-        //The currently active locks on the selected models
+        /** The currently active locks on the selected models **/
         std::vector<unsigned int> m_locks;
 };
 

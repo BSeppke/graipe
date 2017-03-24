@@ -140,9 +140,12 @@ class Factory
 		}	
 };
     
-//Promote the three mostly needed types by own names inside the graipe namespace
+//Promote the three mostly needed types by own names inside the graipe namespace:
+/** A Factory for Models **/
 typedef Factory<ModelFactoryItem>     ModelFactory;
+/** A Factory for ViewControllers **/
 typedef Factory<ViewControllerFactoryItem>      ViewControllerFactory;
+/** A Factory for Algorithms **/
 typedef Factory<AlgorithmFactoryItem> AlgorithmFactory;
 
 }//end of namespace graipe

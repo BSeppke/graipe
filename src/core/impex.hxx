@@ -44,8 +44,10 @@
 #include <QString>
 
 
+namespace graipe {
+
 /**
- * This file defines a complete static class for import/export of all
+ * This defines a complete static class for import/export of all
  * serializable objects (of class Serializable). Since each model has
  * to fulfill this interface, the export is quite simple:
  *
@@ -64,10 +66,6 @@
  * Since the headers are usually organized in a dictionary style, 
  * some helper methods are defined here, too.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT Impex
 { 
 	public:

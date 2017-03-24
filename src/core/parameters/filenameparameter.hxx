@@ -43,17 +43,15 @@
 #include <QPushButton>
 
 
+namespace graipe {
+
 /**
- * This file defines the FilenameParameter class.
+ * This is the FilenameParameter class.
  * It inherits from the Parameter base class to:
  * - hold a QString value as the filename, and
  * - provide editing facilities by means of a QLineEdit, which holds the
  *   filename and a QPushButton to show the file selection dialog.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT FilenameParameter
 :   public Parameter
 {
@@ -109,21 +107,20 @@ class GRAIPE_CORE_EXPORT FilenameParameter
         QString valueText() const;
             
         /**
-         * Serialization of the parameter's state to a QString. Please note, that this can 
-         * vary from the valueText() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * Serialization of the parameter's state to an output device.
+         * Basically, just: "FilenameParameter, " + encode_string(value())
          *
-         * \return The serialization of the parameter's state.
+         * \param out The output device on which we serialize the parameter's state.
          */
         void serialize(QIODevice& out) const;
     
         /**
-         * Deserialization of a parameter's state from a QString.
+         * Deserialization of a parameter's state from an input device.
          *
-         * \param str The serialization of this parameter's state.
+         * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& out);
+        bool deserialize(QIODevice& in);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -150,14 +147,15 @@ class GRAIPE_CORE_EXPORT FilenameParameter
         void updateValue();
         
    protected:    
-        //The storage for the value of this parameter
+        /** The storage for the value of this parameter **/
         QString m_value;
     
-        //The parent delegate widget
+        /** The parent delegate widget **/
         QPointer<QWidget> m_delegate;
     
-        //The children delegates inside the parent
+        /** The children delegates inside the parent **/
         QPointer<QLineEdit> m_lneDelegate;
+        /** The children delegates inside the parent **/
         QPointer<QPushButton> m_btnDelegate;
 };
 

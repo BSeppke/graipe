@@ -152,7 +152,7 @@ QDateTime qDateTimeFromNumberDateTime(const QString& str)
  * or:
  *    yyyyMMddhhmmssmicsec
  *
- * \param satellite_format_string The formatted DateTime QString
+ * \param str The formatted DateTime QString
  * 
  * \return QDateTime representation of this string. May be invalid, if conversion fails.
  */
@@ -258,6 +258,7 @@ void Serializable::setFilename (const QString& new_filename)
 
 /**
  * Since we want to identify, we assign the Serializable class an uid.
+ * Should be overwritten in iheriting classes.
  *
  * \return "Serializable" as a QString
  */

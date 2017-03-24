@@ -46,10 +46,24 @@ namespace graipe {
 
 namespace detail
 {
+    //Static vector of all globally defined (non-extra) color tables:
     static QVector<QVector<QRgb> > colorTables;
 }
 
+/**
+ * Helper function to create a color table as a gradient between three colors.
+ * 
+ * \param col1 First color (at start)
+ * \param col2 Second color (at middle)
+ * \param col3 Third color (at end)
+ * \return 256-element color table by means of gradient w.r.t. three colors given.
+ */
 GRAIPE_CORE_EXPORT QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & col2, const QColor & col3);
+
+/**
+ * Accessor for the global color tables
+ * \return The globally defined color tables
+ */
 GRAIPE_CORE_EXPORT QVector<QVector<QRgb> > colorTables();
 
 } //end of namespace graipe
