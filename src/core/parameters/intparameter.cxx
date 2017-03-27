@@ -222,7 +222,7 @@ bool IntParameter::deserialize(QIODevice& in)
  */
 bool IntParameter::isValid() const
 {
-    return value() >= lowerBound() && value() >= upperBound();
+    return value() >= lowerBound() && value() <= upperBound();
 }
 
 /**

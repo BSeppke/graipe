@@ -78,12 +78,23 @@ ParameterGroup* Algorithm::parameters()
  */
 bool Algorithm::parametersValid() const
 {
+    unsigned int i=0;
+    
     for(auto item : *m_parameters)
     {
         //pointer to parameter not existent or parameter not valid?
-		if ( item.second == NULL || !item.second->isValid() )
-			return false;
-	}
+		if ( item.second == NULL)
+        {
+            qDebug() << "ERR for Alg: Null pointer for parameter " << i << "\n";
+            return false;
+        }
+        if( !item.second->isValid() )
+		{
+            qDebug() << "ERR for Alg: parameter " << i << " Name: " << item.second->name() << " is not valid!\n";
+        	return false;
+        }
+        i++;
+    }
 	return true;
 }
 
@@ -105,22 +116,19 @@ void Algorithm::run()
 	//Tell the caller about status updates
 	emit statusMessage(0.0,   QString("Beginning processing"));
 	
-	if (parametersValid())
+	if (!parametersValid())
 	{
+        //Parameters set incorrectly
+		emit errorMessage(QString("Some parameters are not available"));
+     }
+     else
+     {
         //Parameters set correctly set
 		emit statusMessage(1.0,   QString("Parameters are all available"));
 		
 		//Calculate Result
 		emit statusMessage(100.0, QString("Finished processing"));
 	
-		//Tell the upper instance (the separately started thread) to quit
-		emit finished();
-	}
-	else
-    {
-        //Parameters set incorrectly
-		emit errorMessage(QString("Some parameters are not available"));
-		
 		//Tell the upper instance (the separately started thread) to quit
 		emit finished();
 	}

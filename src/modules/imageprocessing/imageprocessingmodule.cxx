@@ -69,71 +69,79 @@ class AddImages
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                MultiModelParameter	* param_images = static_cast<MultiModelParameter*> ((*m_parameters)["images"]);
-                
-                std::vector<Model*> selected_images = param_images->value();
-                
-                if (selected_images.size() == 0)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    emit errorMessage(QString("Explainable error occured: No images have been selected"));
                     
-                }
-                else
-                {
-                
-                    //for each pair of images: add them				
-                    emit statusMessage(1.0, QString("starting computation"));
+                    emit statusMessage(0.0, QString("started"));
                     
-                    //take the first image as a master for size and channels
-                    Image<float>* image = static_cast<Image<float>*>( selected_images[0] );
+                    MultiModelParameter	* param_images = static_cast<MultiModelParameter*> ((*m_parameters)["images"]);
                     
-                    //create new image to do the addition
-                    Image<float>* new_image = new Image<float>(image->size(), image->numBands());
+                    std::vector<Model*> selected_images = param_images->value();
                     
-                    //Copy all metadata from current image (will be overwritten later)
-                    image->copyMetadata(*new_image);
-                    new_image->setName(QString("addition of ") + param_images->valueText());
-                    
-                    //iterate
-                    for(unsigned int i = 0; i < selected_images.size(); ++i)
+                    if (selected_images.size() == 0)
                     {
+                        emit errorMessage(QString("Explainable error occured: No images have been selected"));
                         
-                        image = static_cast<Image<float>*>( selected_images[i] );
-                        
-                        vigra_precondition(image->size() == new_image->size() && image->numBands() == new_image->numBands(), "images are of different size");
-                        
-                        for( unsigned int c=0; c < image->numBands(); c++)
-                        {
-                            using namespace vigra::functor;
-                    
-                            vigra::combineTwoImages(image->band(c),
-                                                    new_image->band(c),
-                                                    new_image->band(c),
-                                                    Arg1()+Arg2());
-                        }
                     }
+                    else
+                    {
                     
-                    m_results.push_back(new_image);
-                    
-                    emit statusMessage(100.0, QString("finished computation"));
-                    emit finished();
+                        //for each pair of images: add them				
+                        emit statusMessage(1.0, QString("starting computation"));
+                        
+                        //take the first image as a master for size and channels
+                        Image<float>* image = static_cast<Image<float>*>( selected_images[0] );
+                        
+                        //create new image to do the addition
+                        Image<float>* new_image = new Image<float>(image->size(), image->numBands());
+                        
+                        //Copy all metadata from current image (will be overwritten later)
+                        image->copyMetadata(*new_image);
+                        new_image->setName(QString("addition of ") + param_images->valueText());
+                        
+                        //iterate
+                        for(unsigned int i = 0; i < selected_images.size(); ++i)
+                        {
+                            
+                            image = static_cast<Image<float>*>( selected_images[i] );
+                            
+                            vigra_precondition(image->size() == new_image->size() && image->numBands() == new_image->numBands(), "images are of different size");
+                            
+                            for( unsigned int c=0; c < image->numBands(); c++)
+                            {
+                                using namespace vigra::functor;
+                        
+                                vigra::combineTwoImages(image->band(c),
+                                                        new_image->band(c),
+                                                        new_image->band(c),
+                                                        Arg1()+Arg2());
+                            }
+                        }
+                        
+                        m_results.push_back(new_image);
+                        
+                        emit statusMessage(100.0, QString("finished computation"));
+                        emit finished();
+                    }
                 }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -167,50 +175,58 @@ class GaussianGradientCalculator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageband	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
-                FloatParameter*	param_gradientSigma = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
-                
-                vigra::MultiArrayView<2,float> imageband = static_cast<vigra::MultiArrayView<2,float>> (param_imageband->value());
-                float sigma = param_gradientSigma->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                vigra::MultiArray<2, vigra::TinyVector<float, 2> > grad(imageband.width(), imageband.height());
-                
-                vigra::VectorComponentAccessor<vigra::FVector2Image::value_type> x_acc(0);
-                vigra::VectorComponentAccessor<vigra::FVector2Image::value_type> y_acc(1);	
-                
-                vigra::gaussianGradientMultiArray(imageband, grad, sigma);
-                
-                DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(grad.bindElementChannel(0), grad.bindElementChannel(1));
-                
-                //Copy only geometry metadata from current image
-                ((Model*)param_imageband->image())->copyGeometry(*new_gradient_vf);
-                
-                new_gradient_vf->setName(QString("Gaussian gradient of ") + param_imageband->image()->name());
-                QString descr("The following parameters were used to determine the gaussian gradient:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_gradient_vf->setDescription(descr);
-            
-                m_results.push_back(new_gradient_vf);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageband	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
+                    FloatParameter*	param_gradientSigma = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
+                    
+                    vigra::MultiArrayView<2,float> imageband = static_cast<vigra::MultiArrayView<2,float>> (param_imageband->value());
+                    float sigma = param_gradientSigma->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    vigra::MultiArray<2, vigra::TinyVector<float, 2> > grad(imageband.width(), imageband.height());
+                    
+                    vigra::VectorComponentAccessor<vigra::FVector2Image::value_type> x_acc(0);
+                    vigra::VectorComponentAccessor<vigra::FVector2Image::value_type> y_acc(1);	
+                    
+                    vigra::gaussianGradientMultiArray(imageband, grad, sigma);
+                    
+                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(grad.bindElementChannel(0), grad.bindElementChannel(1));
+                    
+                    //Copy only geometry metadata from current image
+                    ((Model*)param_imageband->image())->copyGeometry(*new_gradient_vf);
+                    
+                    new_gradient_vf->setName(QString("Gaussian gradient of ") + param_imageband->image()->name());
+                    QString descr("The following parameters were used to determine the gaussian gradient:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_gradient_vf->setDescription(descr);
+                
+                    m_results.push_back(new_gradient_vf);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -250,54 +266,62 @@ class RecursiveSmoothingFilter : public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                FloatParameter	* param_scale      = static_cast<FloatParameter*>((*m_parameters)["sigma"]);
-                //EnumParameter		* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)[2]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Rec. smoothed ") + current_image->name());
-                
-                float scale = param_scale->value();
-                
-                for( unsigned int c=0; c < current_image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    vigra::recursiveSmoothX(current_image->band(c), new_image->band(c), scale);// vigra::BorderTreatmentMode(param_btmode->value()));
-                    vigra::recursiveSmoothY(new_image->band(c), new_image->band(c), scale);//, vigra::BorderTreatmentMode(param_btmode->value())));
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    FloatParameter	* param_scale      = static_cast<FloatParameter*>((*m_parameters)["sigma"]);
+                    //EnumParameter		* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)[2]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Rec. smoothed ") + current_image->name());
+                    
+                    float scale = param_scale->value();
+                    
+                    for( unsigned int c=0; c < current_image->numBands(); c++)
+                    {
+                        vigra::recursiveSmoothX(current_image->band(c), new_image->band(c), scale);// vigra::BorderTreatmentMode(param_btmode->value()));
+                        vigra::recursiveSmoothY(new_image->band(c), new_image->band(c), scale);//, vigra::BorderTreatmentMode(param_btmode->value())));
+                    }
+                    QString descr("The following parameters were used for recursive smoothing:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                QString descr("The following parameters were used for recursive smoothing:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -335,56 +359,63 @@ class GaussianSmoothingFilter : public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                FloatParameter	* param_scale      = static_cast<FloatParameter*>((*m_parameters)["sigma"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Gaussian smoothed ") + current_image->name());
-                
-                float scale = param_scale->value();
-                
-                vigra::Kernel1D<double> gauss;
-                gauss.initGaussian(scale);
-                
-                for( unsigned int c=0; c < current_image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    vigra::separableConvolveX(current_image->band(c), new_image->band(c), gauss);//, vigra::BorderTreatmentMode(param_btmode->value())) );
-                    vigra::separableConvolveY(new_image->band(c), new_image->band(c), gauss);//, vigra::BorderTreatmentMode(param_btmode->value())));
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    FloatParameter	* param_scale      = static_cast<FloatParameter*>((*m_parameters)["sigma"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Gaussian smoothed ") + current_image->name());
+                    
+                    float scale = param_scale->value();
+                    
+                    vigra::Kernel1D<double> gauss;
+                    gauss.initGaussian(scale);
+                    
+                    for( unsigned int c=0; c < current_image->numBands(); c++)
+                    {
+                        vigra::separableConvolveX(current_image->band(c), new_image->band(c), gauss);//, vigra::BorderTreatmentMode(param_btmode->value())) );
+                        vigra::separableConvolveY(new_image->band(c), new_image->band(c), gauss);//, vigra::BorderTreatmentMode(param_btmode->value())));
+                    }
+                    QString descr("The following parameters were used for gaussian smoothing:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                QString descr("The following parameters were used for gaussian smoothing:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -426,64 +457,72 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                FloatParameter	* param_scale      = static_cast<FloatParameter*>((*m_parameters)["sigma"]);
-                ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
-                
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                vigra::MultiArrayView<2,float> mask = param_mask->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Norm. Gauss. smoothed ") + current_image->name());
-                
-                float scale = param_scale->value();
-                
-                vigra::Kernel1D<double> gauss;
-                gauss.initGaussian(scale);
-                
-                vigra::Kernel2D<double> gauss2d;
-                gauss2d.initSeparable(gauss,gauss);
-                
-                for( unsigned int c=0; c < current_image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    vigra::normalizedConvolveImage(current_image->band(c),
-                                                   mask,
-                                                   new_image->band(c), gauss2d);
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    FloatParameter	* param_scale      = static_cast<FloatParameter*>((*m_parameters)["sigma"]);
+                    ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
+                    
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    vigra::MultiArrayView<2,float> mask = param_mask->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Norm. Gauss. smoothed ") + current_image->name());
+                    
+                    float scale = param_scale->value();
+                    
+                    vigra::Kernel1D<double> gauss;
+                    gauss.initGaussian(scale);
+                    
+                    vigra::Kernel2D<double> gauss2d;
+                    gauss2d.initSeparable(gauss,gauss);
+                    
+                    for( unsigned int c=0; c < current_image->numBands(); c++)
+                    {
+                        vigra::normalizedConvolveImage(current_image->band(c),
+                                                       mask,
+                                                       new_image->band(c), gauss2d);
+                    }
+                    QString descr("The following parameters were used for normalized gaussian smoothing:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                QString descr("The following parameters were used for normalized gaussian smoothing:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -524,58 +563,66 @@ class ApplyMaskToImage
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                
-                ModelParameter		* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
-                
-                
-                Image<float>* image = static_cast<Image<float>*>(  param_image->value() );	
-                vigra::MultiArrayView<2,float> mask = param_mask->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(image->size(), image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("masked ") + image->name());
-                
-                for( unsigned int c=0; c < image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    using namespace vigra::functor;
                     
-                    vigra::combineTwoImages(image->band(c),
-                                            mask,
-                                            new_image->band(c),
-                                            Arg1()*Arg2());
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    
+                    ModelParameter		* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
+                    
+                    
+                    Image<float>* image = static_cast<Image<float>*>(  param_image->value() );	
+                    vigra::MultiArrayView<2,float> mask = param_mask->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(image->size(), image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("masked ") + image->name());
+                    
+                    for( unsigned int c=0; c < image->numBands(); c++)
+                    {
+                        using namespace vigra::functor;
+                        
+                        vigra::combineTwoImages(image->band(c),
+                                                mask,
+                                                new_image->band(c),
+                                                Arg1()*Arg2());
+                    }
+                    QString descr("The following parameters were used for masking:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                QString descr("The following parameters were used for masking:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -615,52 +662,60 @@ class MaskErosion
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                
-                ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
-                IntParameter		* param_radius      = static_cast<IntParameter*> ((*m_parameters)["radius"]);
-                
-                
-                vigra::MultiArrayView<2,float> mask = param_mask->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(mask.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_mask->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Mask erosion: ") + param_mask->valueText());
-                
-                vigra::multiBinaryErosion(mask,
-                                   new_image->band(0),
-                                   param_radius->value());
-                
-                QString descr("The following parameters were used for mask erosion:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    
+                    ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
+                    IntParameter		* param_radius      = static_cast<IntParameter*> ((*m_parameters)["radius"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> mask = param_mask->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(mask.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_mask->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Mask erosion: ") + param_mask->valueText());
+                    
+                    vigra::multiBinaryErosion(mask,
+                                       new_image->band(0),
+                                       param_radius->value());
+                    
+                    QString descr("The following parameters were used for mask erosion:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -699,53 +754,61 @@ class MaskDilation
          * Specialization of the running phase of this algorithm.
          */
         void run()
-        {
-            lockModels();
-            try 
+        {        
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                
-                ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
-                IntParameter		* param_radius    = static_cast<IntParameter*> ((*m_parameters)["radius"]);
-                
-                
-                vigra::MultiArrayView<2,float> mask = param_mask->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(mask.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_mask->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Mask dilation: ") + param_mask->valueText());
-                
-                vigra::multiBinaryDilation(mask,
-                                    new_image->band(0),
-                                    param_radius->value());
-                
-                QString descr("The following parameters were used for mask dilation:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr );
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    
+                    ImageBandParameter<float>	* param_mask      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask"]);
+                    IntParameter		* param_radius    = static_cast<IntParameter*> ((*m_parameters)["radius"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> mask = param_mask->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(mask.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_mask->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Mask dilation: ") + param_mask->valueText());
+                    
+                    vigra::multiBinaryDilation(mask,
+                                        new_image->band(0),
+                                        param_radius->value());
+                    
+                    QString descr("The following parameters were used for mask dilation:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr );
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -785,55 +848,63 @@ class MaskUnion
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                            
-                ImageBandParameter<float>	* param_mask1      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask1"]);
-                ImageBandParameter<float>	* param_mask2      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask2"]);
-                
-                
-                vigra::MultiArrayView<2,float> mask1 = param_mask1->value();
-                vigra::MultiArrayView<2,float> mask2 = param_mask2->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(mask1.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_mask1->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Mask union: ") + param_mask1->image()->name() + " and " + param_mask2->image()->name());
-                
-                using namespace vigra::functor;
-                
-                vigra::combineTwoImages(mask1,
-                                        mask2,
-                                        new_image->band(0),
-                                        Arg1() || Arg2());
-                
-                QString descr("The following parameters were used for mask union:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                                
+                    ImageBandParameter<float>	* param_mask1      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask1"]);
+                    ImageBandParameter<float>	* param_mask2      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask2"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> mask1 = param_mask1->value();
+                    vigra::MultiArrayView<2,float> mask2 = param_mask2->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_mask1->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Mask union: ") + param_mask1->image()->name() + " and " + param_mask2->image()->name());
+                    
+                    using namespace vigra::functor;
+                    
+                    vigra::combineTwoImages(mask1,
+                                            mask2,
+                                            new_image->band(0),
+                                            Arg1() || Arg2());
+                    
+                    QString descr("The following parameters were used for mask union:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -869,55 +940,63 @@ class MaskIntersection: public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_mask1      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask1"]);
-                ImageBandParameter<float>	* param_mask2      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask2"]);
-                
-                
-                vigra::MultiArrayView<2,float> mask1 = param_mask1->value();
-                vigra::MultiArrayView<2,float> mask2 = param_mask2->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(mask1.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_mask1->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Mask intersec.: ") + param_mask1->valueText() + " and " + param_mask2->valueText());
-                
-                using namespace vigra::functor;
-                
-                vigra::combineTwoImages(mask1,
-                                        mask2,
-                                        new_image->band(0),
-                                        Arg1() && Arg2());
-                
-                QString descr("The following parameters were used for mask intersection:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_mask1      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask1"]);
+                    ImageBandParameter<float>	* param_mask2      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask2"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> mask1 = param_mask1->value();
+                    vigra::MultiArrayView<2,float> mask2 = param_mask2->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_mask1->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Mask intersec.: ") + param_mask1->valueText() + " and " + param_mask2->valueText());
+                    
+                    using namespace vigra::functor;
+                    
+                    vigra::combineTwoImages(mask1,
+                                            mask2,
+                                            new_image->band(0),
+                                            Arg1() && Arg2());
+                    
+                    QString descr("The following parameters were used for mask intersection:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -955,55 +1034,63 @@ class MaskDifference: public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_mask1      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask1"]);
-                ImageBandParameter<float>	* param_mask2      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask2"]);
-                
-                
-                vigra::MultiArrayView<2,float> mask1 = param_mask1->value();
-                vigra::MultiArrayView<2,float> mask2 = param_mask2->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(mask1.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_mask1->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Mask difference: ") + param_mask1->valueText() + " and " + param_mask2->valueText());
-                
-                using namespace vigra::functor;
-                
-                vigra::combineTwoImages(mask1,
-                                        mask2,
-                                        new_image->band(0),
-                                        Arg1() && !Arg2());
-                
-                QString descr("The following parameters were used for mask difference:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_mask1      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask1"]);
+                    ImageBandParameter<float>	* param_mask2      = static_cast<ImageBandParameter<float>*> ((*m_parameters)["mask2"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> mask1 = param_mask1->value();
+                    vigra::MultiArrayView<2,float> mask2 = param_mask2->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_mask1->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Mask difference: ") + param_mask1->valueText() + " and " + param_mask2->valueText());
+                    
+                    using namespace vigra::functor;
+                    
+                    vigra::combineTwoImages(mask1,
+                                            mask2,
+                                            new_image->band(0),
+                                            Arg1() && !Arg2());
+                    
+                    QString descr("The following parameters were used for mask difference:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1046,78 +1133,86 @@ class ImageCropper
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                
-                IntParameter	* param_ul_x      = static_cast<IntParameter*>((*m_parameters)["ul_x"]);
-                IntParameter	* param_ul_y      = static_cast<IntParameter*>((*m_parameters)["ul_y"]);
-                IntParameter	* param_lr_x      = static_cast<IntParameter*>((*m_parameters)["lr_x"]);
-                IntParameter	* param_lr_y      = static_cast<IntParameter*>((*m_parameters)["lr_y"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                unsigned int ul_x = param_ul_x->value(),
-							 ul_y = param_ul_y->value(),
-                
-			                 lr_x = param_lr_x->value(),
-							 lr_y = param_lr_y->value();
-                
-                vigra_assert( ul_x< lr_x && ul_y < lr_y, "UpperLeft coords have to be smaller than lower right coords");
-                
-                vigra_assert( ul_x>=0 && ul_y>=0, "UpperLeft coords have to be >= (0,0)");
-                vigra_assert( lr_x<= current_image->width() && lr_y<=current_image->height(), "LowerRight coords have to be <= (width,height)");
-                
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(vigra::Shape2(lr_x - ul_x, lr_y - ul_y), current_image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("cropped ") + current_image->name());
-                
-                for( unsigned int c=0; c < current_image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    new_image->setBand(c, current_image->band(c));
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    
+                    IntParameter	* param_ul_x      = static_cast<IntParameter*>((*m_parameters)["ul_x"]);
+                    IntParameter	* param_ul_y      = static_cast<IntParameter*>((*m_parameters)["ul_y"]);
+                    IntParameter	* param_lr_x      = static_cast<IntParameter*>((*m_parameters)["lr_x"]);
+                    IntParameter	* param_lr_y      = static_cast<IntParameter*>((*m_parameters)["lr_y"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    unsigned int ul_x = param_ul_x->value(),
+                                 ul_y = param_ul_y->value(),
+                    
+                                 lr_x = param_lr_x->value(),
+                                 lr_y = param_lr_y->value();
+                    
+                    vigra_assert( ul_x< lr_x && ul_y < lr_y, "UpperLeft coords have to be smaller than lower right coords");
+                    
+                    vigra_assert( ul_x>=0 && ul_y>=0, "UpperLeft coords have to be >= (0,0)");
+                    vigra_assert( lr_x<= current_image->width() && lr_y<=current_image->height(), "LowerRight coords have to be <= (width,height)");
+                    
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(vigra::Shape2(lr_x - ul_x, lr_y - ul_y), current_image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("cropped ") + current_image->name());
+                    
+                    for( unsigned int c=0; c < current_image->numBands(); c++)
+                    {
+                        new_image->setBand(c, current_image->band(c));
+                    }
+                    
+                    QString descr("The following parameters were used for cropping:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    //Set new geometry manually
+                    //Local geometry
+                    new_image->setLeft(current_image->left() + ul_x);	
+                    new_image->setTop(current_image->top() + ul_y);
+                    new_image->setRight(current_image->left() + lr_x);
+                    new_image->setBottom(current_image->top() + lr_y);
+                    new_image->setWidth(lr_x - ul_x);
+                    new_image->setHeight(lr_y - ul_y);
+                    //global geometry
+                    new_image->setGlobalLeft( current_image->globalLeft() + ul_x/current_image->width() * (current_image->globalRight() - current_image->globalLeft()) );
+                    new_image->setGlobalTop( current_image->globalTop()   + ul_y/current_image->height() * (current_image->globalBottom() - current_image->globalTop()) );
+                    new_image->setGlobalRight( current_image->globalLeft() + lr_x/current_image->width() * (current_image->globalRight() - current_image->globalLeft()) );
+                    new_image->setGlobalBottom( current_image->globalTop() + lr_y/current_image->height() * (current_image->globalBottom() - current_image->globalTop()) );
+                    
+                    m_results.push_back(new_image);
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                
-                QString descr("The following parameters were used for cropping:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                //Set new geometry manually
-                //Local geometry
-                new_image->setLeft(current_image->left() + ul_x);	
-                new_image->setTop(current_image->top() + ul_y);
-                new_image->setRight(current_image->left() + lr_x);
-                new_image->setBottom(current_image->top() + lr_y);
-                new_image->setWidth(lr_x - ul_x);
-                new_image->setHeight(lr_y - ul_y);
-                //global geometry
-                new_image->setGlobalLeft( current_image->globalLeft() + ul_x/current_image->width() * (current_image->globalRight() - current_image->globalLeft()) );
-                new_image->setGlobalTop( current_image->globalTop()   + ul_y/current_image->height() * (current_image->globalBottom() - current_image->globalTop()) );
-                new_image->setGlobalRight( current_image->globalLeft() + lr_x/current_image->width() * (current_image->globalRight() - current_image->globalLeft()) );
-                new_image->setGlobalBottom( current_image->globalTop() + lr_y/current_image->height() * (current_image->globalBottom() - current_image->globalTop()) );
-                
-                m_results.push_back(new_image);
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1158,88 +1253,96 @@ class ImageResizer : public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                
-                IntParameter	* param_width			= static_cast<IntParameter*>((*m_parameters)["width"]);
-                IntParameter	* param_height			   = static_cast<IntParameter*>((*m_parameters)["height"]);
-                IntParameter	* param_spline_degree      = static_cast<IntParameter*>((*m_parameters)["degree"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                int width  = param_width->value(),
-                    height = param_height->value();
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(vigra::Shape2(width,height), current_image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("resized ") + current_image->name());
-                
-                for( unsigned int c=0; c < current_image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    switch (param_spline_degree->value())
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    
+                    IntParameter	* param_width			= static_cast<IntParameter*>((*m_parameters)["width"]);
+                    IntParameter	* param_height			   = static_cast<IntParameter*>((*m_parameters)["height"]);
+                    IntParameter	* param_spline_degree      = static_cast<IntParameter*>((*m_parameters)["degree"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    int width  = param_width->value(),
+                        height = param_height->value();
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(vigra::Shape2(width,height), current_image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("resized ") + current_image->name());
+                    
+                    for( unsigned int c=0; c < current_image->numBands(); c++)
                     {
-                        case 5:
-                            vigra::resizeImageSplineInterpolation(current_image->band(c),
-                                                                  new_image->band(c),
-                                                                  vigra::BSpline<5, float>());
-                            break;
-                        case 4:
-                            vigra::resizeImageSplineInterpolation(current_image->band(c),
-                                                                  new_image->band(c),
-                                                                  vigra::BSpline<4, float>());
-                            break;
-                        case 3:
-                            vigra::resizeImageSplineInterpolation(current_image->band(c),
-                                                                  new_image->band(c),
-                                                                  vigra::BSpline<3, float>());
-                            break;
-                        case 2:
-                            vigra::resizeImageSplineInterpolation(current_image->band(c),
-                                                                  new_image->band(c),
-                                                                  vigra::BSpline<2, float>());
-                            break;
-                        case 1:
-                            vigra::resizeImageLinearInterpolation(current_image->band(c),
+                        switch (param_spline_degree->value())
+                        {
+                            case 5:
+                                vigra::resizeImageSplineInterpolation(current_image->band(c),
+                                                                      new_image->band(c),
+                                                                      vigra::BSpline<5, float>());
+                                break;
+                            case 4:
+                                vigra::resizeImageSplineInterpolation(current_image->band(c),
+                                                                      new_image->band(c),
+                                                                      vigra::BSpline<4, float>());
+                                break;
+                            case 3:
+                                vigra::resizeImageSplineInterpolation(current_image->band(c),
+                                                                      new_image->band(c),
+                                                                      vigra::BSpline<3, float>());
+                                break;
+                            case 2:
+                                vigra::resizeImageSplineInterpolation(current_image->band(c),
+                                                                      new_image->band(c),
+                                                                      vigra::BSpline<2, float>());
+                                break;
+                            case 1:
+                                vigra::resizeImageLinearInterpolation(current_image->band(c),
+                                                                      new_image->band(c));
+                                break;
+                            default:
+                            case 0:
+                                vigra::resizeImageNoInterpolation(current_image->band(c),
                                                                   new_image->band(c));
-                            break;
-                        default:
-                        case 0:
-                            vigra::resizeImageNoInterpolation(current_image->band(c),
-                                                              new_image->band(c));
-                            break;
+                                break;
+                        }
                     }
+                    QString descr("The following parameters were used for resizing:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    //overwrite width and heigt
+                    new_image->setWidth(width);
+                    new_image->setHeight(height);
+                    
+                    m_results.push_back(new_image);
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                QString descr("The following parameters were used for resizing:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                //overwrite width and heigt
-                new_image->setWidth(width);
-                new_image->setHeight(height);
-                
-                m_results.push_back(new_image);
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1274,65 +1377,73 @@ class ImageInverter
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                
-                BoolParameter	* param_use_maximum			= static_cast<BoolParameter*>((*m_parameters)["invert"]);
-                IntParameter	* param_offset			   = static_cast<IntParameter*>((*m_parameters)["invert_offset"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //Copy all metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("inverted ") + current_image->name());
-                
-                for( unsigned int c=0; c < current_image->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    float offset = param_offset->value();
                     
-                    if (param_use_maximum->value())
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    
+                    BoolParameter	* param_use_maximum			= static_cast<BoolParameter*>((*m_parameters)["invert"]);
+                    IntParameter	* param_offset			   = static_cast<IntParameter*>((*m_parameters)["invert_offset"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("inverted ") + current_image->name());
+                    
+                    for( unsigned int c=0; c < current_image->numBands(); c++)
                     {
-                        vigra::FindMinMax<vigra::FImage::PixelType> minmax;   // init functor
+                        float offset = param_offset->value();
                         
-                        vigra::inspectImage(current_image->band(c), minmax);
+                        if (param_use_maximum->value())
+                        {
+                            vigra::FindMinMax<vigra::FImage::PixelType> minmax;   // init functor
+                            
+                            vigra::inspectImage(current_image->band(c), minmax);
+                            
+                            offset =  minmax.max;
+                        }
                         
-                        offset =  minmax.max;
+                        using namespace vigra::functor;
+                        
+                        vigra::transformImage(current_image->band(c),
+                                              new_image->band(c),
+                                              Param(offset)-Arg1());
+                        
                     }
-                    
-                    using namespace vigra::functor;
-                    
-                    vigra::transformImage(current_image->band(c),
-                                          new_image->band(c),
-                                          Param(offset)-Arg1());
+                    QString descr("The following parameters were used for inverting:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    m_results.push_back(new_image);
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                     
                 }
-                QString descr("The following parameters were used for inverting:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                m_results.push_back(new_image);
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1376,58 +1487,66 @@ class ImageThresholder
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	   = static_cast<ImageBandParameter<float>*>((*m_parameters)["image"]);
-            
-                FloatParameter	* param_lowerT			   = static_cast<FloatParameter*>((*m_parameters)["low"]);
-                FloatParameter	* param_upperT			   = static_cast<FloatParameter*>((*m_parameters)["hi"]);
-                
-                FloatParameter	* param_mark0			   = static_cast<FloatParameter*>((*m_parameters)["no"]);
-                FloatParameter	* param_mark1			   = static_cast<FloatParameter*>((*m_parameters)["yes"]);
-                
-                
-                vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
-                
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(imageband.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_imageBand->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("thresholded ") + param_imageBand->valueText());
-                
-                using namespace vigra::functor;
-                
-                vigra::transformImage(imageband,
-                                      new_image->band(0),
-                                      ifThenElse(Arg1()<Param(param_lowerT->value()) || Arg1()>Param(param_upperT->value()),
-                                                 Param(param_mark0->value()),
-                                                 Param(param_mark1->value())));
-                
-                QString descr("The following parameters were used for thresholding:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand	   = static_cast<ImageBandParameter<float>*>((*m_parameters)["image"]);
+                
+                    FloatParameter	* param_lowerT			   = static_cast<FloatParameter*>((*m_parameters)["low"]);
+                    FloatParameter	* param_upperT			   = static_cast<FloatParameter*>((*m_parameters)["hi"]);
+                    
+                    FloatParameter	* param_mark0			   = static_cast<FloatParameter*>((*m_parameters)["no"]);
+                    FloatParameter	* param_mark1			   = static_cast<FloatParameter*>((*m_parameters)["yes"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
+                    
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_imageBand->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("thresholded ") + param_imageBand->valueText());
+                    
+                    using namespace vigra::functor;
+                    
+                    vigra::transformImage(imageband,
+                                          new_image->band(0),
+                                          ifThenElse(Arg1()<Param(param_lowerT->value()) || Arg1()>Param(param_upperT->value()),
+                                                     Param(param_mark0->value()),
+                                                     Param(param_mark1->value())));
+                    
+                    QString descr("The following parameters were used for thresholding:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1474,87 +1593,95 @@ class FloatingImageThresholder
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	   = static_cast<ImageBandParameter<float>*>((*m_parameters)["image"]);
-                
-                FloatParameter	* param_lowerT_start	   = static_cast<FloatParameter*>((*m_parameters)["lowS"]);
-                FloatParameter	* param_upperT_start	   = static_cast<FloatParameter*>((*m_parameters)["hiS"]);
-                
-                FloatParameter	* param_lowerT_end		   = static_cast<FloatParameter*>((*m_parameters)["lowE"]);
-                FloatParameter	* param_upperT_end		   = static_cast<FloatParameter*>((*m_parameters)["hiE"]);
-                
-                FloatParameter	* param_mark0			   = static_cast<FloatParameter*>((*m_parameters)["no"]);
-                FloatParameter	* param_mark1			   = static_cast<FloatParameter*>((*m_parameters)["yes"]);
-                
-                BoolParameter		* param_horizontally	   = static_cast<BoolParameter*>((*m_parameters)["horizontal"]);
-
-                
-                vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
-                
-                float temp_val, temp_lowerT, temp_upperT;
-                
-                vigra::MultiArray<2,float> res(imageband.shape());
-                
-                for(unsigned int y=0; y< imageband.height(); y++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    for(unsigned int x=0; x< imageband.width(); x++)
-                    {
-                        temp_val = imageband(x,y);
-                        if( param_horizontally->value() )
-                        {
-                            temp_lowerT = param_lowerT_start->value() + float(x)/imageband.width()*(param_lowerT_end->value() - param_lowerT_start->value());
-                            temp_upperT = param_upperT_start->value() + float(x)/imageband.width()*(param_upperT_end->value() - param_upperT_start->value());
-                        }
-                        else 
-                        {							
-                            temp_lowerT = param_lowerT_start->value() + float(y)/imageband.height()*(param_lowerT_end->value() - param_lowerT_start->value());
-                            temp_upperT = param_upperT_start->value() + float(y)/imageband.height()*(param_upperT_end->value() - param_upperT_start->value());
-                        }
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand	   = static_cast<ImageBandParameter<float>*>((*m_parameters)["image"]);
+                    
+                    FloatParameter	* param_lowerT_start	   = static_cast<FloatParameter*>((*m_parameters)["lowS"]);
+                    FloatParameter	* param_upperT_start	   = static_cast<FloatParameter*>((*m_parameters)["hiS"]);
+                    
+                    FloatParameter	* param_lowerT_end		   = static_cast<FloatParameter*>((*m_parameters)["lowE"]);
+                    FloatParameter	* param_upperT_end		   = static_cast<FloatParameter*>((*m_parameters)["hiE"]);
+                    
+                    FloatParameter	* param_mark0			   = static_cast<FloatParameter*>((*m_parameters)["no"]);
+                    FloatParameter	* param_mark1			   = static_cast<FloatParameter*>((*m_parameters)["yes"]);
+                    
+                    BoolParameter		* param_horizontally	   = static_cast<BoolParameter*>((*m_parameters)["horizontal"]);
 
-                        if(temp_val<temp_lowerT || temp_val>temp_upperT )
+                    
+                    vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
+                    
+                    float temp_val, temp_lowerT, temp_upperT;
+                    
+                    vigra::MultiArray<2,float> res(imageband.shape());
+                    
+                    for(unsigned int y=0; y< imageband.height(); y++)
+                    {
+                        for(unsigned int x=0; x< imageband.width(); x++)
                         {
-                            res(x,y) = param_mark0->value();
-                        }
-                        else 
-                        {
-                            res(x,y) = param_mark1->value();
+                            temp_val = imageband(x,y);
+                            if( param_horizontally->value() )
+                            {
+                                temp_lowerT = param_lowerT_start->value() + float(x)/imageband.width()*(param_lowerT_end->value() - param_lowerT_start->value());
+                                temp_upperT = param_upperT_start->value() + float(x)/imageband.width()*(param_upperT_end->value() - param_upperT_start->value());
+                            }
+                            else 
+                            {							
+                                temp_lowerT = param_lowerT_start->value() + float(y)/imageband.height()*(param_lowerT_end->value() - param_lowerT_start->value());
+                                temp_upperT = param_upperT_start->value() + float(y)/imageband.height()*(param_upperT_end->value() - param_upperT_start->value());
+                            }
+
+                            if(temp_val<temp_lowerT || temp_val>temp_upperT )
+                            {
+                                res(x,y) = param_mark0->value();
+                            }
+                            else 
+                            {
+                                res(x,y) = param_mark1->value();
+                            }
                         }
                     }
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    new_image->setBand(0, res);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_imageBand->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("floating thresholded ") + param_imageBand->valueText());
+                    
+                    
+                    QString descr("The following parameters were used for floating thresholding:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
                 }
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(imageband.shape(), 1);
-                new_image->setBand(0, res);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_imageBand->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("floating thresholded ") + param_imageBand->valueText());
-                
-                
-                QString descr("The following parameters were used for floating thresholding:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1605,130 +1732,138 @@ class ThinLineExtractor
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*>((*m_parameters)["mask"]);
-                
-                FloatParameter	* param_maxWidth		= static_cast<FloatParameter*>((*m_parameters)["linewidth"]);
-                
-                EnumParameter * param_stat_mode			= static_cast<EnumParameter*>((*m_parameters)["regions"]);
-                
-                FloatParameter	* param_mark0			= static_cast<FloatParameter*>((*m_parameters)["no"]);
-                FloatParameter	* param_mark1			= static_cast<FloatParameter*>((*m_parameters)["yes"]);
-                
-                BoolParameter	* param_saveRegionDists		= static_cast<BoolParameter*>((*m_parameters)["save"]);
-                
-                vigra::MultiArrayView<2,float> imageband =  param_imageBand->value();
-                
-                vigra::MultiArray<2, float> res(imageband.shape());
-                vigra::MultiArray<2, float> res_stats_val(imageband.shape());
-                vigra::MultiArray<2, float> res_stats_var(imageband.shape());
-                
-                using namespace vigra::functor;
-                vigra::distanceTransform(imageband, res,1 ,2);
-                
-                
-                //label image
-                vigra::MultiArray<2,unsigned int> labels(imageband.shape());
-                unsigned int max_label = vigra::labelImageWithBackground(imageband, labels, false, 0);
-                
-                // init functor as an array of 'max_label' FindMinMax-Functors
-                vigra::ArrayOfRegionStatistics<vigra::FindMinMax<float> > minmax(max_label);
-                vigra::inspectTwoImages(res, labels, minmax);
-                
-                // init functor as an array of 'max_label' FindAverage-Functors
-                vigra::ArrayOfRegionStatistics<vigra::FindAverageAndVariance<float> > average_variance(max_label);
-                vigra::inspectTwoImages(res, labels, average_variance);
-                
-                for (unsigned int y=0; y < (unsigned int)labels.height(); ++y)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    for (unsigned int x=0; x < (unsigned int)labels.width(); ++x)
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    
+                    ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*>((*m_parameters)["mask"]);
+                    
+                    FloatParameter	* param_maxWidth		= static_cast<FloatParameter*>((*m_parameters)["linewidth"]);
+                    
+                    EnumParameter * param_stat_mode			= static_cast<EnumParameter*>((*m_parameters)["regions"]);
+                    
+                    FloatParameter	* param_mark0			= static_cast<FloatParameter*>((*m_parameters)["no"]);
+                    FloatParameter	* param_mark1			= static_cast<FloatParameter*>((*m_parameters)["yes"]);
+                    
+                    BoolParameter	* param_saveRegionDists		= static_cast<BoolParameter*>((*m_parameters)["save"]);
+                    
+                    vigra::MultiArrayView<2,float> imageband =  param_imageBand->value();
+                    
+                    vigra::MultiArray<2, float> res(imageband.shape());
+                    vigra::MultiArray<2, float> res_stats_val(imageband.shape());
+                    vigra::MultiArray<2, float> res_stats_var(imageband.shape());
+                    
+                    using namespace vigra::functor;
+                    vigra::distanceTransform(imageband, res,1 ,2);
+                    
+                    
+                    //label image
+                    vigra::MultiArray<2,unsigned int> labels(imageband.shape());
+                    unsigned int max_label = vigra::labelImageWithBackground(imageband, labels, false, 0);
+                    
+                    // init functor as an array of 'max_label' FindMinMax-Functors
+                    vigra::ArrayOfRegionStatistics<vigra::FindMinMax<float> > minmax(max_label);
+                    vigra::inspectTwoImages(res, labels, minmax);
+                    
+                    // init functor as an array of 'max_label' FindAverage-Functors
+                    vigra::ArrayOfRegionStatistics<vigra::FindAverageAndVariance<float> > average_variance(max_label);
+                    vigra::inspectTwoImages(res, labels, average_variance);
+                    
+                    for (unsigned int y=0; y < (unsigned int)labels.height(); ++y)
                     {
-                        if( imageband(x,y)  == 0)
-                            continue;
-                        
-                        float val=0;
-                        
-                        switch (param_stat_mode->value())
+                        for (unsigned int x=0; x < (unsigned int)labels.width(); ++x)
                         {
-                            case 1:
-                                val = minmax[labels(x,y)].min;
-                                break;
-                            case 2:
-                                val = minmax[labels(x,y)].max;
-                                break;
-                            default:
-                            case 0:
-                                val = average_variance[labels(x,y)].average();
-                                break;
-                        }
-                        
-                        res_stats_val(x,y) = val;
-                        res_stats_var(x,y) = average_variance[labels(x,y)].variance();
-                        
-                        if(val < param_maxWidth->value()/2.0)
-                        {
-                            res(x,y) = param_mark1->value();
-                        }
-                        else
-                        {
-                            res(x,y) = param_mark0->value();
-                        }
-                        
-                    }
-                }
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(imageband.shape(), 1);
-                new_image->setBand(0, res);
-                
-                Image<float>* new_stat_image = new Image<float>(imageband.shape(), 2);
-                new_stat_image->setBand(0, res_stats_val);
-                new_stat_image->setBand(1, res_stats_val);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_imageBand->image()->copyMetadata(*new_image);
-                param_imageBand->image()->copyMetadata(*new_stat_image);
-                
-                new_image->setName(QString("filtered ") + param_imageBand->valueText());
-                new_stat_image->setName(QString("region stats. of filtered ") + param_imageBand->valueText());
-                
-                
-                QString descr("The following parameters were used for finding thin lines:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
+                            if( imageband(x,y)  == 0)
+                                continue;
                             
-                m_results.push_back(new_image);
-                
-                if( param_saveRegionDists->value() )
-                {
-                    new_stat_image->setDescription(descr + "Band 0: distance value\nBand 1: variance of distance in region\n");
-                    m_results.push_back(new_stat_image);
-                }
-                else
-                {
-                    delete new_stat_image;
-                }
+                            float val=0;
+                            
+                            switch (param_stat_mode->value())
+                            {
+                                case 1:
+                                    val = minmax[labels(x,y)].min;
+                                    break;
+                                case 2:
+                                    val = minmax[labels(x,y)].max;
+                                    break;
+                                default:
+                                case 0:
+                                    val = average_variance[labels(x,y)].average();
+                                    break;
+                            }
+                            
+                            res_stats_val(x,y) = val;
+                            res_stats_var(x,y) = average_variance[labels(x,y)].variance();
+                            
+                            if(val < param_maxWidth->value()/2.0)
+                            {
+                                res(x,y) = param_mark1->value();
+                            }
+                            else
+                            {
+                                res(x,y) = param_mark0->value();
+                            }
+                            
+                        }
+                    }
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    new_image->setBand(0, res);
+                    
+                    Image<float>* new_stat_image = new Image<float>(imageband.shape(), 2);
+                    new_stat_image->setBand(0, res_stats_val);
+                    new_stat_image->setBand(1, res_stats_val);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_imageBand->image()->copyMetadata(*new_image);
+                    param_imageBand->image()->copyMetadata(*new_stat_image);
+                    
+                    new_image->setName(QString("filtered ") + param_imageBand->valueText());
+                    new_stat_image->setName(QString("region stats. of filtered ") + param_imageBand->valueText());
+                    
+                    
+                    QString descr("The following parameters were used for finding thin lines:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                                
+                    m_results.push_back(new_image);
+                    
+                    if( param_saveRegionDists->value() )
+                    {
+                        new_stat_image->setDescription(descr + "Band 0: distance value\nBand 1: variance of distance in region\n");
+                        m_results.push_back(new_stat_image);
+                    }
+                    else
+                    {
+                        delete new_stat_image;
+                    }
 
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -1767,44 +1902,52 @@ class DistanceTransformator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*>((*m_parameters)["mask"]);			
-                
-                vigra::MultiArrayView<2,float> imageband =  param_imageBand->value();
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(imageband.shape(), 1);
-                
-                //Copy all metadata from current image (will be overwritten later)
-                param_imageBand->image()->copyMetadata(*new_image);
-                
-                new_image->setName(QString("distance transform of ") + param_imageBand->valueText());
-                
-                using namespace vigra::functor;
-                vigra::distanceTransform(imageband, new_image->band(0), 1 ,2);
-                
-                QString descr("No parameters needed for distance transform!");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-                
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*>((*m_parameters)["mask"]);			
+                    
+                    vigra::MultiArrayView<2,float> imageband =  param_imageBand->value();
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    
+                    //Copy all metadata from current image (will be overwritten later)
+                    param_imageBand->image()->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("distance transform of ") + param_imageBand->valueText());
+                    
+                    using namespace vigra::functor;
+                    vigra::distanceTransform(imageband, new_image->band(0), 1 ,2);
+                    
+                    QString descr("No parameters needed for distance transform!");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                    
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 

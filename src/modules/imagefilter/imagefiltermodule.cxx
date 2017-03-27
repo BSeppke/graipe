@@ -124,61 +124,68 @@ class FrostFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                FloatParameter	* param_damping_k  = static_cast<FloatParameter*>((*m_parameters)["k"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Frost Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    frostFilter(current_image->band(m_phase),
-                                new_image->band(m_phase),
-                                vigra::Diff2D(param_windowSize->value(),param_windowSize->value()),
-                                param_damping_k->value(),
-                                vigra::BorderTreatmentMode(param_btmode->value()));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    FloatParameter	* param_damping_k  = static_cast<FloatParameter*>((*m_parameters)["k"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Frost Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        frostFilter(current_image->band(m_phase),
+                                    new_image->band(m_phase),
+                                    vigra::Diff2D(param_windowSize->value(),param_windowSize->value()),
+                                    param_damping_k->value(),
+                                    vigra::BorderTreatmentMode(param_btmode->value()));
+                                    
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
                                 
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -222,62 +229,69 @@ class EnhancedFrostFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                FloatParameter	* param_damping_k  = static_cast<FloatParameter*>((*m_parameters)["k"]);
-                IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                            
-                new_image->setName(QString("Enh. Frost Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    enhancedFrostFilter(current_image->band(m_phase),
-                                        new_image->band(m_phase),
-                                        vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
-                                        param_damping_k->value(), param_enl->value(),
-                                        vigra::BorderTreatmentMode(param_btmode->value()));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    FloatParameter	* param_damping_k  = static_cast<FloatParameter*>((*m_parameters)["k"]);
+                    IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                                
+                    new_image->setName(QString("Enh. Frost Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        enhancedFrostFilter(current_image->band(m_phase),
+                                            new_image->band(m_phase),
+                                            vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
+                                            param_damping_k->value(), param_enl->value(),
+                                            vigra::BorderTreatmentMode(param_btmode->value()));
+                        
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -322,61 +336,68 @@ class GammaMAPFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                FloatParameter	* param_enl        = static_cast<FloatParameter*>((*m_parameters)["ENL"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Gamma Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    gammaMAPFilter(current_image->band(m_phase),
-                                   new_image->band(m_phase),
-                                   vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
-                                   param_enl->value(),
-                                   vigra::BorderTreatmentMode(param_btmode->value()));
-                                   
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    FloatParameter	* param_enl        = static_cast<FloatParameter*>((*m_parameters)["ENL"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Gamma Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        gammaMAPFilter(current_image->band(m_phase),
+                                       new_image->band(m_phase),
+                                       vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
+                                       param_enl->value(),
+                                       vigra::BorderTreatmentMode(param_btmode->value()));
+                                       
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -419,61 +440,68 @@ class KuanFilter
          */
         void run()
         {
-            lockModels();
-         
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Kuan Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    kuanFilter(current_image->band(m_phase),
-                               new_image->band(m_phase),
-                               vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
-                               param_enl->value(),
-                               vigra::BorderTreatmentMode(param_btmode->value()));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Kuan Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        kuanFilter(current_image->band(m_phase),
+                                   new_image->band(m_phase),
+                                   vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
+                                   param_enl->value(),
+                                   vigra::BorderTreatmentMode(param_btmode->value()));
+                        
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -516,61 +544,68 @@ class LeeFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Lee Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    leeFilter(current_image->band(m_phase),
-                              new_image->band(m_phase),
-                              vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
-                              param_enl->value(),
-                              vigra::BorderTreatmentMode(param_btmode->value()));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(param_image->value());
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Lee Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        leeFilter(current_image->band(m_phase),
+                                  new_image->band(m_phase),
+                                  vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
+                                  param_enl->value(),
+                                  vigra::BorderTreatmentMode(param_btmode->value()));
+                        
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -617,62 +652,69 @@ class EnhancedLeeFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                FloatParameter	* param_damping_k  = static_cast<FloatParameter*>((*m_parameters)["k"]);
-                IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Enh. Lee Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    enhancedLeeFilter(current_image->band(m_phase),
-                                      new_image->band(m_phase),
-                                      vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
-                                      param_damping_k->value(), param_enl->value(),
-                                      vigra::BorderTreatmentMode(param_btmode->value()));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    FloatParameter	* param_damping_k  = static_cast<FloatParameter*>((*m_parameters)["k"]);
+                    IntParameter	* param_enl		   = static_cast<IntParameter*>((*m_parameters)["ENL"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Enh. Lee Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        enhancedLeeFilter(current_image->band(m_phase),
+                                          new_image->band(m_phase),
+                                          vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
+                                          param_damping_k->value(), param_enl->value(),
+                                          vigra::BorderTreatmentMode(param_btmode->value()));
+                        
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -714,59 +756,66 @@ class MedianFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
-                EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Median Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    medianFilter(current_image->band(m_phase),
-                                 new_image->band(m_phase),
-                                 vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
-                                 vigra::BorderTreatmentMode(param_btmode->value()));
-                                         
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    IntParameter	* param_windowSize = static_cast<IntParameter*>((*m_parameters)["size"]);
+                    EnumParameter	* param_btmode     = static_cast<EnumParameter*> ((*m_parameters)["bt"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Median Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        medianFilter(current_image->band(m_phase),
+                                     new_image->band(m_phase),
+                                     vigra::Diff2D(param_windowSize->value(), param_windowSize->value()),
+                                     vigra::BorderTreatmentMode(param_btmode->value()));
+                                             
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
+                    
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -810,61 +859,68 @@ class ShockFilter
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
-                FloatParameter	* param_iSigma     = static_cast<FloatParameter*>((*m_parameters)["sigma1"]);
-                FloatParameter	* param_oSigma     = static_cast<FloatParameter*>((*m_parameters)["sigma2"]);
-                FloatParameter	* param_upwind     = static_cast<FloatParameter*>((*m_parameters)["upwind"]);
-                IntParameter	* param_iterations = static_cast<IntParameter*>((*m_parameters)["iterations"]);
-                
-                Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new image and do the transform
-                Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
-                
-                //copy metadata from current image (will be overwritten later)
-                current_image->copyMetadata(*new_image);
-                
-                new_image->setName(QString("Shock Filtered ") + current_image->name());
-                
-                m_phase_count = current_image->numBands();
-                
-                for( m_phase=0; m_phase < m_phase_count; m_phase++)
-                {	
-                    shockFilter(current_image->band(m_phase),
-                                new_image->band(m_phase),
-                                param_iSigma->value(), param_oSigma->value(),
-                                param_upwind->value(), param_iterations->value());
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                    emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
-                }
+                    ModelParameter	* param_image      = static_cast<ModelParameter*> ((*m_parameters)["image"]);
+                    FloatParameter	* param_iSigma     = static_cast<FloatParameter*>((*m_parameters)["sigma1"]);
+                    FloatParameter	* param_oSigma     = static_cast<FloatParameter*>((*m_parameters)["sigma2"]);
+                    FloatParameter	* param_upwind     = static_cast<FloatParameter*>((*m_parameters)["upwind"]);
+                    IntParameter	* param_iterations = static_cast<IntParameter*>((*m_parameters)["iterations"]);
+                    
+                    Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new image and do the transform
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    
+                    //copy metadata from current image (will be overwritten later)
+                    current_image->copyMetadata(*new_image);
+                    
+                    new_image->setName(QString("Shock Filtered ") + current_image->name());
+                    
+                    m_phase_count = current_image->numBands();
+                    
+                    for( m_phase=0; m_phase < m_phase_count; m_phase++)
+                    {	
+                        shockFilter(current_image->band(m_phase),
+                                    new_image->band(m_phase),
+                                    param_iSigma->value(), param_oSigma->value(),
+                                    param_upwind->value(), param_iterations->value());
+                        
+                        emit statusMessage(m_phase*99.0/m_phase_count, QString("filtering"));
+                    }
 
-                QString descr("The following parameters were used for filtering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                            
-                delete m_results[0];
-                m_results[0] = new_image;
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    QString descr("The following parameters were used for filtering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                                
+                    delete m_results[0];
+                    m_results[0] = new_image;
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 

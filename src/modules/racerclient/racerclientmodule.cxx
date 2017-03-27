@@ -126,422 +126,300 @@ class RacerInterpreter
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                Vectorfield2D* measured_vf = static_cast<Vectorfield2D*>(  m_param_measured_vectorfield->value() );
-                
-                if (measured_vf->scale() == 0)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the measured vf.");
-                }
-                
-                QString abox_filename = m_param_abox_filename->value();
-                QString tbox_filename = m_param_tbox_filename->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                RacerConnection conn;
-                
-                unsigned int connection_timeout =		 5*	1000; //5 secs
-                unsigned int tbox_timeout =				60*	1000; //1 min
-                unsigned int abox_timeout =				60*	1000; //1 min
-                unsigned int query_timeout =		30*	60*	1000; //30 min
-                
-                qDebug("Trying to connect to the RACER server");
-                conn.connectToServer(connection_timeout);
-                
-                if(conn.connected())
-                {
-                    //qInfo() << "Connected with RACER SERVER? " << conn.connected() <<"\n"
-                    //			<< "ipAddress: " << conn.ipAddress() << "\n"
-                    //			<< "port:      " << conn.port() << "\n"
-                    //			<< "racer version:      " << conn.racerVersion() << "\n";
+                    emit statusMessage(0.0, QString("started"));
                     
-                    QString request,result;
+                    Vectorfield2D* measured_vf = static_cast<Vectorfield2D*>(  m_param_measured_vectorfield->value() );
                     
-                    if(!tbox_filename.isEmpty())
+                    if (measured_vf->scale() == 0)
                     {
-                        request = "(racer-read-file \"" + tbox_filename + "\")";
-                        result = conn.send(request, tbox_timeout);
+                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the measured vf.");
                     }
                     
-                    //If T-Box has been loaded, we proceed
-                    if(result != "")
-                    {					
-                        //qDebug() << "Received result from RACER after loading TBox: " << result << "\n";
+                    QString abox_filename = m_param_abox_filename->value();
+                    QString tbox_filename = m_param_tbox_filename->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    RacerConnection conn;
+                    
+                    unsigned int connection_timeout =		 5*	1000; //5 secs
+                    unsigned int tbox_timeout =				60*	1000; //1 min
+                    unsigned int abox_timeout =				60*	1000; //1 min
+                    unsigned int query_timeout =		30*	60*	1000; //30 min
+                    
+                    qDebug("Trying to connect to the RACER server");
+                    conn.connectToServer(connection_timeout);
+                    
+                    if(conn.connected())
+                    {
+                        //qInfo() << "Connected with RACER SERVER? " << conn.connected() <<"\n"
+                        //			<< "ipAddress: " << conn.ipAddress() << "\n"
+                        //			<< "port:      " << conn.port() << "\n"
+                        //			<< "racer version:      " << conn.racerVersion() << "\n";
                         
-                        std::vector<QString> directions(8);
-                        directions[0] = "north";
-                        directions[1] = "northeast";
-                        directions[2] = "east";
-                        directions[3] = "southeast";
-                        directions[4] = "south";
-                        directions[5] = "southwest";
-                        directions[6] = "west";
-                        directions[7] = "northwest";
+                        QString request,result;
                         
-                        QTextStream* filestream  = NULL;
-                        
-                        if(m_param_save_abox->value())
+                        if(!tbox_filename.isEmpty())
                         {
-                            QFile file(abox_filename);
-                            if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-                            {
-                                filestream = new QTextStream(&file);
-                            }
+                            request = "(racer-read-file \"" + tbox_filename + "\")";
+                            result = conn.send(request, tbox_timeout);
                         }
                         
-                        if (m_param_use_wind->value())
-                        {
-                            Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );	
+                        //If T-Box has been loaded, we proceed
+                        if(result != "")
+                        {					
+                            //qDebug() << "Received result from RACER after loading TBox: " << result << "\n";
                             
-                            if(wind_vf != NULL)
+                            std::vector<QString> directions(8);
+                            directions[0] = "north";
+                            directions[1] = "northeast";
+                            directions[2] = "east";
+                            directions[3] = "southeast";
+                            directions[4] = "south";
+                            directions[5] = "southwest";
+                            directions[6] = "west";
+                            directions[7] = "northwest";
+                            
+                            QTextStream* filestream  = NULL;
+                            
+                            if(m_param_save_abox->value())
                             {
-                                if (wind_vf->scale() == 0)
+                                QFile file(abox_filename);
+                                if (file.open(QIODevice::WriteOnly | QIODevice::Text))
                                 {
-                                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the wind vf.");
-                                    
-                                    conn.disconnect();
-                                }
-                                else
-                                {
-                                    //only add wind vectors to abox, which have a role relation with a measured vector:
-                                    for(unsigned int i=0; i<wind_vf->size(); ++i)
-                                    {
-                                        
-                                        QTransform wind_vf_transform = wind_vf->globalTransformation();
-                                        
-                                        QPointF t_i = wind_vf_transform.map(QPointF(wind_vf->origin(i).x(), wind_vf->origin(i).y()));
-                                        QPointF t_j;
-                                        
-                                        for(unsigned int j=0; j<measured_vf->size(); ++j)
-                                        {
-                                            QTransform measured_vf_transform = measured_vf->globalTransformation();
-                                            
-                                            t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
-                                            
-                                            float distance = distanceOnEarth(t_i, t_j);
-                                            
-                                            if (distance <= m_param_distance3->value())
-                                            {
-                                                QString name = QString("wind%1").arg(i);
-                                                
-                                                QTextStream datastream;
-                                                
-                                                //add the concept
-                                                datastream <<  "(instance " << name << " (and windcurrent\n";
-                                                
-                                                //find out direction (in qualitative description)
-                                                QString angle_str = directions[std::min(7.0,std::max(0.0, double(wind_vf->angle(i)) / 360 * directions.size()))];
-                                                datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                                                
-                                                //find out velocity (in qualitative description)
-                                                float velocity = wind_vf->length(i)*wind_vf->scale();
-                                                
-                                                if (velocity != 0)
-                                                {
-                                                    QString  velocity_str;
-                                                    if (velocity<= m_param_velocity1->value())
-                                                    {
-                                                        velocity_str = "low";
-                                                    }
-                                                    else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                                                    {
-                                                        velocity_str = "moderate";
-                                                    }
-                                                    else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                                                    {
-                                                        velocity_str = "high";
-                                                    }
-                                                    if (!velocity_str.isEmpty())
-                                                        datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                                                    
-                                                    //Close idividual descriptor:
-                                                    datastream << "))\n\n";
-                                                    
-                                                    QString request = datastream.readAll();
-                                                    if(filestream)
-                                                    {
-                                                        *filestream << request;
-                                                    }
-                                                    
-                                                    //Send ABox for current wind vector to RACER
-                                                    result =  conn.send(request, abox_timeout);
-                                                    if (result.isEmpty())
-                                                    {
-                                                        break;
-                                                    }
-                                                }
-                                                
-                                                break; //break out of inner for loop
-                                            }
-                                        }
-                                    }
+                                    filestream = new QTextStream(&file);
                                 }
                             }
-                        }
-                        
-                        if (m_param_use_modelled_currents->value())
-                        {
-                            Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );	
-                            
-                            if(modelled_vf != NULL)
-                            {
-                                if (modelled_vf->scale() == 0)
-                                {
-                                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the modelled vf.");
-                                    
-                                    conn.disconnect();
-                                }
-                                else
-                                {
-                                    //only add modelled vectors to abox, which have a role relation with a measured vector:
-                                    for(unsigned int i=0; i<modelled_vf->size(); ++i)
-                                    {
-                                        
-                                        QTransform modelled_vf_transform = modelled_vf->globalTransformation();
-                                        
-                                        QPointF t_i = modelled_vf_transform.map(QPointF(modelled_vf->origin(i).x(), modelled_vf->origin(i).y()));
-                                        QPointF t_j;
-                                        
-                                        for(unsigned int j=0; j<measured_vf->size(); ++j)
-                                        {
-                                            QTransform measured_vf_transform = measured_vf->globalTransformation();
-                                            
-                                            t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
-                                            
-                                            float distance = distanceOnEarth(t_i, t_j);
-                                            
-                                            if (distance <= m_param_distance3->value())
-                                            {
-                                                QString name = QString("modelled%1").arg(i);
-                                                
-                                                QTextStream datastream;
-                                                
-                                                //add the concept
-                                                datastream <<  "(instance " << name << " (and modelledcurrent\n";
-                                                
-                                                //find out direction (in qualitative description)
-                                                QString angle_str = directions[std::min(7.0,std::max(0.0, double(modelled_vf->angle(i)) / 360 * directions.size()))];
-                                                datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                                                
-                                                //find out velocity (in qualitative description)
-                                                float velocity = modelled_vf->length(i)*modelled_vf->scale();
-                                                
-                                                if (velocity != 0)
-                                                {
-                                                    QString  velocity_str;
-                                                    if (velocity<= m_param_velocity1->value())
-                                                    {
-                                                        velocity_str = "low";
-                                                    }
-                                                    else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                                                    {
-                                                        velocity_str = "moderate";
-                                                    }
-                                                    else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                                                    {
-                                                        velocity_str = "high";
-                                                    }
-                                                    if (!velocity_str.isEmpty())
-                                                        datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                                                    
-                                                    //Close idividual descriptor:
-                                                    datastream << "))\n\n";
-                                                    
-                                                    QString request = datastream.readAll();
-                                                    
-                                                    if(filestream)
-                                                    {
-                                                        *filestream << request;
-                                                    }
-                                                    
-                                                    //Send ABox for current modelled vector to RACER
-                                                    result =  conn.send(request, abox_timeout);
-                                                    if (result.isEmpty())
-                                                    {
-                                                        break;
-                                                    }
-                                                }
-                                                
-                                                break; //break out of inner for loop
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        //for each measured vector:
-                        for(unsigned int i=0; i<measured_vf->size(); ++i)
-                        {
-                            QString name = QString("measured%1").arg(i);
-                            
-                            QTextStream datastream;
-                            
-                            //add the concept
-                            datastream <<  "(instance " << name << " (and measuredcurrent\n";
-                            
-                            //find out direction (in qualitative description)
-                            QString angle_str= directions[std::min(7.0,std::max(0.0, double(measured_vf->angle(i)) / 360 * directions.size()))];
-                            datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                            
-                            //find out velocity (in qualitative description)
-                            float velocity = measured_vf->length(i)*measured_vf->scale();
-                            
-                            
-                            QString  velocity_str;
-                            if (velocity<= m_param_velocity1->value())
-                            {
-                                velocity_str = "low";
-                            }
-                            else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                            {
-                                velocity_str = "moderate";
-                            }
-                            else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                            {
-                                velocity_str = "high";
-                            }
-                            if (!velocity_str.isEmpty())
-                                datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                            
-                            //Close idividual descriptor:
-                            datastream << "))\n";
-                            QString request = datastream.readAll();
-                            
-                            if(filestream)
-                            {
-                                *filestream << request;
-                            }
-                            
-                            //Send ABox for current vector to RACER
-                            result =  conn.send(request, abox_timeout);
-                            if (result.isEmpty())
-                            {
-                                qDebug() << "Error at datastream: " << request;
-                                break;
-                            }
-                        }
-                        
-                        //for each measured vector determine role relations:
-                        for(unsigned int i=0; i<measured_vf->size(); ++i)
-                        {
-                            QString name = QString("measured%1").arg(i);
-                            
-                            QTextStream datastream;
-                            QTransform measured_vf_transform = measured_vf->globalTransformation();
-                            
-                            QPointF t_i = measured_vf_transform.map(QPointF(measured_vf->origin(i).x(), measured_vf->origin(i).y()));
-                            QPointF t_j;
                             
                             if (m_param_use_wind->value())
                             {
-                                Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );
+                                Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );	
+                                
                                 if(wind_vf != NULL)
                                 {
-                                    QTransform wind_vf_transform = wind_vf->globalTransformation();
-                                    
-                                    //find out distant wind individuals (in qualitative description)
-                                    //for each neighbor wind vector:
-                                    for(unsigned int j=0; j<wind_vf->size(); ++j)
+                                    if (wind_vf->scale() == 0)
                                     {
-                                        QString neighbor_name = QString("wind%1").arg(j);
+                                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the wind vf.");
                                         
-                                        t_j = wind_vf_transform.map(QPointF(wind_vf->origin(j).x(), wind_vf->origin(j).y()));
-                                        
-                                        float distance = distanceOnEarth(t_i, t_j);
-                                        
-                                        QString distance_str;
-                                        if (distance <= m_param_distance1->value())
+                                        conn.disconnect();
+                                    }
+                                    else
+                                    {
+                                        //only add wind vectors to abox, which have a role relation with a measured vector:
+                                        for(unsigned int i=0; i<wind_vf->size(); ++i)
                                         {
-                                            distance_str = "touches";
+                                            
+                                            QTransform wind_vf_transform = wind_vf->globalTransformation();
+                                            
+                                            QPointF t_i = wind_vf_transform.map(QPointF(wind_vf->origin(i).x(), wind_vf->origin(i).y()));
+                                            QPointF t_j;
+                                            
+                                            for(unsigned int j=0; j<measured_vf->size(); ++j)
+                                            {
+                                                QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                                
+                                                t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                                
+                                                float distance = distanceOnEarth(t_i, t_j);
+                                                
+                                                if (distance <= m_param_distance3->value())
+                                                {
+                                                    QString name = QString("wind%1").arg(i);
+                                                    
+                                                    QTextStream datastream;
+                                                    
+                                                    //add the concept
+                                                    datastream <<  "(instance " << name << " (and windcurrent\n";
+                                                    
+                                                    //find out direction (in qualitative description)
+                                                    QString angle_str = directions[std::min(7.0,std::max(0.0, double(wind_vf->angle(i)) / 360 * directions.size()))];
+                                                    datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                                    
+                                                    //find out velocity (in qualitative description)
+                                                    float velocity = wind_vf->length(i)*wind_vf->scale();
+                                                    
+                                                    if (velocity != 0)
+                                                    {
+                                                        QString  velocity_str;
+                                                        if (velocity<= m_param_velocity1->value())
+                                                        {
+                                                            velocity_str = "low";
+                                                        }
+                                                        else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                                        {
+                                                            velocity_str = "moderate";
+                                                        }
+                                                        else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                                        {
+                                                            velocity_str = "high";
+                                                        }
+                                                        if (!velocity_str.isEmpty())
+                                                            datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                                        
+                                                        //Close idividual descriptor:
+                                                        datastream << "))\n\n";
+                                                        
+                                                        QString request = datastream.readAll();
+                                                        if(filestream)
+                                                        {
+                                                            *filestream << request;
+                                                        }
+                                                        
+                                                        //Send ABox for current wind vector to RACER
+                                                        result =  conn.send(request, abox_timeout);
+                                                        if (result.isEmpty())
+                                                        {
+                                                            break;
+                                                        }
+                                                    }
+                                                    
+                                                    break; //break out of inner for loop
+                                                }
+                                            }
                                         }
-                                        else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
-                                        {
-                                            distance_str = "is-next-to";
-                                        }
-                                        else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
-                                        {
-                                            distance_str = "is-far-away-from";
-                                        }
-                                        if(!distance_str.isEmpty())
-                                            datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
                                     }
                                 }
                             }
                             
                             if (m_param_use_modelled_currents->value())
                             {
-                                Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );
+                                Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );	
+                                
                                 if(modelled_vf != NULL)
                                 {
-                                    QTransform modelled_vf_transform = modelled_vf->globalTransformation();
-                                    
-                                    //find out distant modelled current individuals (in qualitative description)
-                                    //for each neighbor modelled current vector:
-                                    for(unsigned int j=0; j<modelled_vf->size(); ++j)
+                                    if (modelled_vf->scale() == 0)
                                     {
-                                        QString neighbor_name = QString("modelled%1").arg(j);
+                                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the modelled vf.");
                                         
-                                        t_j = modelled_vf_transform.map(QPointF(modelled_vf->origin(j).x(), modelled_vf->origin(j).y()));
-                                        
-                                        float distance = distanceOnEarth(t_i, t_j);
-                                        
-                                        QString distance_str;
-                                        if (distance <= m_param_distance1->value())
+                                        conn.disconnect();
+                                    }
+                                    else
+                                    {
+                                        //only add modelled vectors to abox, which have a role relation with a measured vector:
+                                        for(unsigned int i=0; i<modelled_vf->size(); ++i)
                                         {
-                                            distance_str = "touches";
+                                            
+                                            QTransform modelled_vf_transform = modelled_vf->globalTransformation();
+                                            
+                                            QPointF t_i = modelled_vf_transform.map(QPointF(modelled_vf->origin(i).x(), modelled_vf->origin(i).y()));
+                                            QPointF t_j;
+                                            
+                                            for(unsigned int j=0; j<measured_vf->size(); ++j)
+                                            {
+                                                QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                                
+                                                t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                                
+                                                float distance = distanceOnEarth(t_i, t_j);
+                                                
+                                                if (distance <= m_param_distance3->value())
+                                                {
+                                                    QString name = QString("modelled%1").arg(i);
+                                                    
+                                                    QTextStream datastream;
+                                                    
+                                                    //add the concept
+                                                    datastream <<  "(instance " << name << " (and modelledcurrent\n";
+                                                    
+                                                    //find out direction (in qualitative description)
+                                                    QString angle_str = directions[std::min(7.0,std::max(0.0, double(modelled_vf->angle(i)) / 360 * directions.size()))];
+                                                    datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                                    
+                                                    //find out velocity (in qualitative description)
+                                                    float velocity = modelled_vf->length(i)*modelled_vf->scale();
+                                                    
+                                                    if (velocity != 0)
+                                                    {
+                                                        QString  velocity_str;
+                                                        if (velocity<= m_param_velocity1->value())
+                                                        {
+                                                            velocity_str = "low";
+                                                        }
+                                                        else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                                        {
+                                                            velocity_str = "moderate";
+                                                        }
+                                                        else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                                        {
+                                                            velocity_str = "high";
+                                                        }
+                                                        if (!velocity_str.isEmpty())
+                                                            datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                                        
+                                                        //Close idividual descriptor:
+                                                        datastream << "))\n\n";
+                                                        
+                                                        QString request = datastream.readAll();
+                                                        
+                                                        if(filestream)
+                                                        {
+                                                            *filestream << request;
+                                                        }
+                                                        
+                                                        //Send ABox for current modelled vector to RACER
+                                                        result =  conn.send(request, abox_timeout);
+                                                        if (result.isEmpty())
+                                                        {
+                                                            break;
+                                                        }
+                                                    }
+                                                    
+                                                    break; //break out of inner for loop
+                                                }
+                                            }
                                         }
-                                        else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
-                                        {
-                                            distance_str = "is-next-to";
-                                        }
-                                        else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
-                                        {
-                                            distance_str = "is-far-away-from";
-                                        }
-                                        if(!distance_str.isEmpty())
-                                            datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
                                     }
                                 }
                             }
                             
-                            //find out distant measured individuals (in qualitative description)
-                            //for each neighbor vector with a smaller id.
-                            //This is possible due to the reflexive spatial rules!
-                            for(unsigned int j=0; j<i; ++j)
+                            //for each measured vector:
+                            for(unsigned int i=0; i<measured_vf->size(); ++i)
                             {
-                                QString neighbor_name = QString("measured%1").arg(j);
+                                QString name = QString("measured%1").arg(i);
                                 
-                                t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                QTextStream datastream;
                                 
-                                float distance = distanceOnEarth(t_i, t_j);
+                                //add the concept
+                                datastream <<  "(instance " << name << " (and measuredcurrent\n";
                                 
-                                QString distance_str;
-                                if (distance <= m_param_distance1->value())
+                                //find out direction (in qualitative description)
+                                QString angle_str= directions[std::min(7.0,std::max(0.0, double(measured_vf->angle(i)) / 360 * directions.size()))];
+                                datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                
+                                //find out velocity (in qualitative description)
+                                float velocity = measured_vf->length(i)*measured_vf->scale();
+                                
+                                
+                                QString  velocity_str;
+                                if (velocity<= m_param_velocity1->value())
                                 {
-                                    distance_str = "touches";
+                                    velocity_str = "low";
                                 }
-                                else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
                                 {
-                                    distance_str = "is-next-to";
+                                    velocity_str = "moderate";
                                 }
-                                else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
                                 {
-                                    distance_str = "is-far-away-from";
+                                    velocity_str = "high";
                                 }
-                                if(!distance_str.isEmpty())
-                                    datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
-                            }
-                            
-                            QString request = datastream.readAll();
-                            
-                            if(!request.isEmpty())
-                            {
+                                if (!velocity_str.isEmpty())
+                                    datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                
+                                //Close idividual descriptor:
+                                datastream << "))\n";
+                                QString request = datastream.readAll();
+                                
                                 if(filestream)
                                 {
                                     *filestream << request;
@@ -551,95 +429,225 @@ class RacerInterpreter
                                 result =  conn.send(request, abox_timeout);
                                 if (result.isEmpty())
                                 {
-                                    qDebug() << "Error at request: " << request;
+                                    qDebug() << "Error at datastream: " << request;
                                     break;
                                 }
                             }
-                            emit statusMessage(i*100.0/measured_vf->size(), QString("creating A-Box from data"));
-                        }	
-                        
-                        
-                        //ABox is written completely - close it
-                        if(filestream)
-                        {
-                            filestream->flush();
-                            delete filestream;
-                            filestream = NULL;
-                        }
-                        
-                        
-                        /**
-                         *
-                         * Pose questions onto that (already submitted) A- and TBox:
-                         *
-                         */
-                        
-                        //TODO Add Landmask and shiproutes
-                        
-                        //Find wind problems (not further distinguishable)
-                        if (m_param_use_wind->value())
-                        {
-                            qInfo()	<< "(retrieve (?x) (?x wind-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x wind-problem))", query_timeout) << "\n\n\n\n";
-                        }						
-                        
-                        //find wrong modellcurrents:						
-                        if (m_param_use_modelled_currents->value())
-                        {
-                            qInfo()	<< "(retrieve (?x) (?x modelledcurrent-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-problem))", query_timeout) << "\n\n";
+                            
+                            //for each measured vector determine role relations:
+                            for(unsigned int i=0; i<measured_vf->size(); ++i)
+                            {
+                                QString name = QString("measured%1").arg(i);
+                                
+                                QTextStream datastream;
+                                QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                
+                                QPointF t_i = measured_vf_transform.map(QPointF(measured_vf->origin(i).x(), measured_vf->origin(i).y()));
+                                QPointF t_j;
+                                
+                                if (m_param_use_wind->value())
+                                {
+                                    Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );
+                                    if(wind_vf != NULL)
+                                    {
+                                        QTransform wind_vf_transform = wind_vf->globalTransformation();
+                                        
+                                        //find out distant wind individuals (in qualitative description)
+                                        //for each neighbor wind vector:
+                                        for(unsigned int j=0; j<wind_vf->size(); ++j)
+                                        {
+                                            QString neighbor_name = QString("wind%1").arg(j);
+                                            
+                                            t_j = wind_vf_transform.map(QPointF(wind_vf->origin(j).x(), wind_vf->origin(j).y()));
+                                            
+                                            float distance = distanceOnEarth(t_i, t_j);
+                                            
+                                            QString distance_str;
+                                            if (distance <= m_param_distance1->value())
+                                            {
+                                                distance_str = "touches";
+                                            }
+                                            else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                            {
+                                                distance_str = "is-next-to";
+                                            }
+                                            else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                            {
+                                                distance_str = "is-far-away-from";
+                                            }
+                                            if(!distance_str.isEmpty())
+                                                datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                        }
+                                    }
+                                }
+                                
+                                if (m_param_use_modelled_currents->value())
+                                {
+                                    Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );
+                                    if(modelled_vf != NULL)
+                                    {
+                                        QTransform modelled_vf_transform = modelled_vf->globalTransformation();
+                                        
+                                        //find out distant modelled current individuals (in qualitative description)
+                                        //for each neighbor modelled current vector:
+                                        for(unsigned int j=0; j<modelled_vf->size(); ++j)
+                                        {
+                                            QString neighbor_name = QString("modelled%1").arg(j);
+                                            
+                                            t_j = modelled_vf_transform.map(QPointF(modelled_vf->origin(j).x(), modelled_vf->origin(j).y()));
+                                            
+                                            float distance = distanceOnEarth(t_i, t_j);
+                                            
+                                            QString distance_str;
+                                            if (distance <= m_param_distance1->value())
+                                            {
+                                                distance_str = "touches";
+                                            }
+                                            else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                            {
+                                                distance_str = "is-next-to";
+                                            }
+                                            else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                            {
+                                                distance_str = "is-far-away-from";
+                                            }
+                                            if(!distance_str.isEmpty())
+                                                datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                        }
+                                    }
+                                }
+                                
+                                //find out distant measured individuals (in qualitative description)
+                                //for each neighbor vector with a smaller id.
+                                //This is possible due to the reflexive spatial rules!
+                                for(unsigned int j=0; j<i; ++j)
+                                {
+                                    QString neighbor_name = QString("measured%1").arg(j);
+                                    
+                                    t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                    
+                                    float distance = distanceOnEarth(t_i, t_j);
+                                    
+                                    QString distance_str;
+                                    if (distance <= m_param_distance1->value())
+                                    {
+                                        distance_str = "touches";
+                                    }
+                                    else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                    {
+                                        distance_str = "is-next-to";
+                                    }
+                                    else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                    {
+                                        distance_str = "is-far-away-from";
+                                    }
+                                    if(!distance_str.isEmpty())
+                                        datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                }
+                                
+                                QString request = datastream.readAll();
+                                
+                                if(!request.isEmpty())
+                                {
+                                    if(filestream)
+                                    {
+                                        *filestream << request;
+                                    }
+                                    
+                                    //Send ABox for current vector to RACER
+                                    result =  conn.send(request, abox_timeout);
+                                    if (result.isEmpty())
+                                    {
+                                        qDebug() << "Error at request: " << request;
+                                        break;
+                                    }
+                                }
+                                emit statusMessage(i*100.0/measured_vf->size(), QString("creating A-Box from data"));
+                            }	
+                            
+                            
+                            //ABox is written completely - close it
+                            if(filestream)
+                            {
+                                filestream->flush();
+                                delete filestream;
+                                filestream = NULL;
+                            }
+                            
+                            
+                            /**
+                             *
+                             * Pose questions onto that (already submitted) A- and TBox:
+                             *
+                             */
+                            
+                            //TODO Add Landmask and shiproutes
+                            
+                            //Find wind problems (not further distinguishable)
+                            if (m_param_use_wind->value())
+                            {
+                                qInfo()	<< "(retrieve (?x) (?x wind-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x wind-problem))", query_timeout) << "\n\n\n\n";
+                            }						
+                            
+                            //find wrong modellcurrents:						
+                            if (m_param_use_modelled_currents->value())
+                            {
+                                qInfo()	<< "(retrieve (?x) (?x modelledcurrent-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-problem))", query_timeout) << "\n\n";
+                                
+                                //distinguish between wrong direction and wrong speed
+                                qInfo()	<< "(retrieve (?x) (?x modelledcurrent-direction-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-direction-problem))", query_timeout) << "\n\n";
+                                
+                                qInfo()	<< "(retrieve (?x) (?x modelledcurrent-velocity-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-velocity-problem))", query_timeout) << "\n\n\n\n";
+                            }
+                            
+                            
+                            //find wrong measuredcurrents:						
+                            qInfo()	<< "(retrieve (?x) (?x currentsmoothness-problem))\n";
+                            qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-problem))", query_timeout) << "\n\n";
                             
                             //distinguish between wrong direction and wrong speed
-                            qInfo()	<< "(retrieve (?x) (?x modelledcurrent-direction-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-direction-problem))", query_timeout) << "\n\n";
+                            qInfo()	<< "(retrieve (?x) (?x currentsmoothness-direction-problem))\n";
+                            qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-direction-problem))", query_timeout) << "\n\n";
                             
-                            qInfo()	<< "(retrieve (?x) (?x modelledcurrent-velocity-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-velocity-problem))", query_timeout) << "\n\n\n\n";
+                            qInfo()	<< "(retrieve (?x) (?x currentsmoothness-velocity-problem))\n";
+                            qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-velocity-problem))", query_timeout) << "\n\n";
+                        }
+                        else
+                        {
+                            qCritical("RACER did not read TBox....");
+                            conn.disconnect();
+                            emit errorMessage(	QString("Explainable error occured: RACER Server did not read TBox"));
                         }
                         
                         
-                        //find wrong measuredcurrents:						
-                        qInfo()	<< "(retrieve (?x) (?x currentsmoothness-problem))\n";
-                        qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-problem))", query_timeout) << "\n\n";
-                        
-                        //distinguish between wrong direction and wrong speed
-                        qInfo()	<< "(retrieve (?x) (?x currentsmoothness-direction-problem))\n";
-                        qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-direction-problem))", query_timeout) << "\n\n";
-                        
-                        qInfo()	<< "(retrieve (?x) (?x currentsmoothness-velocity-problem))\n";
-                        qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-velocity-problem))", query_timeout) << "\n\n";
-                    }
-                    else
-                    {
-                        qCritical("RACER did not read TBox....");
                         conn.disconnect();
-                        emit errorMessage(	QString("Explainable error occured: RACER Server did not read TBox"));
+                        
+                        emit statusMessage(100.0, QString("finished computation"));
+                        emit finished();
                     }
-                    
-                    
-                    conn.disconnect();
-                    
-                    emit statusMessage(100.0, QString("finished computation"));
-                    emit finished();
+                    else 
+                    {
+                        emit errorMessage(	QString("Explainable error occured: RACER Server was not found under ")
+                                          + conn.ipAddress()
+                                          + QString(" (port: %1)").arg(conn.port()));
+                    }
                 }
-                else 
+                catch(std::exception& e)
                 {
-                    emit errorMessage(	QString("Explainable error occured: RACER Server was not found under ")
-                                      + conn.ipAddress()
-                                      + QString(" (port: %1)").arg(conn.port()));
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
                 }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));
-            }
-            unlockModels();
         }
-	
+
     protected:
         //Additional parameters
         ModelParameter * m_param_measured_vectorfield;
@@ -746,518 +754,526 @@ class RacerClusteredInterpreter
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                Vectorfield2D* measured_vf = static_cast<Vectorfield2D*>(  m_param_measured_vectorfield->value() );	
-                WeightedPolygonList2D* measured_clusters = static_cast<WeightedPolygonList2D*>(  m_param_clusters->value() );	
-                
-                if (measured_vf->scale() == 0)
-                {
-                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the measured vf.");
-                }
-                
-                QString abox_filename = m_param_abox_filename->value();
-                QString tbox_filename = m_param_tbox_filename->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                RacerConnection conn;
-                
-                unsigned int connection_timeout =		 5*	1000; //5 secs
-                unsigned int tbox_timeout =				60*	1000; //1 min
-                unsigned int abox_timeout =				60*	1000; //1 min
-                unsigned int query_timeout =		30*	60*	1000; //30 min
-                
-                qDebug("Trying to connect to the RACER server");
-                conn.connectToServer(connection_timeout);
-                
-                if(conn.connected())
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
                     
-                    //qInfo() << "Connected with RACER SERVER? " << conn.connected() <<"\n"
-                    //			<< "ipAddress: " << conn.ipAddress() << "\n"
-                    //			<< "port:      " << conn.port() << "\n"
-                    //			<< "racer version:      " << conn.racerVersion() << "\n";
+                    emit statusMessage(0.0, QString("started"));
                     
+                    Vectorfield2D* measured_vf = static_cast<Vectorfield2D*>(  m_param_measured_vectorfield->value() );	
+                    WeightedPolygonList2D* measured_clusters = static_cast<WeightedPolygonList2D*>(  m_param_clusters->value() );	
                     
-                    QString request,result;
-                    
-                    if(!tbox_filename.isEmpty())
+                    if (measured_vf->scale() == 0)
                     {
-                        request = "(racer-read-file \"" + tbox_filename + "\")";
-                        result = conn.send(request, tbox_timeout);
+                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the measured vf.");
                     }
                     
-                    //If T-Box has been loaded, we proceed
-                    if(result != "")
-                    {					
-                        //qDebug() << "Received result from RACER after loading TBox: " << result << "\n";
+                    QString abox_filename = m_param_abox_filename->value();
+                    QString tbox_filename = m_param_tbox_filename->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    RacerConnection conn;
+                    
+                    unsigned int connection_timeout =		 5*	1000; //5 secs
+                    unsigned int tbox_timeout =				60*	1000; //1 min
+                    unsigned int abox_timeout =				60*	1000; //1 min
+                    unsigned int query_timeout =		30*	60*	1000; //30 min
+                    
+                    qDebug("Trying to connect to the RACER server");
+                    conn.connectToServer(connection_timeout);
+                    
+                    if(conn.connected())
+                    {
                         
-                        std::vector<QString> directions(8);
-                        directions[0] = "north";
-                        directions[1] = "northeast";
-                        directions[2] = "east";
-                        directions[3] = "southeast";
-                        directions[4] = "south";
-                        directions[5] = "southwest";
-                        directions[6] = "west";
-                        directions[7] = "northwest";
+                        //qInfo() << "Connected with RACER SERVER? " << conn.connected() <<"\n"
+                        //			<< "ipAddress: " << conn.ipAddress() << "\n"
+                        //			<< "port:      " << conn.port() << "\n"
+                        //			<< "racer version:      " << conn.racerVersion() << "\n";
                         
-                        QTextStream* filestream  = NULL;
                         
-                        if(m_param_save_abox->value())
+                        QString request,result;
+                        
+                        if(!tbox_filename.isEmpty())
                         {
-                            QFile file(abox_filename);
-                            if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-                            {
-                                filestream = new QTextStream(&file);
-                            }
+                            request = "(racer-read-file \"" + tbox_filename + "\")";
+                            result = conn.send(request, tbox_timeout);
                         }
                         
-                        if (m_param_use_wind->value())
-                        {
-                            Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );	
+                        //If T-Box has been loaded, we proceed
+                        if(result != "")
+                        {					
+                            //qDebug() << "Received result from RACER after loading TBox: " << result << "\n";
                             
-                            if(wind_vf != NULL)
+                            std::vector<QString> directions(8);
+                            directions[0] = "north";
+                            directions[1] = "northeast";
+                            directions[2] = "east";
+                            directions[3] = "southeast";
+                            directions[4] = "south";
+                            directions[5] = "southwest";
+                            directions[6] = "west";
+                            directions[7] = "northwest";
+                            
+                            QTextStream* filestream  = NULL;
+                            
+                            if(m_param_save_abox->value())
                             {
-                                if (wind_vf->scale() == 0)
+                                QFile file(abox_filename);
+                                if (file.open(QIODevice::WriteOnly | QIODevice::Text))
                                 {
-                                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the wind vf.");
-                                    
-                                    conn.disconnect();
-                                }
-                                else
-                                {
-                                    //only add wind vectors to abox, which have a role relation with a measured vector:
-                                    for(unsigned int i=0; i<wind_vf->size(); ++i)
-                                    {
-                                        
-                                        QTransform wind_vf_transform = wind_vf->globalTransformation();
-                                        
-                                        QPointF t_i = wind_vf_transform.map(QPointF(wind_vf->origin(i).x(), wind_vf->origin(i).y()));
-                                        QPointF t_j;
-                                        
-                                        for(unsigned int j=0; j<measured_vf->size(); ++j)
-                                        {
-                                            QTransform measured_vf_transform = measured_vf->globalTransformation();
-                                            
-                                            t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
-                                            
-                                            float distance = distanceOnEarth(t_i, t_j);
-                                            
-                                            if (distance <= m_param_distance3->value())
-                                            {
-                                                QString name = QString("wind%1").arg(i);
-                                                
-                                                QTextStream datastream;
-                                                
-                                                //add the concept
-                                                datastream <<  "(instance " << name << " (and windcurrent\n";
-                                                
-                                                //find out direction (in qualitative description)
-                                                QString angle_str= directions[std::min(7.0,std::max(0.0, double(wind_vf->angle(i)) / 360 * directions.size()))];
-                                                datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                                                
-                                                //find out velocity (in qualitative description)
-                                                float velocity = wind_vf->length(i)*wind_vf->scale();
-                                                
-                                                if (velocity != 0)
-                                                {
-                                                    QString  velocity_str;
-                                                    if (velocity<= m_param_velocity1->value())
-                                                    {
-                                                        velocity_str = "low";
-                                                    }
-                                                    else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                                                    {
-                                                        velocity_str = "moderate";
-                                                    }
-                                                    else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                                                    {
-                                                        velocity_str = "high";
-                                                    }
-                                                    if (!velocity_str.isEmpty())
-                                                        datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                                                    
-                                                    //Close idividual descriptor:
-                                                    datastream << "))\n\n";
-                                                    
-                                                   QString request = datastream.readAll();
-                            
-                                                    if(!request.isEmpty())
-                                                    {
-                                                        if(filestream)
-                                                        {
-                                                            *filestream << request;
-                                                        }
-                                                        
-                                                        //Send ABox for current vector to RACER
-                                                        result =  conn.send(request, abox_timeout);
-                                                        if (result.isEmpty())
-                                                        {
-                                                            qDebug() << "Error at request: " << request;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                break; //break out of inner for loop
-                                            }
-                                        }
-                                    }
+                                    filestream = new QTextStream(&file);
                                 }
                             }
-                        }
-                        
-                        if (m_param_use_modelled_currents->value())
-                        {
-                            Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );	
-                            
-                            if(modelled_vf != NULL)
-                            {
-                                if (modelled_vf->scale() == 0)
-                                {
-                                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the modelled vf.");
-                                    
-                                    conn.disconnect();
-                                }
-                                else
-                                {
-                                    //only add modelled vectors to abox, which have a role relation with a measured vector:
-                                    for(unsigned int i=0; i<modelled_vf->size(); ++i)
-                                    {
-                                        
-                                        QTransform modelled_vf_transform = modelled_vf->globalTransformation();
-                                        
-                                        QPointF t_i = modelled_vf_transform.map(QPointF(modelled_vf->origin(i).x(), modelled_vf->origin(i).y()));
-                                        QPointF t_j;
-                                        
-                                        for(unsigned int j=0; j<measured_vf->size(); ++j)
-                                        {
-                                            QTransform measured_vf_transform = measured_vf->globalTransformation();
-                                            
-                                            t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
-                                            
-                                            float distance = distanceOnEarth(t_i, t_j);
-                                            
-                                            if (distance <= m_param_distance3->value())
-                                            {
-                                                QString name = QString("modelled%1").arg(i);
-                                                
-                                                QTextStream datastream;
-                                                
-                                                //add the concept
-                                                datastream <<  "(instance " << name << " (and modelledcurrent\n";
-                                                
-                                                //find out direction (in qualitative description)
-                                                QString angle_str= directions[std::min(7.0,std::max(0.0, double(modelled_vf->angle(i)) / 360 * directions.size()))];
-                                                datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                                                
-                                                //find out velocity (in qualitative description)
-                                                float velocity = modelled_vf->length(i)*modelled_vf->scale();
-                                                
-                                                if (velocity != 0)
-                                                {
-                                                    QString  velocity_str;
-                                                    if (velocity<= m_param_velocity1->value())
-                                                    {
-                                                        velocity_str = "low";
-                                                    }
-                                                    else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                                                    {
-                                                        velocity_str = "moderate";
-                                                    }
-                                                    else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                                                    {
-                                                        velocity_str = "high";
-                                                    }
-                                                    if (!velocity_str.isEmpty())
-                                                        datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                                                    
-                                                    //Close idividual descriptor:
-                                                    datastream << "))\n\n";
-                                                    
-                                                    QString request = datastream.readAll();
-                                                    
-                                                    if(!request.isEmpty())
-                                                    {
-                                                        
-                                                        if(filestream)
-                                                        {
-                                                            *filestream << request;
-                                                        }
-                                                        
-                                                        //Send ABox for current vector to RACER
-                                                        result =  conn.send(request, abox_timeout);
-                                                        if (result.isEmpty())
-                                                        {
-                                                            qDebug() << "Error at request: " << request;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                break; //break out of inner for loop
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        //for each measured vector:
-                        for(unsigned int i=0; i<measured_vf->size(); ++i)
-                        {
-                            QString name = QString("measured%1").arg(i);
-                            
-                            QTextStream datastream;
-                            
-                            //add the concept
-                            datastream <<  "(instance " << name << " (and measuredcurrent\n";
-                            
-                            //find out direction (in qualitative description)
-                            QString angle_str= directions[std::min(7.0,std::max(0.0, double(measured_vf->angle(i)) / 360 * directions.size()))];
-                            datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                            
-                            //find out velocity (in qualitative description)
-                            float velocity = measured_vf->length(i)*measured_vf->scale();
-                            
-                            
-                            QString  velocity_str;
-                            if (velocity<= m_param_velocity1->value())
-                            {
-                                velocity_str = "low";
-                            }
-                            else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                            {
-                                velocity_str = "moderate";
-                            }
-                            else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                            {
-                                velocity_str = "high";
-                            }
-                            if (!velocity_str.isEmpty())
-                                datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                            
-                            //Close idividual descriptor:
-                            datastream << "))\n";
-                            
-                            QString request = datastream.readAll();
-                            
-                            if(!request.isEmpty())
-                            {
-                                if(filestream)
-                                {
-                                    *filestream << request;
-                                }
-                                
-                                //Send ABox for current vector to RACER
-                                result =  conn.send(request, abox_timeout);
-                                if (result.isEmpty())
-                                {
-                                    qDebug() << "Error at request: " << request;
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        //for each measured vector determine role relations:
-                        for(unsigned int i=0; i<measured_vf->size(); ++i)
-                        {
-                            QString name = QString("measured%1").arg(i);
-                            
-                            QTextStream datastream;
-                            QTransform measured_vf_transform = measured_vf->globalTransformation();
-                            
-                            QPointF t_i = measured_vf_transform.map(QPointF(measured_vf->origin(i).x(), measured_vf->origin(i).y()));
-                            QPointF t_j;
                             
                             if (m_param_use_wind->value())
                             {
-                                Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );
+                                Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );	
+                                
                                 if(wind_vf != NULL)
                                 {
-                                    QTransform wind_vf_transform = wind_vf->globalTransformation();
-                                    
-                                    //find out distant wind individuals (in qualitative description)
-                                    //for each neighbor wind vector:
-                                    for(unsigned int j=0; j<wind_vf->size(); ++j)
+                                    if (wind_vf->scale() == 0)
                                     {
-                                        QString neighbor_name = QString("wind%1").arg(j);
+                                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the wind vf.");
                                         
-                                        t_j = wind_vf_transform.map(QPointF(wind_vf->origin(j).x(), wind_vf->origin(j).y()));
-                                        
-                                        float distance = distanceOnEarth(t_i, t_j);
-                                        
-                                        QString distance_str;
-                                        if (distance <= m_param_distance1->value())
+                                        conn.disconnect();
+                                    }
+                                    else
+                                    {
+                                        //only add wind vectors to abox, which have a role relation with a measured vector:
+                                        for(unsigned int i=0; i<wind_vf->size(); ++i)
                                         {
-                                            distance_str = "touches";
+                                            
+                                            QTransform wind_vf_transform = wind_vf->globalTransformation();
+                                            
+                                            QPointF t_i = wind_vf_transform.map(QPointF(wind_vf->origin(i).x(), wind_vf->origin(i).y()));
+                                            QPointF t_j;
+                                            
+                                            for(unsigned int j=0; j<measured_vf->size(); ++j)
+                                            {
+                                                QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                                
+                                                t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                                
+                                                float distance = distanceOnEarth(t_i, t_j);
+                                                
+                                                if (distance <= m_param_distance3->value())
+                                                {
+                                                    QString name = QString("wind%1").arg(i);
+                                                    
+                                                    QTextStream datastream;
+                                                    
+                                                    //add the concept
+                                                    datastream <<  "(instance " << name << " (and windcurrent\n";
+                                                    
+                                                    //find out direction (in qualitative description)
+                                                    QString angle_str= directions[std::min(7.0,std::max(0.0, double(wind_vf->angle(i)) / 360 * directions.size()))];
+                                                    datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                                    
+                                                    //find out velocity (in qualitative description)
+                                                    float velocity = wind_vf->length(i)*wind_vf->scale();
+                                                    
+                                                    if (velocity != 0)
+                                                    {
+                                                        QString  velocity_str;
+                                                        if (velocity<= m_param_velocity1->value())
+                                                        {
+                                                            velocity_str = "low";
+                                                        }
+                                                        else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                                        {
+                                                            velocity_str = "moderate";
+                                                        }
+                                                        else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                                        {
+                                                            velocity_str = "high";
+                                                        }
+                                                        if (!velocity_str.isEmpty())
+                                                            datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                                        
+                                                        //Close idividual descriptor:
+                                                        datastream << "))\n\n";
+                                                        
+                                                       QString request = datastream.readAll();
+                                
+                                                        if(!request.isEmpty())
+                                                        {
+                                                            if(filestream)
+                                                            {
+                                                                *filestream << request;
+                                                            }
+                                                            
+                                                            //Send ABox for current vector to RACER
+                                                            result =  conn.send(request, abox_timeout);
+                                                            if (result.isEmpty())
+                                                            {
+                                                                qDebug() << "Error at request: " << request;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    break; //break out of inner for loop
+                                                }
+                                            }
                                         }
-                                        else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
-                                        {
-                                            distance_str = "is-next-to";
-                                        }
-                                        else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
-                                        {
-                                            distance_str = "is-far-away-from";
-                                        }
-                                        if(!distance_str.isEmpty())
-                                            datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
                                     }
                                 }
                             }
                             
                             if (m_param_use_modelled_currents->value())
                             {
-                                Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );
+                                Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );	
+                                
                                 if(modelled_vf != NULL)
                                 {
-                                    QTransform modelled_vf_transform = modelled_vf->globalTransformation();
-                                    
-                                    //find out distant modelled current individuals (in qualitative description)
-                                    //for each neighbor modelled current vector:
-                                    for(unsigned int j=0; j<modelled_vf->size(); ++j)
+                                    if (modelled_vf->scale() == 0)
                                     {
-                                        QString neighbor_name = QString("modelled%1").arg(j);
+                                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the modelled vf.");
                                         
-                                        t_j = modelled_vf_transform.map(QPointF(modelled_vf->origin(j).x(), modelled_vf->origin(j).y()));
-                                        
-                                        float distance = distanceOnEarth(t_i, t_j);
-                                        
-                                        QString distance_str;
-                                        if (distance <= m_param_distance1->value())
+                                        conn.disconnect();
+                                    }
+                                    else
+                                    {
+                                        //only add modelled vectors to abox, which have a role relation with a measured vector:
+                                        for(unsigned int i=0; i<modelled_vf->size(); ++i)
                                         {
-                                            distance_str = "touches";
+                                            
+                                            QTransform modelled_vf_transform = modelled_vf->globalTransformation();
+                                            
+                                            QPointF t_i = modelled_vf_transform.map(QPointF(modelled_vf->origin(i).x(), modelled_vf->origin(i).y()));
+                                            QPointF t_j;
+                                            
+                                            for(unsigned int j=0; j<measured_vf->size(); ++j)
+                                            {
+                                                QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                                
+                                                t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                                
+                                                float distance = distanceOnEarth(t_i, t_j);
+                                                
+                                                if (distance <= m_param_distance3->value())
+                                                {
+                                                    QString name = QString("modelled%1").arg(i);
+                                                    
+                                                    QTextStream datastream;
+                                                    
+                                                    //add the concept
+                                                    datastream <<  "(instance " << name << " (and modelledcurrent\n";
+                                                    
+                                                    //find out direction (in qualitative description)
+                                                    QString angle_str= directions[std::min(7.0,std::max(0.0, double(modelled_vf->angle(i)) / 360 * directions.size()))];
+                                                    datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                                    
+                                                    //find out velocity (in qualitative description)
+                                                    float velocity = modelled_vf->length(i)*modelled_vf->scale();
+                                                    
+                                                    if (velocity != 0)
+                                                    {
+                                                        QString  velocity_str;
+                                                        if (velocity<= m_param_velocity1->value())
+                                                        {
+                                                            velocity_str = "low";
+                                                        }
+                                                        else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                                        {
+                                                            velocity_str = "moderate";
+                                                        }
+                                                        else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                                        {
+                                                            velocity_str = "high";
+                                                        }
+                                                        if (!velocity_str.isEmpty())
+                                                            datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                                        
+                                                        //Close idividual descriptor:
+                                                        datastream << "))\n\n";
+                                                        
+                                                        QString request = datastream.readAll();
+                                                        
+                                                        if(!request.isEmpty())
+                                                        {
+                                                            
+                                                            if(filestream)
+                                                            {
+                                                                *filestream << request;
+                                                            }
+                                                            
+                                                            //Send ABox for current vector to RACER
+                                                            result =  conn.send(request, abox_timeout);
+                                                            if (result.isEmpty())
+                                                            {
+                                                                qDebug() << "Error at request: " << request;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    break; //break out of inner for loop
+                                                }
+                                            }
                                         }
-                                        else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
-                                        {
-                                            distance_str = "is-next-to";
-                                        }
-                                        else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
-                                        {
-                                            distance_str = "is-far-away-from";
-                                        }
-                                        if(!distance_str.isEmpty())
-                                            datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
                                     }
                                 }
                             }
                             
-                            //find out smoothness of each individual by  means of cluster smoothness:
-                            float smoothness = measured_clusters->weight(i);
-                            
-                            if (smoothness > m_param_smoothness_threshold->value())
-                            { 
-                                datastream << "(instance " << name << " currentsmoothness-problem)\n";
+                            //for each measured vector:
+                            for(unsigned int i=0; i<measured_vf->size(); ++i)
+                            {
+                                QString name = QString("measured%1").arg(i);
+                                
+                                QTextStream datastream;
+                                
+                                //add the concept
+                                datastream <<  "(instance " << name << " (and measuredcurrent\n";
+                                
+                                //find out direction (in qualitative description)
+                                QString angle_str= directions[std::min(7.0,std::max(0.0, double(measured_vf->angle(i)) / 360 * directions.size()))];
+                                datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                
+                                //find out velocity (in qualitative description)
+                                float velocity = measured_vf->length(i)*measured_vf->scale();
+                                
+                                
+                                QString  velocity_str;
+                                if (velocity<= m_param_velocity1->value())
+                                {
+                                    velocity_str = "low";
+                                }
+                                else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                {
+                                    velocity_str = "moderate";
+                                }
+                                else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                {
+                                    velocity_str = "high";
+                                }
+                                if (!velocity_str.isEmpty())
+                                    datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                
+                                //Close idividual descriptor:
+                                datastream << "))\n";
+                                
+                                QString request = datastream.readAll();
+                                
+                                if(!request.isEmpty())
+                                {
+                                    if(filestream)
+                                    {
+                                        *filestream << request;
+                                    }
+                                    
+                                    //Send ABox for current vector to RACER
+                                    result =  conn.send(request, abox_timeout);
+                                    if (result.isEmpty())
+                                    {
+                                        qDebug() << "Error at request: " << request;
+                                        break;
+                                    }
+                                }
                             }
                             
-                            QString request = datastream.readAll();
-                            
-                            if(!request.isEmpty())
+                            //for each measured vector determine role relations:
+                            for(unsigned int i=0; i<measured_vf->size(); ++i)
                             {
-                                if(filestream)
+                                QString name = QString("measured%1").arg(i);
+                                
+                                QTextStream datastream;
+                                QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                
+                                QPointF t_i = measured_vf_transform.map(QPointF(measured_vf->origin(i).x(), measured_vf->origin(i).y()));
+                                QPointF t_j;
+                                
+                                if (m_param_use_wind->value())
                                 {
-                                    *filestream << request;
+                                    Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );
+                                    if(wind_vf != NULL)
+                                    {
+                                        QTransform wind_vf_transform = wind_vf->globalTransformation();
+                                        
+                                        //find out distant wind individuals (in qualitative description)
+                                        //for each neighbor wind vector:
+                                        for(unsigned int j=0; j<wind_vf->size(); ++j)
+                                        {
+                                            QString neighbor_name = QString("wind%1").arg(j);
+                                            
+                                            t_j = wind_vf_transform.map(QPointF(wind_vf->origin(j).x(), wind_vf->origin(j).y()));
+                                            
+                                            float distance = distanceOnEarth(t_i, t_j);
+                                            
+                                            QString distance_str;
+                                            if (distance <= m_param_distance1->value())
+                                            {
+                                                distance_str = "touches";
+                                            }
+                                            else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                            {
+                                                distance_str = "is-next-to";
+                                            }
+                                            else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                            {
+                                                distance_str = "is-far-away-from";
+                                            }
+                                            if(!distance_str.isEmpty())
+                                                datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                        }
+                                    }
                                 }
                                 
-                                //Send ABox for current vector to RACER
-                                result =  conn.send(request, abox_timeout);
-                                if (result.isEmpty())
+                                if (m_param_use_modelled_currents->value())
                                 {
-                                    qDebug() << "Error at request: " << request;
-                                    break;
+                                    Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );
+                                    if(modelled_vf != NULL)
+                                    {
+                                        QTransform modelled_vf_transform = modelled_vf->globalTransformation();
+                                        
+                                        //find out distant modelled current individuals (in qualitative description)
+                                        //for each neighbor modelled current vector:
+                                        for(unsigned int j=0; j<modelled_vf->size(); ++j)
+                                        {
+                                            QString neighbor_name = QString("modelled%1").arg(j);
+                                            
+                                            t_j = modelled_vf_transform.map(QPointF(modelled_vf->origin(j).x(), modelled_vf->origin(j).y()));
+                                            
+                                            float distance = distanceOnEarth(t_i, t_j);
+                                            
+                                            QString distance_str;
+                                            if (distance <= m_param_distance1->value())
+                                            {
+                                                distance_str = "touches";
+                                            }
+                                            else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                            {
+                                                distance_str = "is-next-to";
+                                            }
+                                            else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                            {
+                                                distance_str = "is-far-away-from";
+                                            }
+                                            if(!distance_str.isEmpty())
+                                                datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                        }
+                                    }
                                 }
+                                
+                                //find out smoothness of each individual by  means of cluster smoothness:
+                                float smoothness = measured_clusters->weight(i);
+                                
+                                if (smoothness > m_param_smoothness_threshold->value())
+                                { 
+                                    datastream << "(instance " << name << " currentsmoothness-problem)\n";
+                                }
+                                
+                                QString request = datastream.readAll();
+                                
+                                if(!request.isEmpty())
+                                {
+                                    if(filestream)
+                                    {
+                                        *filestream << request;
+                                    }
+                                    
+                                    //Send ABox for current vector to RACER
+                                    result =  conn.send(request, abox_timeout);
+                                    if (result.isEmpty())
+                                    {
+                                        qDebug() << "Error at request: " << request;
+                                        break;
+                                    }
+                                }
+                                emit statusMessage(i*100.0/measured_vf->size(), QString("creating A-Box from data"));
+                            }	
+                            
+                            
+                            //ABox is written completely - close it
+                            if(filestream)
+                            {
+                                filestream->flush();
+                                delete filestream;
+                                filestream = NULL;
                             }
-                            emit statusMessage(i*100.0/measured_vf->size(), QString("creating A-Box from data"));
-                        }	
-                        
-                        
-                        //ABox is written completely - close it
-                        if(filestream)
-                        {
-                            filestream->flush();
-                            delete filestream;
-                            filestream = NULL;
-                        }
-                        
-                        
-                        /**
-                         *
-                         * Pose questions onto that (already submitted) A- and TBox:
-                         *
-                         */
-                        
-                        //TODO Add Landmask and shiproutes
-                        
-                        //Find wind problems (not further distinguishable)
-                        if (m_param_use_wind->value())
-                        {
-                            qInfo()	<< "(retrieve (?x) (?x wind-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x wind-problem))", query_timeout) << "\n\n\n\n";
-                        }						
-                        
-                        //find wrong modellcurrents:						
-                        if (m_param_use_modelled_currents->value())
-                        {
-                            qInfo()	<< "(retrieve (?x) (?x modelledcurrent-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-problem))", query_timeout) << "\n\n";
+                            
+                            
+                            /**
+                             *
+                             * Pose questions onto that (already submitted) A- and TBox:
+                             *
+                             */
+                            
+                            //TODO Add Landmask and shiproutes
+                            
+                            //Find wind problems (not further distinguishable)
+                            if (m_param_use_wind->value())
+                            {
+                                qInfo()	<< "(retrieve (?x) (?x wind-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x wind-problem))", query_timeout) << "\n\n\n\n";
+                            }						
+                            
+                            //find wrong modellcurrents:						
+                            if (m_param_use_modelled_currents->value())
+                            {
+                                qInfo()	<< "(retrieve (?x) (?x modelledcurrent-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-problem))", query_timeout) << "\n\n";
+                                
+                                //distinguish between wrong direction and wrong speed
+                                qInfo()	<< "(retrieve (?x) (?x modelledcurrent-direction-problem))\n";
+                                qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-direction-problem))", query_timeout) << "\n\n";
+                                
+                                qInfo()	<< "(retrieve (?x) (?x modelledcurrent-velocity-problem))\n";
+                                qInfo() << conn.send("(retrieve (?x) (?x modelledcurrent-velocity-problem))", query_timeout) << "\n\n\n\n";
+                            }
+                            
+                            
+                            //find wrong measuredcurrents:						
+                            qInfo()	<< "(retrieve (?x) (?x currentsmoothness-problem))\n";
+                            qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-problem))", query_timeout) << "\n\n";
                             
                             //distinguish between wrong direction and wrong speed
-                            qInfo()	<< "(retrieve (?x) (?x modelledcurrent-direction-problem))\n";
-                            qInfo()	<< conn.send("(retrieve (?x) (?x modelledcurrent-direction-problem))", query_timeout) << "\n\n";
+                            qInfo()	<< "(retrieve (?x) (?x currentsmoothness-direction-problem))\n";
+                            qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-direction-problem))", query_timeout) << "\n\n";
                             
-                            qInfo()	<< "(retrieve (?x) (?x modelledcurrent-velocity-problem))\n";
-                            qInfo() << conn.send("(retrieve (?x) (?x modelledcurrent-velocity-problem))", query_timeout) << "\n\n\n\n";
+                            qInfo()	<< "(retrieve (?x) (?x currentsmoothness-velocity-problem))\n";
+                            qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-velocity-problem))", query_timeout) << "\n\n";
+                        }
+                        else
+                        {
+                            qDebug("RACER did not read TBox....");
+                            conn.disconnect();
+                            emit errorMessage(QString("Explainable error occured: RACER Server did not read TBox"));
                         }
                         
                         
-                        //find wrong measuredcurrents:						
-                        qInfo()	<< "(retrieve (?x) (?x currentsmoothness-problem))\n";
-                        qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-problem))", query_timeout) << "\n\n";
-                        
-                        //distinguish between wrong direction and wrong speed
-                        qInfo()	<< "(retrieve (?x) (?x currentsmoothness-direction-problem))\n";
-                        qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-direction-problem))", query_timeout) << "\n\n";
-                        
-                        qInfo()	<< "(retrieve (?x) (?x currentsmoothness-velocity-problem))\n";
-                        qInfo()	<< conn.send("(retrieve (?x) (?x currentsmoothness-velocity-problem))", query_timeout) << "\n\n";
-                    }
-                    else
-                    {
-                        qDebug("RACER did not read TBox....");
                         conn.disconnect();
-                        emit errorMessage(QString("Explainable error occured: RACER Server did not read TBox"));
+                        
+                        emit statusMessage(100.0, QString("finished computation"));
+                        emit finished();
                     }
-                    
-                    
-                    conn.disconnect();
-                    
-                    emit statusMessage(100.0, QString("finished computation"));
-                    emit finished();
+                    else 
+                    {
+                        emit errorMessage(	QString("Explainable error occured: RACER Server was not found under ")
+                                          + conn.ipAddress()
+                                          + QString(" (port: %1)").arg(conn.port()));
+                    }
                 }
-                else 
+                catch(std::exception& e)
                 {
-                    emit errorMessage(	QString("Explainable error occured: RACER Server was not found under ")
-                                      + conn.ipAddress()
-                                      + QString(" (port: %1)").arg(conn.port()));
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
                 }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
-	
+    
     protected:
         //Additional parameters
         ModelParameter * m_param_measured_vectorfield;
@@ -1363,382 +1379,389 @@ class ClusteredABox
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                Vectorfield2D* measured_vf = static_cast<Vectorfield2D*>(  m_param_measured_vectorfield->value() );	
-                WeightedPolygonList2D* measured_clusters = static_cast<WeightedPolygonList2D*>(  m_param_clusters->value() );	
-                
-                if (measured_vf->scale() == 0)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the measured vf.");
-                }
-                
-                QString abox_filename = m_param_abox_filename->value();
-                //QString tbox_filename = m_param_tbox_filename->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    Vectorfield2D* measured_vf = static_cast<Vectorfield2D*>(  m_param_measured_vectorfield->value() );	
+                    WeightedPolygonList2D* measured_clusters = static_cast<WeightedPolygonList2D*>(  m_param_clusters->value() );	
+                    
+                    if (measured_vf->scale() == 0)
+                    {
+                        emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the measured vf.");
+                    }
+                    
+                    QString abox_filename = m_param_abox_filename->value();
+                    //QString tbox_filename = m_param_tbox_filename->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
 
-                std::vector<QString> directions(8);
-                directions[0] = "north";
-                directions[1] = "northeast";
-                directions[2] = "east";
-                directions[3] = "southeast";
-                directions[4] = "south";
-                directions[5] = "southwest";
-                directions[6] = "west";
-                directions[7] = "northwest";
-        
-                QTextStream* filestream  = NULL;
-                
-                QFile file(abox_filename);
-        
-                if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-                {
-                    filestream = new QTextStream(&file);
-                }
-        
-                if (m_param_use_wind->value())
-                {
-                    Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );	
+                    std::vector<QString> directions(8);
+                    directions[0] = "north";
+                    directions[1] = "northeast";
+                    directions[2] = "east";
+                    directions[3] = "southeast";
+                    directions[4] = "south";
+                    directions[5] = "southwest";
+                    directions[6] = "west";
+                    directions[7] = "northwest";
+            
+                    QTextStream* filestream  = NULL;
                     
-                    if(wind_vf != NULL)
+                    QFile file(abox_filename);
+            
+                    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
                     {
-                        if (wind_vf->scale() == 0)
-                        {
-                            emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the wind vf.");
-                            
-                            //conn.disconnect();
-                        }
-                        else
-                        {
-                            //only add wind vectors to abox, which have a role relation with a measured vector:
-                            for(unsigned int i=0; i<wind_vf->size(); ++i)
-                            {
-                                
-                                QTransform wind_vf_transform = wind_vf->globalTransformation();
-                                
-                                QPointF t_i = wind_vf_transform.map(QPointF(wind_vf->origin(i).x(), wind_vf->origin(i).y()));
-                                QPointF t_j;
-                                
-                                for(unsigned int j=0; j<measured_vf->size(); ++j)
-                                {
-                                    QTransform measured_vf_transform = measured_vf->globalTransformation();
-                                    
-                                    t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
-                                    
-                                    float distance = distanceOnEarth(t_i, t_j);
-                                    
-                                    if (distance <= m_param_distance3->value())
-                                    {
-                                        QString name = QString("wind%1").arg(i);
-                                        
-                                        QTextStream datastream;
-                                        
-                                        //add the concept
-                                        datastream <<  "(instance " << name << " (and windcurrent\n";
-                                        
-                                        //find out direction (in qualitative description)
-                                        QString angle_str= directions[std::min(7.0, std::max(0.0, double(wind_vf->angle(i)) / 360 * directions.size()))];
-                                        datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                                        
-                                        //find out velocity (in qualitative description)
-                                        float velocity = wind_vf->length(i)*wind_vf->scale();
-                                        
-                                        if (velocity != 0)
-                                        {
-                                            QString  velocity_str;
-                                            if (velocity<= m_param_velocity1->value())
-                                            {
-                                                velocity_str = "low";
-                                            }
-                                            else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                                            {
-                                                velocity_str = "moderate";
-                                            }
-                                            else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                                            {
-                                                velocity_str = "high";
-                                            }
-                                            if (!velocity_str.isEmpty())
-                                                datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                                            
-                                            //Close idividual descriptor:
-                                            datastream << "))\n\n";
-                                        
-                                            QString request = datastream.readAll();
-                                            
-                                            if(filestream)
-                                            {
-                                                *filestream << request;
-                                            }
-                                        }
-                                        
-                                        break; //break out of inner for loop
-                                    }
-                                }
-                            }
-                        }
+                        filestream = new QTextStream(&file);
                     }
-                }
-                
-                if (m_param_use_modelled_currents->value())
-                {
-                    Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );	
-                    
-                    if(modelled_vf != NULL)
-                    {
-                        if (modelled_vf->scale() == 0)
-                        {
-                            emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the modelled vf.");
-                            
-                            //conn.disconnect();
-                        }
-                        else
-                        {
-                            //only add modelled vectors to abox, which have a role relation with a measured vector:
-                            for(unsigned int i=0; i<modelled_vf->size(); ++i)
-                            {
-                                
-                                QTransform modelled_vf_transform = modelled_vf->globalTransformation();
-                                
-                                QPointF t_i = modelled_vf_transform.map(QPointF(modelled_vf->origin(i).x(), modelled_vf->origin(i).y()));
-                                QPointF t_j;
-                                
-                                for(unsigned int j=0; j<measured_vf->size(); ++j)
-                                {
-                                    QTransform measured_vf_transform = measured_vf->globalTransformation();
-                                    
-                                    t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
-                                    
-                                    float distance = distanceOnEarth(t_i, t_j);
-                                    
-                                    if (distance <= m_param_distance3->value())
-                                    {
-                                        QString name = QString("modelled%1").arg(i);
-                                        
-                                        QTextStream datastream;
-                                        
-                                        //add the concept
-                                        datastream <<  "(instance " << name << " (and modelledcurrent\n";
-                                        
-                                        //find out direction (in qualitative description)
-                                        QString angle_str= directions[std::min(7.0,std::max(0.0, double(modelled_vf->angle(i)) / 360 * directions.size()))];
-                                        datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                                        
-                                        //find out velocity (in qualitative description)
-                                        float velocity = modelled_vf->length(i)*modelled_vf->scale();
-                                        
-                                        if (velocity != 0)
-                                        {
-                                            QString  velocity_str;
-                                            if (velocity<= m_param_velocity1->value())
-                                            {
-                                                velocity_str = "low";
-                                            }
-                                            else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                                            {
-                                                velocity_str = "moderate";
-                                            }
-                                            else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                                            {
-                                                velocity_str = "high";
-                                            }
-                                            if (!velocity_str.isEmpty())
-                                                datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                                            
-                                            //Close idividual descriptor:
-                                            datastream << "))\n\n";
-                                            
-                                            QString request = datastream.readAll();
-                                            
-                                            if(filestream)
-                                            {
-                                                *filestream << request;
-                                            }
-                                        }
-                                        
-                                        break; //break out of inner for loop
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                //for each measured vector:
-                for(unsigned int i=0; i<measured_vf->size(); ++i)
-                {
-                    QString name = QString("measured%1").arg(i);
-                    
-                    QTextStream datastream;
-                    
-                    //add the concept
-                    datastream <<  "(instance " << name << " (and measuredcurrent\n";
-                    
-                    //find out direction (in qualitative description)
-                    QString angle_str= directions[std::min(7.0,std::max(0.0, double(measured_vf->angle(i)) / 360 * directions.size()))];
-                    datastream << "\t\t(some has-direction " << angle_str << ")\n";
-                    
-                    //find out velocity (in qualitative description)
-                    float velocity = measured_vf->length(i)*measured_vf->scale();
-                    
-                    
-                    QString  velocity_str;
-                    if (velocity<= m_param_velocity1->value())
-                    {
-                        velocity_str = "low";
-                    }
-                    else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
-                    {
-                        velocity_str = "moderate";
-                    }
-                    else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
-                    {
-                        velocity_str = "high";
-                    }
-                    if (!velocity_str.isEmpty())
-                        datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
-                    
-                    //Close idividual descriptor:
-                    datastream << "))\n";
-                    
-                    QString request = datastream.readAll();
-                    
-                    if(filestream)
-                    {
-                        *filestream << request;
-                    }
-                }
-                
-                //for each measured vector determine role relations:
-                for(unsigned int i=0; i<measured_vf->size(); ++i)
-                {
-                    QString name = QString("measured%1").arg(i);
-                    
-                    QTextStream datastream;
-                    QTransform measured_vf_transform = measured_vf->globalTransformation();
-                    
-                    QPointF t_i = measured_vf_transform.map(QPointF(measured_vf->origin(i).x(), measured_vf->origin(i).y()));
-                    QPointF t_j;
-                    
+            
                     if (m_param_use_wind->value())
                     {
-                        Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );
+                        Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );	
+                        
                         if(wind_vf != NULL)
                         {
-                            QTransform wind_vf_transform = wind_vf->globalTransformation();
-                            
-                            //find out distant wind individuals (in qualitative description)
-                            //for each neighbor wind vector:
-                            for(unsigned int j=0; j<wind_vf->size(); ++j)
+                            if (wind_vf->scale() == 0)
                             {
-                                QString neighbor_name = QString("wind%1").arg(j);
+                                emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the wind vf.");
                                 
-                                t_j = wind_vf_transform.map(QPointF(wind_vf->origin(j).y(), wind_vf->origin(j).y()));
-                                
-                                float distance = distanceOnEarth(t_i, t_j);
-                                
-                                QString distance_str;
-                                if (distance <= m_param_distance1->value())
+                                //conn.disconnect();
+                            }
+                            else
+                            {
+                                //only add wind vectors to abox, which have a role relation with a measured vector:
+                                for(unsigned int i=0; i<wind_vf->size(); ++i)
                                 {
-                                    distance_str = "touches";
+                                    
+                                    QTransform wind_vf_transform = wind_vf->globalTransformation();
+                                    
+                                    QPointF t_i = wind_vf_transform.map(QPointF(wind_vf->origin(i).x(), wind_vf->origin(i).y()));
+                                    QPointF t_j;
+                                    
+                                    for(unsigned int j=0; j<measured_vf->size(); ++j)
+                                    {
+                                        QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                        
+                                        t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                        
+                                        float distance = distanceOnEarth(t_i, t_j);
+                                        
+                                        if (distance <= m_param_distance3->value())
+                                        {
+                                            QString name = QString("wind%1").arg(i);
+                                            
+                                            QTextStream datastream;
+                                            
+                                            //add the concept
+                                            datastream <<  "(instance " << name << " (and windcurrent\n";
+                                            
+                                            //find out direction (in qualitative description)
+                                            QString angle_str= directions[std::min(7.0, std::max(0.0, double(wind_vf->angle(i)) / 360 * directions.size()))];
+                                            datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                            
+                                            //find out velocity (in qualitative description)
+                                            float velocity = wind_vf->length(i)*wind_vf->scale();
+                                            
+                                            if (velocity != 0)
+                                            {
+                                                QString  velocity_str;
+                                                if (velocity<= m_param_velocity1->value())
+                                                {
+                                                    velocity_str = "low";
+                                                }
+                                                else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                                {
+                                                    velocity_str = "moderate";
+                                                }
+                                                else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                                {
+                                                    velocity_str = "high";
+                                                }
+                                                if (!velocity_str.isEmpty())
+                                                    datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                                
+                                                //Close idividual descriptor:
+                                                datastream << "))\n\n";
+                                            
+                                                QString request = datastream.readAll();
+                                                
+                                                if(filestream)
+                                                {
+                                                    *filestream << request;
+                                                }
+                                            }
+                                            
+                                            break; //break out of inner for loop
+                                        }
+                                    }
                                 }
-                                else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
-                                {
-                                    distance_str = "is-next-to";
-                                }
-                                else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
-                                {
-                                    distance_str = "is-far-away-from";
-                                }
-                                if(!distance_str.isEmpty())
-                                    datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
                             }
                         }
                     }
                     
                     if (m_param_use_modelled_currents->value())
                     {
-                        Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );
+                        Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );	
+                        
                         if(modelled_vf != NULL)
                         {
-                            QTransform modelled_vf_transform = modelled_vf->globalTransformation();
-                            
-                            //find out distant modelled current individuals (in qualitative description)
-                            //for each neighbor modelled current vector:
-                            for(unsigned int j=0; j<modelled_vf->size(); ++j)
+                            if (modelled_vf->scale() == 0)
                             {
-                                QString neighbor_name = QString("modelled%1").arg(j);
+                                emit errorMessage("Error: No scale given to compute the 'cm/s' for each vector of the modelled vf.");
                                 
-                                t_j = modelled_vf_transform.map(QPointF(modelled_vf->origin(j).x(), modelled_vf->origin(j).y()));
-                                
-                                float distance = distanceOnEarth(t_i, t_j);
-                                
-                                QString distance_str;
-                                if (distance <= m_param_distance1->value())
+                                //conn.disconnect();
+                            }
+                            else
+                            {
+                                //only add modelled vectors to abox, which have a role relation with a measured vector:
+                                for(unsigned int i=0; i<modelled_vf->size(); ++i)
                                 {
-                                    distance_str = "touches";
+                                    
+                                    QTransform modelled_vf_transform = modelled_vf->globalTransformation();
+                                    
+                                    QPointF t_i = modelled_vf_transform.map(QPointF(modelled_vf->origin(i).x(), modelled_vf->origin(i).y()));
+                                    QPointF t_j;
+                                    
+                                    for(unsigned int j=0; j<measured_vf->size(); ++j)
+                                    {
+                                        QTransform measured_vf_transform = measured_vf->globalTransformation();
+                                        
+                                        t_j = measured_vf_transform.map(QPointF(measured_vf->origin(j).x(), measured_vf->origin(j).y()));
+                                        
+                                        float distance = distanceOnEarth(t_i, t_j);
+                                        
+                                        if (distance <= m_param_distance3->value())
+                                        {
+                                            QString name = QString("modelled%1").arg(i);
+                                            
+                                            QTextStream datastream;
+                                            
+                                            //add the concept
+                                            datastream <<  "(instance " << name << " (and modelledcurrent\n";
+                                            
+                                            //find out direction (in qualitative description)
+                                            QString angle_str= directions[std::min(7.0,std::max(0.0, double(modelled_vf->angle(i)) / 360 * directions.size()))];
+                                            datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                                            
+                                            //find out velocity (in qualitative description)
+                                            float velocity = modelled_vf->length(i)*modelled_vf->scale();
+                                            
+                                            if (velocity != 0)
+                                            {
+                                                QString  velocity_str;
+                                                if (velocity<= m_param_velocity1->value())
+                                                {
+                                                    velocity_str = "low";
+                                                }
+                                                else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                                                {
+                                                    velocity_str = "moderate";
+                                                }
+                                                else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                                                {
+                                                    velocity_str = "high";
+                                                }
+                                                if (!velocity_str.isEmpty())
+                                                    datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                                                
+                                                //Close idividual descriptor:
+                                                datastream << "))\n\n";
+                                                
+                                                QString request = datastream.readAll();
+                                                
+                                                if(filestream)
+                                                {
+                                                    *filestream << request;
+                                                }
+                                            }
+                                            
+                                            break; //break out of inner for loop
+                                        }
+                                    }
                                 }
-                                else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
-                                {
-                                    distance_str = "is-next-to";
-                                }
-                                else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
-                                {
-                                    distance_str = "is-far-away-from";
-                                }
-                                if(!distance_str.isEmpty())
-                                    datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
                             }
                         }
                     }
                     
-                    //find out smoothness of each individual by  means of cluster smoothness:
-                    float smoothness = measured_clusters->weight(i);
-                    
-                    if (smoothness > m_param_smoothness_threshold->value())
-                    { 
-                        datastream << "(instance " << name << " currentsmoothness-problem)\n";
+                    //for each measured vector:
+                    for(unsigned int i=0; i<measured_vf->size(); ++i)
+                    {
+                        QString name = QString("measured%1").arg(i);
+                        
+                        QTextStream datastream;
+                        
+                        //add the concept
+                        datastream <<  "(instance " << name << " (and measuredcurrent\n";
+                        
+                        //find out direction (in qualitative description)
+                        QString angle_str= directions[std::min(7.0,std::max(0.0, double(measured_vf->angle(i)) / 360 * directions.size()))];
+                        datastream << "\t\t(some has-direction " << angle_str << ")\n";
+                        
+                        //find out velocity (in qualitative description)
+                        float velocity = measured_vf->length(i)*measured_vf->scale();
+                        
+                        
+                        QString  velocity_str;
+                        if (velocity<= m_param_velocity1->value())
+                        {
+                            velocity_str = "low";
+                        }
+                        else if (velocity > m_param_velocity1->value() && velocity <= m_param_velocity2->value())
+                        {
+                            velocity_str = "moderate";
+                        }
+                        else if (velocity > m_param_velocity2->value() && velocity <= m_param_velocity3->value())
+                        {
+                            velocity_str = "high";
+                        }
+                        if (!velocity_str.isEmpty())
+                            datastream << "\t\t(some has-velocity " << velocity_str << ")\n";
+                        
+                        //Close idividual descriptor:
+                        datastream << "))\n";
+                        
+                        QString request = datastream.readAll();
+                        
+                        if(filestream)
+                        {
+                            *filestream << request;
+                        }
                     }
-                                            
-                    QString request = datastream.readAll();
                     
+                    //for each measured vector determine role relations:
+                    for(unsigned int i=0; i<measured_vf->size(); ++i)
+                    {
+                        QString name = QString("measured%1").arg(i);
+                        
+                        QTextStream datastream;
+                        QTransform measured_vf_transform = measured_vf->globalTransformation();
+                        
+                        QPointF t_i = measured_vf_transform.map(QPointF(measured_vf->origin(i).x(), measured_vf->origin(i).y()));
+                        QPointF t_j;
+                        
+                        if (m_param_use_wind->value())
+                        {
+                            Vectorfield2D* wind_vf = static_cast<Vectorfield2D*>(  m_param_wind_vectorfield->value() );
+                            if(wind_vf != NULL)
+                            {
+                                QTransform wind_vf_transform = wind_vf->globalTransformation();
+                                
+                                //find out distant wind individuals (in qualitative description)
+                                //for each neighbor wind vector:
+                                for(unsigned int j=0; j<wind_vf->size(); ++j)
+                                {
+                                    QString neighbor_name = QString("wind%1").arg(j);
+                                    
+                                    t_j = wind_vf_transform.map(QPointF(wind_vf->origin(j).y(), wind_vf->origin(j).y()));
+                                    
+                                    float distance = distanceOnEarth(t_i, t_j);
+                                    
+                                    QString distance_str;
+                                    if (distance <= m_param_distance1->value())
+                                    {
+                                        distance_str = "touches";
+                                    }
+                                    else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                    {
+                                        distance_str = "is-next-to";
+                                    }
+                                    else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                    {
+                                        distance_str = "is-far-away-from";
+                                    }
+                                    if(!distance_str.isEmpty())
+                                        datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                }
+                            }
+                        }
+                        
+                        if (m_param_use_modelled_currents->value())
+                        {
+                            Vectorfield2D* modelled_vf = static_cast<Vectorfield2D*>(  m_param_modelled_vectorfield->value() );
+                            if(modelled_vf != NULL)
+                            {
+                                QTransform modelled_vf_transform = modelled_vf->globalTransformation();
+                                
+                                //find out distant modelled current individuals (in qualitative description)
+                                //for each neighbor modelled current vector:
+                                for(unsigned int j=0; j<modelled_vf->size(); ++j)
+                                {
+                                    QString neighbor_name = QString("modelled%1").arg(j);
+                                    
+                                    t_j = modelled_vf_transform.map(QPointF(modelled_vf->origin(j).x(), modelled_vf->origin(j).y()));
+                                    
+                                    float distance = distanceOnEarth(t_i, t_j);
+                                    
+                                    QString distance_str;
+                                    if (distance <= m_param_distance1->value())
+                                    {
+                                        distance_str = "touches";
+                                    }
+                                    else if (distance > m_param_distance1->value() && distance <= m_param_distance2->value())
+                                    {
+                                        distance_str = "is-next-to";
+                                    }
+                                    else if (distance > m_param_distance2->value() && distance <= m_param_distance3->value())
+                                    {
+                                        distance_str = "is-far-away-from";
+                                    }
+                                    if(!distance_str.isEmpty())
+                                        datastream << "(related " << name << " " << neighbor_name << " " << distance_str << ")\n";
+                                }
+                            }
+                        }
+                        
+                        //find out smoothness of each individual by  means of cluster smoothness:
+                        float smoothness = measured_clusters->weight(i);
+                        
+                        if (smoothness > m_param_smoothness_threshold->value())
+                        { 
+                            datastream << "(instance " << name << " currentsmoothness-problem)\n";
+                        }
+                                                
+                        QString request = datastream.readAll();
+                        
+                        if(filestream)
+                        {
+                            *filestream << request;
+                        }
+                        
+                        emit statusMessage(i*100.0/measured_vf->size(), QString("creating A-Box from data"));
+                    }	
+                    
+            
+                    //ABox is written completely - close it
                     if(filestream)
                     {
-                        *filestream << request;
+                        filestream->flush();
+                        delete filestream;
+                        filestream = NULL;
                     }
-                    
-                    emit statusMessage(i*100.0/measured_vf->size(), QString("creating A-Box from data"));
-                }	
-                
-        
-                //ABox is written completely - close it
-                if(filestream)
-                {
-                    filestream->flush();
-                    delete filestream;
-                    filestream = NULL;
+            
+            
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-        
-        
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
-        
+    
     protected:
         //Additional parameters
         ModelParameter * m_param_measured_vectorfield;

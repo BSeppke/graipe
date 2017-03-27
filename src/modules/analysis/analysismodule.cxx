@@ -63,71 +63,79 @@ class MeanVectorfield
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                MultiModelParameter		* param_vectorfields      = static_cast<MultiModelParameter*> ((*m_parameters)["vf"]);
-                
-                std::vector<Model*> selected_vectorfields = param_vectorfields->value();
-                
-                if (selected_vectorfields.size() == 0)
-                {
-                    emit errorMessage(QString("Explainable error occured: No vectorfields have been selected"));
-                    
-                }
-                else
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
                     
-                    //for each pair of images: add them				
-                    emit statusMessage(1.0, QString("starting computation"));
+                    emit statusMessage(0.0, QString("started"));
                     
-                    //take the first image as a master for size and channels
-                    DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>( selected_vectorfields[0] );
+                    MultiModelParameter		* param_vectorfields      = static_cast<MultiModelParameter*> ((*m_parameters)["vf"]);
                     
-                    unsigned int ref_w = vf->width(), ref_h = vf->height();
-                    vigra::MultiArray<2,float>temp_u(ref_w,ref_h), temp_v(ref_w,ref_h);
+                    std::vector<Model*> selected_vectorfields = param_vectorfields->value();
                     
-                    //iterate ->add vfs
-                    for(unsigned int i = 0; i < selected_vectorfields.size(); ++i)
+                    if (selected_vectorfields.size() == 0)
+                    {
+                        emit errorMessage(QString("Explainable error occured: No vectorfields have been selected"));
+                        
+                    }
+                    else
                     {
                         
-                        vf = static_cast<DenseVectorfield2D*>( selected_vectorfields[i] );
+                        //for each pair of images: add them				
+                        emit statusMessage(1.0, QString("starting computation"));
                         
-                        vigra_precondition(vf->width() == ref_w && vf->height() == ref_h, "vectorfields are of different size");
+                        //take the first image as a master for size and channels
+                        DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>( selected_vectorfields[0] );
                         
-                        temp_u += vf->u();
-                        temp_v += vf->v();
+                        unsigned int ref_w = vf->width(), ref_h = vf->height();
+                        vigra::MultiArray<2,float>temp_u(ref_w,ref_h), temp_v(ref_w,ref_h);
+                        
+                        //iterate ->add vfs
+                        for(unsigned int i = 0; i < selected_vectorfields.size(); ++i)
+                        {
+                            
+                            vf = static_cast<DenseVectorfield2D*>( selected_vectorfields[i] );
+                            
+                            vigra_precondition(vf->width() == ref_w && vf->height() == ref_h, "vectorfields are of different size");
+                            
+                            temp_u += vf->u();
+                            temp_v += vf->v();
+                        }
+                        
+                        //divide by count
+                        temp_u /= selected_vectorfields.size();
+                        temp_v /= selected_vectorfields.size();
+                        
+                        //create new image to do the addition
+                        DenseVectorfield2D* new_vf = new DenseVectorfield2D(temp_u, temp_v);
+                        
+                        //Copy all metadata from current image (will be overwritten later)
+                        vf->copyMetadata(*new_vf);
+                        new_vf->setName(QString("mean vectorfield of ") + param_vectorfields->valueText());
+                                        
+                        m_results.push_back(new_vf);
+                        
+                        emit statusMessage(100.0, QString("finished computation"));
+                        emit finished();
                     }
-                    
-                    //divide by count
-                    temp_u /= selected_vectorfields.size();
-                    temp_v /= selected_vectorfields.size();
-                    
-                    //create new image to do the addition
-                    DenseVectorfield2D* new_vf = new DenseVectorfield2D(temp_u, temp_v);
-                    
-                    //Copy all metadata from current image (will be overwritten later)
-                    vf->copyMetadata(*new_vf);
-                    new_vf->setName(QString("mean vectorfield of ") + param_vectorfields->valueText());
-                                    
-                    m_results.push_back(new_vf);
-                    
-                    emit statusMessage(100.0, QString("finished computation"));
-                    emit finished();
                 }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 /**
@@ -166,107 +174,117 @@ class Vectorfield2DDenseModelComparison
          */
         void run()
         {
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ( (*m_parameters)["vf1"]),
-                                    * param_reference_vf = static_cast<ModelParameter*> ((*m_parameters)["vf2"]);
-                
-                IntParameter		* param_interpolation  =  static_cast<IntParameter*> ((*m_parameters)["degree"]);
-                
-                Vectorfield2D*		first_vf     = static_cast<Vectorfield2D*>(param_vf->value());
-                DenseVectorfield2D* reference_vf = static_cast<DenseVectorfield2D*>(param_reference_vf->value());
-                
-                vigra_precondition(first_vf		!= NULL, "bad first vf pointer");
-                vigra_precondition(reference_vf != NULL, "bad reference vf pointer");
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                AverageAngularErrorFunctor f_aae;
-                QString report_aae;
-                WeightedPointFeatureList2D* comparison_aae;
-                
-                switch (param_interpolation->value()) {
-                    case 0:
-                        comparison_aae = compareVectorfieldToDenseModel<0>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                    case 1:
-                        comparison_aae = compareVectorfieldToDenseModel<1>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                    case 2:
-                        comparison_aae = compareVectorfieldToDenseModel<2>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                    case 3:
-                        comparison_aae = compareVectorfieldToDenseModel<3>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                    case 4:
-                        comparison_aae = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                    case 5:
-                        comparison_aae = compareVectorfieldToDenseModel<5>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                    default:
-                        comparison_aae = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_aae, report_aae);
-                        break;
-                }
-                        
-                comparison_aae->setName(f_aae.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
-                
-                QString descr("The following parameters were used for comparison:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                comparison_aae->setDescription(descr + report_aae);
-                
-                first_vf->copyGeometry(*comparison_aae);
-                
-                m_results.push_back(comparison_aae);
-                
-                emit statusMessage(50.0, QString("half-way done"));
-                
-                AverageVelocityErrorFunctor f_ave;
-                QString report_ave;
-                WeightedPointFeatureList2D* comparison_ave;
-                
-                switch (param_interpolation->value()) {
-                    case 0:
-                        comparison_ave = compareVectorfieldToDenseModel<0>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                    case 1:
-                        comparison_ave = compareVectorfieldToDenseModel<1>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                    case 2:
-                        comparison_ave = compareVectorfieldToDenseModel<2>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                    case 3:
-                        comparison_ave = compareVectorfieldToDenseModel<3>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                    case 4:
-                        comparison_ave = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                    case 5:
-                        comparison_ave = compareVectorfieldToDenseModel<5>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                    default:
-                        comparison_ave = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_ave, report_ave);
-                        break;
-                }
-                comparison_ave->setName(f_ave.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
-                comparison_ave->setDescription(descr + report_ave);
-                
-                first_vf->copyGeometry(*comparison_ave);
-                
-                m_results.push_back(comparison_ave);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ( (*m_parameters)["vf1"]),
+                                        * param_reference_vf = static_cast<ModelParameter*> ((*m_parameters)["vf2"]);
+                    
+                    IntParameter		* param_interpolation  =  static_cast<IntParameter*> ((*m_parameters)["degree"]);
+                    
+                    Vectorfield2D*		first_vf     = static_cast<Vectorfield2D*>(param_vf->value());
+                    DenseVectorfield2D* reference_vf = static_cast<DenseVectorfield2D*>(param_reference_vf->value());
+                    
+                    vigra_precondition(first_vf		!= NULL, "bad first vf pointer");
+                    vigra_precondition(reference_vf != NULL, "bad reference vf pointer");
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    AverageAngularErrorFunctor f_aae;
+                    QString report_aae;
+                    WeightedPointFeatureList2D* comparison_aae;
+                    
+                    switch (param_interpolation->value()) {
+                        case 0:
+                            comparison_aae = compareVectorfieldToDenseModel<0>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                        case 1:
+                            comparison_aae = compareVectorfieldToDenseModel<1>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                        case 2:
+                            comparison_aae = compareVectorfieldToDenseModel<2>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                        case 3:
+                            comparison_aae = compareVectorfieldToDenseModel<3>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                        case 4:
+                            comparison_aae = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                        case 5:
+                            comparison_aae = compareVectorfieldToDenseModel<5>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                        default:
+                            comparison_aae = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_aae, report_aae);
+                            break;
+                    }
+                            
+                    comparison_aae->setName(f_aae.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
+                    
+                    QString descr("The following parameters were used for comparison:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    comparison_aae->setDescription(descr + report_aae);
+                    
+                    first_vf->copyGeometry(*comparison_aae);
+                    
+                    m_results.push_back(comparison_aae);
+                    
+                    emit statusMessage(50.0, QString("half-way done"));
+                    
+                    AverageVelocityErrorFunctor f_ave;
+                    QString report_ave;
+                    WeightedPointFeatureList2D* comparison_ave;
+                    
+                    switch (param_interpolation->value()) {
+                        case 0:
+                            comparison_ave = compareVectorfieldToDenseModel<0>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                        case 1:
+                            comparison_ave = compareVectorfieldToDenseModel<1>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                        case 2:
+                            comparison_ave = compareVectorfieldToDenseModel<2>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                        case 3:
+                            comparison_ave = compareVectorfieldToDenseModel<3>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                        case 4:
+                            comparison_ave = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                        case 5:
+                            comparison_ave = compareVectorfieldToDenseModel<5>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                        default:
+                            comparison_ave = compareVectorfieldToDenseModel<4>(first_vf, reference_vf, f_ave, report_ave);
+                            break;
+                    }
+                    comparison_ave->setName(f_ave.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
+                    comparison_ave->setDescription(descr + report_ave);
+                    
+                    first_vf->copyGeometry(*comparison_ave);
+                    
+                    m_results.push_back(comparison_ave);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
         }
 };
@@ -309,63 +327,73 @@ class Vectorfield2DGenericComparison
          */
         void run()
         {
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf1"]),
-                                    * param_reference_vf = static_cast<ModelParameter*> ((*m_parameters)["vf2"]);
-                
-                IntParameter		* param_n_neighbors  =  static_cast<IntParameter*> ((*m_parameters)["n"]);
-                
-                Vectorfield2D* first_vf     = static_cast<Vectorfield2D*>(param_vf->value());
-                Vectorfield2D* reference_vf = static_cast<Vectorfield2D*>(param_reference_vf->value());
-                
-                vigra_precondition(first_vf		!= NULL, "bad first vf pointer");
-                vigra_precondition(reference_vf != NULL, "bad reference vf pointer");
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                AverageAngularErrorFunctor f_aae;
-                QString report_aae;
-                WeightedPointFeatureList2D* comparison_aae =  compareVectorfieldsGeneric(first_vf, reference_vf, param_n_neighbors->value(), f_aae, report_aae);
-                
-                comparison_aae->setName(f_aae.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
-            
-                QString descr("The following parameters were used for comparison:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                comparison_aae->setDescription(descr + report_aae);
-                
-                first_vf->copyGeometry(*comparison_aae);
-                
-                m_results.push_back(comparison_aae);
-                
-                
-                emit statusMessage(50.0, QString("half-way done"));
-                
-                
-                AverageVelocityErrorFunctor f_ave;
-                QString report_ave;
-                WeightedPointFeatureList2D* comparison_ave =  compareVectorfieldsGeneric(first_vf, reference_vf, param_n_neighbors->value(), f_ave, report_ave);
-                
-                comparison_ave->setName(f_ave.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
-                comparison_ave->setDescription(descr + report_ave);
-                
-                first_vf->copyGeometry(*comparison_ave);
-                
-                m_results.push_back(comparison_ave);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf1"]),
+                                        * param_reference_vf = static_cast<ModelParameter*> ((*m_parameters)["vf2"]);
+                    
+                    IntParameter		* param_n_neighbors  =  static_cast<IntParameter*> ((*m_parameters)["n"]);
+                    
+                    Vectorfield2D* first_vf     = static_cast<Vectorfield2D*>(param_vf->value());
+                    Vectorfield2D* reference_vf = static_cast<Vectorfield2D*>(param_reference_vf->value());
+                    
+                    vigra_precondition(first_vf		!= NULL, "bad first vf pointer");
+                    vigra_precondition(reference_vf != NULL, "bad reference vf pointer");
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    AverageAngularErrorFunctor f_aae;
+                    QString report_aae;
+                    WeightedPointFeatureList2D* comparison_aae =  compareVectorfieldsGeneric(first_vf, reference_vf, param_n_neighbors->value(), f_aae, report_aae);
+                    
+                    comparison_aae->setName(f_aae.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
+                
+                    QString descr("The following parameters were used for comparison:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    comparison_aae->setDescription(descr + report_aae);
+                    
+                    first_vf->copyGeometry(*comparison_aae);
+                    
+                    m_results.push_back(comparison_aae);
+                    
+                    
+                    emit statusMessage(50.0, QString("half-way done"));
+                    
+                    
+                    AverageVelocityErrorFunctor f_ave;
+                    QString report_ave;
+                    WeightedPointFeatureList2D* comparison_ave =  compareVectorfieldsGeneric(first_vf, reference_vf, param_n_neighbors->value(), f_ave, report_ave);
+                    
+                    comparison_ave->setName(f_ave.shortName() + QString(" Vectorfield comparison: ") + first_vf->name() + QString(" and ") + reference_vf->name());
+                    comparison_ave->setDescription(descr + report_ave);
+                    
+                    first_vf->copyGeometry(*comparison_ave);
+                    
+                    m_results.push_back(comparison_ave);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
         }
 };
@@ -405,55 +433,65 @@ class Vectorfield2DSeparation
          */
         void run()
         {
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                if(param_vf->value()->typeName() == "SparseVectorfield2D")
-                {
-                    SparseVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseVectorfield2D*>(param_vf->value()));
-                    m_results.push_back(result_vf);
-                }
-                else if(param_vf->value()->typeName() == "SparseWeightedVectorfield2D")
-                {
-                    SparseWeightedVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseWeightedVectorfield2D*>(param_vf->value()));
-                    m_results.push_back(result_vf);
-                }
-                else if(param_vf->value()->typeName() == "SparseMultiVectorfield2D")
-                {
-                    SparseMultiVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseMultiVectorfield2D*>(param_vf->value()));
-                    m_results.push_back(result_vf);
-                }
-                else if(param_vf->value()->typeName() == "SparseWeightedMultiVectorfield2D")
-                {
-                    SparseWeightedMultiVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseWeightedMultiVectorfield2D*>(param_vf->value()));
-                    m_results.push_back(result_vf);
-                }
-                else if(param_vf->value()->typeName() == "DenseVectorfield2D")
-                {
-                    DenseVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<DenseVectorfield2D*>(param_vf->value()));
-                    m_results.push_back(result_vf);
-                }
-                else if(param_vf->value()->typeName() == "DenseWeightedVectorfield2D")
-                {
-                    DenseWeightedVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<DenseWeightedVectorfield2D*>(param_vf->value()));
-                    m_results.push_back(result_vf);
-                }
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    if(param_vf->value()->typeName() == "SparseVectorfield2D")
+                    {
+                        SparseVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseVectorfield2D*>(param_vf->value()));
+                        m_results.push_back(result_vf);
+                    }
+                    else if(param_vf->value()->typeName() == "SparseWeightedVectorfield2D")
+                    {
+                        SparseWeightedVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseWeightedVectorfield2D*>(param_vf->value()));
+                        m_results.push_back(result_vf);
+                    }
+                    else if(param_vf->value()->typeName() == "SparseMultiVectorfield2D")
+                    {
+                        SparseMultiVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseMultiVectorfield2D*>(param_vf->value()));
+                        m_results.push_back(result_vf);
+                    }
+                    else if(param_vf->value()->typeName() == "SparseWeightedMultiVectorfield2D")
+                    {
+                        SparseWeightedMultiVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<SparseWeightedMultiVectorfield2D*>(param_vf->value()));
+                        m_results.push_back(result_vf);
+                    }
+                    else if(param_vf->value()->typeName() == "DenseVectorfield2D")
+                    {
+                        DenseVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<DenseVectorfield2D*>(param_vf->value()));
+                        m_results.push_back(result_vf);
+                    }
+                    else if(param_vf->value()->typeName() == "DenseWeightedVectorfield2D")
+                    {
+                        DenseWeightedVectorfield2D* result_vf = computeGlobalMotionOfVectorfield(static_cast<DenseWeightedVectorfield2D*>(param_vf->value()));
+                        m_results.push_back(result_vf);
+                    }
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
         }
 };
@@ -493,55 +531,65 @@ class Vectorfield2DCurl
          */
         void run()
         {
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                FloatParameter	* param_sigma = static_cast<FloatParameter*> ((*m_parameters)["sigma"]);
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>(param_vf->value());
-                
-                unsigned int w = vf->width(),
-                             h = vf->height();
-                
-                Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1);
-                vf->copyGeometry(*img);
-                
-                vigra::Kernel1D<double> kernel;
-                kernel.initGaussianDerivative(param_sigma->value(),1);
-                
-                vigra::MultiArray<2,float>m_uy(w,h), m_vx(w,h), res(w,h);
-                
-                vigra::separableConvolveY(vf->u(), m_uy, kernel);
-                vigra::separableConvolveX(vf->v(), m_vx, kernel);
-                
-                for (unsigned int y=0 ; y < h; ++y)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
                 {
-                    for (unsigned int x=0 ; x < w; ++x)
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    FloatParameter	* param_sigma = static_cast<FloatParameter*> ((*m_parameters)["sigma"]);
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>(param_vf->value());
+                    
+                    unsigned int w = vf->width(),
+                                 h = vf->height();
+                    
+                    Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1);
+                    vf->copyGeometry(*img);
+                    
+                    vigra::Kernel1D<double> kernel;
+                    kernel.initGaussianDerivative(param_sigma->value(),1);
+                    
+                    vigra::MultiArray<2,float>m_uy(w,h), m_vx(w,h), res(w,h);
+                    
+                    vigra::separableConvolveY(vf->u(), m_uy, kernel);
+                    vigra::separableConvolveX(vf->v(), m_vx, kernel);
+                    
+                    for (unsigned int y=0 ; y < h; ++y)
                     {
-                        res(x,y)  = m_vx(x,y) - m_uy(x,y);
+                        for (unsigned int x=0 ; x < w; ++x)
+                        {
+                            res(x,y)  = m_vx(x,y) - m_uy(x,y);
+                        }
                     }
+                    
+                    img->setBand(0,res);
+                    img->setName("Scalar Curl of: " + vf->name());
+                    img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
+                    
+                    m_results.push_back(img);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                img->setBand(0,res);
-                img->setName("Scalar Curl of: " + vf->name());
-                img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
-                
-                m_results.push_back(img);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-            }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
         }
 };
@@ -581,55 +629,65 @@ class Vectorfield2DDiv
          */
         void run()
         {
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                FloatParameter	* param_sigma = static_cast<FloatParameter*> ((*m_parameters)["sigma"]);
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>(param_vf->value());
-                
-                unsigned int w = vf->width(),
-                             h = vf->height();
-                
-                Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1);
-                vf->copyGeometry(*img);
-                
-                vigra::Kernel1D<double> kernel;
-                kernel.initGaussianDerivative(param_sigma->value(),1);
-                
-                vigra::MultiArray<2,float> m_ux(w,h), m_vy(w,h), res(w,h);
-                
-                vigra::separableConvolveX(vf->u(), m_ux, kernel);
-                vigra::separableConvolveY(vf->v(), m_vy, kernel);
-                
-                for (unsigned int y=0 ; y < h; ++y)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
                 {
-                    for (unsigned int x=0 ; x < w; ++x)
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    FloatParameter	* param_sigma = static_cast<FloatParameter*> ((*m_parameters)["sigma"]);
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    DenseVectorfield2D* vf = static_cast<DenseVectorfield2D*>(param_vf->value());
+                    
+                    unsigned int w = vf->width(),
+                                 h = vf->height();
+                    
+                    Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1);
+                    vf->copyGeometry(*img);
+                    
+                    vigra::Kernel1D<double> kernel;
+                    kernel.initGaussianDerivative(param_sigma->value(),1);
+                    
+                    vigra::MultiArray<2,float> m_ux(w,h), m_vy(w,h), res(w,h);
+                    
+                    vigra::separableConvolveX(vf->u(), m_ux, kernel);
+                    vigra::separableConvolveY(vf->v(), m_vy, kernel);
+                    
+                    for (unsigned int y=0 ; y < h; ++y)
                     {
-                        res(x,y)  = m_ux(x,y) + m_vy(x,y);
+                        for (unsigned int x=0 ; x < w; ++x)
+                        {
+                            res(x,y)  = m_ux(x,y) + m_vy(x,y);
+                        }
                     }
+                    
+                    img->setBand(0,res);
+                    img->setName("Divergence of: " + vf->name());
+                    img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
+                    
+                    m_results.push_back(img);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                img->setBand(0,res);
-                img->setName("Divergence of: " + vf->name());
-                img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
-                
-                m_results.push_back(img);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
-            }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
         }
 };

@@ -66,63 +66,70 @@ class MonotonyFeatureDetector
          */
         void run()
         {
-            lockModels();
-            
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
-                
-                BoolParameter			* param_useMask   = static_cast<BoolParameter*>( (*m_parameters)["mask?"]);
-                ImageBandParameter<float>	* param_mask_image	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["mask"]);
-                
-                IntParameter			* param_lowestMonotonyClass  = static_cast<IntParameter*>( (*m_parameters)["lowM"]),
-                                        * param_highestMonotonyClass = static_cast<IntParameter*>( (*m_parameters)["hiM"]);
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
+                    
+                    BoolParameter			* param_useMask   = static_cast<BoolParameter*>( (*m_parameters)["mask?"]);
+                    ImageBandParameter<float>	* param_mask_image	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["mask"]);
+                    
+                    IntParameter			* param_lowestMonotonyClass  = static_cast<IntParameter*>( (*m_parameters)["lowM"]),
+                                            * param_highestMonotonyClass = static_cast<IntParameter*>( (*m_parameters)["hiM"]);
+                            
+                    vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
+                    
+                    
+                    WeightedPointFeatureList2D* new_feature_list;
                         
-                vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
-                
-                
-                WeightedPointFeatureList2D* new_feature_list;
+                    emit statusMessage(1.0, QString("starting computation"));
                     
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                if(param_useMask->value())
-                {
-                    vigra::MultiArrayView<2,float> mask = param_mask_image->value();
+                    if(param_useMask->value())
+                    {
+                        vigra::MultiArrayView<2,float> mask = param_mask_image->value();
+                        
+                        new_feature_list = detectFeaturesUsingMonotonyOperatorWithMask(imageband,
+                                                                                       mask,
+                                                                                       param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
+                    }
+                    else
+                    {
+                        new_feature_list = detectFeaturesUsingMonotonyOperator(imageband,
+                                                                               param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
+                    }
+                    new_feature_list->setName(QString("Monotony Features of ") + param_imageBand->valueText());
+                    QString descr("The following parameters were used to determine the Monotony Features:\n");
+                    descr += m_parameters->valueText("ModelParameter");
                     
-                    new_feature_list = detectFeaturesUsingMonotonyOperatorWithMask(imageband,
-                                                                                   mask,
-                                                                                   param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
+                    new_feature_list->setDescription(descr);
+                    
+                    ((Model*)param_imageBand->image())->copyGeometry(*new_feature_list);
+                    
+                    m_results.push_back(new_feature_list);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                else
+                catch(std::exception& e)
                 {
-                    new_feature_list = detectFeaturesUsingMonotonyOperator(imageband,
-                                                                           param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
                 }
-                new_feature_list->setName(QString("Monotony Features of ") + param_imageBand->valueText());
-                QString descr("The following parameters were used to determine the Monotony Features:\n");
-                descr += m_parameters->valueText("ModelParameter");
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
                 
-                new_feature_list->setDescription(descr);
-                
-                ((Model*)param_imageBand->image())->copyGeometry(*new_feature_list);
-                
-                m_results.push_back(new_feature_list);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            
-            unlockModels();
         }
 };
 
@@ -165,62 +172,69 @@ class HarrisCornerDetector
          */
         void run()
         {
-            lockModels();
-            
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
-                
-                BoolParameter       * param_useMask   = static_cast<BoolParameter*>( (*m_parameters)["mask?"]);
-                ImageBandParameter<float>	* param_mask	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["mask"]);
-                
-                FloatParameter	* param_gradientSigma = static_cast<FloatParameter*>( (*m_parameters)["sigma"]),
-                                * param_responseThreshold = static_cast<FloatParameter*>( (*m_parameters)["T"]);
-                
-                vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
-                
-                WeightedPointFeatureList2D* new_feature_list;
-                    
-                emit statusMessage(1.0, QString("starting computation"));
-                    
-                if(param_useMask->value())
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
                 {
-                    vigra::MultiArrayView<2,float> mask =  param_mask->value();
+                    emit statusMessage(0.0, QString("started"));
                     
-                    new_feature_list = detectFeaturesUsingHarrisWithMask(imageband,
-                                                                         mask,
-                                                                         param_gradientSigma->value(), param_responseThreshold->value());
+                    ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
                     
+                    BoolParameter       * param_useMask   = static_cast<BoolParameter*>( (*m_parameters)["mask?"]);
+                    ImageBandParameter<float>	* param_mask	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["mask"]);
+                    
+                    FloatParameter	* param_gradientSigma = static_cast<FloatParameter*>( (*m_parameters)["sigma"]),
+                                    * param_responseThreshold = static_cast<FloatParameter*>( (*m_parameters)["T"]);
+                    
+                    vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
+                    
+                    WeightedPointFeatureList2D* new_feature_list;
+                        
+                    emit statusMessage(1.0, QString("starting computation"));
+                        
+                    if(param_useMask->value())
+                    {
+                        vigra::MultiArrayView<2,float> mask =  param_mask->value();
+                        
+                        new_feature_list = detectFeaturesUsingHarrisWithMask(imageband,
+                                                                             mask,
+                                                                             param_gradientSigma->value(), param_responseThreshold->value());
+                        
+                    }
+                    else
+                    {
+                        new_feature_list = detectFeaturesUsingHarris(imageband,
+                                                                     param_gradientSigma->value(), param_responseThreshold->value());
+                    }
+                        
+                    new_feature_list->setName(QString("Harris Features of ") + param_imageBand->valueText());
+                    QString descr("The following parameters were used to determine the Harris Features:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_feature_list->setDescription(descr);
+                    
+                    ((Model*)param_imageBand->image())->copyGeometry(*new_feature_list);
+                    
+                    m_results.push_back(new_feature_list);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                else
+                catch(std::exception& e)
                 {
-                    new_feature_list = detectFeaturesUsingHarris(imageband,
-                                                                 param_gradientSigma->value(), param_responseThreshold->value());
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
                 }
-                    
-                new_feature_list->setName(QString("Harris Features of ") + param_imageBand->valueText());
-                QString descr("The following parameters were used to determine the Harris Features:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_feature_list->setDescription(descr);
-                
-                ((Model*)param_imageBand->image())->copyGeometry(*new_feature_list);
-                
-                m_results.push_back(new_feature_list);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -263,62 +277,69 @@ class CannyFeatureDetector
          */
         void run()
         {
-            lockModels();
-            
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
-                
-                BoolParameter		* param_useMask   = static_cast<BoolParameter*>( (*m_parameters)["mask?"]);
-                ImageBandParameter<float>	* param_mask	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["mask"]);
-                
-                FloatParameter*	param_cannyScale = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
-                FloatParameter*	param_cannyThreshold = static_cast<FloatParameter*>( (*m_parameters)["sigmaT"]);
-                
-                vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                    
-                EdgelFeatureList2D* new_edgel_feature_list;
-                
-                if(param_useMask->value())
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    vigra::MultiArrayView<2,float> mask = param_mask->value();
+                    emit statusMessage(0.0, QString("started"));
                     
-                    new_edgel_feature_list = detectFeaturesUsingCannyWithMask(imageband,
-                                                                              mask,
-                                                                              param_cannyScale->value(), param_cannyThreshold->value());
+                    ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
+                    
+                    BoolParameter		* param_useMask   = static_cast<BoolParameter*>( (*m_parameters)["mask?"]);
+                    ImageBandParameter<float>	* param_mask	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["mask"]);
+                    
+                    FloatParameter*	param_cannyScale = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
+                    FloatParameter*	param_cannyThreshold = static_cast<FloatParameter*>( (*m_parameters)["sigmaT"]);
+                    
+                    vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                        
+                    EdgelFeatureList2D* new_edgel_feature_list;
+                    
+                    if(param_useMask->value())
+                    {
+                        vigra::MultiArrayView<2,float> mask = param_mask->value();
+                        
+                        new_edgel_feature_list = detectFeaturesUsingCannyWithMask(imageband,
+                                                                                  mask,
+                                                                                  param_cannyScale->value(), param_cannyThreshold->value());
+                    }
+                    else
+                    {
+                        new_edgel_feature_list = detectFeaturesUsingCanny(imageband,
+                                                                          param_cannyScale->value(), param_cannyThreshold->value());
+                    }
+                    
+                    new_edgel_feature_list->setName(QString("Canny-Edgel Features of ") + param_imageBand->valueText());
+                    QString descr("The following parameters were used to determine the Canny-Edgel Features:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    new_edgel_feature_list->setDescription(descr);
+                    
+                    ((Model*)param_imageBand->image())->copyGeometry(*new_edgel_feature_list);
+                    
+                    m_results.push_back(new_edgel_feature_list);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
                 }
-                else
+                catch(std::exception& e)
                 {
-                    new_edgel_feature_list = detectFeaturesUsingCanny(imageband,
-                                                                      param_cannyScale->value(), param_cannyThreshold->value());
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
                 }
-                
-                new_edgel_feature_list->setName(QString("Canny-Edgel Features of ") + param_imageBand->valueText());
-                QString descr("The following parameters were used to determine the Canny-Edgel Features:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                new_edgel_feature_list->setDescription(descr);
-                
-                ((Model*)param_imageBand->image())->copyGeometry(*new_edgel_feature_list);
-                
-                m_results.push_back(new_edgel_feature_list);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -358,44 +379,51 @@ class CannyFeatureLengthFilter
          */
         void run()
         {
-            lockModels();
-            
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_features	= static_cast<ModelParameter*> ( (*m_parameters)["edgels"]);
-                
-                FloatParameter*	param_minimalLength = static_cast<FloatParameter*>( (*m_parameters)["min-length"]);
-                FloatParameter*	param_searchRadius  = static_cast<FloatParameter*>( (*m_parameters)["radius"]);
-                
-                EdgelFeatureList2D* features = static_cast<EdgelFeatureList2D*> (param_features->value()); 
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                EdgelFeatureList2D* new_edgel_feature_list = removeShortEdgesFromEdgelList(features, param_minimalLength->value(),param_searchRadius->value());
-                
-                new_edgel_feature_list->setName(QString("Filtered ") + features->name());
-                QString descr("The following parameters were used to filter the Canny-Edgel Features:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_edgel_feature_list->setDescription(descr);
-                
-                features->copyGeometry(*new_edgel_feature_list);
-                
-                m_results.push_back(new_edgel_feature_list);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_features	= static_cast<ModelParameter*> ( (*m_parameters)["edgels"]);
+                    
+                    FloatParameter*	param_minimalLength = static_cast<FloatParameter*>( (*m_parameters)["min-length"]);
+                    FloatParameter*	param_searchRadius  = static_cast<FloatParameter*>( (*m_parameters)["radius"]);
+                    
+                    EdgelFeatureList2D* features = static_cast<EdgelFeatureList2D*> (param_features->value()); 
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    EdgelFeatureList2D* new_edgel_feature_list = removeShortEdgesFromEdgelList(features, param_minimalLength->value(),param_searchRadius->value());
+                    
+                    new_edgel_feature_list->setName(QString("Filtered ") + features->name());
+                    QString descr("The following parameters were used to filter the Canny-Edgel Features:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_edgel_feature_list->setDescription(descr);
+                    
+                    features->copyGeometry(*new_edgel_feature_list);
+                    
+                    m_results.push_back(new_edgel_feature_list);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
     
     private:
@@ -512,56 +540,63 @@ class SIFTFeatureDetector
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
-                
-                FloatParameter	*	param_sigma = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
-                
-                IntParameter	*	param_octaves = static_cast<IntParameter*>( (*m_parameters)["octaves"]),
-                                *	param_levels  = static_cast<IntParameter*>( (*m_parameters)["levels"]);
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                FloatParameter	*	param_contrast_threshold = static_cast<FloatParameter*>( (*m_parameters)["contrast"]),
-                                *	param_curvature_threshold  = static_cast<FloatParameter*>( (*m_parameters)["curvature"]);
-                
-                BoolParameter	*	param_double_size  = static_cast<BoolParameter*>( (*m_parameters)["double"]),
-                                *	param_normalize = static_cast<BoolParameter*>( (*m_parameters)["norm"]);
-                
-                
-                vigra::MultiArrayView<2,float>	imageband = param_imageBand->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                SIFTFeatureList2D* new_feature_list =  detectFeaturesUsingSIFT(imageband,
-                                                                               param_sigma->value(), param_octaves->value(), param_levels->value(),
-                                                                               param_contrast_threshold->value(), param_curvature_threshold->value(), param_double_size->value(), param_normalize->value());
-                
-                new_feature_list->setName(QString("SIFT Features of ") + param_imageBand->valueText());
-                QString descr("The following parameters were used to determine the SIFT Features:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                new_feature_list->setDescription(descr);
-                            
-                ((Model*)param_imageBand->image())->copyGeometry(*new_feature_list);
-        
-                m_results.push_back(new_feature_list);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    ImageBandParameter<float>	* param_imageBand	= static_cast<ImageBandParameter<float>*> ( (*m_parameters)["image"]);
+                    
+                    FloatParameter	*	param_sigma = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
+                    
+                    IntParameter	*	param_octaves = static_cast<IntParameter*>( (*m_parameters)["octaves"]),
+                                    *	param_levels  = static_cast<IntParameter*>( (*m_parameters)["levels"]);
+                        
+                    FloatParameter	*	param_contrast_threshold = static_cast<FloatParameter*>( (*m_parameters)["contrast"]),
+                                    *	param_curvature_threshold  = static_cast<FloatParameter*>( (*m_parameters)["curvature"]);
+                    
+                    BoolParameter	*	param_double_size  = static_cast<BoolParameter*>( (*m_parameters)["double"]),
+                                    *	param_normalize = static_cast<BoolParameter*>( (*m_parameters)["norm"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float>	imageband = param_imageBand->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    SIFTFeatureList2D* new_feature_list =  detectFeaturesUsingSIFT(imageband,
+                                                                                   param_sigma->value(), param_octaves->value(), param_levels->value(),
+                                                                                   param_contrast_threshold->value(), param_curvature_threshold->value(), param_double_size->value(), param_normalize->value());
+                    
+                    new_feature_list->setName(QString("SIFT Features of ") + param_imageBand->valueText());
+                    QString descr("The following parameters were used to determine the SIFT Features:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    new_feature_list->setDescription(descr);
+                                
+                    ((Model*)param_imageBand->image())->copyGeometry(*new_feature_list);
+            
+                    m_results.push_back(new_feature_list);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 

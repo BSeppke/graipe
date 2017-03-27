@@ -65,50 +65,58 @@ class VectorfieldSmoother
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                        
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    FloatParameter	* param_radius = static_cast<FloatParameter*>((*m_parameters)["radius"]);
+                    FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
+                    IntParameter		* param_iterations = static_cast<IntParameter*>((*m_parameters)["iterations"]);
+                    BoolParameter		* param_use_all = static_cast<BoolParameter*>((*m_parameters)["use_all_weights?"]);
                     
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                FloatParameter	* param_radius = static_cast<FloatParameter*>((*m_parameters)["radius"]);
-                FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
-                IntParameter		* param_iterations = static_cast<IntParameter*>((*m_parameters)["iterations"]);
-                BoolParameter		* param_use_all = static_cast<BoolParameter*>((*m_parameters)["use_all_weights?"]);
-                
-                SparseWeightedMultiVectorfield2D* current_vf = static_cast<SparseWeightedMultiVectorfield2D* >(  param_vf->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                SparseWeightedVectorfield2D* new_vf = smoothVectorfield(current_vf,
-                                                                          param_iterations->value(), 
-                                                                          param_radius->value(), 
-                                                                          param_threshold->value(), 
-                                                                          param_use_all->value());
-                
-                new_vf->setName(QString("Smoothed ") + current_vf->name());
-                
-                QString descr("The following parameters were used for smoothing:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_vf->setDescription(descr);
-                
-                current_vf->copyGeometry(*new_vf);
-                new_vf->setScale(current_vf->scale());
-                
-                m_results.push_back(new_vf);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    SparseWeightedMultiVectorfield2D* current_vf = static_cast<SparseWeightedMultiVectorfield2D* >(  param_vf->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    SparseWeightedVectorfield2D* new_vf = smoothVectorfield(current_vf,
+                                                                              param_iterations->value(), 
+                                                                              param_radius->value(), 
+                                                                              param_threshold->value(), 
+                                                                              param_use_all->value());
+                    
+                    new_vf->setName(QString("Smoothed ") + current_vf->name());
+                    
+                    QString descr("The following parameters were used for smoothing:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_vf->setDescription(descr);
+                    
+                    current_vf->copyGeometry(*new_vf);
+                    new_vf->setScale(current_vf->scale());
+                    
+                    m_results.push_back(new_vf);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -149,50 +157,58 @@ class VectorfieldRelaxer : public Algorithm
          */
         void run()
         {
-            lockModels();
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                FloatParameter	* param_radius = static_cast<FloatParameter*>((*m_parameters)["radius"]);
-                FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
-                IntParameter		* param_iterations = static_cast<IntParameter*>((*m_parameters)["iterations"]);
-                BoolParameter		* param_use_all = static_cast<BoolParameter*>((*m_parameters)["use_all_weights?"]);
-                
-                SparseWeightedMultiVectorfield2D* current_vf = static_cast<SparseWeightedMultiVectorfield2D* >(  param_vf->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                //create new vf and do the transform
-                SparseWeightedVectorfield2D* new_vf;
-                
-                new_vf = relaxVectorfield(current_vf,	param_iterations->value(), 
-                                          param_radius->value(), param_threshold->value(), param_use_all->value());
-                
-                new_vf->setName(QString("Relaxed ") + current_vf->name());
-                
-                QString descr("The following parameters were used for relaxation:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_vf->setDescription(descr);
-                
-                current_vf->copyGeometry(*new_vf);
-                new_vf->setScale(current_vf->scale());
-                
-                m_results.push_back(new_vf);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    FloatParameter	* param_radius = static_cast<FloatParameter*>((*m_parameters)["radius"]);
+                    FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
+                    IntParameter		* param_iterations = static_cast<IntParameter*>((*m_parameters)["iterations"]);
+                    BoolParameter		* param_use_all = static_cast<BoolParameter*>((*m_parameters)["use_all_weights?"]);
+                    
+                    SparseWeightedMultiVectorfield2D* current_vf = static_cast<SparseWeightedMultiVectorfield2D* >(  param_vf->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    //create new vf and do the transform
+                    SparseWeightedVectorfield2D* new_vf;
+                    
+                    new_vf = relaxVectorfield(current_vf,	param_iterations->value(), 
+                                              param_radius->value(), param_threshold->value(), param_use_all->value());
+                    
+                    new_vf->setName(QString("Relaxed ") + current_vf->name());
+                    
+                    QString descr("The following parameters were used for relaxation:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_vf->setDescription(descr);
+                    
+                    current_vf->copyGeometry(*new_vf);
+                    new_vf->setScale(current_vf->scale());
+                    
+                    m_results.push_back(new_vf);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -233,63 +249,71 @@ class VectorfieldClustererGreedy : public Algorithm
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                    
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                FloatParameter	* param_direction_weight = static_cast<FloatParameter*>((*m_parameters)["weight-dir"]);
-                FloatParameter	* param_radius = static_cast<FloatParameter*>((*m_parameters)["radius"]);
-                FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
-                BoolParameter	    * param_use_local = static_cast<BoolParameter*>((*m_parameters)["use_local_vectors?"]);
-                
-                SparseVectorfield2D* current_vf = static_cast<SparseVectorfield2D* >(  param_vf->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                std::vector<Model*> results; 
-                
-                if(current_vf->typeName() =="SparseWeightedVectorfield2D")
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    results = clusterVectorfieldGreedy(static_cast<SparseWeightedVectorfield2D*>(current_vf), param_radius->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
-                }
-                else {
-                    results = clusterVectorfieldGreedy(static_cast<SparseWeightedMultiVectorfield2D*>(current_vf), param_radius->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
-                }
+                    emit statusMessage(0.0, QString("started"));
+                        
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    FloatParameter	* param_direction_weight = static_cast<FloatParameter*>((*m_parameters)["weight-dir"]);
+                    FloatParameter	* param_radius = static_cast<FloatParameter*>((*m_parameters)["radius"]);
+                    FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
+                    BoolParameter	    * param_use_local = static_cast<BoolParameter*>((*m_parameters)["use_local_vectors?"]);
+                    
+                    SparseVectorfield2D* current_vf = static_cast<SparseVectorfield2D* >(  param_vf->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    std::vector<Model*> results; 
+                    
+                    if(current_vf->typeName() =="SparseWeightedVectorfield2D")
+                    {
+                        results = clusterVectorfieldGreedy(static_cast<SparseWeightedVectorfield2D*>(current_vf), param_radius->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
+                    }
+                    else {
+                        results = clusterVectorfieldGreedy(static_cast<SparseWeightedMultiVectorfield2D*>(current_vf), param_radius->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
+                    }
 
-                results[0]->setName(QString("Labeled cluster vectors ") + current_vf->name());
-                static_cast<SparseWeightedVectorfield2D*>(results[0])->setScale(current_vf->scale());
-                
-                results[1]->setName(QString("Cluster center vectors ") + current_vf->name());
-                static_cast<SparseWeightedVectorfield2D*>(results[1])->setScale(current_vf->scale());
-                
-                results[2]->setName(QString("Cluster boarders ") + current_vf->name());
-                
-                QString descr("The following parameters were used for clustering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                for(unsigned int i=0; i<results.size(); ++i)
-                {
-                    results[i]->setDescription(descr);
+                    results[0]->setName(QString("Labeled cluster vectors ") + current_vf->name());
+                    static_cast<SparseWeightedVectorfield2D*>(results[0])->setScale(current_vf->scale());
                     
-                    current_vf->copyGeometry(*results[i]);
+                    results[1]->setName(QString("Cluster center vectors ") + current_vf->name());
+                    static_cast<SparseWeightedVectorfield2D*>(results[1])->setScale(current_vf->scale());
                     
-                    m_results.push_back(results[i]);
+                    results[2]->setName(QString("Cluster boarders ") + current_vf->name());
+                    
+                    QString descr("The following parameters were used for clustering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    for(unsigned int i=0; i<results.size(); ++i)
+                    {
+                        results[i]->setDescription(descr);
+                        
+                        current_vf->copyGeometry(*results[i]);
+                        
+                        m_results.push_back(results[i]);
+                    }
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -331,64 +355,72 @@ class VectorfieldClustererKMeans
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-                FloatParameter	* param_direction_weight = static_cast<FloatParameter*>((*m_parameters)["weight-dir"]);
-                IntParameter		* param_k = static_cast<IntParameter*>((*m_parameters)["k"]);
-                FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
-                BoolParameter	    * param_use_local = static_cast<BoolParameter*>((*m_parameters)["use_local_vectors?"]);
-                
-                SparseVectorfield2D* current_vf = static_cast<SparseVectorfield2D* >(  param_vf->value() );	
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                std::vector<Model*> results; 
-                
-                if(current_vf->typeName() =="SparseWeightedVectorfield2D")
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    results = clusterVectorfieldKMeans(static_cast<SparseWeightedVectorfield2D*>(current_vf), param_k->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    FloatParameter	* param_direction_weight = static_cast<FloatParameter*>((*m_parameters)["weight-dir"]);
+                    IntParameter		* param_k = static_cast<IntParameter*>((*m_parameters)["k"]);
+                    FloatParameter	* param_threshold = static_cast<FloatParameter*>((*m_parameters)["weightT"]);
+                    BoolParameter	    * param_use_local = static_cast<BoolParameter*>((*m_parameters)["use_local_vectors?"]);
+                    
+                    SparseVectorfield2D* current_vf = static_cast<SparseVectorfield2D* >(  param_vf->value() );	
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    std::vector<Model*> results; 
+                    
+                    if(current_vf->typeName() =="SparseWeightedVectorfield2D")
+                    {
+                        results = clusterVectorfieldKMeans(static_cast<SparseWeightedVectorfield2D*>(current_vf), param_k->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
+                    }
+                    else {
+                        results = clusterVectorfieldKMeans(static_cast<SparseWeightedMultiVectorfield2D*>(current_vf), param_k->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
+                    }
+                    
+                    results[0]->setName(QString("K-Means Labeled cluster vectors ") + current_vf->name());
+                    static_cast<SparseWeightedVectorfield2D*>(results[0])->setScale(current_vf->scale());
+                    
+                    results[1]->setName(QString("K-Means Cluster center vectors ") + current_vf->name());
+                    static_cast<SparseWeightedVectorfield2D*>(results[1])->setScale(current_vf->scale());
+                    
+                    results[2]->setName(QString("K-Means Cluster boarders ") + current_vf->name());
+                
+                    
+                    QString descr("The following parameters were used for k-means clustering:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    for(unsigned int i=0; i<results.size(); ++i)
+                    {
+                        results[i]->setDescription(descr);
+                        
+                        current_vf->copyGeometry(*results[i]);
+                        
+                        m_results.push_back(results[i]);
+                    }
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                else {
-                    results = clusterVectorfieldKMeans(static_cast<SparseWeightedMultiVectorfield2D*>(current_vf), param_k->value(), param_threshold->value(), param_direction_weight->value(), param_use_local->value());
-                }
-                
-                results[0]->setName(QString("K-Means Labeled cluster vectors ") + current_vf->name());
-                static_cast<SparseWeightedVectorfield2D*>(results[0])->setScale(current_vf->scale());
-                
-                results[1]->setName(QString("K-Means Cluster center vectors ") + current_vf->name());
-                static_cast<SparseWeightedVectorfield2D*>(results[1])->setScale(current_vf->scale());
-                
-                results[2]->setName(QString("K-Means Cluster boarders ") + current_vf->name());
-            
-                
-                QString descr("The following parameters were used for k-means clustering:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                for(unsigned int i=0; i<results.size(); ++i)
+                catch(std::exception& e)
                 {
-                    results[i]->setDescription(descr);
-                    
-                    current_vf->copyGeometry(*results[i]);
-                    
-                    m_results.push_back(results[i]);
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
                 }
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 

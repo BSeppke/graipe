@@ -409,33 +409,41 @@ class OpticalFlowHSEstimator
          */
 		void run()
 		{
-            lockModels();
-			try 
-			{
-				emit statusMessage(0.0, QString("started"));
-				
-				OPTICALFLOW_FUNCTOR func(m_param_alpha->value(),
-										 m_param_iterations->value(),
-										 m_param_sigma->value());
-				
-				emit statusMessage(1.0, QString("started computation"));
-				
-				computeFlow(func);
-				
-				emit statusMessage(100.0, QString("finished computation"));
-				emit finished();
-			}
-			catch(std::exception& e)
-			{
-				emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-			}
-			catch(...)
-			{
-				emit errorMessage(QString("Non-explainable error occured"));		
-			}
-            unlockModels();
-		}
-
+            if(!parametersValid())
+            {
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OPTICALFLOW_FUNCTOR func(m_param_alpha->value(),
+                                             m_param_iterations->value(),
+                                             m_param_sigma->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
+            }
+        }
+    
     protected:
         FloatParameter * m_param_sigma;
         FloatParameter * m_param_alpha;
@@ -483,34 +491,43 @@ class OpticalFlowBruhnEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OPTICALFLOW_FUNCTOR	func(m_param_alpha->value(),
-                                         m_param_inner_sigma->value(), 
-                                         m_param_outer_sigma->value(),
-                                         m_param_omega->value(),
-                                         m_param_iterations->value());
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OPTICALFLOW_FUNCTOR	func(m_param_alpha->value(),
+                                             m_param_inner_sigma->value(), 
+                                             m_param_outer_sigma->value(),
+                                             m_param_omega->value(),
+                                             m_param_iterations->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
+    
     protected:
         FloatParameter * m_param_inner_sigma;
         FloatParameter * m_param_outer_sigma;
@@ -555,33 +572,41 @@ class OpticalFlowLKEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OpticalFlowLKFunctor func(m_param_sigma->value(), 
-                                          m_param_mask_size->value(),
-                                          m_param_threshold->value(),
-                                          m_param_iterations->value()); 		
-                
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OpticalFlowLKFunctor func(m_param_sigma->value(), 
+                                              m_param_mask_size->value(),
+                                              m_param_threshold->value(),
+                                              m_param_iterations->value()); 		
+                    
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
         
     protected:
@@ -627,32 +652,40 @@ class OpticalFlowFBEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OpticalFlowFBFunctor func(m_param_sigma->value(),
-                                          m_param_mask_size->value(),
-                                          m_param_threshold->value(),
-                                          m_param_iterations->value()); 		
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OpticalFlowFBFunctor func(m_param_sigma->value(),
+                                              m_param_mask_size->value(),
+                                              m_param_threshold->value(),
+                                              m_param_iterations->value()); 		
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
     
     protected:
@@ -703,33 +736,41 @@ class OpticalFlowTensorEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OPTICALFLOW_FUNCTOR func(m_param_inner_sigma->value(), 
-                                         m_param_outer_sigma->value(),
-                                         m_param_mask_size->value(),
-                                         m_param_threshold->value(),
-                                         m_param_iterations->value());
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OPTICALFLOW_FUNCTOR func(m_param_inner_sigma->value(), 
+                                             m_param_outer_sigma->value(),
+                                             m_param_mask_size->value(),
+                                             m_param_threshold->value(),
+                                             m_param_iterations->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
     
     protected:
@@ -774,31 +815,39 @@ class OpticalFlowCCEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OpticalFlowCCFunctor func(m_param_sigma->value(),
-                                          m_param_threshold->value(),
-                                          m_param_iterations->value());
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OpticalFlowCCFunctor func(m_param_sigma->value(),
+                                              m_param_threshold->value(),
+                                              m_param_iterations->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
     
     protected:
@@ -844,33 +893,40 @@ class OpticalFlowExperimentalEstimator
          *
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OPTICALFLOW_FUNCTOR func(m_param_inner_sigma->value(), 
-                                         m_param_outer_sigma->value(),
-                                         m_param_threshold->value());
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OPTICALFLOW_FUNCTOR func(m_param_inner_sigma->value(), 
+                                             m_param_outer_sigma->value(),
+                                             m_param_threshold->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
-    
     protected:
         FloatParameter * m_param_inner_sigma;
         FloatParameter * m_param_outer_sigma;

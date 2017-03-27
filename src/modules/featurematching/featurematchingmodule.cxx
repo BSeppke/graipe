@@ -74,111 +74,118 @@ class BlockWiseImageMatcher
          */
         void run()
         {
-            
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                using namespace ::std;
-                using namespace ::vigra;
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand1 = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
-                ImageBandParameter<float>	* param_imageBand2 = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
-                IntParameter		* param_xSamples       = static_cast<IntParameter*> ((*m_parameters)["x-samples"]),
-                                    * param_ySamples       = static_cast<IntParameter*> ((*m_parameters)["y-samples"]),
-                                    * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
-                                    * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
-                                    * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
-                                    * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
-                BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
-                
-            
-                vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
-                vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
-                    
-                PointFeatureList2D features_of_image1;
-                    
-                unsigned int y_step = param_imageBand1->image()->height()/param_ySamples->value();
-                unsigned int x_step = param_imageBand1->image()->width()/param_xSamples->value();
-                    
-                for(unsigned int y=y_step/2; y < param_imageBand1->image()->height(); y+=y_step)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
                 {
-                    for(unsigned int x=x_step/2; x < param_imageBand1->image()->width(); x+=x_step)
+                    using namespace ::std;
+                    using namespace ::vigra;
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand1 = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
+                    ImageBandParameter<float>	* param_imageBand2 = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
+                    IntParameter		* param_xSamples       = static_cast<IntParameter*> ((*m_parameters)["x-samples"]),
+                                        * param_ySamples       = static_cast<IntParameter*> ((*m_parameters)["y-samples"]),
+                                        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
+                                        * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
+                                        * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
+                                        * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
+                    BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
+                    
+                
+                    vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
+                    vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
+                        
+                    PointFeatureList2D features_of_image1;
+                        
+                    unsigned int y_step = param_imageBand1->image()->height()/param_ySamples->value();
+                    unsigned int x_step = param_imageBand1->image()->width()/param_xSamples->value();
+                        
+                    for(unsigned int y=y_step/2; y < param_imageBand1->image()->height(); y+=y_step)
                     {
-                        features_of_image1.addFeature(PointFeatureList2D::PointType(x, y));
+                        for(unsigned int x=x_step/2; x < param_imageBand1->image()->width(); x+=x_step)
+                        {
+                            features_of_image1.addFeature(PointFeatureList2D::PointType(x, y));
+                        }
                     }
+                                                                                               
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
+                    double rotation_correlation=0, translation_correlation=0;
+                    unsigned int used_distance = param_searchDistance->value();
+                                                                                               
+                    MATCHING_FUNCTOR func;
+                    
+                    QElapsedTimer timer;
+                    timer.start();
+                    
+                    SparseWeightedMultiVectorfield2D* new_block_matching_vectorfield
+                        = matchFeaturesToImage(imageband1,
+                                               imageband2,
+                                               features_of_image1, 
+                                               func, 
+                                               param_maskWidth->value(), param_maskHeight->value(), 
+                                               param_searchDistance->value(), 
+                                               param_nCandidates->value(), 
+                                               param_useGME->value(),
+                                               mat,
+                                               rotation_correlation, translation_correlation,
+                                               used_distance);
+                    
+                    qint64 processing_time = timer.elapsed();
+                    
+                    new_block_matching_vectorfield->setName(QString("I->I block matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    
+                    QString descr("The following parameters were used to calculate the Block Matching (Image->Image):\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    QTransform transform(mat(0,0), mat(1,0), mat(2,0),
+                                         mat(0,1), mat(1,1), mat(2,1),
+                                         mat(0,2), mat(1,2), mat(2,2));
+                    
+                    QString mat_str = TransformParameter::valueText(transform);
+                    
+                    descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
+                                        "rotation accuracy: %2\n"
+                                        "translation accuracy: %3\n"
+                                        "used maximum distance: %4\n"
+                                        "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
+                    
+                    new_block_matching_vectorfield->setDescription(descr);
+                    
+                    ((Model*)param_imageBand1->image())->copyGeometry(*new_block_matching_vectorfield);
+                    new_block_matching_vectorfield->setGlobalMotion(transform);
+                    
+                    //Get time diff
+                    unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
+                    
+                    if(seconds != 0){
+                        new_block_matching_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
+                    }		
+                    
+                    m_results.push_back(new_block_matching_vectorfield);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                                                                                           
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
-                double rotation_correlation=0, translation_correlation=0;
-                unsigned int used_distance = param_searchDistance->value();
-                                                                                           
-                MATCHING_FUNCTOR func;
-                
-                QElapsedTimer timer;
-                timer.start();
-                
-                SparseWeightedMultiVectorfield2D* new_block_matching_vectorfield
-                    = matchFeaturesToImage(imageband1,
-                                           imageband2,
-                                           features_of_image1, 
-                                           func, 
-                                           param_maskWidth->value(), param_maskHeight->value(), 
-                                           param_searchDistance->value(), 
-                                           param_nCandidates->value(), 
-                                           param_useGME->value(),
-                                           mat,
-                                           rotation_correlation, translation_correlation,
-                                           used_distance);
-                
-                qint64 processing_time = timer.elapsed();
-                
-                new_block_matching_vectorfield->setName(QString("I->I block matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
-                
-                QString descr("The following parameters were used to calculate the Block Matching (Image->Image):\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                QTransform transform(mat(0,0), mat(1,0), mat(2,0),
-                                     mat(0,1), mat(1,1), mat(2,1),
-                                     mat(0,2), mat(1,2), mat(2,2));
-                
-                QString mat_str = TransformParameter::valueText(transform);
-                
-                descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
-                                    "rotation accuracy: %2\n"
-                                    "translation accuracy: %3\n"
-                                    "used maximum distance: %4\n"
-                                    "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
-                
-                new_block_matching_vectorfield->setDescription(descr);
-                
-                ((Model*)param_imageBand1->image())->copyGeometry(*new_block_matching_vectorfield);
-                new_block_matching_vectorfield->setGlobalMotion(transform);
-                
-                //Get time diff
-                unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
-                
-                if(seconds != 0){
-                    new_block_matching_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
-                }		
-                
-                m_results.push_back(new_block_matching_vectorfield);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -238,104 +245,112 @@ class FeatureToFeatureMatcher
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                using namespace ::std;
-                
-                emit statusMessage(0.0, QString("started"));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    using namespace ::std;
                     
-                ImageBandParameter<float>	* param_imageBand1         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
-                ModelParameter	* param_features1		= static_cast<ModelParameter*> ( (*m_parameters)["features1"]);
-                ImageBandParameter<float>	* param_imageBand2         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
-                ModelParameter	* param_features2		= static_cast<ModelParameter*> ( (*m_parameters)["features2"]);
-                
-                IntParameter        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
-                                    * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
-                                    * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
-                                    * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
-                BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
-                
-                
-                vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
-                vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
-                
-                vigra_assert( imageband1.shape() == imageband2.shape(), "image sizes differ!");
-                
-                PointFeatureList2D* features_of_image1 = static_cast<PointFeatureList2D*>( param_features1->value() );
-                PointFeatureList2D* features_of_image2 = static_cast<PointFeatureList2D*>( param_features2->value() );
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
-                double rotation_correlation=0, translation_correlation=0;
-                unsigned int used_distance = param_searchDistance->value();
-                
-                MATCHING_FUNCTOR func;
-                
-                QElapsedTimer timer;
-                timer.start();
-                            
-                SparseWeightedMultiVectorfield2D* new_vectorfield
-                    = matchFeaturesToFeatures(imageband1,
-                                              imageband2,
-                                              *features_of_image1,
-                                              *features_of_image2,
-                                              func, 
-                                              param_maskWidth->value(), param_maskHeight->value(), 
-                                              param_searchDistance->value(), 
-                                              param_nCandidates->value(), param_useGME->value(),
-                                              mat,
-                                              rotation_correlation, translation_correlation,
-                                              used_distance);
-                
-                qint64 processing_time = timer.elapsed();
-                
-                new_vectorfield->setName(QString("F->F matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
-                
-                QString descr("The following parameters were used to calculate the NCC (Features->Features):\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                QTransform transform(mat(0,0), mat(1,0), mat(2,0),
-                                     mat(0,1), mat(1,1), mat(2,1),
-                                     mat(0,2), mat(1,2), mat(2,2));
+                    emit statusMessage(0.0, QString("started"));
+                        
+                    ImageBandParameter<float>	* param_imageBand1         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
+                    ModelParameter	* param_features1		= static_cast<ModelParameter*> ( (*m_parameters)["features1"]);
+                    ImageBandParameter<float>	* param_imageBand2         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
+                    ModelParameter	* param_features2		= static_cast<ModelParameter*> ( (*m_parameters)["features2"]);
+                    
+                    IntParameter        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
+                                        * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
+                                        * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
+                                        * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
+                    BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
+                    vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
+                    
+                    vigra_assert( imageband1.shape() == imageband2.shape(), "image sizes differ!");
+                    
+                    PointFeatureList2D* features_of_image1 = static_cast<PointFeatureList2D*>( param_features1->value() );
+                    PointFeatureList2D* features_of_image2 = static_cast<PointFeatureList2D*>( param_features2->value() );
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
+                    double rotation_correlation=0, translation_correlation=0;
+                    unsigned int used_distance = param_searchDistance->value();
+                    
+                    MATCHING_FUNCTOR func;
+                    
+                    QElapsedTimer timer;
+                    timer.start();
+                                
+                    SparseWeightedMultiVectorfield2D* new_vectorfield
+                        = matchFeaturesToFeatures(imageband1,
+                                                  imageband2,
+                                                  *features_of_image1,
+                                                  *features_of_image2,
+                                                  func, 
+                                                  param_maskWidth->value(), param_maskHeight->value(), 
+                                                  param_searchDistance->value(), 
+                                                  param_nCandidates->value(), param_useGME->value(),
+                                                  mat,
+                                                  rotation_correlation, translation_correlation,
+                                                  used_distance);
+                    
+                    qint64 processing_time = timer.elapsed();
+                    
+                    new_vectorfield->setName(QString("F->F matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    
+                    QString descr("The following parameters were used to calculate the NCC (Features->Features):\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    QTransform transform(mat(0,0), mat(1,0), mat(2,0),
+                                         mat(0,1), mat(1,1), mat(2,1),
+                                         mat(0,2), mat(1,2), mat(2,2));
 
-                QString mat_str = TransformParameter::valueText(transform);
-                
-                descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
-                                    "rotation accuracy: %2\n"
-                                    "translation accuracy: %3\n"
-                                    "used maximum distance: %4\n"
-                                    "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
-                
-                new_vectorfield->setDescription(descr);
+                    QString mat_str = TransformParameter::valueText(transform);
+                    
+                    descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
+                                        "rotation accuracy: %2\n"
+                                        "translation accuracy: %3\n"
+                                        "used maximum distance: %4\n"
+                                        "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
+                    
+                    new_vectorfield->setDescription(descr);
 
-                ((Model*)param_imageBand1->image())->copyGeometry(*new_vectorfield);
-                new_vectorfield->setGlobalMotion(transform);
-                
-                
-                //Get time diff
-                unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
-                
-                if(seconds != 0){
-                    new_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
+                    ((Model*)param_imageBand1->image())->copyGeometry(*new_vectorfield);
+                    new_vectorfield->setGlobalMotion(transform);
+                    
+                    
+                    //Get time diff
+                    unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
+                    
+                    if(seconds != 0){
+                        new_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
+                    }
+                    m_results.push_back(new_vectorfield);
+                    
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
                 }
-                m_results.push_back(new_vectorfield);
-                
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -395,101 +410,109 @@ class FeatureToImageMatcher
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                using namespace ::std;
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    using namespace ::std;
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand1  = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
+                    ModelParameter              * param_features1   = static_cast<ModelParameter*> ( (*m_parameters)["features1"]);
+                    ImageBandParameter<float>	* param_imageBand2  = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
+                    
+                    IntParameter        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
+                                        * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
+                                        * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
+                                        * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
+                    BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
+                    vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
+                    
+                    vigra_assert( imageband1.size() == imageband2.size(), "image sizes differ!");
+                    
+                    PointFeatureList2D* features_of_image1 = static_cast<PointFeatureList2D*>( param_features1->value() );
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
                 
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand1  = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
-                ModelParameter              * param_features1   = static_cast<ModelParameter*> ( (*m_parameters)["features1"]);
-                ImageBandParameter<float>	* param_imageBand2  = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
-                
-                IntParameter        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
-                                    * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
-                                    * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
-                                    * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
-                BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
-                
-                
-                vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
-                vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
-                
-                vigra_assert( imageband1.size() == imageband2.size(), "image sizes differ!");
-                
-                PointFeatureList2D* features_of_image1 = static_cast<PointFeatureList2D*>( param_features1->value() );
-                
-                emit statusMessage(1.0, QString("starting computation"));
-            
-                vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
-                double rotation_correlation=0, translation_correlation=0;
-                unsigned int used_distance = param_searchDistance->value();
-                
-                MATCHING_FUNCTOR func;
-                
-                QElapsedTimer timer;
-                timer.start();
-                
-                
-                SparseWeightedMultiVectorfield2D* new_vectorfield
-                    = matchFeaturesToImage(imageband1,
-                                           imageband2,
-                                           *features_of_image1,
-                                           func, 
-                                           param_maskWidth->value(), param_maskHeight->value(), 
-                                           param_searchDistance->value(),
-                                           param_nCandidates->value(), param_useGME->value(),
-                                           mat,
-                                           rotation_correlation, translation_correlation,
-                                           used_distance);
-                
-                qint64 processing_time = timer.elapsed();
-                
-                new_vectorfield->setName(QString("F->I Matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
-                
-                QString descr("The following parameters were used to calculate the matching (Features->Image):\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                QTransform transform(mat(0,0), mat(1,0), mat(2,0),
-                                     mat(0,1), mat(1,1), mat(2,1),
-                                     mat(0,2), mat(1,2), mat(2,2));
+                    vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
+                    double rotation_correlation=0, translation_correlation=0;
+                    unsigned int used_distance = param_searchDistance->value();
+                    
+                    MATCHING_FUNCTOR func;
+                    
+                    QElapsedTimer timer;
+                    timer.start();
+                    
+                    
+                    SparseWeightedMultiVectorfield2D* new_vectorfield
+                        = matchFeaturesToImage(imageband1,
+                                               imageband2,
+                                               *features_of_image1,
+                                               func, 
+                                               param_maskWidth->value(), param_maskHeight->value(), 
+                                               param_searchDistance->value(),
+                                               param_nCandidates->value(), param_useGME->value(),
+                                               mat,
+                                               rotation_correlation, translation_correlation,
+                                               used_distance);
+                    
+                    qint64 processing_time = timer.elapsed();
+                    
+                    new_vectorfield->setName(QString("F->I Matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    
+                    QString descr("The following parameters were used to calculate the matching (Features->Image):\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    QTransform transform(mat(0,0), mat(1,0), mat(2,0),
+                                         mat(0,1), mat(1,1), mat(2,1),
+                                         mat(0,2), mat(1,2), mat(2,2));
 
-                QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = TransformParameter::valueText(transform);
+                    
+                    descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
+                                        "rotation accuracy: %2\n"
+                                        "translation accuracy: %3\n"
+                                        "used maximum distance: %4\n"
+                                        "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
+                    
+                    
+                    new_vectorfield->setDescription(descr);
+                    
+                    ((Model*)param_imageBand1->image())->copyGeometry(*new_vectorfield);
+                    new_vectorfield->setGlobalMotion(transform);
+                    
+                    //Get time diff
+                    unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
                 
-                descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
-                                    "rotation accuracy: %2\n"
-                                    "translation accuracy: %3\n"
-                                    "used maximum distance: %4\n"
-                                    "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
-                
-                
-                new_vectorfield->setDescription(descr);
-                
-                ((Model*)param_imageBand1->image())->copyGeometry(*new_vectorfield);
-                new_vectorfield->setGlobalMotion(transform);
-                
-                //Get time diff
-                unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
-            
-                if(seconds != 0){
-                    new_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
-                }		
-                
-                m_results.push_back(new_vectorfield);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    if(seconds != 0){
+                        new_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
+                    }		
+                    
+                    m_results.push_back(new_vectorfield);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -549,98 +572,106 @@ class ShapeContextMatcher
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                using namespace ::std;
-                
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand1         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
-                ModelParameter	* param_features1		= static_cast<ModelParameter*> ( (*m_parameters)["features1"]);
-                ImageBandParameter<float>	* param_imageBand2         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
-                ModelParameter	* param_features2		= static_cast<ModelParameter*> ( (*m_parameters)["features2"]);
-                
-                IntParameter        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
-                * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
-                * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
-                * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
-                BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
-                
-                
-                vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
-                vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
-                
-                vigra_assert( imageband1.size() == imageband2.size(), "image sizes differ!");
-                
-                PointFeatureList2D* features_of_image1 = static_cast<PointFeatureList2D*>( param_features1->value() );
-                PointFeatureList2D* features_of_image2 = static_cast<PointFeatureList2D*>( param_features2->value() );
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
-                double rotation_correlation=0, translation_correlation=0;
-                unsigned int used_distance = param_searchDistance->value();
-                
-                QElapsedTimer timer;
-                timer.start();
-                            
-                SparseWeightedMultiVectorfield2D* new_sc_vectorfield
-                    = matchFeaturesToFeaturesUsingShapeContext(imageband1,
-                                                               imageband2,
-                                                               *features_of_image1,  *features_of_image2,
-                                                               param_maskWidth->value(), param_maskHeight->value(), 
-                                                               param_searchDistance->value(),
-                                                               param_nCandidates->value(), param_useGME->value(),
-                                                               mat,
-                                                               rotation_correlation, translation_correlation,
-                                                               used_distance);
-                
-                qint64 processing_time = timer.elapsed();
-                
-                new_sc_vectorfield->setName(QString("Shape Context matching (F->F) with ") + features_of_image1->name() + QString("and ") + features_of_image2->name());
-                QString descr("The following parameters were used to calculate the Shape Context matching (Features->Features):\n");
-                descr += m_parameters->valueText("ModelParameter");
-                QTransform transform(mat(0,0), mat(1,0), mat(2,0),
-                                     mat(0,1), mat(1,1), mat(2,1),
-                                     mat(0,2), mat(1,2), mat(2,2));
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    using namespace ::std;
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand1         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
+                    ModelParameter	* param_features1		= static_cast<ModelParameter*> ( (*m_parameters)["features1"]);
+                    ImageBandParameter<float>	* param_imageBand2         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
+                    ModelParameter	* param_features2		= static_cast<ModelParameter*> ( (*m_parameters)["features2"]);
+                    
+                    IntParameter        * param_maskWidth      = static_cast<IntParameter*> ((*m_parameters)["mask_w"]),
+                    * param_maskHeight     = static_cast<IntParameter*> ((*m_parameters)["mask_h"]),
+                    * param_searchDistance = static_cast<IntParameter*> ((*m_parameters)["max_d"]),
+                    * param_nCandidates    = static_cast<IntParameter*> ((*m_parameters)["best_n"]);
+                    BoolParameter		* param_useGME         = static_cast<BoolParameter*> ((*m_parameters)["gme?"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
+                    vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
+                    
+                    vigra_assert( imageband1.size() == imageband2.size(), "image sizes differ!");
+                    
+                    PointFeatureList2D* features_of_image1 = static_cast<PointFeatureList2D*>( param_features1->value() );
+                    PointFeatureList2D* features_of_image2 = static_cast<PointFeatureList2D*>( param_features2->value() );
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
+                    double rotation_correlation=0, translation_correlation=0;
+                    unsigned int used_distance = param_searchDistance->value();
+                    
+                    QElapsedTimer timer;
+                    timer.start();
+                                
+                    SparseWeightedMultiVectorfield2D* new_sc_vectorfield
+                        = matchFeaturesToFeaturesUsingShapeContext(imageband1,
+                                                                   imageband2,
+                                                                   *features_of_image1,  *features_of_image2,
+                                                                   param_maskWidth->value(), param_maskHeight->value(), 
+                                                                   param_searchDistance->value(),
+                                                                   param_nCandidates->value(), param_useGME->value(),
+                                                                   mat,
+                                                                   rotation_correlation, translation_correlation,
+                                                                   used_distance);
+                    
+                    qint64 processing_time = timer.elapsed();
+                    
+                    new_sc_vectorfield->setName(QString("Shape Context matching (F->F) with ") + features_of_image1->name() + QString("and ") + features_of_image2->name());
+                    QString descr("The following parameters were used to calculate the Shape Context matching (Features->Features):\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    QTransform transform(mat(0,0), mat(1,0), mat(2,0),
+                                         mat(0,1), mat(1,1), mat(2,1),
+                                         mat(0,2), mat(1,2), mat(2,2));
 
-                QString mat_str = TransformParameter::valueText(transform);
-                
-                descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
-                                    "rotation accuracy: %2\n"
-                                    "translation accuracy: %3\n"
-                                    "used maximum distance: %4\n"
-                                    "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
-                
-                new_sc_vectorfield->setDescription(descr);
-                
-                ((Model*)param_imageBand1->image())->copyGeometry(*new_sc_vectorfield);
-                new_sc_vectorfield->setGlobalMotion(transform);
-                
-                
-                //Get time diff
-                unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
-                
-                if(seconds != 0){
-                    new_sc_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
-                }		
-                
-                
-                m_results.push_back(new_sc_vectorfield);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    QString mat_str = TransformParameter::valueText(transform);
+                    
+                    descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
+                                        "rotation accuracy: %2\n"
+                                        "translation accuracy: %3\n"
+                                        "used maximum distance: %4\n"
+                                        "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
+                    
+                    new_sc_vectorfield->setDescription(descr);
+                    
+                    ((Model*)param_imageBand1->image())->copyGeometry(*new_sc_vectorfield);
+                    new_sc_vectorfield->setGlobalMotion(transform);
+                    
+                    
+                    //Get time diff
+                    unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
+                    
+                    if(seconds != 0){
+                        new_sc_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
+                    }		
+                    
+                    
+                    m_results.push_back(new_sc_vectorfield);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -687,106 +718,114 @@ class SIFTMatcher
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    
+                    using namespace ::std;
+                    using namespace ::vigra;
+                    
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ImageBandParameter<float>	* param_imageBand1         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
+                    ModelParameter	* param_features1		= static_cast<ModelParameter*> ( (*m_parameters)["sift1"]);
+                    ImageBandParameter<float>	* param_imageBand2         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
+                    ModelParameter	* param_features2		= static_cast<ModelParameter*> ( (*m_parameters)["sift2"]);
                 
-                using namespace ::std;
-                using namespace ::vigra;
+                    FloatParameter	*	param_maxDistance = static_cast<FloatParameter*> ( (*m_parameters)["max_sift_d"]),
+                                    *	param_maxGeoDistance = static_cast<FloatParameter*> ( (*m_parameters)["max_geo_d"]);
+                    IntParameter	*	param_nCandidates = static_cast<IntParameter*> ( (*m_parameters)["best_n"]);
                 
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand1         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image1"]);
-                ModelParameter	* param_features1		= static_cast<ModelParameter*> ( (*m_parameters)["sift1"]);
-                ImageBandParameter<float>	* param_imageBand2         = static_cast<ImageBandParameter<float>*> ((*m_parameters)["image2"]);
-                ModelParameter	* param_features2		= static_cast<ModelParameter*> ( (*m_parameters)["sift2"]);
-            
-                FloatParameter	*	param_maxDistance = static_cast<FloatParameter*> ( (*m_parameters)["max_sift_d"]),
-                                *	param_maxGeoDistance = static_cast<FloatParameter*> ( (*m_parameters)["max_geo_d"]);
-                IntParameter	*	param_nCandidates = static_cast<IntParameter*> ( (*m_parameters)["best_n"]);
-            
-                BoolParameter	*	param_useGME = static_cast<BoolParameter*> ( (*m_parameters)["gme?"]);
-                
-                
-                vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
-                vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
-                
-                vigra_assert( imageband1.size() == imageband2.size(), "image sizes differ!");
-                
-                
-                SIFTFeatureList2D* features_of_image1 = static_cast<SIFTFeatureList2D*>( param_features1->value() );
-                SIFTFeatureList2D* features_of_image2 = static_cast<SIFTFeatureList2D*>( param_features2->value() );
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
-                double rotation_correlation=0, translation_correlation=0;
-                unsigned int used_distance = param_maxGeoDistance->value();
-                
-                QElapsedTimer timer;
-                timer.start();
-                            
-                SparseWeightedMultiVectorfield2D* new_sift_vectorfield
-                    = matchSIFTFeaturesUsingDistance(imageband1,
-                                                     imageband2,
-                                                     *features_of_image1,
-                                                     *features_of_image2,
-                                                     param_maxDistance->value(),
-                                                     param_maxGeoDistance->value(),
-                                                     param_nCandidates->value(),
-                                                     param_useGME->value(),
-                                                     mat,
-                                                     rotation_correlation, translation_correlation,
-                                                     used_distance);
-                
-                qint64 processing_time = timer.elapsed();
-                
-                new_sift_vectorfield->setName(QString("SIFT (F->F) with ") + features_of_image1->name() + QString("and ") + features_of_image2->name());
-                
-                QString descr("The following parameters were used to calculate the SIFT matching (Features->Features):\n");
-                descr += m_parameters->valueText("ModelParameter");
-                
-                QTransform transform(mat(0,0), mat(1,0), mat(2,0),
-                                     mat(0,1), mat(1,1), mat(2,1),
-                                     mat(0,2), mat(1,2), mat(2,2));
+                    BoolParameter	*	param_useGME = static_cast<BoolParameter*> ( (*m_parameters)["gme?"]);
+                    
+                    
+                    vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
+                    vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
+                    
+                    vigra_assert( imageband1.size() == imageband2.size(), "image sizes differ!");
+                    
+                    
+                    SIFTFeatureList2D* features_of_image1 = static_cast<SIFTFeatureList2D*>( param_features1->value() );
+                    SIFTFeatureList2D* features_of_image2 = static_cast<SIFTFeatureList2D*>( param_features2->value() );
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    vigra::Matrix<double> mat = vigra::identityMatrix<double>(3);
+                    double rotation_correlation=0, translation_correlation=0;
+                    unsigned int used_distance = param_maxGeoDistance->value();
+                    
+                    QElapsedTimer timer;
+                    timer.start();
+                                
+                    SparseWeightedMultiVectorfield2D* new_sift_vectorfield
+                        = matchSIFTFeaturesUsingDistance(imageband1,
+                                                         imageband2,
+                                                         *features_of_image1,
+                                                         *features_of_image2,
+                                                         param_maxDistance->value(),
+                                                         param_maxGeoDistance->value(),
+                                                         param_nCandidates->value(),
+                                                         param_useGME->value(),
+                                                         mat,
+                                                         rotation_correlation, translation_correlation,
+                                                         used_distance);
+                    
+                    qint64 processing_time = timer.elapsed();
+                    
+                    new_sift_vectorfield->setName(QString("SIFT (F->F) with ") + features_of_image1->name() + QString("and ") + features_of_image2->name());
+                    
+                    QString descr("The following parameters were used to calculate the SIFT matching (Features->Features):\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    
+                    QTransform transform(mat(0,0), mat(1,0), mat(2,0),
+                                         mat(0,1), mat(1,1), mat(2,1),
+                                         mat(0,2), mat(1,2), mat(2,2));
 
-                QString mat_str = TransformParameter::valueText(transform);
-                
-                descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
-                                    "rotation accuracy: %2\n"
-                                    "translation accuracy: %3\n"
-                                    "used maximum distance: %4\n"
-                                    "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
-                                    
-                new_sift_vectorfield->setDescription(descr);
-                
-                ((Model*)param_imageBand1->image())->copyGeometry(*new_sift_vectorfield);
-                new_sift_vectorfield->setGlobalMotion(transform);
-                
-                
-                //Get time diff
-                unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
-                
-                if(seconds != 0){
-                    new_sift_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
-                }		
-                
-                
-                m_results.push_back(new_sift_vectorfield);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    QString mat_str = TransformParameter::valueText(transform);
+                    
+                    descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
+                                        "rotation accuracy: %2\n"
+                                        "translation accuracy: %3\n"
+                                        "used maximum distance: %4\n"
+                                        "processing time: %5 seconds").arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(used_distance).arg(processing_time/1000.0);
+                                        
+                    new_sift_vectorfield->setDescription(descr);
+                    
+                    ((Model*)param_imageBand1->image())->copyGeometry(*new_sift_vectorfield);
+                    new_sift_vectorfield->setGlobalMotion(transform);
+                    
+                    
+                    //Get time diff
+                    unsigned int seconds = (unsigned int)param_imageBand1->image()->timestamp().secsTo(param_imageBand2->image()->timestamp());
+                    
+                    if(seconds != 0){
+                        new_sift_vectorfield->setScale(param_imageBand1->image()->scale()*100.0/seconds);
+                    }		
+                    
+                    
+                    m_results.push_back(new_sift_vectorfield);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 

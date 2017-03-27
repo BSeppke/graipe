@@ -165,42 +165,49 @@ class FourierSpectrumWindDetector
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
                     
-                emit statusMessage(0.0, QString("started"));
-                
-                ImageBandParameter<float>	* param_imageBand = static_cast<ImageBandParameter<float>*> ((*m_parameters)["band"]);
-                
-                FloatParameter	* param_smoothing = static_cast<FloatParameter*>((*m_parameters)["sigma"]),
-                                    * param_threshold = static_cast<FloatParameter*>((*m_parameters)["T"]),
-                                    * param_radius = static_cast<FloatParameter*>((*m_parameters)["hp"]);
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                WindDetector::detect_wind_prototype(FourierSpectrumWindDetectionFunctor(param_smoothing->value(), 
-                                                                                        param_threshold->value(), 
-                                                                                        param_radius->value()));
-                
-                m_results.back()->setName(QString("FFT Wind estimation using ") + param_imageBand->valueText());
-                
-                QString descr("The following parameters were used to calculate the Fourier Wind field:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                m_results.back()->setDescription(descr);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    ImageBandParameter<float>	* param_imageBand = static_cast<ImageBandParameter<float>*> ((*m_parameters)["band"]);
+                    
+                    FloatParameter	* param_smoothing = static_cast<FloatParameter*>((*m_parameters)["sigma"]),
+                                        * param_threshold = static_cast<FloatParameter*>((*m_parameters)["T"]),
+                                        * param_radius = static_cast<FloatParameter*>((*m_parameters)["hp"]);
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    WindDetector::detect_wind_prototype(FourierSpectrumWindDetectionFunctor(param_smoothing->value(), 
+                                                                                            param_threshold->value(), 
+                                                                                            param_radius->value()));
+                    
+                    m_results.back()->setName(QString("FFT Wind estimation using ") + param_imageBand->valueText());
+                    
+                    QString descr("The following parameters were used to calculate the Fourier Wind field:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    m_results.back()->setDescription(descr);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -240,41 +247,49 @@ class GradientHistogramWindDetector
          */
         void run()
         {	
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image = static_cast<ModelParameter*> ((*m_parameters)["band"]);
-                
-                FloatParameter	* param_scale = static_cast<FloatParameter*>((*m_parameters)["sigma"]),
-                                    * param_threshold = static_cast<FloatParameter*>((*m_parameters)["T"]);
-                
-                Image<float>* image = static_cast<Image<float>*>(  param_image->value() );	
-                        
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                WindDetector::detect_wind_prototype(GradientHistogramWindDetectionFunctor(param_scale->value(), 
-                                                                                          param_threshold->value()));
-                
-                m_results.back()->setName(QString("GH Wind estimation using ") + image->name());
-                
-                QString descr("The following parameters were used to calculate the Gradient Histogram Wind field:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                m_results.back()->setDescription(descr);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image = static_cast<ModelParameter*> ((*m_parameters)["band"]);
+                    
+                    FloatParameter	* param_scale = static_cast<FloatParameter*>((*m_parameters)["sigma"]),
+                                        * param_threshold = static_cast<FloatParameter*>((*m_parameters)["T"]);
+                    
+                    Image<float>* image = static_cast<Image<float>*>(  param_image->value() );	
+                            
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    WindDetector::detect_wind_prototype(GradientHistogramWindDetectionFunctor(param_scale->value(), 
+                                                                                              param_threshold->value()));
+                    
+                    m_results.back()->setName(QString("GH Wind estimation using ") + image->name());
+                    
+                    QString descr("The following parameters were used to calculate the Gradient Histogram Wind field:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    m_results.back()->setDescription(descr);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -316,47 +331,55 @@ class StructureTensorWindDetector
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-            
-                ImageBandParameter<float>	* param_imageBand = static_cast<ImageBandParameter<float>*> ((*m_parameters)["band"]);
-                EnumParameter		* param_wind_knowledge = static_cast<EnumParameter*>((*m_parameters)["dir"]);
-                FloatParameter      * param_innerScale = static_cast<FloatParameter*>((*m_parameters)["sigma1"]),
-                                    * param_outerScale = static_cast<FloatParameter*>((*m_parameters)["sigma2"]);
-                
-                vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                DenseVectorfield2D* new_wind_vectorfield
-                    = estimateWindDirectionFromSARImageUsingStructureTensor(imageband,
-                                                                            param_innerScale->value(), param_outerScale->value(), 
-                                                                            direction_vectors()[param_wind_knowledge->value()]);
-            
-                new_wind_vectorfield->setName(QString("ST Wind estimation using ") + param_imageBand->valueText());
-                
-                QString descr("The following parameters were used to compute ST winds:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_wind_vectorfield->setDescription(descr);		
-                
-                ((Model*)param_imageBand->image())->copyGeometry(*new_wind_vectorfield);
-                
-                m_results.push_back(new_wind_vectorfield);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                
+                    ImageBandParameter<float>	* param_imageBand = static_cast<ImageBandParameter<float>*> ((*m_parameters)["band"]);
+                    EnumParameter		* param_wind_knowledge = static_cast<EnumParameter*>((*m_parameters)["dir"]);
+                    FloatParameter      * param_innerScale = static_cast<FloatParameter*>((*m_parameters)["sigma1"]),
+                                        * param_outerScale = static_cast<FloatParameter*>((*m_parameters)["sigma2"]);
+                    
+                    vigra::MultiArrayView<2,float> imageband = param_imageBand->value();
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    DenseVectorfield2D* new_wind_vectorfield
+                        = estimateWindDirectionFromSARImageUsingStructureTensor(imageband,
+                                                                                param_innerScale->value(), param_outerScale->value(), 
+                                                                                direction_vectors()[param_wind_knowledge->value()]);
+                
+                    new_wind_vectorfield->setName(QString("ST Wind estimation using ") + param_imageBand->valueText());
+                    
+                    QString descr("The following parameters were used to compute ST winds:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_wind_vectorfield->setDescription(descr);		
+                    
+                    ((Model*)param_imageBand->image())->copyGeometry(*new_wind_vectorfield);
+                    
+                    m_results.push_back(new_wind_vectorfield);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 

@@ -84,66 +84,74 @@ class MSCannyFeatureDetector
          */
         void run()
         {
-            lockModels();
-            try
+            if(!parametersValid())
             {
-                    
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
-                
-                FloatParameter*	param_cannyScale = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
-                FloatParameter*	param_cannyThreshold = static_cast<FloatParameter*>( (*m_parameters)["T"]);
-                
-                EnumParameter* param_gradient = static_cast<EnumParameter*> ((*m_parameters)["mode"]);
-                
-                Image<float>* image = static_cast<Image<float>*> (param_image->value()); 
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                    
-                EdgelFeatureList2D* new_edgel_feature_list;
-                
-                QString alg_type;
-                
-                switch (param_gradient->value())
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
                 {
-                    case 2:
-                        new_edgel_feature_list = msCannyFeatures<MSMVGradientFunctor>(image, param_cannyScale->value(), param_cannyThreshold->value());
-                        alg_type = "msMV";
-                        break;
-                    case 1:
-                        new_edgel_feature_list = msCannyFeatures<MSMaxGradientFunctor>(image, param_cannyScale->value(), param_cannyThreshold->value());
-                        alg_type = "msMax";
-                        break;
-                    case 0:				
-                    default:
-                        new_edgel_feature_list = msCannyFeatures<MSMeanGradientFunctor>(image, param_cannyScale->value(), param_cannyThreshold->value());
-                        alg_type = "msMean";
-                        break;
+                        
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
+                    
+                    FloatParameter*	param_cannyScale = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
+                    FloatParameter*	param_cannyThreshold = static_cast<FloatParameter*>( (*m_parameters)["T"]);
+                    
+                    EnumParameter* param_gradient = static_cast<EnumParameter*> ((*m_parameters)["mode"]);
+                    
+                    Image<float>* image = static_cast<Image<float>*> (param_image->value()); 
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                        
+                    EdgelFeatureList2D* new_edgel_feature_list;
+                    
+                    QString alg_type;
+                    
+                    switch (param_gradient->value())
+                    {
+                        case 2:
+                            new_edgel_feature_list = msCannyFeatures<MSMVGradientFunctor>(image, param_cannyScale->value(), param_cannyThreshold->value());
+                            alg_type = "msMV";
+                            break;
+                        case 1:
+                            new_edgel_feature_list = msCannyFeatures<MSMaxGradientFunctor>(image, param_cannyScale->value(), param_cannyThreshold->value());
+                            alg_type = "msMax";
+                            break;
+                        case 0:				
+                        default:
+                            new_edgel_feature_list = msCannyFeatures<MSMeanGradientFunctor>(image, param_cannyScale->value(), param_cannyThreshold->value());
+                            alg_type = "msMean";
+                            break;
+                    }
+                    
+                    new_edgel_feature_list->setName(alg_type + QString(" Canny-Edgel Features of ") + image->name());
+                    QString descr("The following parameters were used to determine the Canny-Edgel Features:\n");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_edgel_feature_list->setDescription(descr);
+                    
+                    ((Model*)image)->copyGeometry(*new_edgel_feature_list);
+                    
+                    m_results.push_back(new_edgel_feature_list);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
                 }
-                
-                new_edgel_feature_list->setName(alg_type + QString(" Canny-Edgel Features of ") + image->name());
-                QString descr("The following parameters were used to determine the Canny-Edgel Features:\n");
-                descr += m_parameters->valueText("ModelParameter");
-                new_edgel_feature_list->setDescription(descr);
-                
-                ((Model*)image)->copyGeometry(*new_edgel_feature_list);
-                
-                m_results.push_back(new_edgel_feature_list);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -185,50 +193,58 @@ class MSGradientCalculator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
-                
-                FloatParameter*	param_scale = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
-                
-                Image<float>* image = static_cast<Image<float>*> (param_image->value()); 
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                std::vector<vigra::MultiArray<2, vigra::TinyVector<float,2> > > jacobian;
-                vigra::MultiArray<2, vigra::TinyVector<float,2> >  gradient;
-                imageToJacobian(image, jacobian, param_scale->value());
-                
-                MS_GRADIENT_FUNCTOR func;
-                func(jacobian, gradient);
-                
-                DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(gradient.bindElementChannel(0) , gradient.bindElementChannel(1));
-                
-                new_gradient_vf->setName(func.shortName() + QString(" gradient ") + image->name());
-                QString descr = QString("The following parameters were used to determine the %1 gradient\n").arg(func.name());
-                descr += m_parameters->valueText("ModelParameter");
-                new_gradient_vf->setDescription(descr);
-                
-                ((Model*)image)->copyGeometry(*new_gradient_vf);
-                
-                m_results.push_back(new_gradient_vf);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
+                    
+                    FloatParameter*	param_scale = static_cast<FloatParameter*>( (*m_parameters)["sigma"]);
+                    
+                    Image<float>* image = static_cast<Image<float>*> (param_image->value()); 
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    std::vector<vigra::MultiArray<2, vigra::TinyVector<float,2> > > jacobian;
+                    vigra::MultiArray<2, vigra::TinyVector<float,2> >  gradient;
+                    imageToJacobian(image, jacobian, param_scale->value());
+                    
+                    MS_GRADIENT_FUNCTOR func;
+                    func(jacobian, gradient);
+                    
+                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(gradient.bindElementChannel(0) , gradient.bindElementChannel(1));
+                    
+                    new_gradient_vf->setName(func.shortName() + QString(" gradient ") + image->name());
+                    QString descr = QString("The following parameters were used to determine the %1 gradient\n").arg(func.name());
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_gradient_vf->setDescription(descr);
+                    
+                    ((Model*)image)->copyGeometry(*new_gradient_vf);
+                    
+                    m_results.push_back(new_gradient_vf);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -291,56 +307,64 @@ class NDVIEstimator
          */
         void run()
         {
-            lockModels();
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
-                
-                IntParameter	* red_band_param = static_cast<IntParameter*> ( (*m_parameters)["red-id"]);
-                IntParameter	* nir_band_param = static_cast<IntParameter*> ( (*m_parameters)["nir-id"]);
-                
-                Image<float>* image = static_cast<Image<float>*>(param_image->value());
-                
-                //Check for bands and image sizes:
-                vigra_assert(	(unsigned int)nir_band_param->value() < image->numBands() 
-                             &&	(unsigned int)red_band_param->value() < image->numBands(), "Invalid band numbers!");
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                Image<float>* new_image = new Image<float>(image->size(), 1);
-                
-                using namespace vigra::functor;
-                
-                computeNDVI(image->band(nir_band_param->value()),
-                            image->band(red_band_param->value()),
-                            new_image->band(0),
-                            this);
-                
-                image->copyMetadata(*new_image);
-                
-                new_image->setName("NDVI of " + image->name() );
-                
-                QString descr("The following parameters were used to determine the NDVI");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
+                    
+                    IntParameter	* red_band_param = static_cast<IntParameter*> ( (*m_parameters)["red-id"]);
+                    IntParameter	* nir_band_param = static_cast<IntParameter*> ( (*m_parameters)["nir-id"]);
+                    
+                    Image<float>* image = static_cast<Image<float>*>(param_image->value());
+                    
+                    //Check for bands and image sizes:
+                    vigra_assert(	(unsigned int)nir_band_param->value() < image->numBands() 
+                                 &&	(unsigned int)red_band_param->value() < image->numBands(), "Invalid band numbers!");
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    Image<float>* new_image = new Image<float>(image->size(), 1);
+                    
+                    using namespace vigra::functor;
+                    
+                    computeNDVI(image->band(nir_band_param->value()),
+                                image->band(red_band_param->value()),
+                                new_image->band(0),
+                                this);
+                    
+                    image->copyMetadata(*new_image);
+                    
+                    new_image->setName("NDVI of " + image->name() );
+                    
+                    QString descr("The following parameters were used to determine the NDVI");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -387,63 +411,71 @@ class EVIEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
-                
-                IntParameter	* blue_band_param = static_cast<IntParameter*> ( (*m_parameters)["blue-id"]);
-                IntParameter	* red_band_param = static_cast<IntParameter*> ( (*m_parameters)["red-id"]);
-                IntParameter	* nir_band_param = static_cast<IntParameter*> ( (*m_parameters)["nir-id"]);
-                
-                FloatParameter	* param_L = static_cast<FloatParameter*> ( (*m_parameters)["L"]);
-                FloatParameter	* param_C1 = static_cast<FloatParameter*> ( (*m_parameters)["C1"]);
-                FloatParameter	* param_C2 = static_cast<FloatParameter*> ( (*m_parameters)["C2"]);
-                FloatParameter	* param_G = static_cast<FloatParameter*> ( (*m_parameters)["Gain"]);
-                
-                Image<float>* image = static_cast<Image<float>*>(param_image->value());
-                
-                //Check for bands and image sizes:
-                vigra_assert(	(unsigned int)nir_band_param->value() < image->numBands() 
-                             &&	(unsigned int)blue_band_param->value() < image->numBands()
-                             &&	(unsigned int)red_band_param->value() < image->numBands(), "Invalid band numbers!");
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                Image<float>* new_image = new Image<float>(image->size(), 1);
-                
-                computeEVI(image->band(nir_band_param->value()),
-                           image->band(red_band_param->value()),
-                           image->band(blue_band_param->value()),
-                           new_image->band(0),
-                           param_C1->value(), param_C2->value(), param_L->value(), param_G->value(),
-                           this);
-                
-                image->copyMetadata(*new_image);
-                
-                new_image->setName("EVI of " + image->name() );
-                
-                QString descr("The following parameters were used to determine the EVI");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
+                    
+                    IntParameter	* blue_band_param = static_cast<IntParameter*> ( (*m_parameters)["blue-id"]);
+                    IntParameter	* red_band_param = static_cast<IntParameter*> ( (*m_parameters)["red-id"]);
+                    IntParameter	* nir_band_param = static_cast<IntParameter*> ( (*m_parameters)["nir-id"]);
+                    
+                    FloatParameter	* param_L = static_cast<FloatParameter*> ( (*m_parameters)["L"]);
+                    FloatParameter	* param_C1 = static_cast<FloatParameter*> ( (*m_parameters)["C1"]);
+                    FloatParameter	* param_C2 = static_cast<FloatParameter*> ( (*m_parameters)["C2"]);
+                    FloatParameter	* param_G = static_cast<FloatParameter*> ( (*m_parameters)["Gain"]);
+                    
+                    Image<float>* image = static_cast<Image<float>*>(param_image->value());
+                    
+                    //Check for bands and image sizes:
+                    vigra_assert(	(unsigned int)nir_band_param->value() < image->numBands() 
+                                 &&	(unsigned int)blue_band_param->value() < image->numBands()
+                                 &&	(unsigned int)red_band_param->value() < image->numBands(), "Invalid band numbers!");
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    Image<float>* new_image = new Image<float>(image->size(), 1);
+                    
+                    computeEVI(image->band(nir_band_param->value()),
+                               image->band(red_band_param->value()),
+                               image->band(blue_band_param->value()),
+                               new_image->band(0),
+                               param_C1->value(), param_C2->value(), param_L->value(), param_G->value(),
+                               this);
+                    
+                    image->copyMetadata(*new_image);
+                    
+                    new_image->setName("EVI of " + image->name() );
+                    
+                    QString descr("The following parameters were used to determine the EVI");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -491,59 +523,67 @@ class EVI2BandsEstimator
          */
         void run()
         {
-            lockModels();
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
-                
-                IntParameter	* red_band_param = static_cast<IntParameter*> ( (*m_parameters)["red-id"]);
-                IntParameter	* nir_band_param = static_cast<IntParameter*> ( (*m_parameters)["nir_id"]);
-                
-                FloatParameter	* param_L = static_cast<FloatParameter*> ( (*m_parameters)["L"]);
-                FloatParameter	* param_C = static_cast<FloatParameter*> ( (*m_parameters)["C"]);
-                FloatParameter	* param_G = static_cast<FloatParameter*> ( (*m_parameters)["Gain"]);
-                
-                Image<float>* image = static_cast<Image<float>*>(param_image->value());
-                
-                //Check for bands and image sizes:
-                vigra_assert(	(unsigned int)nir_band_param->value() < image->numBands() 
-                             &&	(unsigned int)red_band_param->value() < image->numBands(), "Invalid band numbers!");
-                
-                
-                emit statusMessage(1.0, QString("starting computation"));
-                
-                Image<float>* new_image = new Image<float>(image->size(), 1);
-                
-                computeEVI2(image->band(nir_band_param->value()),
-                            image->band(red_band_param->value()),
-                            new_image->band(0),
-                            param_C->value(), param_L->value(), param_G->value(),
-                            this);
-                
-                image->copyMetadata(*new_image);
-                
-                new_image->setName("EVI (2 bands) of " + image->name() );
-                
-                QString descr("The following parameters were used to determine the 2band-EVI");
-                descr += m_parameters->valueText("ModelParameter");
-                new_image->setDescription(descr);
-                
-                m_results.push_back(new_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));		
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image	= static_cast<ModelParameter*> ( (*m_parameters)["image"]);
+                    
+                    IntParameter	* red_band_param = static_cast<IntParameter*> ( (*m_parameters)["red-id"]);
+                    IntParameter	* nir_band_param = static_cast<IntParameter*> ( (*m_parameters)["nir_id"]);
+                    
+                    FloatParameter	* param_L = static_cast<FloatParameter*> ( (*m_parameters)["L"]);
+                    FloatParameter	* param_C = static_cast<FloatParameter*> ( (*m_parameters)["C"]);
+                    FloatParameter	* param_G = static_cast<FloatParameter*> ( (*m_parameters)["Gain"]);
+                    
+                    Image<float>* image = static_cast<Image<float>*>(param_image->value());
+                    
+                    //Check for bands and image sizes:
+                    vigra_assert(	(unsigned int)nir_band_param->value() < image->numBands() 
+                                 &&	(unsigned int)red_band_param->value() < image->numBands(), "Invalid band numbers!");
+                    
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    Image<float>* new_image = new Image<float>(image->size(), 1);
+                    
+                    computeEVI2(image->band(nir_band_param->value()),
+                                image->band(red_band_param->value()),
+                                new_image->band(0),
+                                param_C->value(), param_L->value(), param_G->value(),
+                                this);
+                    
+                    image->copyMetadata(*new_image);
+                    
+                    new_image->setName("EVI (2 bands) of " + image->name() );
+                    
+                    QString descr("The following parameters were used to determine the 2band-EVI");
+                    descr += m_parameters->valueText("ModelParameter");
+                    new_image->setDescription(descr);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));		
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
 };
 
@@ -594,31 +634,39 @@ class OpticalFlow2BandsEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OpticalFlow2BandsFunctor func(m_param_sigma->value(), 
-                                              m_param_threshold->value(),
-                                              m_param_iterations->value());
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OpticalFlow2BandsFunctor func(m_param_sigma->value(), 
+                                                  m_param_threshold->value(),
+                                                  m_param_iterations->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
         
     protected:
@@ -676,31 +724,39 @@ class OpticalFlowHS2BandsEstimator
          */
         void run()
         {
-            lockModels();
-            try 
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                OpticalFlowHS2BandsFunctor func(m_param_sigma->value(), 
-                                                m_param_alpha->value(),
-                                                m_param_iterations->value());
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                computeFlow(func);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
-            catch(std::exception& e)
+            else
             {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                lockModels();
+                try 
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    OpticalFlowHS2BandsFunctor func(m_param_sigma->value(), 
+                                                    m_param_alpha->value(),
+                                                    m_param_iterations->value());
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    computeFlow(func);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
         
     protected:

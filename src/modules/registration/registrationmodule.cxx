@@ -71,83 +71,90 @@ class GlobalMotionCorrector
          */
         void run()
         {
-            lockModels();
-            
-            try
+            if(!parametersValid())
             {
-                emit statusMessage(0.0, QString("started"));
-                
-                vigra::MultiArrayView<2,float> imageband1 =  m_param_imageBand1->value();
-                vigra::MultiArrayView<2,float> imageband2 =  m_param_imageBand2->value();
-                
-                vigra_precondition(imageband1.size() && imageband2.size(), "At least one image size is 0x0!");
-                vigra_precondition(imageband1.size()==imageband2.size(),   "Image sizes differ!");
-                
-                emit statusMessage(1.0, QString("started computation"));
-                
-                vigra::Matrix<double> mat(3,3);
-                double rotation_correlation;
-                double translation_correlation;
-                
-                QElapsedTimer timer;
-                timer.start();
-                
-                estimateGlobalRotationTranslation(imageband1,
-                                                  imageband2,
-                                                  mat,
-                                                  rotation_correlation,
-                                                  translation_correlation);
-                
-                Image<float>* displaced_image = new Image<float>(imageband2.shape(), m_param_imageBand1->image()->numBands());
-                
-                for( unsigned int c=0; c < m_param_imageBand1->image()->numBands(); c++)
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
+            }
+            else
+            {
+                lockModels();
+                try
                 {
-                    vigra::affineWarpImage(vigra::SplineImageView<3, float>(m_param_imageBand1->image()->band(c)),
-                                           displaced_image->band(c),
-                                           mat);
-                }
-                
-                qint64 processing_time = timer.elapsed();
-                
-                m_param_imageBand2->image()->copyMetadata(*displaced_image);
-                
-                displaced_image->setName("GME corrected image band " + m_param_imageBand1->valueText());
-                
-                
-                QTransform transform(mat(0,0), mat(1,0), mat(2,0),
-                                     mat(0,1), mat(1,1), mat(2,1),
-                                     mat(0,2), mat(1,2), mat(2,2));
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    vigra::MultiArrayView<2,float> imageband1 =  m_param_imageBand1->value();
+                    vigra::MultiArrayView<2,float> imageband2 =  m_param_imageBand2->value();
+                    
+                    vigra_precondition(imageband1.size() && imageband2.size(), "At least one image size is 0x0!");
+                    vigra_precondition(imageband1.size()==imageband2.size(),   "Image sizes differ!");
+                    
+                    emit statusMessage(1.0, QString("started computation"));
+                    
+                    vigra::Matrix<double> mat(3,3);
+                    double rotation_correlation;
+                    double translation_correlation;
+                    
+                    QElapsedTimer timer;
+                    timer.start();
+                    
+                    estimateGlobalRotationTranslation(imageband1,
+                                                      imageband2,
+                                                      mat,
+                                                      rotation_correlation,
+                                                      translation_correlation);
+                    
+                    Image<float>* displaced_image = new Image<float>(imageband2.shape(), m_param_imageBand1->image()->numBands());
+                    
+                    for( unsigned int c=0; c < m_param_imageBand1->image()->numBands(); c++)
+                    {
+                        vigra::affineWarpImage(vigra::SplineImageView<3, float>(m_param_imageBand1->image()->band(c)),
+                                               displaced_image->band(c),
+                                               mat);
+                    }
+                    
+                    qint64 processing_time = timer.elapsed();
+                    
+                    m_param_imageBand2->image()->copyMetadata(*displaced_image);
+                    
+                    displaced_image->setName("GME corrected image band " + m_param_imageBand1->valueText());
+                    
+                    
+                    QTransform transform(mat(0,0), mat(1,0), mat(2,0),
+                                         mat(0,1), mat(1,1), mat(2,1),
+                                         mat(0,2), mat(1,2), mat(2,2));
 
-                QString mat_str = TransformParameter::valueText(transform);
-                
-                qDebug() << "GME: Matrix=" << transform << "\nMatString="<< mat_str <<"\n";
-                
-                QString descr = QString("First image band: %1\n"
-                                        "Second image band: %2\n"
-                                        "Computed global motion matrix (I1 -> I2): %3\n"
-                                        "rotation accuracy: %4\n"
-                                        "translation accuracy: %5\n"
-                                        "processing time: %6 seconds").arg(m_param_imageBand1->valueText()).arg(m_param_imageBand2->valueText())
-                                        .arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(processing_time/1000.0);
-                                    
-                displaced_image->setDescription(descr);
-                
-                m_results.push_back(displaced_image);
-                
-                emit statusMessage(100.0, QString("finished computation"));
-                emit finished();
+                    QString mat_str = TransformParameter::valueText(transform);
+                    
+                    qDebug() << "GME: Matrix=" << transform << "\nMatString="<< mat_str <<"\n";
+                    
+                    QString descr = QString("First image band: %1\n"
+                                            "Second image band: %2\n"
+                                            "Computed global motion matrix (I1 -> I2): %3\n"
+                                            "rotation accuracy: %4\n"
+                                            "translation accuracy: %5\n"
+                                            "processing time: %6 seconds").arg(m_param_imageBand1->valueText()).arg(m_param_imageBand2->valueText())
+                                            .arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(processing_time/1000.0);
+                                        
+                    displaced_image->setDescription(descr);
+                    
+                    m_results.push_back(displaced_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
             }
-            catch(std::exception& e)
-            {
-                emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-            }
-            catch(...)
-            {
-                emit errorMessage(QString("Non-explainable error occured"));		
-            }
-            unlockModels();
         }
-    
+
     protected:
         //Additional parameters
         ImageBandParameter<float> * m_param_imageBand1;
@@ -192,59 +199,80 @@ class GenericRegistration
          * Specialization of the running phase of this algorithm.
          */
 		void run()
-		{	
-			emit statusMessage(0.0, QString("started"));
-			
-			ModelParameter	* param_image1 = static_cast<ModelParameter*> ((*m_parameters)["image1"]),
-							* param_image2 = static_cast<ModelParameter*> ((*m_parameters)["image2"]),
-                            * param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
-			
-			Image<float>* image1 = static_cast<Image<float>*>(  param_image1->value() );	
-			Image<float>* image2 = static_cast<Image<float>*>(  param_image2->value() );	
-			
-			Vectorfield2D* vf =  static_cast<Vectorfield2D*> (param_vf->value());
-			
-			emit statusMessage(1.0, QString("starting computation"));
-			
-			WARPING_FUNCTOR func_a;
-			
-			Image<float>* new_image = new Image<float>(image2->size(), image1->numBands());
-            
-            vigra::MultiArray<2,float> res_img_band(image2->size());
-            std::vector<vigra::TinyVector<double,2> > src_points(vf->size()), dest_points(vf->size());
-    
-            for(unsigned int i=0; i<vf->size(); ++i)
+		{
+            if(!parametersValid())
             {
-                src_points[i][0] = vf->origin(i).x();
-                src_points[i][1] = vf->origin(i).x();
-        
-                dest_points[i][0] = vf->target(i).x();
-                dest_points[i][1] = vf->target(i).y();
+                //Parameters set incorrectly
+                emit errorMessage(QString("Some parameters are not available"));
             }
+            else
+            {
+                lockModels();
+                try
+                {
+                    emit statusMessage(0.0, QString("started"));
+                    
+                    ModelParameter	* param_image1 = static_cast<ModelParameter*> ((*m_parameters)["image1"]),
+                                    * param_image2 = static_cast<ModelParameter*> ((*m_parameters)["image2"]),
+                                    * param_vf = static_cast<ModelParameter*> ((*m_parameters)["vf"]);
+                    
+                    Image<float>* image1 = static_cast<Image<float>*>(  param_image1->value() );	
+                    Image<float>* image2 = static_cast<Image<float>*>(  param_image2->value() );	
+                    
+                    Vectorfield2D* vf =  static_cast<Vectorfield2D*> (param_vf->value());
+                    
+                    emit statusMessage(1.0, QString("starting computation"));
+                    
+                    WARPING_FUNCTOR func_a;
+                    
+                    Image<float>* new_image = new Image<float>(image2->size(), image1->numBands());
+                    
+                    vigra::MultiArray<2,float> res_img_band(image2->size());
+                    std::vector<vigra::TinyVector<double,2> > src_points(vf->size()), dest_points(vf->size());
             
-			for(unsigned int c=0; c<image1->numBands(); c++)
-			{
-                func_a(image1->band(c), new_image->band(c), src_points.begin(), src_points.end(), dest_points.begin());
-	
-			}
-			
-			new_image->setName(func_a.name() + QString(" of ") + image1->name() + QString(" to ") + image2->name());
-			QString descr("The following components were used to compute the ");
-			
-			descr += func_a.name() + QString(":\n");
-			descr +=  QString("First image: ") + image1->name()  + QString("\n");
-			descr +=  QString("Reference image: ") + image2->name()  + QString("\n");
-			descr +=  QString("Correspondence vectorfield: ") + vf->name()  + QString("\n");
-			
-			new_image->setDescription(descr);
-			
-			image2->copyGeometry(*new_image);
-			
-			m_results.push_back(new_image);
-			
-			emit statusMessage(100.0, QString("finished computation"));
-			emit finished();
-		}
+                    for(unsigned int i=0; i<vf->size(); ++i)
+                    {
+                        src_points[i][0] = vf->origin(i).x();
+                        src_points[i][1] = vf->origin(i).x();
+                
+                        dest_points[i][0] = vf->target(i).x();
+                        dest_points[i][1] = vf->target(i).y();
+                    }
+                    
+                    for(unsigned int c=0; c<image1->numBands(); c++)
+                    {
+                        func_a(image1->band(c), new_image->band(c), src_points.begin(), src_points.end(), dest_points.begin());
+            
+                    }
+                    
+                    new_image->setName(func_a.name() + QString(" of ") + image1->name() + QString(" to ") + image2->name());
+                    QString descr("The following components were used to compute the ");
+                    
+                    descr += func_a.name() + QString(":\n");
+                    descr +=  QString("First image: ") + image1->name()  + QString("\n");
+                    descr +=  QString("Reference image: ") + image2->name()  + QString("\n");
+                    descr +=  QString("Correspondence vectorfield: ") + vf->name()  + QString("\n");
+                    
+                    new_image->setDescription(descr);
+                    
+                    image2->copyGeometry(*new_image);
+                    
+                    m_results.push_back(new_image);
+                    
+                    emit statusMessage(100.0, QString("finished computation"));
+                    emit finished();
+                }
+                catch(std::exception& e)
+                {
+                    emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
+                }
+                catch(...)
+                {
+                    emit errorMessage(QString("Non-explainable error occured"));		
+                }
+                unlockModels();
+            }
+        }
 };
 
 /** 
