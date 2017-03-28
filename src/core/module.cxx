@@ -35,6 +35,14 @@
 
 #include "core/module.hxx"
 
+/**
+ * @file
+ * @brief Implementation file for the Module class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
     
 /**
@@ -52,3 +60,7 @@ Module::~Module()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

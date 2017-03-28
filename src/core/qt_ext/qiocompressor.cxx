@@ -83,6 +83,14 @@
 #include "zlib.h"
 #include <QtCore/QDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the QIOCompressor class, see license terms above
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
     
 typedef Bytef ZlibByte;
@@ -662,3 +670,7 @@ bool QIOCompressor::checkGzipSupport(const char * const versionString)
 }
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */

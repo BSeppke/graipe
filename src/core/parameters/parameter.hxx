@@ -45,12 +45,18 @@
 #include <QFormLayout>
 #include <QSizePolicy>
 
+/**
+ * @file
+ * @brief Header file for the general Parameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
 //Forward declaration of Model class to resolve circular dependency
 class Model;
-
 
 /**
  * This is the base class of all Parameters.
@@ -272,5 +278,9 @@ class GRAIPE_CORE_EXPORT Parameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_PARAMETER_HXX

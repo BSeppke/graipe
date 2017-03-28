@@ -43,6 +43,13 @@
 
 #include <QString>
 
+/**
+ * @file
+ * @brief Header file for the import and export of data
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -120,5 +127,9 @@ class GRAIPE_CORE_EXPORT Impex
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_IMPEX_HXX

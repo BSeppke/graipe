@@ -43,9 +43,18 @@
 #include <QGraphicsObject>
 #include <QGraphicsScene>
 
+/**
+ * @file
+ * @brief Header file for the ViewController class
+ *
+ * @addtogroup core
+ * @{
+ */
+
+namespace graipe {
 
 /**
- * This file defines the view of a (data) object, to which we refer as 
+ * This class defines the view of a (data) object, to which we refer as
  * models in the GRAIPE framework. Although it is generally possible to 
  * implement a model type without a view and to use it e.g. with some
  * algorithms, models become *really* useful, iff you can see them!
@@ -64,10 +73,6 @@
  * may also have to adjust the boundingRect() method to avoid incorrect
  * rendering or rendering artifacts.
  */
-
-
-namespace graipe {
-
 class GRAIPE_CORE_EXPORT ViewController
 :	public QGraphicsObject,
     public Serializable
@@ -280,5 +285,9 @@ class GRAIPE_CORE_EXPORT ViewController
 };
 
 } //end of namespace graipe
-    
+
+/**
+ * @}
+ */
+
 #endif //GRAIPE_CORE_SERIALIZABLE_HXX

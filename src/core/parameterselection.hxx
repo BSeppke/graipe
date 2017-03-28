@@ -47,15 +47,17 @@
 #include <QCheckBox>
 #include <QScrollArea>
 
-
 /**
- * This file defines the ParameterSelection classes, which are QDialog
+ * @file
+ * @brief This file defines the ParameterSelection classes, which are QDialog
  * wrappers for the most commonly used class.
  *
  * This is e.g. used to determine the actual parameters' values for each
  * algorithm run, for a new model creation or for single parameters.
+ *
+ * @addtogroup core
+ * @{
  */
-
 
 namespace graipe {
 
@@ -202,5 +204,9 @@ protected:
 };
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERSELECTION_HXX

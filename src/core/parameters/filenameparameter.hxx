@@ -42,6 +42,13 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+/**
+ * @file
+ * @brief Header file for the FilenameParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -160,5 +167,9 @@ class GRAIPE_CORE_EXPORT FilenameParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_FILENAMEPARAMETER_HXX

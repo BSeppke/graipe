@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the DoubleParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -266,3 +274,7 @@ void DoubleParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

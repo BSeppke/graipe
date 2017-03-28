@@ -43,6 +43,13 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 
+/**
+ * @file
+ * @brief Header file for the QGraphicsResizableItem class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -174,5 +181,9 @@ class GRAIPE_CORE_EXPORT QGraphicsResizableItem
 };
     
 }//end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif

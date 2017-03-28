@@ -41,6 +41,13 @@
 #include <QPointer>
 #include <QFormLayout>
 
+/**
+ * @file
+ * @brief Header file for the ParameterGroup class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -245,5 +252,9 @@ class GRAIPE_CORE_EXPORT ParameterGroup
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_PARAMETERGROUP_HXX

@@ -42,6 +42,14 @@
 #include <QRgb>
 #include <QColor>
 
+/**
+ * @file
+ * @brief Header file for the color table classes
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 namespace detail
@@ -67,5 +75,9 @@ GRAIPE_CORE_EXPORT QVector<QRgb> createColorTableFrom3Colors(const QColor & col1
 GRAIPE_CORE_EXPORT QVector<QVector<QRgb> > colorTables();
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_COLORTABLES_HXX

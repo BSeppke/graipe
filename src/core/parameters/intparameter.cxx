@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the IntParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -263,3 +271,7 @@ void IntParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the DateTimeParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -203,3 +211,7 @@ void DateTimeParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

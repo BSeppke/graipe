@@ -40,6 +40,13 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Header file for the BasicStatistics class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe  {
 
@@ -88,5 +95,9 @@ void printStats(const BasicStatistics<T>& stats)
 }
     
 }//end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_BASICSTATISTICS_HXX

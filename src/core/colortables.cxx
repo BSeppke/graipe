@@ -35,6 +35,14 @@
 
 #include "core/colortables.hxx"
 
+/**
+ * @file
+ * @brief Implementation file for the color table classes
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -1568,3 +1576,7 @@ QVector<QVector<QRgb> > colorTables()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

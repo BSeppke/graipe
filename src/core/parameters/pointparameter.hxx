@@ -41,6 +41,13 @@
 #include <QPointer>
 #include <QSpinBox>
 
+/**
+ * @file
+ * @brief Header file for the PointParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -198,5 +205,9 @@ class GRAIPE_CORE_EXPORT PointParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_POINTPARAMETER_HXX

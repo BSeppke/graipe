@@ -40,6 +40,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the FilenameParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -210,3 +218,7 @@ void FilenameParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

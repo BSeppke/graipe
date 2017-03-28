@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implmentation file for the MultiModelParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -337,3 +345,7 @@ void MultiModelParameter::updateValue()
 
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

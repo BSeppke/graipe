@@ -42,6 +42,14 @@
 #include <QEventLoop>
 #include <QMessageBox>
 
+/**
+ * @file
+ * @brief Implementation file for the UpdateChecker class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -102,3 +110,7 @@ void UpdateChecker::checkForUpdates(unsigned int max_version_jump, unsigned int 
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

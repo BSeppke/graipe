@@ -38,6 +38,14 @@
 #include <QtDebug>
 #include <QObject>
 
+/**
+ * @file
+ * @brief Implementation file for the ColorParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -209,3 +217,7 @@ void ColorParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

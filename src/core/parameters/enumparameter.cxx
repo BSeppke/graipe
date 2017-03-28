@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the EnumParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -211,3 +219,7 @@ void EnumParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

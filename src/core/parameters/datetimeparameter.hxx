@@ -41,6 +41,13 @@
 #include <QPointer>
 #include <QDateTimeEdit>
 
+/**
+ * @file
+ * @brief Header file for the DateTimeParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -153,5 +160,9 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_DATETIMEPARAMETER_HXX

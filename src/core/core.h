@@ -36,6 +36,14 @@
 #ifndef GRAIPE_CORE_H
 #define GRAIPE_CORE_H
 
+/**
+ * @file
+ * @brief Header file for the outer API of GRAIPE's core module
+ *
+ * @defgroup core Core functionality for GRAIPE
+ * @{
+ */
+
 #include "core/algorithm.hxx"
 #include "core/colortables.hxx"
 #include "core/impex.hxx"
@@ -49,5 +57,9 @@
 #include "core/serializable.hxx"
 #include "core/updatechecker.hxx"
 #include "core/viewcontroller.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_H

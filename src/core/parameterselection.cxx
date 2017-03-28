@@ -46,8 +46,15 @@
 #include <QRadioButton>
 #include <QScrollArea>
 
-namespace graipe {
+/**
+ * @file
+ * @brief Implementation file for the ParameterSelection class
+ *
+ * @addtogroup core
+ * @{
+ */
 
+namespace graipe {
     
 /**
  * Constructor of the parameter selection. This constructor
@@ -301,3 +308,7 @@ void AlgorithmParameterSelection::updateResults()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

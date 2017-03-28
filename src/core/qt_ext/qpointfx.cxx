@@ -40,6 +40,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the QPointFX class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -191,3 +199,7 @@ float QPointFX::cross(const QPointF& other) const
 }
 
 } //End of namespace graipe
+
+/**
+ * @}
+ */

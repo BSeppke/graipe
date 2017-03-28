@@ -42,9 +42,15 @@
 #include <QPointer>
 #include <QListWidget>
 
+/**
+ * @file
+ * @brief Header file for the MultiModelParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
-
 
 /**
  * This is the MultiModelParameter class.
@@ -196,5 +202,9 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_MULTIMODELPARAMETER_HXX

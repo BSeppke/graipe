@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the FloatParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -267,3 +275,8 @@ void FloatParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
+

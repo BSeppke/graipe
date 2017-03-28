@@ -41,8 +41,15 @@
 #include <QPointer>
 #include <QSpinBox>
 
+/**
+ * @file
+ * @brief Header file for the IntParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
-    
 
 /**
  * This is the IntParameter class.
@@ -193,5 +200,9 @@ class GRAIPE_CORE_EXPORT IntParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_INTPARAMETER_HXX

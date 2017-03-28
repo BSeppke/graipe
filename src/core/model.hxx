@@ -45,6 +45,13 @@
 #include <QObject>
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Header file for the base types of all data: The Model, ModelList and RasteredModel classes.
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -772,5 +779,9 @@ class GRAIPE_CORE_EXPORT RasteredModel
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_MODEL_HXX

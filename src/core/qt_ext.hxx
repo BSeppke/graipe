@@ -36,16 +36,22 @@
 #ifndef GRAIPE_CORE_QT_EXT_HXX
 #define GRAIPE_CORE_QT_EXT_HXX
 
+/**
+ * @file
+ * @brief This file bundles a collection of different enhancements to the
+ * already great Qt library
+ *
+ * @addtogroup core
+ * @{
+ */
+
 #include "core/qt_ext/qgraphicsresizableitem.hxx"
 #include "core/qt_ext/qiocompressor.hxx"
 #include "core/qt_ext/qlegend.hxx"
 #include "core/qt_ext/qpointfx.hxx"
 
-
 /**
- * This file bundles a collection of different enhancements to the
- * already great Qt library:
+ * @}
  */
-
 
  #endif //GRAIPE_CORE_QT_EXT_HXX

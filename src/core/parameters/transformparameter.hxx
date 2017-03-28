@@ -41,6 +41,13 @@
 #include <QPointer>
 #include <QLineEdit>
 
+/**
+ * @file
+ * @brief Header file for the TransformParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -168,5 +175,9 @@ class GRAIPE_CORE_EXPORT TransformParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETER_HXX

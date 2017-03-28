@@ -35,28 +35,9 @@
 
 #ifndef GRAIPE_CORE_PARAMETERS_HXX
 #define GRAIPE_CORE_PARAMETERS_HXX
-
-#include "core/parameters/boolparameter.hxx"
-#include "core/parameters/colorparameter.hxx"
-#include "core/parameters/colortableparameter.hxx"
-#include "core/parameters/datetimeparameter.hxx"
-#include "core/parameters/doubleparameter.hxx"
-#include "core/parameters/enumparameter.hxx"
-#include "core/parameters/filenameparameter.hxx"
-#include "core/parameters/floatparameter.hxx"
-#include "core/parameters/intparameter.hxx"
-#include "core/parameters/longstringparameter.hxx"
-#include "core/parameters/modelparameter.hxx"
-#include "core/parameters/multimodelparameter.hxx"
-#include "core/parameters/pointfparameter.hxx"
-#include "core/parameters/pointparameter.hxx"
-#include "core/parameters/stringparameter.hxx"
-#include "core/parameters/transformparameter.hxx"
-#include "core/parameters/parametergroup.hxx"
-
-
 /**
- * This file contains a collection of different parameters. The general use of a
+ * @file
+ * @brief This file contains a collection of different parameters. The general use of a
  * parameter to encapsulate a value of various types and to provide an
  * editing possibility with respect to a QWidget. This allows us to
  * define something on a higher parameter level and to get the editing 
@@ -96,7 +77,31 @@
  * You are, of course, able to extend these Parameters by your own
  * specialized class, as it is done inside the image-Module to select just
  * one band of an image.
+ *
+ * @addtogroup core
+ * @{
  */
 
+#include "core/parameters/boolparameter.hxx"
+#include "core/parameters/colorparameter.hxx"
+#include "core/parameters/colortableparameter.hxx"
+#include "core/parameters/datetimeparameter.hxx"
+#include "core/parameters/doubleparameter.hxx"
+#include "core/parameters/enumparameter.hxx"
+#include "core/parameters/filenameparameter.hxx"
+#include "core/parameters/floatparameter.hxx"
+#include "core/parameters/intparameter.hxx"
+#include "core/parameters/longstringparameter.hxx"
+#include "core/parameters/modelparameter.hxx"
+#include "core/parameters/multimodelparameter.hxx"
+#include "core/parameters/pointfparameter.hxx"
+#include "core/parameters/pointparameter.hxx"
+#include "core/parameters/stringparameter.hxx"
+#include "core/parameters/transformparameter.hxx"
+#include "core/parameters/parametergroup.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_HXX

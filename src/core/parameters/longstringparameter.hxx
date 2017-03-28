@@ -41,6 +41,13 @@
 #include <QPointer>
 #include <QPlainTextEdit>
 
+/**
+ * @file
+ * @brief Header file for the LongStringParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -164,5 +171,9 @@ class GRAIPE_CORE_EXPORT LongStringParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_LONGSTRINGPARAMETER_HXX

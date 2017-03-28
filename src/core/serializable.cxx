@@ -38,6 +38,14 @@
 
 #include <QUrl>
 
+/**
+ * @file
+ * @brief This file implements the needed serialization procedures.
+ *
+ * @addtogroup core
+ * @{
+ */
+ 
 namespace graipe {
 /**
  * Splits a string using a given separator.
@@ -268,3 +276,7 @@ QString Serializable::typeName() const
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

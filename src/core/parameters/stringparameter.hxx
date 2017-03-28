@@ -41,6 +41,14 @@
 #include <QPointer>
 #include <QLineEdit>
 
+/**
+ * @file
+ * @brief Header file for the StringParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -158,5 +166,9 @@ class GRAIPE_CORE_EXPORT StringParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_STRINGPARAMETER_HXX

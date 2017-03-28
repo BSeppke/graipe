@@ -41,6 +41,13 @@
 #include <QPointer>
 #include <QCheckBox>
 
+/**
+ * @file
+ * @brief Header file for the BoolParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -153,5 +160,9 @@ class GRAIPE_CORE_EXPORT BoolParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_BOOLPARAMETER_HXX

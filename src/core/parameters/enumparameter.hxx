@@ -41,8 +41,15 @@
 #include <QPointer>
 #include <QComboBox>
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for the EnumParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
+namespace graipe {
 
 /**
  * This is the EnumParameter class.
@@ -158,5 +165,9 @@ class GRAIPE_CORE_EXPORT EnumParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_ENUMPARAMETER_HXX

@@ -36,6 +36,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the ModelParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -306,5 +314,8 @@ void ModelParameter::updateValue()
     }
 }
 
-
 } //end of namespace graipe
+
+/**
+ * @}
+ */

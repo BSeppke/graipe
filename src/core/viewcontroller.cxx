@@ -40,6 +40,14 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
 
+/**
+ * @file
+ * @brief Implementation file for the ViewController class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -451,3 +459,8 @@ bool ViewController::deserialize(QIODevice& in)
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
+

@@ -40,6 +40,14 @@
 #include <QCursor>
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the QGraphicsResizableItem class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
     
 //codes for the handles of the Resizable items
@@ -352,3 +360,7 @@ void QGraphicsResizableItem::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 }
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */

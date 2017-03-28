@@ -38,6 +38,14 @@
 #include <QFile>
 #include "core/qt_ext/qiocompressor.hxx"
 
+/**
+ * @file
+ * @brief Implementation file for the import and export of data
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
     
 /**
@@ -226,3 +234,7 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
 }
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */

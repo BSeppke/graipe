@@ -39,6 +39,13 @@
 #include "core/config.hxx"
 #include "core/factories.hxx"
 
+/**
+ * @file
+ * @brief Header file for the Module class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -97,5 +104,9 @@ class GRAIPE_CORE_EXPORT Module
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //MODULE_HXX

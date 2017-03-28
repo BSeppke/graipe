@@ -38,6 +38,14 @@
 
 #include <QFont>
 
+/**
+ * @file
+ * @brief Implementation file for the QLegend class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -418,3 +426,7 @@ inline float QLegend::text_interval_width() const
 }
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */

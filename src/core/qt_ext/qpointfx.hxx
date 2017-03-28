@@ -42,6 +42,14 @@
 #include <QString>
 #include <QVector>
 
+/**
+ * @file
+ * @brief Header file for the QPointFX class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
   
 /** 
@@ -152,5 +160,9 @@ public:
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif

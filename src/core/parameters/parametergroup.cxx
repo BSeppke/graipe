@@ -38,6 +38,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the ParameterGroup class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -361,3 +369,7 @@ QWidget * ParameterGroup::delegate()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

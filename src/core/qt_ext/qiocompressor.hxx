@@ -86,6 +86,14 @@
 
 #include <QtCore/QIODevice>
 
+/**
+ * @file
+ * @brief Header file for the QIOCompressor class, see license terms above
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 class QIOCompressorPrivate;
@@ -125,5 +133,9 @@ private:
 };
     
 }//end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif

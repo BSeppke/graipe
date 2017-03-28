@@ -45,9 +45,9 @@
 
 #include <QString>
 
-
 /**
- * This file holds all data structures, which are needed for the building
+ * @file
+ * @brief This file holds all data structures, which are needed for the building
  * block system of GRAIPE to work. GRAIPE can be defined/extended by the
  * following items:
  *
@@ -60,9 +60,11 @@
  * defined (all specializing the std::vector).
  *
  * Since this a header only file, we need no export definitions here!
+ *
+ * @addtogroup core
+ * @{
  */
-
-
+ 
 namespace graipe {
 
 /**
@@ -149,5 +151,9 @@ typedef Factory<ViewControllerFactoryItem>      ViewControllerFactory;
 typedef Factory<AlgorithmFactoryItem> AlgorithmFactory;
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_FACTORIES_HXX

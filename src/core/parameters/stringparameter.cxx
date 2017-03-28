@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the StringParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -196,3 +204,7 @@ void StringParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

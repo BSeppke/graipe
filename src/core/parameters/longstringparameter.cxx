@@ -38,6 +38,14 @@
 #include <QFontMetrics>
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implemenation file for the LongStringParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -199,3 +207,7 @@ void LongStringParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

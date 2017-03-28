@@ -39,6 +39,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the general Parameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -327,3 +335,7 @@ void Parameter::initConnections()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

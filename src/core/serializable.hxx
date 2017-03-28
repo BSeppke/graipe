@@ -45,9 +45,9 @@
 #include <QDateTime>
 #include <QIODevice>
 
-
 /**
- * This file holds all data interfaces, which are needed for serialization
+ * @file
+ * @brief This file holds all data interfaces, which are needed for serialization
  * and deserialization of whatever kind of object. It also defines some 
  * helper functions to split comma-separated QStrings into vectors of chars
  * and to encode/decode QStrings. Additionally conversion of datetime QStrings
@@ -60,8 +60,10 @@
  * If you implement your models and ViewControllers this way, GRAIPE gives 
  * you model import/export for free. Additionally, it offers you a complete
  * workspace store/restore!
+ *
+ * @addtogroup core
+ * @{
  */
-
 
 namespace graipe {
 
@@ -249,5 +251,9 @@ class GRAIPE_CORE_EXPORT Serializable
 };
     
 }//end of namespace
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_SERIALIZABLE_HXX

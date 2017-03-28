@@ -39,6 +39,14 @@
 #include <QString>
 #include <QtGlobal>
 
+/**
+ * @file
+ * @brief Header file for the config of GRAIPE's core module
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace  graipe {
 
 #ifdef GRAIPE_VERSION_MAJOR
@@ -94,5 +102,9 @@ static const QString full_version_name = QString("%1.%2.%3").arg(version_major).
 #endif //GRAIPE_CORE_BUILD
 
 } //end of namepace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_CONFIG_HXX

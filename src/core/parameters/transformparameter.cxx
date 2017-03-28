@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the TransformParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -276,3 +284,7 @@ void TransformParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

@@ -37,6 +37,14 @@
 
 #include <QDateTime>
 
+/**
+ * @file
+ * @brief Implmentation file for the logging facilities
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -157,3 +165,7 @@ void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, cons
 }
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */

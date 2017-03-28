@@ -41,6 +41,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the base types of all data: The Model, ModelList and RasteredModel classes.
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -879,5 +887,8 @@ QString RasteredModel::typeName() const
 	return "RasteredModel";
 }
 
-
 } //end of namespace graipe
+
+/**
+ * @}
+ */

@@ -44,6 +44,13 @@
 #include <QFile>
 #include <QTextStream>
 
+/**
+ * @file
+ * @brief Header file for the logging facilities
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -111,5 +118,9 @@ class GRAIPE_CORE_EXPORT Logging
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_LOGGING_HXX

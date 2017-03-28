@@ -39,7 +39,13 @@
 #include "core/config.hxx"
 #include "core/qt_ext/qgraphicsresizableitem.hxx"
 
-
+/**
+ * @file
+ * @brief Header file for the QLegend class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -263,5 +269,9 @@ class GRAIPE_CORE_EXPORT QLegend
 };
     
 }//end of namespace graipe
-    
+
+/**
+ * @}
+ */
+
 #endif //GRAIPE_CORE_QLEGEND_HXX

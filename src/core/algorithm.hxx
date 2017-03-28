@@ -44,6 +44,13 @@
 
 #include <QMutex>
 
+/**
+ * @file
+ * @brief Header file for the Algorithm class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -214,5 +221,9 @@ class GRAIPE_CORE_EXPORT Algorithm
 };
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_ALGORITHM_HXX

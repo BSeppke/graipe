@@ -38,6 +38,14 @@
 #include <QLabel>
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the PointParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -306,3 +314,7 @@ void PointParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

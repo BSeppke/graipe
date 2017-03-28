@@ -40,6 +40,13 @@
 
 #include <QObject>
 
+/**
+ * @file
+ * @brief Header file for the UpdateChecker class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -85,5 +92,9 @@ signals:
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_UPDATECHECKER_HXX

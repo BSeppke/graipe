@@ -37,6 +37,14 @@
 
 #include <QtDebug>
 
+/**
+ * @file
+ * @brief Implementation file for the BoolParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -199,3 +207,7 @@ void BoolParameter::updateValue()
 }
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */

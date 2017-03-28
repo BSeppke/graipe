@@ -42,6 +42,13 @@
 #include <QPushButton>
 #include <QColorDialog>
 
+/**
+ * @file
+ * @brief Header file for the ColorParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
 namespace graipe {
 
@@ -157,5 +164,9 @@ class GRAIPE_CORE_EXPORT ColorParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_COLORPARAMETER_HXX

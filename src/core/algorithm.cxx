@@ -35,6 +35,14 @@
 
 #include "core/algorithm.hxx"
 
+/**
+ * @file
+ * @brief Implementation file for the Algorithm class
+ *
+ * @addtogroup core
+ * @{
+ */
+
 namespace graipe {
 
 /**
@@ -228,3 +236,7 @@ std::vector<Model *>  Algorithm::results()
 }
 
 }//end of namespace graipe
+
+/**
+ * @}
+ */

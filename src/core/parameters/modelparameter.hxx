@@ -42,8 +42,15 @@
 #include <QPointer>
 #include <QComboBox>
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for the ModelParameter class
+ *
+ * @addtogroup core
+ * @{
+ */
 
+namespace graipe {
 
 /**
  * This is the ModelParameter class.
@@ -194,5 +201,9 @@ class GRAIPE_CORE_EXPORT ModelParameter
 };
 
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_CORE_PARAMETERS_MODELPARAMETER_HXX
