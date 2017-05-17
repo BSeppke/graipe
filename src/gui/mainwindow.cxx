@@ -162,6 +162,13 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     
     this->setWindowTitle("GRAIPE v." + version_name);
     
+    //Set Stylesheet for info label:
+    m_ui.lblStatusInformation->setStyleSheet(
+        QString("QLabel table {     width: 100%;   border: 1px solid black; } ")
+            + "QLabel th {  padding: 5px;     border: 1px solid black; } "
+            + "QLabel td {  text-align: right; padding: 5px; border: 1px solid black; } "
+        );
+    
     //load the recent files from the "graipe.ini" file
     updateRecentActionList();
     

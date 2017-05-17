@@ -120,14 +120,6 @@ class GRAIPE_CORE_EXPORT TransformParameter
          * \return A comma separated tring w.r.t. the order given above.
          */
         static QString valueText(const QTransform& trans);
-
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically it's just: "TransformParameter, " + valueText()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
     
         /**
          * Deserialization of a parameter's state from an input device.

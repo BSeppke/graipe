@@ -36,6 +36,7 @@
 #include "core/parameters/colorparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 #include <QObject>
 
 /**
@@ -131,10 +132,15 @@ QString  ColorParameter::valueText() const
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void ColorParameter::serialize(QIODevice& out) const
+void ColorParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", " + QString("%1").arg(value().rgba()), out);
+    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Value", QString("%1").arg(value().rgba()));
+    xmlWriter.writeEndElement();
 }
 
 /**

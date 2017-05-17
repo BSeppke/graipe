@@ -254,7 +254,7 @@ QString ParameterGroup::valueText(const QString & filter_types) const
  */
 QString ParameterGroup::magicID() const
 {
-    return "";
+    return "ParameterGroup";
 }
 
 /**
@@ -266,17 +266,26 @@ QString ParameterGroup::magicID() const
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void ParameterGroup::serialize(QIODevice& out) const
+void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
 {
+    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Parameters", QString::number(m_parameters.size()));
+    
     for(storage_type::const_iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
     {
         if (iter->second)
-        {
-            write_on_device(iter->first + ": ", out);
-            iter->second->serialize(out);
-            write_on_device("\n", out);
+        {            
+            xmlWriter.writeStartElement("Parameter");
+            xmlWriter.writeAttribute("ID",iter->first);
+            iter->second->serialize(xmlWriter);
+            xmlWriter.writeEndElement();
         }
     }
+    xmlWriter.writeEndElement();
 }
 
 /**

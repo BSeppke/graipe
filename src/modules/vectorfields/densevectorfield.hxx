@@ -412,7 +412,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserializion of a  dense vectorfield from a QIODevice.
@@ -600,7 +600,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserializion of a  dense vectorfield from a QIODevice.

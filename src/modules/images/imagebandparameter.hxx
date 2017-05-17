@@ -221,7 +221,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          *
          * \return The serialization of the parameter's state.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization of a parameter's state from a string.

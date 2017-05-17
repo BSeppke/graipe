@@ -36,6 +36,7 @@
 #include "core/parameters/enumparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -133,10 +134,15 @@ QString EnumParameter::valueText() const
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void EnumParameter::serialize(QIODevice& out) const
+void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", " + QString("%1").arg(value()), out);
+    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Value", QString("%1").arg(value()));
+    xmlWriter.writeEndElement();
 }
 
 /**

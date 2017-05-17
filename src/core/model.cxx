@@ -40,6 +40,7 @@
 #include <cmath>
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -544,7 +545,7 @@ QString Model::typeName() const
  */
 QString Model::magicID() const
 {
-    return  QString("[Graipe::") + typeName() + "]";
+    return  typeName();
 }
 
 /**
@@ -556,11 +557,21 @@ QString Model::magicID() const
  *
  * \param out The output device for the serialization.
  */
-void Model::serialize(QIODevice& out) const
+void Model::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    serialize_header(out);
-    write_on_device("\n[Content]\n", out);
-    serialize_content(out);
+
+    
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.setAutoFormattingIndent(4);
+    
+    xmlWriter.writeStartDocument();
+        xmlWriter.writeStartElement(magicID());
+            m_parameters->serialize(xmlWriter);
+            xmlWriter.writeStartElement("Content");
+                serialize_content(xmlWriter);
+            xmlWriter.writeEndElement();
+        xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
 }
 
 /**
@@ -596,10 +607,8 @@ bool Model::deserialize(QIODevice& in)
  *
  * \param out the output device.
  */
-void Model::serialize_header(QIODevice& out) const
+void Model::serialize_header(QXmlStreamWriter& xmlWriter) const
 {
-	write_on_device(magicID() + "\n", out);
-    m_parameters->serialize(out);
 }
 
 /**
@@ -635,9 +644,8 @@ bool Model::deserialize_header(QIODevice& in)
  *
  * \param out the output device.
  */
-void Model::serialize_content(QIODevice& out) const
+void Model::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    write_on_device("none\n", out);
 }
 
 /**

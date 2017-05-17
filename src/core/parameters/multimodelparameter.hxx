@@ -130,7 +130,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \param out The output device on which we serialize the parameter's state.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization of a parameter's state from an input device.

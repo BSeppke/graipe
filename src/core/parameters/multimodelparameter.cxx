@@ -36,6 +36,7 @@
 #include "core/parameters/multimodelparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -203,14 +204,19 @@ void MultiModelParameter::refresh()
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void MultiModelParameter::serialize(QIODevice& out) const
+void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
     
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    int i=0;
     for(const Model* model: value())
     {
-        write_on_device(", " + encode_string(model->filename()), out);
+        xmlWriter.writeTextElement(QString("value%1").arg(++i), model->filename());
     }
+    xmlWriter.writeEndElement();
 }
 
 /**

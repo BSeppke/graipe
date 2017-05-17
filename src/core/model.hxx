@@ -44,6 +44,7 @@
 #include <QTransform>
 #include <QObject>
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -355,7 +356,7 @@ class GRAIPE_CORE_EXPORT Model
          *
          * \param out The output device for the serialization.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the model by means of its header and content
@@ -372,7 +373,7 @@ class GRAIPE_CORE_EXPORT Model
          *
          * \param out the output device.
          */
-        virtual void serialize_header(QIODevice& out) const;
+        virtual void serialize_header(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the Model's header.
@@ -388,7 +389,7 @@ class GRAIPE_CORE_EXPORT Model
          *
          * \param out the output device.
          */
-        virtual void serialize_content(QIODevice& out) const;
+        virtual void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the Model's content.
@@ -611,14 +612,15 @@ class GRAIPE_CORE_EXPORT ItemListModel
          *
          * \param out The output device, where the serialization will take place.
          */
-        void serialize_content(QIODevice & out) const
+        void serialize_content(QXmlStreamWriter& xmlWriter) const
         {
-            write_on_device(T::headerCSV(), out);
-    
+//TODO!!!            write_on_device(T::headerCSV(), out);
+    /*
             for(const item_type& item : m_data)
             {
                 write_on_device("\n" + item.toCSV(), out);
             }
+            */
         }
     
         /**

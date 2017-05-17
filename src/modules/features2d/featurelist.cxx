@@ -201,14 +201,16 @@ bool PointFeatureList2D::deserialize_item(const QString & serial)
  *
  * \param out The output device for serialization.
  */
-void PointFeatureList2D::serialize_content(QIODevice & out) const
+void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    write_on_device(item_header(), out);
+//TODO
+/*    write_on_device(item_header(), out);
     
 	for(unsigned int i=0; i < size(); ++i)
     {
 		write_on_device("\n" + serialize_item(i), out);
 	}
+    */
 }
 
 /**

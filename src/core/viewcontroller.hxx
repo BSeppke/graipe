@@ -229,7 +229,7 @@ class GRAIPE_CORE_EXPORT ViewController
          *
          * \param out The output device, where we serialize to.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the ViewController by means of its parameter settings.

@@ -176,7 +176,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserializion of a  sparse vectorfield from a QIODevice.

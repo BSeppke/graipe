@@ -207,14 +207,16 @@ bool PolygonList2D::deserialize_item(const QString & serial)
  *
  * \param out The QIODevice, where we will put our output on.
  */
-void PolygonList2D::serialize_content(QIODevice& out) const
+void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-	write_on_device(item_header(), out);
+//TODO!!!
+/*	write_on_device(item_header(), out);
 	
     for(unsigned int index=0; index < size()-1; ++index)
     {
 		write_on_device("\n" + serialize_item(index), out);
 	}
+    */
 }
 
 /**

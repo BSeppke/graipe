@@ -194,19 +194,34 @@ QString  PointFParameter::valueText() const
 {
     return QString("(") + QString::number(value().x(),'g', 10) + "x" + QString::number(value().y(),'g', 10) + ")";
 }
-
 /**
  * Serialization of the parameter's state to an output device.
- * Basically, it's just: "PointFParameter" + valueText()
+ * Writes the following XML on the device:
+ * 
+ * <MAGICID>
+ *     <Name>NAME</Name>
+ *     <x>X</x>
+ *     <y>Y</y>
+ * </MAGICID>
+ *
+ * with MAGICID = magicID(),
+ *         NAME = name(),
+ *            X = value().x(), and
+ *            Y = value().y().
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void PointFParameter::serialize(QIODevice& out) const
+void PointFParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", "+ valueText(), out);
-}
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("x", QString::number(value().x(),'g', 10));
+    xmlWriter.writeTextElement("y", QString::number(value().y(),'g', 10));
+    xmlWriter.writeEndElement();
 
+}
 /**
  * Deserialization of a parameter's state from an input device.
  *

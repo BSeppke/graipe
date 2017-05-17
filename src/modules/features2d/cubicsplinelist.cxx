@@ -228,14 +228,17 @@ bool CubicSplineList2D::deserialize_item(const QString & serial)
  *
  * \param out The QIODevice, where we will put our output on.
  */
-void CubicSplineList2D::serialize_content(QIODevice& out) const
+void CubicSplineList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
+//TODO!!!
+/**
 	write_on_device(item_header(), out);
     
 	for(unsigned int i=0; i < size(); ++i)
     {
 		write_on_device("\n" + serialize_item(i), out);
 	}
+    */
 }
 
 /**

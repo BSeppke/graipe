@@ -210,9 +210,11 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
 			QIOCompressor compressor(&file);
 			compressor.setStreamFormat(QIOCompressor::GzipFormat);
 		
+            QXmlStreamWriter xmlWriter(&compressor);
+            
 			if (compressor.open(QIODevice::WriteOnly))
 			{
-                object->serialize(compressor);
+                object->serialize(xmlWriter);
 				compressor.close();
 				
 				success = true;
@@ -220,7 +222,8 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
 		}
 		else if(file.open(QIODevice::WriteOnly))
 		{
-            object->serialize(file);
+            QXmlStreamWriter xmlWriter(&file);
+            object->serialize(xmlWriter);
 			file.close();
 				
 			success = true;

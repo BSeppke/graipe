@@ -44,6 +44,7 @@
 
 #include <QDateTime>
 #include <QIODevice>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -243,7 +244,7 @@ class GRAIPE_CORE_EXPORT Serializable
          *
          * \param out The output device.
          */
-        virtual void serialize(QIODevice& out) const = 0;
+        virtual void serialize(QXmlStreamWriter& xmlWriter) const = 0;
     
     protected:
         /** the filename of this serializable instance **/

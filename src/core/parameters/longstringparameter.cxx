@@ -127,19 +127,6 @@ QString  LongStringParameter::valueText() const
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "LongStringParameter, " + encode_string(value())
- *
- * \param out The output device on which we serialize the parameter's state.
- */
-void LongStringParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    
-    write_on_device(", " + encode_string(value()), out);
-}
-
-/**
  * Deserialization of a parameter's state from an input device.
  *
  * \param in the input device.

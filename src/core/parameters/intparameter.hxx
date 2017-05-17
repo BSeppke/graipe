@@ -149,14 +149,6 @@ class GRAIPE_CORE_EXPORT IntParameter
         QString valueText() const;
     
         /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, just: "IntParameter, " + valueText()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
-    
-        /**
          * Deserialization of a parameter's state from an input device.
          *
          * \param in the input device.

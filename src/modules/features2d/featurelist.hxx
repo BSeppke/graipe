@@ -150,7 +150,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserializion of a  feature list from a QIODevice.

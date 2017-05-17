@@ -431,10 +431,11 @@ QString ViewController::magicID() const
  *
  * \param out The output device, where we serialize to.
  */
-void ViewController::serialize(QIODevice& out) const
+void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
 {
-	write_on_device(magicID() + "\n", out);
-    m_parameters->serialize(out);
+    //TODO!!!!
+	//write_on_device(magicID() + "\n", xmlWriter);
+    m_parameters->serialize(xmlWriter);
 }
 
 /**

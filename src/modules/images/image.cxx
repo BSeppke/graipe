@@ -36,6 +36,8 @@
 #include "images/image.hxx"
 #include "images/imageimpex.hxx"
 
+#include <QIODevice>
+
 namespace graipe {
 
 /**
@@ -421,19 +423,19 @@ void Image<T>::copyData(Model& other) const
  * \param out The QIODevice, where we will put our output on.
  */
 template<class T>
-void Image<T>::serialize_content(QIODevice& out) const
+void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
     qint64 channel_size = this->width()*this->height()*sizeof(T);
-    
+
     for(unsigned int c=0; c<m_imagebands.size(); ++c)
     {
+        QByteArray block((const char*)m_imagebands[c].data(),channel_size);
         
-        qint64 written_bytes = out.write((const char*)m_imagebands[c].data(),channel_size);
-        
-        if (written_bytes != channel_size)
-        {
-            qCritical() << "Image<T>::serialize_content: Error while writing band " << c << ". Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
-        }
+        xmlWriter.writeStartElement("Channel");
+        xmlWriter.writeAttribute("ID", QString::number(c));
+        xmlWriter.writeAttribute("Encoding", "Base64");
+        xmlWriter.writeCharacters(block.toBase64());
+        xmlWriter.writeEndElement();
     }
 }
 

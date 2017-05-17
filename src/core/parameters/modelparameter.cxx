@@ -35,6 +35,7 @@
 #include "core/parameters/modelparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -194,10 +195,15 @@ void ModelParameter::refresh()
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void ModelParameter::serialize(QIODevice& out) const
+void ModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", " + encode_string(value()->filename()), out);
+    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Value", value()->filename());
+    xmlWriter.writeEndElement();
 }
 
 /**

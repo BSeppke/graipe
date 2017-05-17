@@ -42,6 +42,7 @@
 #include <map>
 
 #include <QString>
+#include <QXmlStreamWriter>
 
 /**
  * @file

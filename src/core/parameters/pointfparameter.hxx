@@ -147,14 +147,25 @@ class GRAIPE_CORE_EXPORT PointFParameter
          * \return The value of the parameter converted to an QString.
          */
         QString valueText() const;
-            
+    
         /**
          * Serialization of the parameter's state to an output device.
-         * Basically, it's just: "PointFParameter" + valueText()
+         * Writes the following XML on the device:
+         * 
+         * <MAGICID>
+         *     <Name>NAME</Name>
+         *     <x>X</x>
+         *     <y>Y</y>
+         * </MAGICID>
+         *
+         * with MAGICID = magicID(),
+         *         NAME = name(),
+         *            X = value().x(), and
+         *            Y = value().y().
          *
          * \param out The output device on which we serialize the parameter's state.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization of a parameter's state from an input device.

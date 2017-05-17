@@ -146,14 +146,23 @@ class GRAIPE_CORE_EXPORT Parameter
          * \return The same as the typeName() function.
          */
         QString magicID() const;
-    
+
         /**
          * Serialization of the parameter's state to an output device.
-         * Just writes the magicID a.k.a. typeName() on the device.
+         * Writes the following XML on the device:
+         * 
+         * <MAGICID>
+         *     <Name>NAME</Name>
+         *     <value>VALUETEXT</value>
+         * </MAGICID>
+         *
+         * with MAGICID = magicID(),
+         *         NAME = name(), and
+         *    VALUETEXT = valueText().
          *
          * \param out The output device on which we serialize the parameter's state.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization of a parameter's state from an input device.

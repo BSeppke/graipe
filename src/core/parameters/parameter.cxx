@@ -38,6 +38,8 @@
 #include "core/model.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -158,13 +160,27 @@ QString Parameter::magicID() const
 
 /**
  * Serialization of the parameter's state to an output device.
- * Just writes the magicID a.k.a. typeName() on the device.
+ * Writes the following XML on the device:
+ * 
+ * <MAGICID>
+ *     <Name>NAME</Name>
+ *     <value>VALUETEXT</value>
+ * </MAGICID>
+ *
+ * with MAGICID = magicID(),
+ *         NAME = name(), and
+ *    VALUETEXT = valueText().
  *
  * \param out The output device on which we serialize the parameter's state.
  */
-void Parameter::serialize(QIODevice& out) const
+void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    write_on_device(magicID(), out);
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Value", valueText());
+    xmlWriter.writeEndElement();
 }
 
 /**
@@ -175,19 +191,29 @@ void Parameter::serialize(QIODevice& out) const
  */
 bool Parameter::deserialize(QIODevice & in)
 {
-    //Read the first bytes, needed for the magicID
-    QString id_str(in.read(magicID().size()));
+    QXmlStreamReader xmlReader(&in);
     
-    //read the ", " too!
-    in.read(2);
-    
-    if(id_str.trimmed() == magicID())
+    try
     {
-        return true;
+        while(!xmlReader.atEnd())
+        {
+            if (xmlReader.readNextStartElement())
+            {
+                if(xmlReader.name() == magicID())
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                throw std::runtime_error("Did not find magicID in XML tree");
+            }
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
     }
-    else
+    catch(std::runtime_error & e)
     {
-        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << " but got: " << id_str.trimmed();
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
         return false;
     }
 }

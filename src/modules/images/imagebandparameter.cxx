@@ -309,10 +309,15 @@ void ImageBandParameter<T>::refresh()
  * \return The serialization of the parameter's state.
  */
 template <class T>
-void ImageBandParameter<T>::serialize(QIODevice & out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + encode_string(m_image->filename()) + ", " + m_bandId, out);
+void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
+{    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Filename", m_image->filename());
+    xmlWriter.writeTextElement("BandID", QString::number(m_bandId));
+    xmlWriter.writeEndElement();
 }
 
 /**

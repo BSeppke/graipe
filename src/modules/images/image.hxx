@@ -248,7 +248,7 @@ class GRAIPE_IMAGES_EXPORT Image
          *
          * \param out The QIODevice, where we will put our output on.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserializion of a list of polygons from a QIODevice.

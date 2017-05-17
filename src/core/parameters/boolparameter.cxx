@@ -36,6 +36,8 @@
 #include "core/parameters/boolparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -119,18 +121,6 @@ void BoolParameter::setValue(bool value)
 QString BoolParameter::valueText() const
 {
     return (value()?"true":"false");
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "BoolParameter, " + valueText()
- *
- * \param out The output device on which we serialize the parameter's state.
- */
-void BoolParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + valueText(), out);
 }
 
 /**

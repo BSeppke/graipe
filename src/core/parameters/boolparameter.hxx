@@ -110,14 +110,6 @@ class GRAIPE_CORE_EXPORT BoolParameter
          * \return The value of the parameter converted to an QString
          */
         QString valueText() const;
-            
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, just: "BoolParameter, " + valueText()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
     
         /**
          * Deserialization of a parameter's state from an input device.

@@ -551,10 +551,10 @@ void DenseVectorfield2D::setV(const ArrayViewType& new_v)
  *
  * \param out The output device for serialization.
  */
-void DenseVectorfield2D::serialize_content(QIODevice& out) const
+void DenseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    qint64 channel_size = m_u.width()*m_u.height()*sizeof(ArrayType::value_type);
-    qint64 written_bytes;
+//TODO!!!    qint64 channel_size = m_u.width()*m_u.height()*sizeof(ArrayType::value_type);
+/*    qint64 written_bytes;
     
     //First write x-part of vectors: m_u
     written_bytes = out.write((const char*)m_u.data(),channel_size);
@@ -569,7 +569,7 @@ void DenseVectorfield2D::serialize_content(QIODevice& out) const
     {
        qCritical() << "DenseVectorfield2D::serialize_content: Error while writing y-part of vectors from m_v. Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
     }
-
+*/
 }
 
 /**
@@ -871,10 +871,10 @@ void DenseWeightedVectorfield2D::setWeight(unsigned int x, unsigned int y, float
  *
  * \param out The output device for serialization.
  */
-void DenseWeightedVectorfield2D::serialize_content(QIODevice& out) const
+void DenseWeightedVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    DenseVectorfield2D::serialize_content(out);
-    
+//TODO!!!    DenseVectorfield2D::serialize_content(out);
+    /*
     qint64 channel_size = m_w.width()*m_w.height()*sizeof(ArrayType::value_type);
     
     //Write weights of vectors: m_w
@@ -883,6 +883,7 @@ void DenseWeightedVectorfield2D::serialize_content(QIODevice& out) const
     {
        qCritical() << "DenseWeightedVectorfield2D::serialize_content: Error while writing weights of vectors from m_w. Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
     }
+    */
 }
 
 /**
