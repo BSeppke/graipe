@@ -226,9 +226,10 @@ void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  *
  * \param in The QIODevice, where we will read from.
  */
-bool PolygonList2D::deserialize_content(QIODevice& in)
+bool PolygonList2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    if(locked())
+//TODO!!!
+/**    if(locked())
         return false;
         
     //Read in header line and then throw it away immideately
@@ -255,6 +256,8 @@ bool PolygonList2D::deserialize_content(QIODevice& in)
         }
     }
     return true;
+    */
+    return false;
 }
 
 

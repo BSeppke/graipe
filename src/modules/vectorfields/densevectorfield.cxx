@@ -580,9 +580,10 @@ void DenseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  * \param in The QIODevice, where we will read from.
  * \return True, if the content could be deserialized and the model is not locked.
  */
-bool DenseVectorfield2D::deserialize_content(QIODevice& in)
+bool DenseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    if(width() == 0 || height()==0)
+ //TODO!!!
+/**   if(width() == 0 || height()==0)
     {
         qCritical("DenseVectorfield2D::deserialize_content: storage image has zero size!");
         return false;
@@ -611,6 +612,8 @@ bool DenseVectorfield2D::deserialize_content(QIODevice& in)
     }
     
     return true;
+    **/
+    return false;
 }
 
 /**
@@ -894,9 +897,10 @@ void DenseWeightedVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) 
  * \param in The QIODevice, where we will read from.
  * \return True, if the content could be deserialized and the model is not locked.
  */
-bool DenseWeightedVectorfield2D::deserialize_content(QIODevice& in)
+bool DenseWeightedVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    if( !DenseVectorfield2D::deserialize_content(in))
+//TODO!!!
+/**    if( !DenseVectorfield2D::deserialize_content(in))
     {
         return false;
     }
@@ -914,6 +918,8 @@ bool DenseWeightedVectorfield2D::deserialize_content(QIODevice& in)
     }
 
     return true;
+    **/
+    return false;
 }
 
 

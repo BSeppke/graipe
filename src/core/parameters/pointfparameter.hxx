@@ -146,7 +146,7 @@ class GRAIPE_CORE_EXPORT PointFParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
+        QString toString() const;
     
         /**
          * Serialization of the parameter's state to an output device.
@@ -173,7 +173,7 @@ class GRAIPE_CORE_EXPORT PointFParameter
          * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.

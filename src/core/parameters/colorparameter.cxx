@@ -121,7 +121,7 @@ void ColorParameter::setValue(const QColor& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  ColorParameter::valueText() const
+QString  ColorParameter::toString() const
 {
     return m_value.name();
 }
@@ -134,12 +134,16 @@ QString  ColorParameter::valueText() const
  */
 void ColorParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(magicID());
-    xmlWriter.writeTextElement("Name", name());
-    xmlWriter.writeTextElement("Value", QString("%1").arg(value().rgba()));
+        xmlWriter.writeTextElement("Name", name());
+        xmlWriter.writeStartElement("Color");
+        xmlWriter.writeAttribute("Type", "RGB");
+            xmlWriter.writeTextElement("R", QString::number(value().red()));
+            xmlWriter.writeTextElement("G", QString::number(value().green()));
+            xmlWriter.writeTextElement("B", QString::number(value().blue()));
+        xmlWriter.writeEndElement();
     xmlWriter.writeEndElement();
 }
 
@@ -149,28 +153,59 @@ void ColorParameter::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool ColorParameter::deserialize(QIODevice& in)
+bool ColorParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    
-    QString content(in.readLine().trimmed());
-    
     try
     {
-        QRgb col_rgb = content.toUInt();
-        setValue(QColor::fromRgb(col_rgb));
-        
-        return true;
+        if (xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == magicID())
+            {
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(    xmlReader.name() == "Color"
+                        && xmlReader.attributes().hasAttribute("Type")
+                        && xmlReader.attributes().value("Type") == "RGB")
+                    {
+                        QColor color;
+                        
+                        while(xmlReader.readNextStartElement())
+                        {
+                            if(xmlReader.name() == "R")
+                            {
+                                color.setRed(xmlReader.readElementText().toInt());
+                            }
+                            if(xmlReader.name() == "G")
+                            {
+                                color.setGreen(xmlReader.readElementText().toInt());
+                            }
+                            if(xmlReader.name() == "B")
+                            {
+                                color.setBlue(xmlReader.readElementText().toInt());
+                            }
+                        }
+                        setValue(color);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
     }
-    catch (...)
+    catch(std::runtime_error & e)
     {
-        qDebug() << "ColorParameter deserialize: value has to be an integer in file, but found: " << content;
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
     }
-    return false;
 }
 
 /**

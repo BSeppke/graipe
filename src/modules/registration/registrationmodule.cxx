@@ -117,14 +117,14 @@ class GlobalMotionCorrector
                     
                     m_param_imageBand2->image()->copyMetadata(*displaced_image);
                     
-                    displaced_image->setName("GME corrected image band " + m_param_imageBand1->valueText());
+                    displaced_image->setName("GME corrected image band " + m_param_imageBand1->toString());
                     
                     
                     QTransform transform(mat(0,0), mat(1,0), mat(2,0),
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     qDebug() << "GME: Matrix=" << transform << "\nMatString="<< mat_str <<"\n";
                     
@@ -133,7 +133,7 @@ class GlobalMotionCorrector
                                             "Computed global motion matrix (I1 -> I2): %3\n"
                                             "rotation accuracy: %4\n"
                                             "translation accuracy: %5\n"
-                                            "processing time: %6 seconds").arg(m_param_imageBand1->valueText()).arg(m_param_imageBand2->valueText())
+                                            "processing time: %6 seconds").arg(m_param_imageBand1->toString()).arg(m_param_imageBand2->toString())
                                             .arg(mat_str).arg(rotation_correlation).arg(translation_correlation).arg(processing_time/1000.0);
                                         
                     displaced_image->setDescription(descr);

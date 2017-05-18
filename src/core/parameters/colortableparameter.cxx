@@ -224,7 +224,7 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  ColorTableParameter::valueText() const
+QString  ColorTableParameter::toString() const
 {
     QVector<QRgb> ct = value();
     
@@ -238,41 +238,101 @@ QString  ColorTableParameter::valueText() const
 }
 
 /**
+ * Serialization of the parameter's state to an output device.
+ * Basically, just: "ColorParameter, " + value().rgba()
+ *
+ * \param out The output device on which we serialize the parameter's state.
+ */
+void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
+{
+    QVector<QRgb> ct = value();
+    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(magicID());
+        xmlWriter.writeTextElement("Name", name());
+        xmlWriter.writeTextElement("Colors", QString::number(ct.size()));
+    
+    for(unsigned int i=1; i<ct.size(); ++i)
+    {
+        xmlWriter.writeStartElement("Color");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+        xmlWriter.writeAttribute("Type", "RGB");
+            xmlWriter.writeTextElement("R", QString::number(QColor(ct[i]).red()));
+            xmlWriter.writeTextElement("G", QString::number(QColor(ct[i]).green()));
+            xmlWriter.writeTextElement("B", QString::number(QColor(ct[i]).blue()));
+        xmlWriter.writeEndElement();
+    }
+    xmlWriter.writeEndElement();
+}
+
+/**
  * Deserialization of a parameter's state from an input device.
  *
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool ColorTableParameter::deserialize(QIODevice& in)
+bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    QStringList content_list = split_string(content, ", ");
     try
     {
-        if(content_list.size() != 256)
+        if (xmlReader.readNextStartElement())
         {
-            throw std::runtime_error("Error: Did not find 256 entries");
+            if(xmlReader.name() == magicID())
+            {
+                QVector<QRgb> ct(256);
+                
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Colors")
+                    {
+                        ct.resize(xmlReader.readElementText().toInt());
+                    }
+                    if(    xmlReader.name() == "Color"
+                        && xmlReader.attributes().hasAttribute("ID")
+                        && xmlReader.attributes().hasAttribute("Type")
+                        && xmlReader.attributes().value("Type") == "RGB")
+                    {
+                        int color_id = xmlReader.attributes().value("ID").toInt();
+                        QColor color;
+                        
+                        while(xmlReader.readNextStartElement())
+                        {
+                            if(xmlReader.name() == "R")
+                            {
+                                color.setRed(xmlReader.readElementText().toInt());
+                            }
+                            if(xmlReader.name() == "G")
+                            {
+                                color.setGreen(xmlReader.readElementText().toInt());
+                            }
+                            if(xmlReader.name() == "B")
+                            {
+                                color.setBlue(xmlReader.readElementText().toInt());
+                            }
+                        }
+                        ct[color_id] = color.rgb();
+                    }
+                }
+                setValue(ct);
+                return true;
+            }
         }
-        
-        QVector<QRgb> ct(256);
-        for(unsigned int i=0; i<ct.size(); ++i)
+        else
         {
-            ct[i] = content_list[i].toUInt();
+            throw std::runtime_error("Did not find magicID in XML tree");
         }
-        setValue(ct);
-        
-        return true;
+        throw std::runtime_error("Did not find any start element in XML tree");
     }
-    catch (...)
+    catch(std::runtime_error & e)
     {
-        qDebug() << "ColorTableParameter deserialize: value has to be an integer list in file, but found: " << content;
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
     }
-    return false;
 }
 
 /**

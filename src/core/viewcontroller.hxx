@@ -239,7 +239,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * \param  in The input device, where we read the serialization of this ViewController class from.
          * \return True, if the parameters could be restored,
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
     public slots:
         /**

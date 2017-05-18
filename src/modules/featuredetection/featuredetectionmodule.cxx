@@ -106,7 +106,7 @@ class MonotonyFeatureDetector
                         new_feature_list = detectFeaturesUsingMonotonyOperator(imageband,
                                                                                param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
                     }
-                    new_feature_list->setName(QString("Monotony Features of ") + param_imageBand->valueText());
+                    new_feature_list->setName(QString("Monotony Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the Monotony Features:\n");
                     descr += m_parameters->valueText("ModelParameter");
                     
@@ -213,7 +213,7 @@ class HarrisCornerDetector
                                                                      param_gradientSigma->value(), param_responseThreshold->value());
                     }
                         
-                    new_feature_list->setName(QString("Harris Features of ") + param_imageBand->valueText());
+                    new_feature_list->setName(QString("Harris Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the Harris Features:\n");
                     descr += m_parameters->valueText("ModelParameter");
                     new_feature_list->setDescription(descr);
@@ -317,7 +317,7 @@ class CannyFeatureDetector
                                                                           param_cannyScale->value(), param_cannyThreshold->value());
                     }
                     
-                    new_edgel_feature_list->setName(QString("Canny-Edgel Features of ") + param_imageBand->valueText());
+                    new_edgel_feature_list->setName(QString("Canny-Edgel Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the Canny-Edgel Features:\n");
                     descr += m_parameters->valueText("ModelParameter");
                     
@@ -574,7 +574,7 @@ class SIFTFeatureDetector
                                                                                    param_sigma->value(), param_octaves->value(), param_levels->value(),
                                                                                    param_contrast_threshold->value(), param_curvature_threshold->value(), param_double_size->value(), param_normalize->value());
                     
-                    new_feature_list->setName(QString("SIFT Features of ") + param_imageBand->valueText());
+                    new_feature_list->setName(QString("SIFT Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the SIFT Features:\n");
                     descr += m_parameters->valueText("ModelParameter");
                     

@@ -279,9 +279,10 @@ void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  * \param in The QIODevice, where we will read from.
  * \return True, if the content could be deserialized and the model is not locked.
  */
-bool SparseVectorfield2D::deserialize_content(QIODevice& in)
+bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    if(locked())
+//TODO!!!
+/**    if(locked())
         return false;
         
     //Read in header line and then throw it away immideately
@@ -308,6 +309,8 @@ bool SparseVectorfield2D::deserialize_content(QIODevice& in)
         }
     }
     return true;
+    */
+    return false;
 }
 
 

@@ -364,7 +364,7 @@ class GRAIPE_CORE_EXPORT Model
          * \param  in The input device.
          * \return True, if the Model could be restored,
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function serializes the header of a model like this:
@@ -381,7 +381,7 @@ class GRAIPE_CORE_EXPORT Model
          * \param  in The input device.
          * \return True, if the Model's header could be restored,
          */
-        virtual bool deserialize_header(QIODevice& in);
+        virtual bool deserialize_header(QXmlStreamReader& xmlReader);
     
         /**
          * This function serializes the content of a model.
@@ -397,7 +397,7 @@ class GRAIPE_CORE_EXPORT Model
          * \param  in The input device.
          * \return True, if the Model's content could be restored,
          */
-        virtual bool deserialize_content(QIODevice& in);
+        virtual bool deserialize_content(QXmlStreamReader& xmlReader);
     
         /**
          * Models may be locked (to read only access), while algorithms are using them e.g.
@@ -631,12 +631,12 @@ class GRAIPE_CORE_EXPORT ItemListModel
          * \param in The input device, where we read from.
          ± \return true, if the complete content could be deserialized from the input device.
          */
-        bool deserialize_content(QIODevice& in)
+        bool deserialize_content(QXmlStreamReader& xmlReader)
         {
             if (locked())
                 return false;
-                
-            //Read in header line and then throw it away immideately
+//TODO:
+       /*     //Read in header line and then throw it away immideately
             if(!in.atEnd())
                 in.readLine();
 
@@ -660,6 +660,7 @@ class GRAIPE_CORE_EXPORT ItemListModel
                     append(new_item);
                 }
             }
+            */
             return true;
         }
     

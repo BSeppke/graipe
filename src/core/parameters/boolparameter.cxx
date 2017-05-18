@@ -118,7 +118,7 @@ void BoolParameter::setValue(bool value)
  *
  * \return The value of the parameter converted to an QString
  */
-QString BoolParameter::valueText() const
+QString BoolParameter::toString() const
 {
     return (value()?"true":"false");
 }
@@ -129,23 +129,16 @@ QString BoolParameter::valueText() const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool BoolParameter::deserialize(QIODevice& in)
+bool BoolParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
+    if (str == "true" || str == "false")
     {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
-    if (content == "true" || content == "false")
-    {
-        setValue(content == "true");
+        setValue(str == "true");
         return true;
     }
     else
     {
-        qDebug() << "BoolParameter deserialize: value has to be either 'true' or 'false' in file, but found: " << content;
+        qDebug() << "BoolParameter deserialize: value has to be either 'true' or 'false' in file, but found: " << str;
     }
     return false;
 }

@@ -104,16 +104,22 @@ class GRAIPE_CORE_EXPORT ModelParameter
          * \param value The new value of this parameter.
          */
         void setValue(Model* value);
-            
+    
         /**
          * The value converted to a QString. Please note, that this can vary from the 
          * serialize() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
+         * that serialize also may perform encoding of QStrings to avoid special chars.
          *
-         * \return The value of the parameter converted to an QString.
+         * \return The value of the parameter converted to an QString
          */
-        QString valueText() const;
+        QString toString() const;
+    
+        /**
+         * Sets the value using a QString. This is the default method, used by the desearialize .
+         *
+         * \param str The value of the parameter converted to an QString
+         */
+        bool fromString(QString& str);
     
         /**
          * This method is called after each (re-)assignment of the model list
@@ -121,22 +127,6 @@ class GRAIPE_CORE_EXPORT ModelParameter
          * It synchronizes the list of available models with the widget's list.
          */
         void refresh();
-        
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically: "ModelParameter, " + model->fielname()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QXmlStreamWriter& xmlWriter) const;
-    
-        /**
-         * Deserialization of a parameter's state from an input device.
-         *
-         * \param in the input device.
-         * \return True, if the deserialization was successful, else false.
-         */
-        bool deserialize(QIODevice& in);
     
         /**
          * This function locks the parameters value. 

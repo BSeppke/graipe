@@ -682,20 +682,20 @@ void ImageExporter::run()
         {
             res = ImageImpex::exportImage(*static_cast<Image<float>*>(param_image->value()),
                                           param_filename->value(),
-                                          param_fileformat->valueText());
+                                          param_fileformat->toString());
         }
         
         if(param_image->value()->typeName() == "IntImage")
         {
             res = ImageImpex::exportImage(*static_cast<Image<int>*>(param_image->value()),
                                           param_filename->value(),
-                                          param_fileformat->valueText());
+                                          param_fileformat->toString());
         }
         else if(param_image->value()->typeName() == "ByteImage")
         {
             res = ImageImpex::exportImage(*static_cast<Image<unsigned char>*>(param_image->value()),
                                           param_filename->value(),
-                                          param_fileformat->valueText());
+                                          param_fileformat->toString());
         }
         
         if(res)

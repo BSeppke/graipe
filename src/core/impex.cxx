@@ -69,17 +69,21 @@ bool Impex::load(const QString & filename, Serializable * object, bool compress)
             QIOCompressor compressor(&file);
             compressor.setStreamFormat(QIOCompressor::GzipFormat);
             
+            QXmlStreamReader xmlReader(&compressor);
+            
             if (compressor.open(QIODevice::ReadOnly))
             {
-                success = object->deserialize(compressor);
+                success = object->deserialize(xmlReader);
                 compressor.close();
             }
         }
         else
         {
+            QXmlStreamReader xmlReader(&file);
+            
             if(file.open(QIODevice::ReadOnly))
             {
-                success = object->deserialize(file);
+                success = object->deserialize(xmlReader);
                 file.close();
             }
         }

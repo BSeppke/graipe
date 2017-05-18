@@ -179,7 +179,7 @@ void DoubleParameter::setValue(double value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString DoubleParameter::valueText() const
+QString DoubleParameter::toString() const
 {
 	return QString::number(value(),'g', 10);
 }
@@ -190,25 +190,18 @@ QString DoubleParameter::valueText() const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool DoubleParameter::deserialize(QIODevice& in)
+bool DoubleParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-
     try
     {
-        double val = content.toDouble();
+        double val = str.toDouble();
         setValue(val);
         
         return true;
     }
     catch (...)
     {
-        qCritical() << "DoubleParameter deserialize: value could not be imported from: '" << content << "'";
+        qCritical() << "DoubleParameter deserialize: value could not be imported from: '" << str << "'";
     }
     return false;
 }

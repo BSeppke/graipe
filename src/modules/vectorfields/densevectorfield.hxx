@@ -422,7 +422,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * \param in The QIODevice, where we will read from.
          * \return True, if the content could be deserialized and the model is not locked.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
     
     protected slots:
         /**
@@ -610,7 +610,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * \param in The QIODevice, where we will read from.
          * \return True, if the content could be deserialized and the model is not locked.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
 		
         /**
          * Constant reading access to the weights of each direction

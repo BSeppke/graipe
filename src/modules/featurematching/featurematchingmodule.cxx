@@ -142,7 +142,7 @@ class BlockWiseImageMatcher
                     
                     qint64 processing_time = timer.elapsed();
                     
-                    new_block_matching_vectorfield->setName(QString("I->I block matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    new_block_matching_vectorfield->setName(QString("I->I block matching with ") + param_imageBand1->toString() + QString(" and ") + param_imageBand2->toString());
                     
                     QString descr("The following parameters were used to calculate the Block Matching (Image->Image):\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -151,7 +151,7 @@ class BlockWiseImageMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
                     
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -306,7 +306,7 @@ class FeatureToFeatureMatcher
                     
                     qint64 processing_time = timer.elapsed();
                     
-                    new_vectorfield->setName(QString("F->F matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    new_vectorfield->setName(QString("F->F matching with ") + param_imageBand1->toString() + QString(" and ") + param_imageBand2->toString());
                     
                     QString descr("The following parameters were used to calculate the NCC (Features->Features):\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -315,7 +315,7 @@ class FeatureToFeatureMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -468,7 +468,7 @@ class FeatureToImageMatcher
                     
                     qint64 processing_time = timer.elapsed();
                     
-                    new_vectorfield->setName(QString("F->I Matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    new_vectorfield->setName(QString("F->I Matching with ") + param_imageBand1->toString() + QString(" and ") + param_imageBand2->toString());
                     
                     QString descr("The following parameters were used to calculate the matching (Features->Image):\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -477,7 +477,7 @@ class FeatureToImageMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -635,7 +635,7 @@ class ShapeContextMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -789,7 +789,7 @@ class SIFTMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"

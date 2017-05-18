@@ -559,17 +559,13 @@ QString Model::magicID() const
  */
 void Model::serialize(QXmlStreamWriter& xmlWriter) const
 {
-
-    
     xmlWriter.setAutoFormatting(true);
     xmlWriter.setAutoFormattingIndent(4);
     
     xmlWriter.writeStartDocument();
         xmlWriter.writeStartElement(magicID());
-            m_parameters->serialize(xmlWriter);
-            xmlWriter.writeStartElement("Content");
-                serialize_content(xmlWriter);
-            xmlWriter.writeEndElement();
+            serialize_header(xmlWriter);
+            serialize_content(xmlWriter);
         xmlWriter.writeEndElement();
     xmlWriter.writeEndDocument();
 }
@@ -580,22 +576,44 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
  * \param  in The input device.
  * \return True, if the Model could be restored,
  */
-bool Model::deserialize(QIODevice& in)
+bool Model::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(deserialize_header(in))
+    try
     {
-        //Note: deserialize_header already used the (single) newline
-        //      as its break criterion.
-        
-        //Thus, we can now search for [Content] keyword directly
-        QString content(in.readLine().trimmed());
-        
-        if(content != "[Content]")
+        if (xmlReader.readNextStartElement())
         {
-            qCritical() << "Model::deserialize failed. Did not find [Content] preamble, but: " << content ;
-            return false;
+            if(xmlReader.name() == magicID())
+            {
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Header")
+                    {
+                         if(!deserialize_header(xmlReader))
+                         {
+                            return false;
+                        }
+                    }
+                    if(xmlReader.name() == "Content")
+                    {
+                        if(!deserialize_content(xmlReader))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
         }
-        return deserialize_content(in);
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
     }
     return  false;
 }
@@ -609,6 +627,9 @@ bool Model::deserialize(QIODevice& in)
  */
 void Model::serialize_header(QXmlStreamWriter& xmlWriter) const
 {
+    xmlWriter.writeStartElement("Header");
+        m_parameters->serialize(xmlWriter);
+    xmlWriter.writeEndElement();
 }
 
 /**
@@ -617,21 +638,16 @@ void Model::serialize_header(QXmlStreamWriter& xmlWriter) const
  * \param  in The input device.
  * \return True, if the Model's header could be restored,
  */
-bool Model::deserialize_header(QIODevice& in)
+bool Model::deserialize_header(QXmlStreamReader& xmlReader)
 {
     if(locked())
-        return false;
-        
-    QString firstLine(in.readLine());
-    
-    if (!(firstLine.trimmed() == magicID()))
     {
         return false;
     }
-    
+
     disconnect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
     
-    bool res = m_parameters->deserialize(in);
+    bool res = m_parameters->deserialize(xmlReader);
     
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
         
@@ -646,6 +662,9 @@ bool Model::deserialize_header(QIODevice& in)
  */
 void Model::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
+    xmlWriter.writeStartElement("Content");
+        serialize_content(xmlWriter);
+    xmlWriter.writeEndElement();
 }
 
 /**
@@ -654,10 +673,9 @@ void Model::serialize_content(QXmlStreamWriter& xmlWriter) const
  * \param  in The input device.
  * \return True, if the Model's content could be restored,
  */
-bool Model::deserialize_content(QIODevice& in)
+bool Model::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    QString content(in.readLine().trimmed());
-    return (content=="none");
+    return true;
 }
 
 /**

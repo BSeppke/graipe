@@ -203,7 +203,7 @@ unsigned int ParameterGroup::size() const
  *
  * \return The value of the parameter converted to an QString.
  */
-QString ParameterGroup::valueText() const
+QString ParameterGroup::toString() const
 {
     QString report;
     
@@ -212,7 +212,7 @@ QString ParameterGroup::valueText() const
         Parameter * p = iter->second;
         if (p)
         {
-            report += p->name() + ": " + p->valueText() + QString("\n");
+            report += p->name() + ": " + p->toString() + QString("\n");
         }
     }
     
@@ -239,7 +239,7 @@ QString ParameterGroup::valueText(const QString & filter_types) const
         {
             if(!filter_types.contains(p->typeName()))
             {
-                report += p->name() + ": " + p->valueText() + QString("\n");
+                report += p->name() + ": " + p->toString() + QString("\n");
             }
         }
     }
@@ -281,7 +281,7 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
         {            
             xmlWriter.writeStartElement("Parameter");
             xmlWriter.writeAttribute("ID",iter->first);
-            iter->second->serialize(xmlWriter);
+                iter->second->serialize(xmlWriter);
             xmlWriter.writeEndElement();
         }
     }
@@ -294,32 +294,56 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool ParameterGroup::deserialize(QIODevice& in)
+bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
 {
-    while(!in.atEnd())
+    try
     {
-        //1. Try to get the Id of the parameter
-        QString id = read_from_device_until(in, ": ");
-        
-        if(id.isEmpty())
-            break;
-        
-        id = id.left(id.size()-2);
-        
-        //2. Find the correct Parameter for this id
-        for(storage_type::iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
+        if (xmlReader.readNextStartElement())
         {
-            //3. Parameter found in m_parameters
-            if (iter->first == id)
+            if(xmlReader.name() == magicID())
             {
-                //4. Try to serialize the found parameter using the serial
-                if(!iter->second->deserialize(in))
+                while(xmlReader.readNextStartElement())
                 {
-                    qCritical() << "ParameterGroup deserialize: Unable to deserialize '" << id << "' for parameter '" << iter->second->name() << "'";
-                    return false;
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Parameters")
+                    {
+                        int parameter_count = xmlReader.readElementText().toInt();
+                        
+                        if(parameter_count != m_parameters.size())
+                        {
+                            throw std::runtime_error("Parameter count mismatch");
+                        }
+                        
+                        while(xmlReader.readNextStartElement())
+                        {
+                            if(     xmlReader.name() == "Parameter"
+                                &&  xmlReader.attributes().hasAttribute("ID"))
+                            {
+                                QString id = xmlReader.attributes().value("ID").toString();
+                                
+                                if(!m_parameters[id]->deserialize(xmlReader))
+                                {
+                                    throw std::runtime_error("Could not deserialize ID: " + id.toStdString());
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "ParameterGroup::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
     }
     return true;
 }

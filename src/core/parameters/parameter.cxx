@@ -141,9 +141,19 @@ bool Parameter::invertParent() const
  *
  * \return The value of the parameter converted to an QString
  */
-QString  Parameter::valueText() const
+QString Parameter::toString() const
 {
 	return "";
+}
+
+/**
+ * Sets the value using a QString. This is the default method, used by the desearialize .
+ *
+ * \param str The value of the parameter converted to an QString
+ */
+bool Parameter::fromString(QString& str)
+{
+    return true;
 }
 
 
@@ -164,12 +174,12 @@ QString Parameter::magicID() const
  * 
  * <MAGICID>
  *     <Name>NAME</Name>
- *     <value>VALUETEXT</value>
+ *     <Value>VALUETEXT</Value>
  * </MAGICID>
  *
  * with MAGICID = magicID(),
  *         NAME = name(), and
- *    VALUETEXT = valueText().
+ *    VALUETEXT = toString().
  *
  * \param out The output device on which we serialize the parameter's state.
  */
@@ -179,7 +189,7 @@ void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.writeStartElement(magicID());
     xmlWriter.writeTextElement("Name", name());
-    xmlWriter.writeTextElement("Value", valueText());
+    xmlWriter.writeTextElement("Value", toString());
     xmlWriter.writeEndElement();
 }
 
@@ -189,25 +199,31 @@ void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool Parameter::deserialize(QIODevice & in)
+bool Parameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    QXmlStreamReader xmlReader(&in);
-    
     try
     {
-        while(!xmlReader.atEnd())
+        if (xmlReader.readNextStartElement())
         {
-            if (xmlReader.readNextStartElement())
+            if(xmlReader.name() == magicID())
             {
-                if(xmlReader.name() == magicID())
+                while(xmlReader.readNextStartElement())
                 {
-                    return true;
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Value")
+                    {
+                        QString valueText =  xmlReader.readElementText();
+                        return fromString(valueText);
+                    }
                 }
             }
-            else
-            {
-                throw std::runtime_error("Did not find magicID in XML tree");
-            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }

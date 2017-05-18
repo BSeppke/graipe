@@ -116,7 +116,7 @@ void DateTimeParameter::setValue(const QDateTime& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString DateTimeParameter::valueText() const
+QString DateTimeParameter::toString() const
 {
     return value().toString("dd.MM.yyyy hh:mm:ss");
 }
@@ -127,16 +127,9 @@ QString DateTimeParameter::valueText() const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool DateTimeParameter::deserialize(QIODevice& in)
+bool DateTimeParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
-    QDateTime dt = QDateTime::fromString(content,"dd.MM.yyyy hh:mm:ss");
+    QDateTime dt = QDateTime::fromString(str,"dd.MM.yyyy hh:mm:ss");
     
     if(dt.isValid())
     {
@@ -145,7 +138,7 @@ bool DateTimeParameter::deserialize(QIODevice& in)
     }
     else
     {
-        qDebug() << "DateTimeParameter deserialize: date could not be imported from file using format 'dd.MM.yyyy hh:mm:ss'. Was:" << content;
+        qDebug() << "DateTimeParameter deserialize: date could not be imported from file using format 'dd.MM.yyyy hh:mm:ss'. Was:" << str;
         return false;
     }
 }

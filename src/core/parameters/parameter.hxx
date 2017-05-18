@@ -137,7 +137,14 @@ class GRAIPE_CORE_EXPORT Parameter
          *
          * \return The value of the parameter converted to an QString
          */
-        virtual QString valueText() const;
+        virtual QString toString() const;
+    
+        /**
+         * Sets the value using a QString. This is the default method, used by the desearialize .
+         *
+         * \param str The value of the parameter converted to an QString
+         */
+        virtual bool fromString(QString& str);
     
         /**
          * The magicID of this parameter class. 
@@ -153,12 +160,12 @@ class GRAIPE_CORE_EXPORT Parameter
          * 
          * <MAGICID>
          *     <Name>NAME</Name>
-         *     <value>VALUETEXT</value>
+         *     <Value>VALUETEXT</Value>
          * </MAGICID>
          *
          * with MAGICID = magicID(),
          *         NAME = name(), and
-         *    VALUETEXT = valueText().
+         *    VALUETEXT = toString().
          *
          * \param out The output device on which we serialize the parameter's state.
          */
@@ -170,7 +177,7 @@ class GRAIPE_CORE_EXPORT Parameter
          * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
 
         /**
          * Const access to the model list, which is currently assigned to 

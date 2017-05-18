@@ -433,9 +433,14 @@ QString ViewController::magicID() const
  */
 void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    //TODO!!!!
-	//write_on_device(magicID() + "\n", xmlWriter);
-    m_parameters->serialize(xmlWriter);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.setAutoFormattingIndent(4);
+    
+    xmlWriter.writeStartDocument();
+        xmlWriter.writeStartElement(magicID());
+            m_parameters->serialize(xmlWriter);
+        xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
 }
 
 /**
@@ -446,17 +451,29 @@ void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
  * \param  in The input device, where we read the serialization of this ViewController class from.
  * \return True, if the parameters could be restored,
  */
-bool ViewController::deserialize(QIODevice& in)
+bool ViewController::deserialize(QXmlStreamReader& xmlReader)
 {
-    QString firstLine(in.readLine());
-    
-    if(firstLine.trimmed() == magicID())
+    try
     {
-        //Deserialize parameters beginning from the third line on...
-        return m_parameters->deserialize(in);
+        if (xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == magicID())
+            {
+                 return m_parameters->deserialize(xmlReader);
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
     }
-    
-    return false;
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
+    }
+    return  false;
 }
 
 } //end of namespace graipe

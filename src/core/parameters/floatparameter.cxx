@@ -179,7 +179,7 @@ void FloatParameter::setValue(float value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  FloatParameter::valueText() const
+QString  FloatParameter::toString() const
 {
 	return QString::number(value(),'g', 10);
 }
@@ -190,29 +190,22 @@ QString  FloatParameter::valueText() const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool FloatParameter::deserialize(QIODevice& in)
+bool FloatParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
     try
     {
-        
-        float val = content.toFloat();
+        double val = str.toFloat();
         setValue(val);
         
         return true;
     }
     catch (...)
     {
-        qCritical() << "FloatParameter deserialize: value could not be imported from: '" << content << "'";
+        qCritical() << "FloatParameter deserialize: value could not be imported from: '" << str << "'";
     }
     return false;
 }
+
 
 /**
  * This function indicates whether the value of a parameter is valid or not.

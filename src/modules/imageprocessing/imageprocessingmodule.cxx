@@ -105,7 +105,7 @@ class AddImages
                         
                         //Copy all metadata from current image (will be overwritten later)
                         image->copyMetadata(*new_image);
-                        new_image->setName(QString("addition of ") + param_images->valueText());
+                        new_image->setName(QString("addition of ") + param_images->toString());
                         
                         //iterate
                         for(unsigned int i = 0; i < selected_images.size(); ++i)
@@ -690,7 +690,7 @@ class MaskErosion
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("Mask erosion: ") + param_mask->valueText());
+                    new_image->setName(QString("Mask erosion: ") + param_mask->toString());
                     
                     vigra::multiBinaryErosion(mask,
                                        new_image->band(0),
@@ -783,7 +783,7 @@ class MaskDilation
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("Mask dilation: ") + param_mask->valueText());
+                    new_image->setName(QString("Mask dilation: ") + param_mask->toString());
                     
                     vigra::multiBinaryDilation(mask,
                                         new_image->band(0),
@@ -968,7 +968,7 @@ class MaskIntersection: public Algorithm
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("Mask intersec.: ") + param_mask1->valueText() + " and " + param_mask2->valueText());
+                    new_image->setName(QString("Mask intersec.: ") + param_mask1->toString() + " and " + param_mask2->toString());
                     
                     using namespace vigra::functor;
                     
@@ -1062,7 +1062,7 @@ class MaskDifference: public Algorithm
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("Mask difference: ") + param_mask1->valueText() + " and " + param_mask2->valueText());
+                    new_image->setName(QString("Mask difference: ") + param_mask1->toString() + " and " + param_mask2->toString());
                     
                     using namespace vigra::functor;
                     
@@ -1518,7 +1518,7 @@ class ImageThresholder
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("thresholded ") + param_imageBand->valueText());
+                    new_image->setName(QString("thresholded ") + param_imageBand->toString());
                     
                     using namespace vigra::functor;
                     
@@ -1660,7 +1660,7 @@ class FloatingImageThresholder
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("floating thresholded ") + param_imageBand->valueText());
+                    new_image->setName(QString("floating thresholded ") + param_imageBand->toString());
                     
                     
                     QString descr("The following parameters were used for floating thresholding:\n");
@@ -1828,8 +1828,8 @@ class ThinLineExtractor
                     param_imageBand->image()->copyMetadata(*new_image);
                     param_imageBand->image()->copyMetadata(*new_stat_image);
                     
-                    new_image->setName(QString("filtered ") + param_imageBand->valueText());
-                    new_stat_image->setName(QString("region stats. of filtered ") + param_imageBand->valueText());
+                    new_image->setName(QString("filtered ") + param_imageBand->toString());
+                    new_stat_image->setName(QString("region stats. of filtered ") + param_imageBand->toString());
                     
                     
                     QString descr("The following parameters were used for finding thin lines:\n");
@@ -1925,7 +1925,7 @@ class DistanceTransformator
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("distance transform of ") + param_imageBand->valueText());
+                    new_image->setName(QString("distance transform of ") + param_imageBand->toString());
                     
                     using namespace vigra::functor;
                     vigra::distanceTransform(imageband, new_image->band(0), 1 ,2);

@@ -104,15 +104,16 @@ class GRAIPE_CORE_EXPORT StringParameter
          */
         void setValue(const QString& value);
             
+            
         /**
          * The value converted to a QString. Please note, that this can vary from the 
          * serialize() result, which also returns a QString. This is due to the fact,
          * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
+         * inside the QString
          *
-         * \return The value of the parameter converted to an QString.
+         * \return The value of the parameter converted to an QString
          */
-        QString valueText() const;
+        QString toString() const;
     
         /**
          * Deserialization of a parameter's state from an input device.
@@ -120,7 +121,7 @@ class GRAIPE_CORE_EXPORT StringParameter
          * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool fromString(QString& str);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.

@@ -205,7 +205,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
+        QString toString() const;
     
         /**
          * This method is called after each (re-)assignment of the model list
@@ -216,7 +216,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
     
 	    /**
          * Serialization of the parameter's state to a string. Please note, that this can 
-         * vary from the valueText() result, which also returns a string. This is due to the fact,
+         * vary from the toString() result, which also returns a string. This is due to the fact,
          * that serialize also may perform encoding of strings to avoid special chars.
          *
          * \return The serialization of the parameter's state.
@@ -229,7 +229,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          * \param str The serialization of this parameter's state.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function locks the parameters value. 

@@ -118,7 +118,7 @@ class MeanVectorfield
                         
                         //Copy all metadata from current image (will be overwritten later)
                         vf->copyMetadata(*new_vf);
-                        new_vf->setName(QString("mean vectorfield of ") + param_vectorfields->valueText());
+                        new_vf->setName(QString("mean vectorfield of ") + param_vectorfields->toString());
                                         
                         m_results.push_back(new_vf);
                         
@@ -574,7 +574,7 @@ class Vectorfield2DCurl
                     
                     img->setBand(0,res);
                     img->setName("Scalar Curl of: " + vf->name());
-                    img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
+                    img->setDescription("A gaussian sigma of: " + param_sigma->toString() + " has been used to derive the gradents of the vectorfield.");
                     
                     m_results.push_back(img);
                     
@@ -672,7 +672,7 @@ class Vectorfield2DDiv
                     
                     img->setBand(0,res);
                     img->setName("Divergence of: " + vf->name());
-                    img->setDescription("A gaussian sigma of: " + param_sigma->valueText() + " has been used to derive the gradents of the vectorfield.");
+                    img->setDescription("A gaussian sigma of: " + param_sigma->toString() + " has been used to derive the gradents of the vectorfield.");
                     
                     m_results.push_back(img);
                     

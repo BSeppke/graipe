@@ -113,7 +113,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
+        QString toString() const;
     
         /**
          * This method is called after each (re-)assignment of the model list
@@ -138,7 +138,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function locks the parameters value. 

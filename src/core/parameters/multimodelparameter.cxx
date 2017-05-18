@@ -153,7 +153,7 @@ void MultiModelParameter::setValue(const std::vector<Model*>& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString MultiModelParameter::valueText() const
+QString MultiModelParameter::toString() const
 { 
 	QString res;
     
@@ -214,7 +214,10 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
     int i=0;
     for(const Model* model: value())
     {
-        xmlWriter.writeTextElement(QString("value%1").arg(++i), model->filename());
+        xmlWriter.writeStartElement("Value");
+        xmlWriter.writeAttribute("ID", QString::number(i++));
+            xmlWriter.writeCharacters(model->filename());
+        xmlWriter.writeEndElement();
     }
     xmlWriter.writeEndElement();
 }
@@ -225,32 +228,53 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool MultiModelParameter::deserialize(QIODevice& in)
+bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
-        return false;
-    }
-
-    QString content(in.readLine().trimmed());
-    
-    QStringList model_filenames = content.split(", ");
-
-    unsigned int i=0;
-    
-    for(const Model* allowed_model: m_allowed_values)
-    {
-        bool found = false;
-        for(QString model_filename: model_filenames)
+        if (xmlReader.readNextStartElement())
         {
-            if (decode_string(model_filename) == allowed_model->filename())
+            if(xmlReader.name() == magicID())
             {
-                found = true;
-                break;
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Value")
+                    {
+                        QString filename =  xmlReader.readElementText();
+                        
+                        int i=0;
+                        
+                        for(const Model* allowed_model: m_allowed_values)
+                        {
+                           if (filename == allowed_model->filename())
+                           {
+                                m_lstDelegate->item(i)->setSelected(true);
+                                break;
+                            }
+                            ++i;
+                        }
+                        if(i==m_allowed_values.size())
+                        {
+                            throw std::runtime_error("Did not find a model with filename: " + filename.toStdString());
+                        }
+                    }
+                }
             }
         }
-        m_lstDelegate->item(i)->setSelected(found);
-        ++i;
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
     }
     return true;
 }

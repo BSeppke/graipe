@@ -176,7 +176,7 @@ void IntParameter::setValue(int value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  IntParameter::valueText() const
+QString  IntParameter::toString() const
 {
 	return QString("%1").arg(value());
 }
@@ -187,26 +187,18 @@ QString  IntParameter::valueText() const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool IntParameter::deserialize(QIODevice& in)
+bool IntParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-
     try
     {
-        int val = content.toInt();
+        double val = str.toInt();
         setValue(val);
         
         return true;
     }
     catch (...)
     {
-        
-        qCritical() << "IntParameter deserialize: value could not be imported from '" << content <<"'";
+        qCritical() << "IntParameter deserialize: value could not be imported from: '" << str << "'";
     }
     return false;
 }

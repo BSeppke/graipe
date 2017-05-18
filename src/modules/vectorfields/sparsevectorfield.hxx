@@ -186,7 +186,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          * \param in The QIODevice, where we will read from.
          * \return True, if the content could be deserialized and the model is not locked.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
 		
 	protected:
         //Data containers for the origins and directions

@@ -122,10 +122,11 @@ void FilenameParameter::setValue(const QString & value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  FilenameParameter::valueText() const
+QString  FilenameParameter::toString() const
 {
     return value();
 }
+
 
 /**
  * Deserialization of a parameter's state from an input device.
@@ -133,16 +134,9 @@ QString  FilenameParameter::valueText() const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool FilenameParameter::deserialize(QIODevice& in)
+bool FilenameParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    setValue(decode_string(content));
-    
+    setValue(str);
     return true;
 }
 

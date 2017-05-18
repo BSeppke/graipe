@@ -147,9 +147,29 @@ void ModelParameter::setValue(Model* value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString ModelParameter::valueText() const
+QString ModelParameter::toString() const
 { 
-	return value()->name();
+	return value()->filename();
+}
+/**
+ * Deserialization of a parameter's state from an input device.
+ *
+ * \param in the input device.
+ * \return True, if the deserialization was successful, else false.
+ */
+bool ModelParameter::fromString(QString& str)
+{
+    for(Model* allowed: m_allowed_values)
+    {
+        if (allowed->filename() == str)
+        {
+            setValue(allowed);
+            return true;
+        }
+    }
+    
+    qDebug() << "ModelParameter deserialize: filename does not match any given. Was: '" << str << "'";
+    return false;
 }
 
 /**
@@ -189,58 +209,6 @@ void ModelParameter::refresh()
         setValue(m_allowed_values[0]);
 }
 
-/**
- * Serialization of the parameter's state to an output device.
- * Basically: "ModelParameter, " + model->fielname()
- *
- * \param out The output device on which we serialize the parameter's state.
- */
-void ModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
-{
-    
-    xmlWriter.setAutoFormatting(true);
-    
-    xmlWriter.writeStartElement(magicID());
-    xmlWriter.writeTextElement("Name", name());
-    xmlWriter.writeTextElement("Value", value()->filename());
-    xmlWriter.writeEndElement();
-}
-
-/**
- * Deserialization of a parameter's state from an input device.
- *
- * \param in the input device.
- * \return True, if the deserialization was successful, else false.
- */
-bool ModelParameter::deserialize(QIODevice& in)
-{
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    bool found = false;
-    unsigned int i=0;
-    
-    QString content(in.readLine().trimmed());
-    
-    for(Model* allowed: m_allowed_values)
-    {
-        if (allowed->filename() == decode_string(content))
-        {
-            setValue(allowed);
-            found = true;
-        }
-        i++;
-    }
-    
-    if (!found)
-    {
-        qDebug() << "ModelParameter deserialize: filename does not match any given. Was: '" << content << "'";
-    }
-    
-    return found;
-}
 
 /**
  * This function locks the parameters value. 

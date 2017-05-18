@@ -121,27 +121,19 @@ void LongStringParameter::setValue(const QString & value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  LongStringParameter::valueText() const
+QString  LongStringParameter::toString() const
 {
     return value();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Sets the value using a QString. This is the default method, used by the desearialize .
  *
- * \param in the input device.
- * \return True, if the deserialization was successful, else false.
+ * \param str The value of the parameter converted to an QString
  */
-bool LongStringParameter::deserialize(QIODevice& in)
+bool LongStringParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    setValue(decode_string(content));
-    
+    setValue(str);
     return true;
 }
 

@@ -257,7 +257,7 @@ class GRAIPE_IMAGES_EXPORT Image
          *
          * \param in The QIODevice, where we will read from.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
 	
     public slots:
         /**

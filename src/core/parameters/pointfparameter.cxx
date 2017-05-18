@@ -190,7 +190,7 @@ void PointFParameter::setValue(const QPointF& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  PointFParameter::valueText() const
+QString  PointFParameter::toString() const
 {
     return QString("(") + QString::number(value().x(),'g', 10) + "x" + QString::number(value().y(),'g', 10) + ")";
 }
@@ -220,43 +220,56 @@ void PointFParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeTextElement("x", QString::number(value().x(),'g', 10));
     xmlWriter.writeTextElement("y", QString::number(value().y(),'g', 10));
     xmlWriter.writeEndElement();
-
 }
+
+
 /**
  * Deserialization of a parameter's state from an input device.
  *
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool PointFParameter::deserialize(QIODevice& in)
+bool PointFParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
+        if (xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == magicID())
+            {
+                QPointF p;
+                
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "x")
+                    {
+                       p.setX(xmlReader.readElementText().toFloat());
+                    }
+                    if(xmlReader.name() == "y")
+                    {
+                       p.setY(xmlReader.readElementText().toFloat());
+                    }
+                }
+                
+                setValue(p);
+                return true;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "PointFParameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
         return false;
     }
-    
-    QString content(in.readLine().trimmed());
-    
-    //Cut off "(" and ")"
-    QString tmp = content.mid(1, content.size()-2);
-    
-    //Split QString
-    QStringList xy = tmp.split("x");
-    
-    //Check and read in data if possible
-    if(xy.size()==2)
-    {
-        try
-        {
-            setValue(QPointF(xy[0].toFloat(),xy[1].toFloat()));
-            return true;
-        }
-        catch (...)
-        {
-            qDebug() << "PointFParameter deserialize: point could not be imported from file. Was: '" << content << "'";
-        }
-    }
-    return false;
 }
 
 /**

@@ -120,7 +120,7 @@ void EnumParameter::setValue(int value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString EnumParameter::valueText() const
+QString EnumParameter::toString() const
 {
     if (isValid())
     	return m_enum_names[value()];
@@ -136,7 +136,6 @@ QString EnumParameter::valueText() const
  */
 void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(magicID());
@@ -151,30 +150,42 @@ void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool EnumParameter::deserialize(QIODevice& in)
+bool EnumParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
     try
     {
-        QString content(in.readLine().trimmed());
-        
-        unsigned int idx = content.toUInt();
-        setValue(idx);
-        
-        return true;
+        if(xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == magicID())
+            {
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Value")
+                    {
+                        QString valueText =  xmlReader.readElementText();
+                        
+                        setValue(valueText.toInt());
+                        return isValid();
+                    }
+                }
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
     }
-    catch (...)
+    catch(std::runtime_error & e)
     {
-        qDebug("EnumParameter deserialize: enum value could not be imported from file");
+        qCritical() << "EnumParameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        return false;
     }
-    
-    return false;
 }
-    
 /**
  * This function indicates whether the value of a parameter is valid or not.
  *

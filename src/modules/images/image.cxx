@@ -447,9 +447,10 @@ void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
  * \param in The QIODevice, where we will read from.
  */
 template<class T>
-bool Image<T>::deserialize_content(QIODevice& in)
+bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    if(this->width() == 0 || this->height()==0 || this->numBands() ==0)
+ //TODO!!!
+/**   if(this->width() == 0 || this->height()==0 || this->numBands() ==0)
     {
         qCritical("Image<T>::deserialize_content: Image has zero size!");
         return false;
@@ -478,6 +479,8 @@ bool Image<T>::deserialize_content(QIODevice& in)
     }
         
     return true;
+    */
+    return false;
 }
 
 /**

@@ -176,7 +176,7 @@ class GRAIPE_CORE_EXPORT ParameterGroup
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
+        QString toString() const;
         
         /**
          * The value converted to a QString. Please note, that this can vary from the 
@@ -215,7 +215,7 @@ class GRAIPE_CORE_EXPORT ParameterGroup
          * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This method is called after each (re-)assignment of the model list

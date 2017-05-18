@@ -236,7 +236,7 @@ class GRAIPE_CORE_EXPORT Serializable
          * \param in The input device.
          * \return True, if the object could be successfully restored from the device.
          */
-        virtual bool deserialize(QIODevice& in) = 0;
+        virtual bool deserialize(QXmlStreamReader& xmlReader) = 0;
     
         /**
          * Serialization on to an output device.

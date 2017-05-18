@@ -191,7 +191,7 @@ void PointParameter::setValue(const QPoint& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  PointParameter::valueText() const
+QString  PointParameter::toString() const
 {
     return QString("(%1x%2)").arg(value().x()).arg(value().y());
 }
@@ -231,35 +231,47 @@ void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool PointParameter::deserialize(QIODevice& in)
+bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
+        if (xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == magicID())
+            {
+                QPoint p;
+                
+                while(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "x")
+                    {
+                       p.setX(xmlReader.readElementText().toInt());
+                    }
+                    if(xmlReader.name() == "y")
+                    {
+                       p.setY(xmlReader.readElementText().toInt());
+                    }
+                }
+                
+                setValue(p);
+                return true;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "PointParameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
         return false;
     }
-    
-    QString content(in.readLine().trimmed());
-    
-    //Cut off "(" and ")"
-    QString tmp = content.mid(1, content.size()-2);
-    
-    //Split QString
-    QStringList xy = tmp.split("x");
-    
-    //Check and read in data if possible
-    if(xy.size()==2)
-    {
-        try
-        {
-            setValue(QPoint(xy[0].toInt(),xy[1].toInt()));
-            return true;
-        }
-        catch (...)
-        {
-            qDebug("PointParameter deserialize: point could not be imported from file");
-        }
-    }
-    return false;
 }
 
 /**

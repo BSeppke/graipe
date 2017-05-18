@@ -189,7 +189,7 @@ class FourierSpectrumWindDetector
                                                                                             param_threshold->value(), 
                                                                                             param_radius->value()));
                     
-                    m_results.back()->setName(QString("FFT Wind estimation using ") + param_imageBand->valueText());
+                    m_results.back()->setName(QString("FFT Wind estimation using ") + param_imageBand->toString());
                     
                     QString descr("The following parameters were used to calculate the Fourier Wind field:\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -357,7 +357,7 @@ class StructureTensorWindDetector
                                                                                 param_innerScale->value(), param_outerScale->value(), 
                                                                                 direction_vectors()[param_wind_knowledge->value()]);
                 
-                    new_wind_vectorfield->setName(QString("ST Wind estimation using ") + param_imageBand->valueText());
+                    new_wind_vectorfield->setName(QString("ST Wind estimation using ") + param_imageBand->toString());
                     
                     QString descr("The following parameters were used to compute ST winds:\n");
                     descr += m_parameters->valueText("ModelParameter");

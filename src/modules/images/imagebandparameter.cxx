@@ -255,7 +255,7 @@ void ImageBandParameter<T>::setBandId(unsigned int bandid)
  * \return The value of the parameter converted to an QString.
  */
 template <class T>
-QString ImageBandParameter<T>::valueText() const
+QString ImageBandParameter<T>::toString() const
 {
 	if(!isValid())
 	{
@@ -303,7 +303,7 @@ void ImageBandParameter<T>::refresh()
 
 /**
  * Serialization of the parameter's state to a string. Please note, that this can 
- * vary from the valueText() result, which also returns a string. This is due to the fact,
+ * vary from the toString() result, which also returns a string. This is due to the fact,
  * that serialize also may perform encoding of strings to avoid special chars.
  *
  * \return The serialization of the parameter's state.
@@ -327,9 +327,10 @@ void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
  * \return True, if the deserialization was successful, else false.
  */
 template <class T>
-bool ImageBandParameter<T>::deserialize(QIODevice & in)
+bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
 {
-
+//TODO!!!
+/**
     if (!Parameter::deserialize(in))
     {
         return false;
@@ -371,6 +372,7 @@ bool ImageBandParameter<T>::deserialize(QIODevice & in)
         
         return found;
     }
+    */
     return false;
 }
 

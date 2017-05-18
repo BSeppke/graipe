@@ -303,11 +303,11 @@ class OpticalFlowAlgorithm
                     
                     if( i != 0)
                     {
-                        new_vectorfield->setName(QString("%1 (L%2) of %3 and %4").arg(functor_sname).arg(i).arg(m_param_imageBand1->valueText()).arg(m_param_imageBand2->valueText()));
+                        new_vectorfield->setName(QString("%1 (L%2) of %3 and %4").arg(functor_sname).arg(i).arg(m_param_imageBand1->toString()).arg(m_param_imageBand2->toString()));
                     }
                     else
                     {
-                        new_vectorfield->setName(QString("%1 of %2 and %3").arg(functor_sname).arg(m_param_imageBand1->valueText()).arg(m_param_imageBand2->valueText()));
+                        new_vectorfield->setName(QString("%1 of %2 and %3").arg(functor_sname).arg(m_param_imageBand1->toString()).arg(m_param_imageBand2->toString()));
                     }
                     new_vectorfield->setGlobalMotion(QTransform(mat_list[i](0,0), mat_list[i](1,0), mat_list[i](2,0),
                                                                 mat_list[i](0,1), mat_list[i](1,1), mat_list[i](2,1),
@@ -342,7 +342,7 @@ class OpticalFlowAlgorithm
                     
                     m_param_imageBand1->image()->copyMetadata(*new_image);
                     
-                    new_image->setName(QString("Warped Image (L%1) of %2").arg(i).arg(m_param_imageBand1->valueText()));
+                    new_image->setName(QString("Warped Image (L%1) of %2").arg(i).arg(m_param_imageBand1->toString()));
                     new_image->setDescription(QString(  "The following parameters were used to calculate the warping:\n"
                                                         "TPS Functor\n"
                                                         "Subsampled each %1 pixel").arg(5*m_param_pmode->value()));
