@@ -564,8 +564,12 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.writeStartDocument();
         xmlWriter.writeStartElement(magicID());
-            serialize_header(xmlWriter);
-            serialize_content(xmlWriter);
+            xmlWriter.writeStartElement("Header");
+                serialize_header(xmlWriter);
+            xmlWriter.writeEndElement();
+            xmlWriter.writeStartElement("Content");
+                serialize_content(xmlWriter);
+            xmlWriter.writeEndElement();
         xmlWriter.writeEndElement();
     xmlWriter.writeEndDocument();
 }
@@ -627,9 +631,7 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
  */
 void Model::serialize_header(QXmlStreamWriter& xmlWriter) const
 {
-    xmlWriter.writeStartElement("Header");
-        m_parameters->serialize(xmlWriter);
-    xmlWriter.writeEndElement();
+    m_parameters->serialize(xmlWriter);
 }
 
 /**
@@ -662,9 +664,6 @@ bool Model::deserialize_header(QXmlStreamReader& xmlReader)
  */
 void Model::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    xmlWriter.writeStartElement("Content");
-        serialize_content(xmlWriter);
-    xmlWriter.writeEndElement();
 }
 
 /**
