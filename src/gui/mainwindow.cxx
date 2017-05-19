@@ -1175,6 +1175,7 @@ void MainWindow::loadViewController(const QString& filename)
     ViewController* viewController = NULL;
     bool compress =  (filename.right(2) == "gz");
     
+    //TODO: Does not work! Imagine better way to solve impex for ViewControllers!
     std::map<QString,QString> dict = Impex::dictFromFile(filename, compress);
     
     //1. read out the Type of the view and find him in the vc_factory
