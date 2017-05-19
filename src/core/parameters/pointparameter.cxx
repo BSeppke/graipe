@@ -241,8 +241,10 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
             {
                 QPoint p;
                 
-                while(xmlReader.readNextStartElement())
+                for(int i=0; i!=3; ++i)
                 {
+                    xmlReader.readNextStartElement();
+                    
                     if(xmlReader.name() == "Name")
                     {
                         setName(xmlReader.readElementText());
@@ -257,6 +259,19 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
                     }
                 }
                 
+                //Read until </PointParameter> comes....
+                while(true)
+                {
+                    if(!xmlReader.readNext())
+                    {
+                        return false;
+                    }
+                    
+                    if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                    {
+                        break;
+                    }
+                }
                 setValue(p);
                 return true;
             }
@@ -303,12 +318,11 @@ QWidget*  PointParameter::delegate()
 
         m_spbXDelegate->setMaximumSize(9999,9999);
         m_spbXDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-    
-        m_spbYDelegate->setMaximumSize(9999,9999);
-        m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        
         m_spbXDelegate->setRange(m_min_value.x(), m_max_value.x());
         m_spbXDelegate->setValue(m_value.x());
+        
+        m_spbYDelegate->setMaximumSize(9999,9999);
+        m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
         m_spbYDelegate->setRange(m_min_value.y(), m_max_value.y());
         m_spbYDelegate->setValue(m_value.y());
         

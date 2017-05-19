@@ -239,8 +239,10 @@ bool PointFParameter::deserialize(QXmlStreamReader& xmlReader)
             {
                 QPointF p;
                 
-                while(xmlReader.readNextStartElement())
+                for(int i=0; i!=3; ++i)
                 {
+                    xmlReader.readNextStartElement();
+                
                     if(xmlReader.name() == "Name")
                     {
                         setName(xmlReader.readElementText());
@@ -254,7 +256,19 @@ bool PointFParameter::deserialize(QXmlStreamReader& xmlReader)
                        p.setY(xmlReader.readElementText().toFloat());
                     }
                 }
-                
+                //Read until </PointFParameter> comes....
+                while(true)
+                {
+                    if(!xmlReader.readNext())
+                    {
+                        return false;
+                    }
+                    
+                    if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                    {
+                        break;
+                    }
+                }
                 setValue(p);
                 return true;
             }

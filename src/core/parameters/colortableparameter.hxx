@@ -40,6 +40,7 @@
 #include "core/parameters/parameter.hxx"
 #include "core/parameters/parametergroup.hxx"
 
+#include <QPointer>
 #include <QComboBox>
 
 /**

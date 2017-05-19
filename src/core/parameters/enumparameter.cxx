@@ -215,7 +215,7 @@ QWidget*  EnumParameter::delegate()
         }
         m_cmbDelegate->setCurrentIndex(m_value);
     
-        connect(m_cmbDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     return m_cmbDelegate;

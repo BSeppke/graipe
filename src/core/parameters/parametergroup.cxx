@@ -104,18 +104,13 @@ unsigned int ParameterGroup::addParameter(const QString& id, Parameter* param, b
     unsigned int idx = (unsigned int)m_parameters.size();
     
     m_parameters.insert(item_type(id, param));
+    
     if(!hidden)
     {
         m_parameter_order.push_back(id);
+        
     }
     
-    if(m_delegate != NULL && !hidden)
-    {
-        param->delegate()->setMaximumSize(9999,9999);
-        param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred));
-        m_layout->addRow(param->name(), param->delegate());
-        connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
-    }
     return idx;
 }
 
@@ -300,10 +295,15 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {
+            qDebug() << "ParameterGroup::deserialize: readNextStartElement" << xmlReader.name();
+            
             if(xmlReader.name() == magicID())
             {
-                while(xmlReader.readNextStartElement())
+                for(int j=0; j!=2; ++j)
                 {
+                    xmlReader.readNextStartElement();
+                    qDebug() << "ParameterGroup::deserialize: readNextStartElement" << xmlReader.name();
+                    
                     if(xmlReader.name() == "Name")
                     {
                         setName(xmlReader.readElementText());
@@ -317,28 +317,63 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
                             throw std::runtime_error("Parameter count mismatch");
                         }
                         
-                        while(xmlReader.readNextStartElement())
+                        for (int i=0; i!= parameter_count; ++i)
                         {
+                            xmlReader.readNextStartElement();
+                            
                             if(     xmlReader.name() == "Parameter"
                                 &&  xmlReader.attributes().hasAttribute("ID"))
                             {
                                 QString id = xmlReader.attributes().value("ID").toString();
                                 
+                                qDebug() << QString::number(i) << "ParameterGroup::deserialize: readNextStartElement" << xmlReader.name() << " ID= " << id;
+                               
                                 if(!m_parameters[id]->deserialize(xmlReader))
                                 {
                                     throw std::runtime_error("Could not deserialize ID: " + id.toStdString());
+                                }              
+                                //Read until the </Parameter> comes...
+                                while(true)
+                                {
+                                    if(!xmlReader.readNext())
+                                    {
+                                        return false;
+                                    }
+                                    
+                                    if(xmlReader.isEndElement() && xmlReader.name() == "Parameter")
+                                    {
+                                        break;
+                                    }
                                 }
                             }
+
+                        }                            
+                        //Read until </ParameterGroup> comes...
+                        while(true)
+                        {
+                            if(!xmlReader.readNext())
+                            {
+                                return false;
+                            }
+                            
+                            if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                            {
+                                break;
+                            }
                         }
+                        return true;
                     }
                 }
+            }
+            else
+            {
+                throw std::runtime_error("Did not find magicID in XML tree");
             }
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find any start element in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
@@ -382,16 +417,13 @@ QWidget * ParameterGroup::delegate()
         for( QString id : m_parameter_order)
         {
             Parameter* param = m_parameters.at(id);
+            QWidget* p_delegate = param->delegate();
             
-            if(param->delegate())
+            if(p_delegate)
             {
-                param->delegate()->setMaximumSize(9999,9999);
-                param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-                
-                if(!param->isHidden())
-                {
-                    m_layout->addRow(param->name(), param->delegate());
-                }
+                m_layout->addRow(param->name(), p_delegate);
+                p_delegate->setMaximumSize(9999,9999);
+                p_delegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
                 connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
             }
         }

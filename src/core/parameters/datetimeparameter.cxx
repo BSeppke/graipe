@@ -170,7 +170,7 @@ QWidget*  DateTimeParameter::delegate()
         m_dteDelegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
         m_dteDelegate->setDateTime(value());
         
-        connect(m_dteDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        connect(m_dteDelegate, SIGNAL(dateTimeChanged(const QDateTime &)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     

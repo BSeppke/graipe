@@ -73,6 +73,7 @@ bool Impex::load(const QString & filename, Serializable * object, bool compress)
             
             if (compressor.open(QIODevice::ReadOnly))
             {
+                object->setFilename(filename);
                 success = object->deserialize(xmlReader);
                 compressor.close();
             }
@@ -83,6 +84,7 @@ bool Impex::load(const QString & filename, Serializable * object, bool compress)
             
             if(file.open(QIODevice::ReadOnly))
             {
+                object->setFilename(filename);
                 success = object->deserialize(xmlReader);
                 file.close();
             }

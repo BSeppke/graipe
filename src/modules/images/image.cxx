@@ -425,17 +425,24 @@ void Image<T>::copyData(Model& other) const
 template<class T>
 void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    qint64 channel_size = this->width()*this->height()*sizeof(T);
-
-    for(unsigned int c=0; c<m_imagebands.size(); ++c)
+    try
     {
-        QByteArray block((const char*)m_imagebands[c].data(),channel_size);
-        
-        xmlWriter.writeStartElement("Channel");
-        xmlWriter.writeAttribute("ID", QString::number(c));
-        xmlWriter.writeAttribute("Encoding", "Base64");
-        xmlWriter.writeCharacters(block.toBase64());
-        xmlWriter.writeEndElement();
+        qint64 channel_size = this->width()*this->height()*sizeof(T);
+
+        for(unsigned int c=0; c<m_imagebands.size(); ++c)
+        {
+            QByteArray block((const char*)m_imagebands[c].data(),channel_size);
+            
+            xmlWriter.writeStartElement("Channel");
+            xmlWriter.writeAttribute("ID", QString::number(c));
+            xmlWriter.writeAttribute("Encoding", "Base64");
+            xmlWriter.writeCharacters(block.toBase64());
+            xmlWriter.writeEndElement();
+        }
+    }
+    catch(...)
+    {
+        qCritical() << "Image<T>::serialize_content failed!";
     }
 }
 
@@ -449,8 +456,8 @@ void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 template<class T>
 bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
 {
- //TODO!!!
-/**   if(this->width() == 0 || this->height()==0 || this->numBands() ==0)
+
+    if(this->width() == 0 || this->height()==0 || this->numBands() ==0)
     {
         qCritical("Image<T>::deserialize_content: Image has zero size!");
         return false;
@@ -460,27 +467,57 @@ bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
     
     m_imagebands.clear();
     m_imagebands.resize(numBands());
-    
-    //Prepare everything:
+        
+    //Prepare all bands:
     for(unsigned int c=0; c<m_imagebands.size(); ++c)
     {
         m_imagebands[c] = vigra::MultiArray<2,T>(width(),height());
     }
     
-    for(unsigned int c=0; c<m_imagebands.size(); ++c)
+    try
     {
-        qint64  read_bytes = in.read((char*)(m_imagebands[c].data()), channel_size);
-        
-        if (read_bytes != channel_size)
+        while(xmlReader.readNextStartElement())
         {
-            qCritical() << "Image<T>::deserialize_content: Error while reading band " << c << ". Expected to read " << channel_size << "bytes, but got " << read_bytes << " bytes";
-            return false;
+            qDebug() << "Image<T>::deserialize_content: readNextStartElement" << xmlReader.name();
+            
+            if(xmlReader.name() == "Channel"
+                && xmlReader.attributes().hasAttribute("ID")
+                && xmlReader.attributes().hasAttribute("Encoding")
+                && xmlReader.attributes().value("Encoding") == "Base64")
+            {
+                int id = xmlReader.attributes().value("ID").toInt();
+                
+                if (id < 0 || id >= numBands())
+                {
+                    throw std::runtime_error("Channel id not found in image");
+                }
+                
+                QByteArray block;
+                block.append(xmlReader.readElementText());
+                block = QByteArray::fromBase64(block);
+                
+                if(block.size() == channel_size)
+                {
+                    memcpy((char*)m_imagebands[id].data(), block.data(), channel_size);
+                }
+                else
+                {
+                    throw std::runtime_error("Channel serialization was of wrong size in XML after Base64 decoding.");
+                }
+            
+            }
+            else
+            {
+                throw std::runtime_error("Did not find a correct channel element inXML tree");
+            }
         }
     }
-        
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Image<T>::deserialize_content failed! Error: " << e.what();
+        return false;
+    }
     return true;
-    */
-    return false;
 }
 
 /**

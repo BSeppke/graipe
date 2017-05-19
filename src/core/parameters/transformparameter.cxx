@@ -157,7 +157,7 @@ bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
         {
             if(xmlReader.name() == magicID())
             {
-                while(xmlReader.readNextStartElement())
+                for(int i=0; i!=2; ++i)
                 {
                     if(xmlReader.name() == "Name")
                     {
@@ -168,9 +168,11 @@ bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
                         && xmlReader.attributes().value("Type") == "Affine")
                     {
                         double m11, m12, m13, m21, m22, m23, m31, m32, m33;
-                        
-                        while(xmlReader.readNextStartElement())
+                      
+                        for(int i=0; i!=9; ++i)
                         {
+  
+                            xmlReader.readNextStartElement();
                             
                             if(xmlReader.name() == "m11") m11 = xmlReader.readElementText().toDouble();
                             if(xmlReader.name() == "m12") m12 = xmlReader.readElementText().toDouble();

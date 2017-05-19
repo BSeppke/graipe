@@ -209,14 +209,15 @@ bool PolygonList2D::deserialize_item(const QString & serial)
  */
 void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-//TODO!!!
-/*	write_on_device(item_header(), out);
-	
-    for(unsigned int index=0; index < size()-1; ++index)
+    xmlWriter.writeTextElement("Legend", item_header());
+    
+	for(unsigned int i=0; i < size(); ++i)
     {
-		write_on_device("\n" + serialize_item(index), out);
-	}
-    */
+        xmlWriter.writeStartElement("Polygon");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeCharacters(serialize_item(i));
+        xmlWriter.writeEndElement();
+    }
 }
 
 /**
@@ -228,36 +229,27 @@ void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  */
 bool PolygonList2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-//TODO!!!
-/**    if(locked())
+    if (locked())
         return false;
-        
-    //Read in header line and then throw it away immideately
-    if(!in.atEnd())
-        in.readLine();
-    
+
     //Clean up
 	clear();
     updateModel();
     
     //Read the entries
-    while(!in.atEnd())
+    while(xmlReader.readNextStartElement())
     {
-        QString line = QString(in.readLine());
-        
-        //ignore comments and empty lines
-        if(!line.isEmpty() && !line.startsWith(";"))
+        if(xmlReader.name() == "Polygon")
         {
-            if (!deserialize_item(line))
-            {
-                qCritical() << "PolygonList2D::deserialize_content: Polygon could not be deserialized from: '" << line << "'";
+            if(!deserialize_item(xmlReader.readElementText()))
                 return false;
-            }
+        }
+        else
+        {
+            xmlReader.skipCurrentElement();
         }
     }
     return true;
-    */
-    return false;
 }
 
 

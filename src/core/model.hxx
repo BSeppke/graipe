@@ -614,13 +614,17 @@ class GRAIPE_CORE_EXPORT ItemListModel
          */
         void serialize_content(QXmlStreamWriter& xmlWriter) const
         {
-//TODO!!!            write_on_device(T::headerCSV(), out);
-    /*
+            xmlWriter.writeTextElement("Legend", T::headerCSV()());
+    
+            int i=0;
             for(const item_type& item : m_data)
             {
-                write_on_device("\n" + item.toCSV(), out);
+                xmlWriter.writeStartElement("Item");
+                xmlWriter.writeAttribute("ID", QString::number(i++));
+                    xmlWriter.writeCharacters(item.toCSV());
+                xmlWriter.writeEndElement();
             }
-            */
+
         }
     
         /**
@@ -635,32 +639,30 @@ class GRAIPE_CORE_EXPORT ItemListModel
         {
             if (locked())
                 return false;
-//TODO:
-       /*     //Read in header line and then throw it away immideately
-            if(!in.atEnd())
-                in.readLine();
 
             //Clean up
             clear();
             updateModel();
-
+            
             //Read the entries
-            while(!in.atEnd())
+            while(xmlReader.readNextStartElement())
             {
-                QString line(in.readLine());
-                
-                if(!line.isEmpty() && !line.startsWith(";"))
+                if(xmlReader.name() == "Item")
                 {
                     item_type new_item;
-                    if (!new_item.fromCSV(line))
+                    QString text = xmlReader.readElementText();
+                    if (!new_item.fromCSV(text))
                      {
-                        qCritical() << typeName() << "::deserialize_content: Item could not be deserialized from: '" << line << "'";
+                        qCritical() << typeName() << "::deserialize_content: Item could not be deserialized from: '" << text << "'";
                         return false;
                     }
                     append(new_item);
                 }
+                else
+                {
+                    xmlReader.skipCurrentElement();
+                }
             }
-            */
             return true;
         }
     

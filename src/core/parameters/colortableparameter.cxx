@@ -392,6 +392,7 @@ QWidget*  ColorTableParameter::delegate()
         connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_delegate;
 }
 

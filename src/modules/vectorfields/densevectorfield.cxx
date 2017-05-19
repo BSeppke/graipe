@@ -553,23 +553,31 @@ void DenseVectorfield2D::setV(const ArrayViewType& new_v)
  */
 void DenseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-//TODO!!!    qint64 channel_size = m_u.width()*m_u.height()*sizeof(ArrayType::value_type);
-/*    qint64 written_bytes;
-    
-    //First write x-part of vectors: m_u
-    written_bytes = out.write((const char*)m_u.data(),channel_size);
-    if (written_bytes != channel_size)
+    try
     {
-       qCritical() << "DenseVectorfield2D::serialize_content: Error while writing x-part of vectors from m_u. Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
+      
+        qint64 channel_size = m_u.width()*m_u.height()*sizeof(ArrayType::value_type);
+
+        QByteArray block((const char*)m_u.data(),channel_size);
+            
+        xmlWriter.writeStartElement("Channel");
+        xmlWriter.writeAttribute("ID", "u");
+        xmlWriter.writeAttribute("Encoding", "Base64");
+            xmlWriter.writeCharacters(block.toBase64());
+        xmlWriter.writeEndElement();
+        
+        block = QByteArray((const char*)m_v.data(),channel_size);
+            
+        xmlWriter.writeStartElement("Channel");
+        xmlWriter.writeAttribute("ID", "v");
+        xmlWriter.writeAttribute("Encoding", "Base64");
+            xmlWriter.writeCharacters(block.toBase64());
+        xmlWriter.writeEndElement();
     }
-    
-    //Then write y-part of vectors: m_v
-    written_bytes = out.write((const char*)m_v.data(),channel_size);
-    if (written_bytes != channel_size)
+    catch(...)
     {
-       qCritical() << "DenseVectorfield2D::serialize_content: Error while writing y-part of vectors from m_v. Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
+        qCritical() << "DenseVectorfield2D::serialize_content failed!";
     }
-*/
 }
 
 /**
@@ -582,8 +590,7 @@ void DenseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  */
 bool DenseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
- //TODO!!!
-/**   if(width() == 0 || height()==0)
+    if(width() == 0 || height()==0)
     {
         qCritical("DenseVectorfield2D::deserialize_content: storage image has zero size!");
         return false;
@@ -593,27 +600,62 @@ bool DenseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
     m_v.reshape(DiffType(width(), height()));
     
     qint64 channel_size = m_u.width()*m_u.height()*sizeof(ArrayType::value_type);
-    qint64 read_bytes;
     
-    //First read x-part of vectors: m_u
-    read_bytes = in.read((char*)(m_u.data()), channel_size);
-    if (read_bytes != channel_size)
+    try
     {
-        qCritical() << "DenseVectorfield2D::deserialize_content: Error while reading x-part of vectors into m_u. Expected to read " << channel_size << "bytes, but got " << read_bytes << " bytes";
+        for (int i=0; i!=2; ++i)
+        {
+            xmlReader.readNextStartElement();
+            
+            qDebug() << "DenseVectorfield2D::deserialize_content: readNextStartElement" << xmlReader.name();
+            
+            if(xmlReader.name() == "Channel"
+                && xmlReader.attributes().hasAttribute("ID")
+                && xmlReader.attributes().hasAttribute("Encoding")
+                && xmlReader.attributes().value("Encoding") == "Base64")
+            {
+                QString id = xmlReader.attributes().value("ID").toString();
+                
+                QByteArray block;
+                block.append(xmlReader.readElementText());
+                block = QByteArray::fromBase64(block);
+                
+                if (id  == "u")
+                {
+                    if(block.size() == channel_size)
+                    {
+                        memcpy((char*)m_u.data(), block.data(), channel_size);
+                    }
+                    else
+                    {
+                        throw std::runtime_error("Channel serialization was of wrong size in XML after Base64 decoding for u field.");
+                    }
+                }
+                else if (id  == "v")
+                {
+                    if(block.size() == channel_size)
+                    {
+                        memcpy((char*)m_v.data(), block.data(), channel_size);
+                    }
+                    else
+                    {
+                        throw std::runtime_error("Channel serialization was of wrong size in XML after Base64 decoding for v field.");
+                    }
+                }
+            
+            }
+            else
+            {
+                throw std::runtime_error("Did not find a correct channel element inXML tree");
+            }
+        }
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "DenseVectorfield2D::deserialize_content failed! Error: " << e.what();
         return false;
     }
-    
-    //Then read y-part of vectors: m_v
-    read_bytes = in.read((char*)(m_v.data()), channel_size);
-    if (read_bytes != channel_size)
-    {
-        qCritical() << "DenseVectorfield2D::deserialize_content: Error while reading y-part of vectors into m_v. Expected to read " << channel_size << "bytes, but got " << read_bytes << " bytes";
-        return false;
-    }
-    
     return true;
-    **/
-    return false;
 }
 
 /**
@@ -876,17 +918,24 @@ void DenseWeightedVectorfield2D::setWeight(unsigned int x, unsigned int y, float
  */
 void DenseWeightedVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-//TODO!!!    DenseVectorfield2D::serialize_content(out);
-    /*
-    qint64 channel_size = m_w.width()*m_w.height()*sizeof(ArrayType::value_type);
+    DenseVectorfield2D::serialize_content(xmlWriter);
     
-    //Write weights of vectors: m_w
-    qint64 written_bytes = out.write((const char*)m_w.data(),channel_size);
-    if (written_bytes != channel_size)
+    try
     {
-       qCritical() << "DenseWeightedVectorfield2D::serialize_content: Error while writing weights of vectors from m_w. Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
+        qint64 channel_size = m_w.width()*m_w.height()*sizeof(ArrayType::value_type);
+
+        QByteArray block((const char*)m_w.data(),channel_size);
+            
+        xmlWriter.writeStartElement("Channel");
+        xmlWriter.writeAttribute("ID", "w");
+        xmlWriter.writeAttribute("Encoding", "Base64");
+            xmlWriter.writeCharacters(block.toBase64());
+        xmlWriter.writeEndElement();
     }
-    */
+    catch(...)
+    {
+        qCritical() << "DenseWeightedVectorfield2D::serialize_content failed!";
+    }
 }
 
 /**
@@ -899,8 +948,7 @@ void DenseWeightedVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) 
  */
 bool DenseWeightedVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-//TODO!!!
-/**    if( !DenseVectorfield2D::deserialize_content(in))
+    if( !DenseVectorfield2D::deserialize_content(xmlReader))
     {
         return false;
     }
@@ -909,17 +957,48 @@ bool DenseWeightedVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader
     
     m_w.reshape(DiffType(width(), height()));
     
-    //Read weights of vectors: m_w
-    qint64 read_bytes= in.read((char*)(m_w.data()), channel_size);
-    if (read_bytes != channel_size)
+    if(width() == 0 || height()==0)
     {
-        qCritical() << "DenseWeightedVectorfield2D::deserialize_content: Error while reading weight of vectors into m_w. Expected to read " << channel_size << "bytes, but got " << read_bytes << " bytes";
+        qCritical("DenseWeightedVectorfield2D::deserialize_content: storage image has zero size!");
         return false;
     }
-
+    
+    try
+    {
+        xmlReader.readNextStartElement();
+            
+        qDebug() << "DenseVectorfield2D::deserialize_content: readNextStartElement" << xmlReader.name();
+            
+        if(xmlReader.name() == "Channel"
+            && xmlReader.attributes().hasAttribute("ID")
+            && xmlReader.attributes().value("ID") == "w"
+            && xmlReader.attributes().hasAttribute("Encoding")
+            && xmlReader.attributes().value("Encoding") == "Base64")
+        {
+            QByteArray block;
+            block.append(xmlReader.readElementText());
+            block = QByteArray::fromBase64(block);
+            
+            if(block.size() == channel_size)
+            {
+                memcpy((char*)m_w.data(), block.data(), channel_size);
+            }
+            else
+            {
+                throw std::runtime_error("Channel serialization was of wrong size in XML after Base64 decoding for w field.");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find a correct channel element inXML tree");
+        }
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "DenseWeightedVectorfield2D::deserialize_content failed! Error: " << e.what();
+        return false;
+    }
     return true;
-    **/
-    return false;
 }
 
 

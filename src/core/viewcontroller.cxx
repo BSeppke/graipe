@@ -86,8 +86,8 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
     m_parameters->addParameter("name",m_name);
     m_parameters->addParameter("description",m_description);
     
-    m_model_filename->hide(true);
-    m_parameters->addParameter("modelFilename",m_model_filename);
+                                                                //Hidden
+    m_parameters->addParameter("modelFilename",m_model_filename, true);
     
     m_parameters->addParameter("showAx",m_showAxis);
     m_parameters->addParameter("axLineWidth", m_axisLineWidth);

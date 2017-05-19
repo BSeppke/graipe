@@ -261,13 +261,15 @@ bool SparseVectorfield2D::deserialize_item(const QString & serial)
  */
 void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-//TODO!!!     write_on_device(item_header(), out);
-    /*
+    xmlWriter.writeTextElement("Legend", item_header());
+    
 	for(unsigned int i=0; i < size(); ++i)
     {
-		write_on_device("\n" + serialize_item(i), out);
-	}
-    */
+        xmlWriter.writeStartElement("Vector");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeCharacters(serialize_item(i));
+        xmlWriter.writeEndElement();
+    }
 }
 
 /**
@@ -281,36 +283,27 @@ void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  */
 bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-//TODO!!!
-/**    if(locked())
+    if (locked())
         return false;
-        
-    //Read in header line and then throw it away immideately
-    if(!in.atEnd())
-        in.readLine();
-    
+
     //Clean up
 	clear();
     updateModel();
-			
+    
     //Read the entries
-    while(!in.atEnd())
+    while(xmlReader.readNextStartElement())
     {
-        QString line = QString(in.readLine());
-        
-        //ignore comments and empty lines
-        if(!line.isEmpty() && !line.startsWith(";"))
+        if(xmlReader.name() == "Vector")
         {
-            if (!deserialize_item(line))
-            {
-                qCritical() << "Vectorfield2D::deserialize_content: Vector could not be deserialized from: '" << line << "'";
+            if(!deserialize_item(xmlReader.readElementText()))
                 return false;
-            }
+        }
+        else
+        {
+            xmlReader.skipCurrentElement();
         }
     }
     return true;
-    */
-    return false;
 }
 
 

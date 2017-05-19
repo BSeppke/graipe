@@ -38,6 +38,7 @@
 #include "core/model.hxx"
 
 #include <QtDebug>
+#include <QCoreApplication>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
@@ -201,14 +202,18 @@ void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
  */
 bool Parameter::deserialize(QXmlStreamReader& xmlReader)
 {
+    bool success = false;
+    
     try
     {
         if (xmlReader.readNextStartElement())
-        {
+        {            
             if(xmlReader.name() == magicID())
             {
-                while(xmlReader.readNextStartElement())
+                for(int i=0; i!=2; ++i)
                 {
+                    xmlReader.readNextStartElement();
+                
                     if(xmlReader.name() == "Name")
                     {
                         setName(xmlReader.readElementText());
@@ -216,9 +221,22 @@ bool Parameter::deserialize(QXmlStreamReader& xmlReader)
                     if(xmlReader.name() == "Value")
                     {
                         QString valueText =  xmlReader.readElementText();
-                        return fromString(valueText);
+                        success = fromString(valueText);
                     }
                 }
+                while(true)
+                {
+                    if(!xmlReader.readNext())
+                    {
+                        return false;
+                    }
+                    
+                    if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                    {
+                        break;
+                    }
+                }
+                return success;
             }
         }
         else
@@ -301,28 +319,6 @@ bool Parameter::isValid() const
 }
 
 /**
- * Sets a parameter to be hidden. 
- * Hidden parameters behave like visible parameters unless they are added to a
- * parameter group, where their delegates will not be shown.
- *
- * \param hide If true, the parameter will be hidden in a parameter group.
- */
-void Parameter::hide(bool hide)
-{
-    m_hide = hide;
-}
-
-/**
- * Is a parameter marked as "hidden" with respect to a parameter group?
- *
- * \return True, if the parameter will be hidden in a parameter group.
- */
-bool Parameter::isHidden() const
-{
-    return m_hide;
-}
-
-/**
  * The delegate widget of this parameter. 
  * Each parameter generates such a widget on demand, which refers to the
  * first call of this function. This is needed due to the executability of
@@ -374,6 +370,7 @@ void Parameter::initConnections()
             }
         }
     }
+    
 }
 
 } //end of namespace graipe

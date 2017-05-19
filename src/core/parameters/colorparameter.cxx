@@ -239,6 +239,7 @@ QWidget*  ColorParameter::delegate()
         connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_delegate;
 }
 

@@ -329,51 +329,67 @@ void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
 template <class T>
 bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
 {
-//TODO!!!
-/**
-    if (!Parameter::deserialize(in))
+    bool success = false;
+    
+    try
     {
+        if (xmlReader.readNextStartElement())
+        {            
+            if(xmlReader.name() == magicID())
+            {
+                for(int i=0; i!=3; ++i)
+                {
+                    xmlReader.readNextStartElement();
+                
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Filename")
+                    {
+                        QString valueText =  xmlReader.readElementText();
+                        
+                        for(Image<T>* allowed: m_allowed_images)
+                        {
+                            if (allowed->filename() == valueText)
+                            {
+                                setImage(allowed);
+                                success = true;
+                            }
+                        }
+                    }
+                    if(xmlReader.name() == "BandID")
+                    {
+                        QString valueText =  xmlReader.readElementText();
+                        setBandId(valueText.toInt());
+                    }
+                }
+                while(true)
+                {
+                    if(!xmlReader.readNext())
+                    {
+                        return false;
+                    }
+                    
+                    if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                    {
+                        break;
+                    }
+                }
+                return success;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find magicID in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << magicID() << "::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
         return false;
     }
-    
-    bool found = false;
-    unsigned int i=0;
-    
-    QString content(in.readLine());
-    
-    QStringList fname_bandId = split_string_once(content, ", ");
-    
-    if(fname_bandId.size() ==2)
-    {
-        QString filename = decode_string(fname_bandId[0]);
-        unsigned int bandId = fname_bandId[1].toUInt();
-    
-        for(Image<T>* image: m_allowed_images)
-        {
-            if(image->filename() == filename && image->numBands() > bandId)
-            {
-                m_image = image;
-                m_bandId = bandId;
-                
-                if(m_cmbImage != NULL)
-                {
-                    m_cmbImage->setCurrentIndex(i);
-                    m_spbBand->setValue(bandId);
-                }
-                found = true;
-            }
-            i++;
-        }
-        
-        if (!found)
-        {
-            qDebug() << "ImageBandParameter deserialize: filename does not match any given or bandId was erroneous! Was:'" << content << "'";
-        }
-        
-        return found;
-    }
-    */
-    return false;
 }
 
 /**

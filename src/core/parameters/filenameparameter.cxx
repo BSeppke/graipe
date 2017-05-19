@@ -177,6 +177,7 @@ QWidget*  FilenameParameter::delegate()
         connect(m_btnDelegate,  SIGNAL(clicked()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_delegate;
 }
 

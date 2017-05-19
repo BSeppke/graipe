@@ -253,7 +253,7 @@ void MainWindow::reset()
  */
 void MainWindow::loadModel()
 {	
-	QFileDialog dialog(this, "Load models", m_default_dir, "GRAIPE models (*.gz *.csv)");
+	QFileDialog dialog(this, "Load models", m_default_dir, "GRAIPE models (*.xgz *.xml)");
 	dialog.setFileMode(QFileDialog::ExistingFiles);
 	dialog.setViewMode(QFileDialog::Detail);
 	
@@ -784,7 +784,7 @@ void MainWindow::saveCurrentModel()
 		QString suggested_filename = model->name().replace(" ", "_");
 		QString filename = QFileDialog::getSaveFileName(this, tr("Save Model to file"),
                            suggested_filename,
-                            tr("Packed GRAIPE-models (*.gz);;Unpacked GRAIPE-models (*.csv)"));
+                            tr("Packed GRAIPE-models (*.xgz);;Unpacked GRAIPE-models (*.xml)"));
 		
 		if(!filename.isEmpty())
 		{	
@@ -973,7 +973,7 @@ void MainWindow::saveWorkspace(const QString& dirname)
                 if(model_item && model_item->model())
                 {
                     Model* model = model_item->model();
-                    QString suggested_filename = QString("model_%1.csv.gz").arg(j);
+                    QString suggested_filename = QString("model_%1.xgz").arg(j);
                     QString model_filename = dir.filePath(suggested_filename);
                     
                     if(!Impex::save(model, model_filename, true))
@@ -1001,7 +1001,7 @@ void MainWindow::saveWorkspace(const QString& dirname)
                 {
                     ViewController* viewController = vc_item->viewController();
                     
-                    QString suggested_filename = QString("viewController_%1.csv.gz").arg(i);
+                    QString suggested_filename = QString("viewController_%1.xgz").arg(i);
                     
                     if(!Impex::save(viewController, dir.filePath(suggested_filename), true))
                     {

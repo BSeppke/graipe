@@ -348,6 +348,7 @@ QWidget*  MultiModelParameter::delegate()
         connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_lstDelegate;
 }
 

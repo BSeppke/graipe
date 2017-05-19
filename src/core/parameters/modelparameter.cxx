@@ -271,6 +271,7 @@ QWidget*  ModelParameter::delegate()
         connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_cmbDelegate;
 }
 

@@ -203,14 +203,15 @@ bool PointFeatureList2D::deserialize_item(const QString & serial)
  */
 void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-//TODO
-/*    write_on_device(item_header(), out);
+    xmlWriter.writeTextElement("Legend", item_header());
     
 	for(unsigned int i=0; i < size(); ++i)
     {
-		write_on_device("\n" + serialize_item(i), out);
-	}
-    */
+        xmlWriter.writeStartElement("Feature");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeCharacters(serialize_item(i));
+        xmlWriter.writeEndElement();
+    }
 }
 
 /**
@@ -222,30 +223,27 @@ void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
  */
 bool PointFeatureList2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
- //TODO!!!
-/**   if (locked())
+    if (locked())
         return false;
-        
-    //Read in header line and then throw it away immideately
-    if(!in.atEnd())
-        in.readLine();
-    
+
     //Clean up
 	clear();
     updateModel();
     
     //Read the entries
-    while(!in.atEnd())
+    while(xmlReader.readNextStartElement())
     {
-        QString line(in.readLine());
-        if(!line.isEmpty() && !line.startsWith(";"))
+        if(xmlReader.name() == "Feature")
         {
-           deserialize_item(line);
+            if(!deserialize_item(xmlReader.readElementText()))
+                return false;
+        }
+        else
+        {
+            xmlReader.skipCurrentElement();
         }
     }
     return true;
-    */
-    return false;
 }
 
 

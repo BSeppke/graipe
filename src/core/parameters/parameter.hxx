@@ -230,22 +230,6 @@ class GRAIPE_CORE_EXPORT Parameter
         virtual bool isValid() const;
     
         /**
-         * Sets a parameter to be hidden. 
-         * Hidden parameters behave like visible parameters unless they are added to a
-         * parameter group, where their delegates will not be shown.
-         *
-         * \param hide If true, the parameter will be hidden in a parameter group.
-         */
-        virtual void hide(bool hide);
-    
-        /**
-         * Is a parameter marked as "hidden" with respect to a parameter group?
-         *
-         * \return True, if the parameter will be hidden in a parameter group.
-         */
-        virtual bool isHidden() const;
-    
-        /**
          * The delegate widget of this parameter. 
          * Each parameter generates such a widget on demand, which refers to the
          * first call of this function. This is needed due to the executability of
@@ -285,9 +269,6 @@ class GRAIPE_CORE_EXPORT Parameter
     
         /** Should the enabled/disabled by parent rule be inverted? **/
         bool m_invert_parent;
-    
-        /** Shall the parameter be hidden inside a parameter group? **/
-        bool m_hide;
     
         /** The list of all currently loaded models **/
         const std::vector<Model*> * m_modelList;

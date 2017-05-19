@@ -50,7 +50,8 @@
 int main(int argc, char** argv)
 {    
     //Install thes logger's message handler
-    qInstallMessageHandler(&graipe::Logging::messageHandler);
+    //TODO: GET IT WORKING
+    //qInstallMessageHandler(&graipe::Logging::messageHandler);
     
     QApplication app(argc,argv);
 

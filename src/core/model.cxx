@@ -73,8 +73,8 @@ Model::Model()
     m_parameters->addParameter("name", m_name);
     m_parameters->addParameter("descr", m_description);
     
-    m_save_filename->hide(true);
-    m_parameters->addParameter("filename", m_save_filename);
+                                                            //hidden==true
+    m_parameters->addParameter("filename", m_save_filename, true);
     
     m_parameters->addParameter("ul", m_ul);
     m_parameters->addParameter("lr", m_lr);
@@ -105,8 +105,8 @@ Model::Model(const Model& model)
     m_parameters->addParameter("name", m_name);
     m_parameters->addParameter("descr", m_description);
     
-    m_save_filename->hide(true);
-    m_parameters->addParameter("filename", m_save_filename);
+                                                            //Hidden
+    m_parameters->addParameter("filename", m_save_filename, true);
     
     m_parameters->addParameter("ul", m_ul);
     m_parameters->addParameter("lr", m_lr);
@@ -564,6 +564,7 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.writeStartDocument();
         xmlWriter.writeStartElement(magicID());
+        xmlWriter.writeAttribute("ID", filename());
             xmlWriter.writeStartElement("Header");
                 serialize_header(xmlWriter);
             xmlWriter.writeEndElement();
@@ -586,15 +587,32 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {
+            qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
+            
             if(xmlReader.name() == magicID())
             {
                 while(xmlReader.readNextStartElement())
                 {
+                    qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
+            
                     if(xmlReader.name() == "Header")
                     {
                          if(!deserialize_header(xmlReader))
                          {
                             return false;
+                        }
+                        //Read until </Header> comes....
+                        while(true)
+                        {
+                            if(!xmlReader.readNext())
+                            {
+                                return false;
+                            }
+                            
+                            if(xmlReader.isEndElement() && xmlReader.name() == "Header")
+                            {
+                                break;
+                            }
                         }
                     }
                     if(xmlReader.name() == "Content")
