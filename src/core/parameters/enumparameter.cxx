@@ -138,7 +138,7 @@ void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
     
-    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Value", QString("%1").arg(value()));
     xmlWriter.writeEndElement();
@@ -156,7 +156,7 @@ bool EnumParameter::deserialize(QXmlStreamReader& xmlReader)
     {
         if(xmlReader.readNextStartElement())
         {
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 while(xmlReader.readNextStartElement())
                 {
@@ -176,13 +176,13 @@ bool EnumParameter::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find typeName() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << "EnumParameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << "EnumParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
 }

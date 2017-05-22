@@ -145,14 +145,6 @@ class GRAIPE_CORE_EXPORT Parameter
          * \param str The value of the parameter converted to an QString
          */
         virtual bool fromString(QString& str);
-    
-        /**
-         * The magicID of this parameter class. 
-         * Implemented to fullfil the Serializable interface.
-         *
-         * \return The same as the typeName() function.
-         */
-        QString magicID() const;
 
         /**
          * Serialization of the parameter's state to an output device.
@@ -163,7 +155,7 @@ class GRAIPE_CORE_EXPORT Parameter
          *     <Value>VALUETEXT</Value>
          * </MAGICID>
          *
-         * with MAGICID = magicID(),
+         * with MAGICID = typeName(),
          *         NAME = name(), and
          *    VALUETEXT = toString().
          *

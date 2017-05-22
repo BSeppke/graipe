@@ -187,16 +187,7 @@ class GRAIPE_CORE_EXPORT ParameterGroup
          * \param filter_types Only special parameters are given out - filtered by their type. 
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText(const QString & filter_types) const;
-            
-        /**
-         * The magicID of this parameter class. 
-         * Implemented to fullfil the Serializable interface.
-         *
-         * \return "", since a parameter group does not use any magicIDs.
-         */
-        QString magicID() const;
-    
+        QString valueText(const QString & filter_types) const;    
 
         /**
          * Serialization of the parameter's state to an output device.

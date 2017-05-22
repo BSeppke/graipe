@@ -120,7 +120,7 @@ class GRAIPE_CORE_EXPORT TransformParameter
          *     </Transform>
          * </MAGICID>
          *
-         * with MAGICID = magicID(),
+         * with MAGICID = typeName(),
          *         NAME = name().
          *
          * \param out The output device on which we serialize the parameter's state.

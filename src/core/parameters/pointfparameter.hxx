@@ -158,7 +158,7 @@ class GRAIPE_CORE_EXPORT PointFParameter
          *     <y>Y</y>
          * </MAGICID>
          *
-         * with MAGICID = magicID(),
+         * with MAGICID = typeName(),
          *         NAME = name(),
          *            X = value().x(), and
          *            Y = value().y().

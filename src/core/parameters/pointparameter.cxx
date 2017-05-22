@@ -206,7 +206,7 @@ QString  PointParameter::toString() const
  *     <y>Y</y>
  * </MAGICID>
  *
- * with MAGICID = magicID(),
+ * with MAGICID = typeName(),
  *         NAME = name(),
  *            X = value().x(), and
  *            Y = value().y().
@@ -217,7 +217,7 @@ void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
     
-    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("x", QString::number(value().x()));
     xmlWriter.writeTextElement("y", QString::number(value().y()));
@@ -237,7 +237,7 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 QPoint p;
                 
@@ -267,7 +267,7 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
                         return false;
                     }
                     
-                    if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
                     {
                         break;
                     }
@@ -278,13 +278,13 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find typeName() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << "PointParameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << "PointParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
 }

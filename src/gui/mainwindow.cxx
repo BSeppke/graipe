@@ -1172,79 +1172,65 @@ void MainWindow::restoreWorkspace(const QString& dirname)
  */
 void MainWindow::loadViewController(const QString& filename)
 {
-    ViewController* viewController = NULL;
     bool compress =  (filename.right(2) == "gz");
     
-    //TODO: Does not work! Imagine better way to solve impex for ViewControllers!
+    //1. Read the root attributes of the xml node as well as the name of the root
     std::map<QString,QString> dict = Impex::dictFromFile(filename, compress);
     
-    //1. read out the Type of the view and find him in the vc_factory
-    QString vc_type = dict["type"];
+    //   and temporary store properties
+    QString vc_type = dict["Type"];
+    int vc_zorder = dict["ZOrdner"].toInt();
+    QString model_filename = dict["ModelID"];
     
-    //2. find the associated model at the model_list (if it was already loaded)
-    QString model_filename = dict["modelFilename"];
-    model_filename = model_filename.remove("LongStringParameter, ");
     
+    //2. Find the associated model at the model_list (if it was already loaded)
     Model* vc_model = NULL;
-    
-    for(int i=0;  i < m_ui.listModels->count(); ++i)
+    for(int i=0;  i!=m_ui.listModels->count(); ++i)
     {
-    
         QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(i));
         
-        if(model_item && model_item->model() && model_item->model()->filename()==model_filename)
+        if(     model_item
+            &&  model_item->model()
+            &&  model_item->model()->filename() == model_filename)
         {
             vc_model = model_item->model();
-        }
-    }
-    //If it was not found try to load it here
-    if(vc_model==NULL)
-    {
-        qDebug("Exception (first chance): Did not find a model for deserialization of the ViewController, try to reload the model from hdd.");
-        loadModel(model_filename);
-        //^ Throws an error, if model cannot be loaded
-        
-        //Model could be loaded:
-         QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(m_ui.listModels->count()-1));
-        if(model_item && model_item->model() && model_item->model()->filename()==model_filename)
-        {
-            vc_model = model_item->model();
-        }
-        else
-        {
-            throw std::runtime_error("Model was not loaded before ViewController loading, and cannot be loaded from file system on second try.");
+            break;
         }
     }
     
-    //Try the import functions of every registered model:
+    //  If it was not found: Indicate error
+    if(vc_model == NULL)
+    {
+        throw std::runtime_error("Model was not loaded before ViewController loading.");
+    }
+    
+    //3. Create a controller using the vc_type and the model found above:
+    ViewController* vc = NULL;
     for(unsigned int i=0; i<m_viewController_factory.size(); ++i)
     {
         if(m_viewController_factory[i].viewController_name==vc_type)
         {
-            //3. create a controller using the correct Call:
-            viewController = m_viewController_factory[i].viewController_fptr(m_scene, vc_model, i);
-            
-            if(viewController)
-            {
-                //4. do the impex:load to restore the parameters
-                if(Impex::load(filename, viewController, compress))
-                {
-                    connect(viewController, SIGNAL(updateStatusText(QString)), this, SLOT(updateStatusText(QString)));
-                    connect(viewController, SIGNAL(updateStatusDescription(QString)), this, SLOT(updateStatusDescription(QString)));
-
-                    addViewControllerItemToList(viewController);
-                }
-                else
-                {
-                    throw std::runtime_error("Deserialization of further ViewController properties failed");
-                }
-            }
+            vc = m_viewController_factory[i].viewController_fptr(m_scene, vc_model, vc_zorder);
+            break;
         }
-     
     }
-    if (!viewController)
+    //  If it was not found: Indicate error
+    if(vc == NULL)
     {
-        throw std::runtime_error("ViewController could not be loaded from filesystem");
+        throw std::runtime_error("ViewController type was not found in the factory.");
+    }
+    
+    //4. Do the impex::load to restore the parameters
+    if(Impex::load(filename, vc, compress))
+    {
+        connect(vc, SIGNAL(updateStatusText(QString)), this, SLOT(updateStatusText(QString)));
+        connect(vc, SIGNAL(updateStatusDescription(QString)), this, SLOT(updateStatusDescription(QString)));
+
+        addViewControllerItemToList(vc);
+    }
+    else
+    {
+        throw std::runtime_error("Deserialization of further ViewController properties failed");
     }
 }
     

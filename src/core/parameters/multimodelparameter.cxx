@@ -209,7 +209,7 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.setAutoFormatting(true);
     
-    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
     int i=0;
     for(const Model* model: value())
@@ -234,7 +234,7 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 while(xmlReader.readNextStartElement())
                 {
@@ -267,13 +267,13 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find typeName() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
     return true;

@@ -213,18 +213,10 @@ class GRAIPE_CORE_EXPORT ViewController
          * \return "ViewController"
          */
         QString typeName() const;
-
-        /**
-         * This function returns the automagically generated first header line for ViewController
-         * serialization.
-         *
-         * \return The first Header line, namely: "[Graipe::" + typeName() + "]"
-         */
-        QString magicID() const;
     
         /**
          * This function serializes a complete ViewController to an output device.
-         * To do so, it serializes the magicID(), then the model denoted by the model's
+         * To do so, it serializes the typeName(), then the model denoted by the model's
          * filename and eventually the parameter set.
          *
          * \param out The output device, where we serialize to.
@@ -261,7 +253,6 @@ class GRAIPE_CORE_EXPORT ViewController
         //The view's parameter
         StringParameter *m_name;
         LongStringParameter *m_description;
-        LongStringParameter *m_model_filename;
     
         BoolParameter	*m_showAxis;
         FloatParameter	*m_axisLineWidth;

@@ -131,6 +131,11 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
         }
     }
     
+    if(ct_idx != -1)
+    {
+        return ct_idx;
+    }
+    
     //search in extra (user defined) color tables
     for(unsigned int i=0; i != m_extra_tables.size(); ++i)
     {
@@ -140,7 +145,6 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
             break;
         }
     }
-    
     return ct_idx;
 }
 
@@ -165,7 +169,14 @@ void ColorTableParameter::setValue(const QVector<QRgb>& value)
     }
     else
     {
-        qDebug("ColorTableParameter::setValue: Could not find value to set in colortables");
+        qDebug("ColorTableParameter::setValue: Could not find value to set in colortables. Creating a new one");
+        m_ct_idx = addCustomColorTable(value);
+        if(m_delegate != NULL)
+        {
+            m_delegate->setCurrentIndex(ct_idx);
+            Parameter::updateValue();
+        }
+        
     }
 }
 
@@ -208,7 +219,7 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
                 img.setColorTable(ct);
                 m_delegate->insertItem(m_delegate->count()-1, QPixmap::fromImage(img),"");
             }
-            return m_delegate->count()-2;
+            return colorTables().size() + m_extra_tables.size()-1;
         }
     }
     else
@@ -249,11 +260,11 @@ void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.setAutoFormatting(true);
     
-    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeStartElement(typeName());
         xmlWriter.writeTextElement("Name", name());
         xmlWriter.writeTextElement("Colors", QString::number(ct.size()));
     
-    for(unsigned int i=1; i<ct.size(); ++i)
+    for(unsigned int i=0; i<ct.size(); ++i)
     {
         xmlWriter.writeStartElement("Color");
         xmlWriter.writeAttribute("ID", QString::number(i));
@@ -278,7 +289,7 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 QVector<QRgb> ct(256);
                 
@@ -315,6 +326,7 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
                                 color.setBlue(xmlReader.readElementText().toInt());
                             }
                         }
+                        
                         ct[color_id] = color.rgb();
                     }
                 }
@@ -324,13 +336,13 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find typeName() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
 }

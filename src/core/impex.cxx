@@ -38,6 +38,8 @@
 #include <QFile>
 #include "core/qt_ext/qiocompressor.hxx"
 
+#include "core/parameters/longstringparameter.hxx"
+
 /**
  * @file
  * @brief Implementation file for the import and export of data
@@ -47,7 +49,7 @@
  */
 
 namespace graipe {
-    
+
 /**
  * Basic import procedure for all types, which implements the serializable interface.
  *
@@ -94,16 +96,18 @@ bool Impex::load(const QString & filename, Serializable * object, bool compress)
     return success;
 }
 
+
 /**
- * Reads the content of (maybe compressed) file to a QString.
- * Mainly needed for views and their serialization.
+ * Basic import procedure of a settings dictionary from a file.
+ * A dictionary is defined by means of a mapping from QString keys
+ * to QString values.
  *
  * \param filename The filename to be read.
  * \param compress If true, the file will be read using the GZip decompressor.
  */
-QString Impex::readToString(const QString & filename, bool compress)
+std::map<QString,QString> Impex::dictFromFile(const QString & filename, bool compress)
 {
-    QString result;
+    std::map<QString,QString> result;
     
     if(!filename.isEmpty())
     {
@@ -114,10 +118,11 @@ QString Impex::readToString(const QString & filename, bool compress)
             QIOCompressor compressor(&file);
             compressor.setStreamFormat(QIOCompressor::GzipFormat);
             
+            QXmlStreamReader xmlReader(&compressor);
+            
             if (compressor.open(QIODevice::ReadOnly))
             {
-                const QByteArray text = compressor.readAll();
-                result = QString(text);
+                result = dictFromStream(xmlReader);
                 compressor.close();
             }
             else
@@ -127,10 +132,11 @@ QString Impex::readToString(const QString & filename, bool compress)
         }
         else
         {
+            QXmlStreamReader xmlReader(&file);
+            
             if(file.open(QIODevice::ReadOnly))
             {
-                const QByteArray text = file.readAll();
-                result = QString(text);
+                result = dictFromStream(xmlReader);
                 file.close();
             }
             else
@@ -143,21 +149,6 @@ QString Impex::readToString(const QString & filename, bool compress)
 }
 
 /**
- * Basic import procedure of a settings dictionary from a file.
- * A dictionary is defined by means of a mapping from QString keys
- * to QString values.
- *
- * \param filename The filename to be read.
- * \param compress If true, the file will be read using the GZip decompressor.
- */
-std::map<QString,QString> Impex::dictFromFile(const QString & filename, bool compress)
-{
-    
-    QString contents = Impex::readToString(filename, compress);
-    return Impex::dictFromString(contents);
-}
-
-/**
  * Basic import procedure of a settings dictionary from a given QString
  * A dictionary is defined by means of a mapping from QString keys
  * to QString values.
@@ -165,30 +156,24 @@ std::map<QString,QString> Impex::dictFromFile(const QString & filename, bool com
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-std::map<QString,QString> Impex::dictFromString(const QString & contents, QString separator)
+std::map<QString,QString> Impex::dictFromStream(QXmlStreamReader & xmlReader)
 {
     std::map<QString,QString> result;
-    QStringList lines = contents.split("\n");
     
-    if (lines.size() !=0)
+    if(xmlReader.readNextStartElement())
     {
-        // [Graipe::XXXXXXXXXX]
-        QString temp = lines[0];
-        //remove [Graipe:: and the last char
-        temp = temp.mid(9,temp.size()-10);
+        qDebug() << "Impex::dictFromStream readFirstStartElement" << xmlReader.name().toString();
+        //First start element: ViewController's name
+        result.insert(std::pair<QString,QString>("Type", xmlReader.name().toString()));
         
-        result.insert(std::pair<QString,QString>("type", temp));
-    
-        for(int i=1; i<lines.size(); ++i)
+        for(QXmlStreamAttribute attr : xmlReader.attributes())
         {
-            //Important here: do not trim the QStrings!
-            QStringList key_value =  split_string_once(lines[i], separator);
-            
-            if(key_value.size() == 2)
-            {
-                result.insert(std::pair<QString,QString>(key_value[0], decode_string(key_value[1])));
-            }
+            result.insert(std::pair<QString,QString>(attr.name().toString(), attr.value().toString()));
         }
+    }
+    else
+    {
+        qWarning("Could not find a single XML start element!");
     }
     return result;
 }

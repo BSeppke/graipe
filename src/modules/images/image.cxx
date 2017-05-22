@@ -427,6 +427,13 @@ void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
     try
     {
+    
+        xmlWriter.writeTextElement("Width",    QString::number(this->width()));
+        xmlWriter.writeTextElement("Height",   QString::number(this->height()));
+        xmlWriter.writeTextElement("Channels", QString::number(this->numBands()));
+        xmlWriter.writeTextElement("Order",   "Row-major");
+        xmlWriter.writeTextElement("Encoding", "Base64");
+        
         qint64 channel_size = this->width()*this->height()*sizeof(T);
 
         for(unsigned int c=0; c<m_imagebands.size(); ++c)
@@ -435,8 +442,7 @@ void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
             
             xmlWriter.writeStartElement("Channel");
             xmlWriter.writeAttribute("ID", QString::number(c));
-            xmlWriter.writeAttribute("Encoding", "Base64");
-            xmlWriter.writeCharacters(block.toBase64());
+                xmlWriter.writeCharacters(block.toBase64());
             xmlWriter.writeEndElement();
         }
     }
@@ -477,13 +483,48 @@ bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
     try
     {
         while(xmlReader.readNextStartElement())
-        {
-            qDebug() << "Image<T>::deserialize_content: readNextStartElement" << xmlReader.name();
+        {            
+            if (xmlReader.name() == "Width")
+            {
+                int w = xmlReader.readElementText().toInt();
+                
+                if(w != width())
+                {
+                    throw std::runtime_error("Width does not match Header info.");
+                }
+            }            
+            if (xmlReader.name() == "Height")
+            {
+                int h = xmlReader.readElementText().toInt();
+                
+                if(h != height())
+                {
+                    throw std::runtime_error("Height does not match Header info.");
+                }
+            }
             
-            if(xmlReader.name() == "Channel"
-                && xmlReader.attributes().hasAttribute("ID")
-                && xmlReader.attributes().hasAttribute("Encoding")
-                && xmlReader.attributes().value("Encoding") == "Base64")
+            if (xmlReader.name() == "Channels")
+            {
+                int c = xmlReader.readElementText().toInt();
+                
+                if(c != numBands())
+                {
+                    throw std::runtime_error("Number of Channels does not match Header info.");
+                }
+            }
+            
+            if (xmlReader.name() == "Order" && xmlReader.readElementText() != "Row-major")
+            {
+                throw std::runtime_error("Order of data has to be 'Row-major'.");
+            }
+            
+            
+            if (xmlReader.name() == "Encoding" && xmlReader.readElementText() != "Base64")
+            {
+                throw std::runtime_error("Encoding of data has to be 'Base64'.");
+            }
+            
+            if(xmlReader.name() == "Channel" && xmlReader.attributes().hasAttribute("ID"))
             {
                 int id = xmlReader.attributes().value("ID").toInt();
                 
@@ -504,11 +545,6 @@ bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
                 {
                     throw std::runtime_error("Channel serialization was of wrong size in XML after Base64 decoding.");
                 }
-            
-            }
-            else
-            {
-                throw std::runtime_error("Did not find a correct channel element inXML tree");
             }
         }
     }

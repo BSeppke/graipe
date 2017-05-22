@@ -340,14 +340,6 @@ class GRAIPE_CORE_EXPORT Model
         virtual QString typeName() const;
     
         /**
-         * This function returns the automagically generated first header line for model
-         * serialization.
-         *
-         * \return The first Header line, namely: "[Graipe::" + typeName() + "]"
-         */
-        QString magicID() const;
-    
-        /**
          * This function serializes a complete Model to a QString.
          * To do so, it serializes header first, then the content, like this:
          *      serialize_header()
@@ -368,7 +360,7 @@ class GRAIPE_CORE_EXPORT Model
     
         /**
          * This function serializes the header of a model like this:
-         *      magicID()
+         *      typeName()
          *      m_parameters->serialize()
          *
          * \param out the output device.

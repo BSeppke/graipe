@@ -86,16 +86,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \return True, if the loading of the object was successful.
          */
         static bool load(const QString & filename, Serializable * rs_obj, bool compress=true);
-    
-        /**
-         * Reads the content of (maybe compressed) file to a QString.
-         * Mainly needed for views and their serialization.
-         *
-         * \param filename The filename to be read.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         */
-        static QString readToString(const QString & filename, bool compress=true);
-    
+
         /**
          * Basic import procedure of a settings dictionary from a file.
          * A dictionary is defined by means of a mapping from QString keys
@@ -114,7 +105,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param contents The input QString.
          * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
          */
-         static std::map<QString,QString> dictFromString(const QString & contents, QString separator=": ");
+        static std::map<QString,QString> dictFromStream(QXmlStreamReader & xmlReader);
             
         /**
          * Standard exporter for everything, which implements the Serializable interface.

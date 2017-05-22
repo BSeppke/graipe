@@ -242,17 +242,6 @@ QString ParameterGroup::valueText(const QString & filter_types) const
 }
 
 /**
- * The magicID of this parameter class. 
- * Implemented to fullfil the Serializable interface.
- *
- * \return "", since a parameter group does not use any magicIDs.
- */
-QString ParameterGroup::magicID() const
-{
-    return "ParameterGroup";
-}
-
-/**
  * Serialization of the parameter's state to an output device.
  * This serializes each parameter in the group by means of its name and its serialization,
  * one per line, e.g. like:
@@ -266,14 +255,14 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.setAutoFormatting(true);
     
-    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Parameters", QString::number(m_parameters.size()));
     
     for(storage_type::const_iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
     {
         if (iter->second)
-        {            
+        {
             xmlWriter.writeStartElement("Parameter");
             xmlWriter.writeAttribute("ID",iter->first);
                 iter->second->serialize(xmlWriter);
@@ -295,14 +284,11 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {
-            qDebug() << "ParameterGroup::deserialize: readNextStartElement" << xmlReader.name();
-            
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 for(int j=0; j!=2; ++j)
                 {
                     xmlReader.readNextStartElement();
-                    qDebug() << "ParameterGroup::deserialize: readNextStartElement" << xmlReader.name();
                     
                     if(xmlReader.name() == "Name")
                     {
@@ -325,8 +311,6 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
                                 &&  xmlReader.attributes().hasAttribute("ID"))
                             {
                                 QString id = xmlReader.attributes().value("ID").toString();
-                                
-                                qDebug() << QString::number(i) << "ParameterGroup::deserialize: readNextStartElement" << xmlReader.name() << " ID= " << id;
                                
                                 if(!m_parameters[id]->deserialize(xmlReader))
                                 {
@@ -356,7 +340,7 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
                                 return false;
                             }
                             
-                            if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                            if(xmlReader.isEndElement() && xmlReader.name() == typeName())
                             {
                                 break;
                             }
@@ -367,7 +351,7 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
             }
             else
             {
-                throw std::runtime_error("Did not find magicID in XML tree");
+                throw std::runtime_error("Did not find typeName() in XML tree");
             }
         }
         else
@@ -377,7 +361,7 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << "ParameterGroup::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << "ParameterGroup::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
     return true;

@@ -219,15 +219,7 @@ class GRAIPE_CORE_EXPORT Serializable
          *
          * \return "Serializable" as a QString
          */
-        virtual QString typeName() const;
-    
-        /**
-         * Returns the unique magic id of a Serializable instance. 
-         * Has to be specialized in inheriting classes.
-         *
-         * \return The unique magicID.
-         */
-        virtual QString magicID() const = 0;
+        virtual QString typeName() const = 0;
     
         /**
          * Deserialization from an input device.

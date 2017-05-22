@@ -73,7 +73,6 @@ find_package(Qt5Widgets)
 find_package(Qt5Network)
 find_package(Qt5PrintSupport)
 find_package(Qt5Svg)
-find_package(Qt5Xml)
 
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)

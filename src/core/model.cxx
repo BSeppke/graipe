@@ -538,17 +538,6 @@ QString Model::typeName() const
 }
 
 /**
- * This function returns the automagically generated first header line for model
- * serialization.
- *
- * \return The first Header line, namely: "[Graipe::" + typeName() + "]"
- */
-QString Model::magicID() const
-{
-    return  typeName();
-}
-
-/**
  * This function serializes a complete Model to an output device.
  * To do so, it serializes header first, then the content, like this:
  *      serialize_header()
@@ -563,7 +552,7 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormattingIndent(4);
     
     xmlWriter.writeStartDocument();
-        xmlWriter.writeStartElement(magicID());
+        xmlWriter.writeStartElement(typeName());
         xmlWriter.writeAttribute("ID", filename());
             xmlWriter.writeStartElement("Header");
                 serialize_header(xmlWriter);
@@ -589,7 +578,7 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
         {
             qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
             
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 while(xmlReader.readNextStartElement())
                 {
@@ -628,13 +617,13 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find typeName() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
     return  false;
@@ -642,7 +631,7 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
 
 /**
  * This function serializes the header of a model like this:
- *      magicID()
+ *      typeName()
  *      m_parameters->serialize()
  *
  * \param out the output device.

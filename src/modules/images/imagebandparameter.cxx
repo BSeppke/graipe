@@ -313,7 +313,7 @@ void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
 {    
     xmlWriter.setAutoFormatting(true);
     
-    xmlWriter.writeStartElement(magicID());
+    xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Filename", m_image->filename());
     xmlWriter.writeTextElement("BandID", QString::number(m_bandId));
@@ -335,7 +335,7 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
     {
         if (xmlReader.readNextStartElement())
         {            
-            if(xmlReader.name() == magicID())
+            if(xmlReader.name() == typeName())
             {
                 for(int i=0; i!=3; ++i)
                 {
@@ -371,7 +371,7 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
                         return false;
                     }
                     
-                    if(xmlReader.isEndElement() && xmlReader.name() == magicID())
+                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
                     {
                         break;
                     }
@@ -381,13 +381,13 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find magicID in XML tree");
+            throw std::runtime_error("Did not find typeName() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
-        qCritical() << magicID() << "::deserialize failed! Was looking for magicID: " << magicID() << "Error: " << e.what();
+        qCritical() << typeName() << "::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
 }
