@@ -34,6 +34,7 @@
 /************************************************************************/
 
 #include "core/parameters/multimodelparameter.hxx"
+#include "core/globals.hxx"
 
 #include <QtDebug>
 #include <QXmlStreamWriter>
@@ -60,10 +61,10 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<Model*> * allowed_values, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
+MultiModelParameter::MultiModelParameter(const QString& name, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_lstDelegate(new QListWidget),
-    m_allowed_values(*allowed_values),
+    m_allowed_values(models),
 	m_type_filter(type_filter)
 {
     m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -171,11 +172,11 @@ QString MultiModelParameter::toString() const
  */
 void MultiModelParameter::refresh()
 {
-	if(m_modelList != NULL)
+	if(models.size())
 	{
 		m_allowed_values.clear();
 		
-		for(Model* model: *m_modelList)
+		for(Model* model: models)
 		{
 			if( m_type_filter.contains(model->typeName()))
 			{

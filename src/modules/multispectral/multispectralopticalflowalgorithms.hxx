@@ -66,10 +66,10 @@ class OpticalFlowAlgorithm2Bands
          */
         void addImageAndMaskParameters()
         {
-            m_param_image1		= new ModelParameter("Reference Image",	NULL,  "Image");
+            m_param_image1		= new ModelParameter("Reference Image",  "Image");
             m_param_image1Band1	= new IntParameter("Reference Image band 1", 0, 200,0);
             m_param_image1Band2	= new IntParameter("Reference Image band 2", 0, 200,0);
-            m_param_image2		= new ModelParameter("Second Image",	NULL,  "Image");
+            m_param_image2		= new ModelParameter("Second Image", "Image");
             m_param_image2Band1	= new IntParameter("Second Image band 1", 0, 200,0);
             m_param_image2Band2	= new IntParameter("Second Image band 2", 0, 200,0);
             

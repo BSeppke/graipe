@@ -33,33 +33,26 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/module.hxx"
-#include "core/factories.hxx"
-
+#include "core/globals.hxx"
 
 /**
  * @file
- * @brief Implementation file for the Module class
+ * @brief Implementation file for the global vars
  *
  * @addtogroup core
  * @{
  */
 
 namespace graipe {
+    
+//Three global variables for the factories:
+ModelFactory modelFactory;
+ViewControllerFactory viewControllerFactory;
+AlgorithmFactory algorithmFactory;
 
-/**
- * Default constructor of the Module class
- */
-Module::Module()
-{
-}
- 
-/**
- * Default destructor of the Module class
- */
-Module::~Module()
-{
-}
+//And two more holding all currently available Models and ViewControllers:
+std::vector<Model*> models;
+std::vector<ViewController*> viewControllers;
 
 } //end of namespace graipe
 

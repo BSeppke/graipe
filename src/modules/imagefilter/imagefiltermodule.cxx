@@ -112,7 +112,7 @@ class FrostFilter
          */
         FrostFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
@@ -216,7 +216,7 @@ class EnhancedFrostFilter
          */
         EnhancedFrostFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
@@ -324,7 +324,7 @@ class GammaMAPFilter
          */
         GammaMAPFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
@@ -428,7 +428,7 @@ class KuanFilter
          */
         KuanFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
@@ -532,7 +532,7 @@ class LeeFilter
          */
         LeeFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
@@ -639,7 +639,7 @@ class EnhancedLeeFilter
          */
         EnhancedLeeFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
@@ -745,7 +745,7 @@ class MedianFilter
          */
         MedianFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
@@ -846,7 +846,7 @@ class ShockFilter
          */    
         ShockFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("sigma1", new FloatParameter("inner Sigma", 0.0, 100, 0.7f));
             m_parameters->addParameter("sigma2", new FloatParameter("outer Sigma", 0.0, 100, 3));
             m_parameters->addParameter("upwind", new FloatParameter("upwinding factor", 0.0, 10.0, 0.3f));

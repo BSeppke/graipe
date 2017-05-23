@@ -34,6 +34,7 @@
 /************************************************************************/
 
 #include "images/imagebandparameter.hxx"
+#include "core/globals.hxx"
 
 namespace graipe {
 
@@ -276,14 +277,14 @@ QString ImageBandParameter<T>::toString() const
 template <class T>
 void ImageBandParameter<T>::refresh()
 {
-    if(m_modelList && m_cmbImage)
+    if(models.size() && m_cmbImage)
 	{
 		m_allowed_images.clear();
 		m_cmbImage->clear();
 		
         Image<T> temp;
 		
-        for(Model* model : *m_modelList)
+        for(Model* model : models)
 		{
         	if(model->typeName() == temp.typeName())
 			{

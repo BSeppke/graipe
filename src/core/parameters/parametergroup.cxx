@@ -376,7 +376,7 @@ void ParameterGroup::refresh()
 {
     for(storage_type::iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
     {
-        iter->second->setModelList(m_modelList);
+        iter->second->refresh();
     }
 }
 

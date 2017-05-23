@@ -36,8 +36,10 @@
 #include "core/model.hxx"
 #include "core/impex.hxx"
 #include "core/parameters.hxx"
+#include "core/globals.hxx"
 
 #include <cmath>
+#include <algorithm>
 
 #include <QtDebug>
 #include <QXmlStreamWriter>
@@ -83,6 +85,9 @@ Model::Model()
     m_parameters->addParameter("global_lr", m_global_lr);
     
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
+    
+    //Add to global Models list
+    models.push_back(this);
 }
 
 /**
@@ -115,6 +120,9 @@ Model::Model(const Model& model)
     m_parameters->addParameter("global_lr", m_global_lr);
     
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
+    
+    //Add to global Models list
+    models.push_back(this);
 }
 
 /**
@@ -124,6 +132,9 @@ Model::~Model()
 {
     //Delete the parameters
     delete m_parameters;
+    
+    //Remove from global models list
+    models.erase(std::remove(models.begin(), models.end(), this), models.end());
 }
 
 /**
@@ -574,15 +585,16 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
-        {
-            qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
+        //Assume, that the deserialized has already read the start node:
+        //if (xmlReader.readNextStartElement())
+        //{
+        //    qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
             
             if(xmlReader.name() == typeName())
             {
                 while(xmlReader.readNextStartElement())
                 {
-                    qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
+                    //qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
             
                     if(xmlReader.name() == "Header")
                     {
@@ -614,12 +626,15 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
                 }
                 return true;
             }
-        }
-        else
-        {
-            throw std::runtime_error("Did not find typeName() in XML tree");
-        }
-        throw std::runtime_error("Did not find any start element in XML tree");
+            else
+            {
+                throw std::runtime_error("Did not find typeName() in XML tree");
+            }
+        //}
+        //else
+        //{
+        //  throw std::runtime_error("Did not find any start element in XML tree");
+        //}
     }
     catch(std::runtime_error & e)
     {

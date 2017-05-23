@@ -658,7 +658,7 @@ ImageExporter::ImageExporter()
 		format_names.append("JPEG"); format_names.append("netCDF");
 		format_names.append("PNG"); format_names.append("XYZ");
 
-    m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image, IntImage, ByteImage"));
+    m_parameters->addParameter("image", new ModelParameter("Image",	"Image, IntImage, ByteImage"));
     m_parameters->addParameter("filename", new FilenameParameter("Image filename", "", NULL));
     m_parameters->addParameter("format", new EnumParameter("File format", format_names));
 }

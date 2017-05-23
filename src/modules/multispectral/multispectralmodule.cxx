@@ -73,7 +73,7 @@ class MSCannyFeatureDetector
          */
         MSCannyFeatureDetector()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", NULL,"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
             m_parameters->addParameter("sigma", new FloatParameter("Canny Scale", 0,9999999, 0));
             m_parameters->addParameter("T", new FloatParameter("Canny (gradient strength) threshold", 0,9999999, 0));
             m_parameters->addParameter("mode", new EnumParameter("MS gradient mode:", ms_gradient_modes(),0));
@@ -184,7 +184,7 @@ class MSGradientCalculator
          */
         MSGradientCalculator()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", NULL,"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
             m_parameters->addParameter("sigma", new FloatParameter("Gradient Scale", 0,9999999, 0));
         }
     
@@ -297,7 +297,7 @@ class NDVIEstimator
          */
         NDVIEstimator()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", NULL,"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
         }
@@ -395,7 +395,7 @@ class EVIEstimator
          */
         EVIEstimator()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", NULL,"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
             m_parameters->addParameter("blue-id", new IntParameter("Blue band-id", 0,9999999, 0));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
@@ -509,7 +509,7 @@ class EVI2BandsEstimator
          */
         EVI2BandsEstimator()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", NULL,"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
             

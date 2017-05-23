@@ -77,7 +77,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        MultiModelParameter(const QString& name, const std::vector<Model*> * allowed_models, QString type_filter="", std::vector<Model*>* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
+        MultiModelParameter(const QString& name, QString type_filter="", std::vector<Model*>* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * Destructor of the MultiModel class

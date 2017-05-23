@@ -434,28 +434,16 @@ void MainWindow::about()
 void MainWindow::newModel()
 {
     QAction * act = static_cast<QAction *>(sender());
-    
     QString newModel_typeName = act->text();
     
-    std::vector<Model*> similarModels;
-    
-    for(int i=0; i!=m_ui.listModels->count(); i++)
-	{
-		QListWidgetModelItem * model_item = static_cast<QListWidgetModelItem *>(m_ui.listModels->item(i));
-		if (model_item->model()->typeName() == newModel_typeName)
-		{
-			similarModels.push_back( model_item->model());
-		}
-	}
-    
-    for (ModelFactoryItem item : m_model_factory)
+    for (ModelFactoryItem item : modelFactory)
     {
         if(item.model_type == newModel_typeName)
         {
             Model * new_model = item.model_fptr();
             
             //SHOW EDIT DIALOG
-            ModelParameterSelection parameter_selection(this, new_model, &similarModels);
+            ModelParameterSelection parameter_selection(this, new_model);
             parameter_selection.setWindowTitle(QString("Create new ")+ act->text());
             parameter_selection.setModal(true);
 	
@@ -492,7 +480,7 @@ void MainWindow::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = m_algorithm_factory[index];
+    AlgorithmFactoryItem alg_item = algorithmFactory[index];
 	
 	Algorithm* alg = alg_item.algorithm_fptr();
 	alg->setGlobalAlgorithmMutex(&global_algorithm_mutex);
@@ -510,7 +498,7 @@ void MainWindow::runAlgorithm(int index)
 	}
 	
 	//Refresh object stack for all params
-	alg->parameters()->setModelList(alg_object_stack);
+	alg->parameters()->refresh();
     
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);
@@ -718,7 +706,7 @@ void MainWindow::showCurrentModel()
 			
         if(model_item && model_item->model()->isViewable())
         {
-            ViewControllerFactory vc_possibilities =  m_viewController_factory.filterByModelType(model_item->model());
+            ViewControllerFactory vc_possibilities =  viewControllerFactory.filterByModelType(model_item->model());
             int vc_index = -1;
             
             //Select the view/controller
@@ -788,7 +776,7 @@ void MainWindow::saveCurrentModel()
 		
 		if(!filename.isEmpty())
 		{	
-			ModelFactory model_possibilities =  m_model_factory.filterByModelType(model);
+			ModelFactory model_possibilities =  modelFactory.filterByModelType(model);
 			
 			if(model_possibilities.size()==1)
 			{
@@ -1172,65 +1160,40 @@ void MainWindow::restoreWorkspace(const QString& dirname)
  */
 void MainWindow::loadViewController(const QString& filename)
 {
-    bool compress =  (filename.right(2) == "gz");
-    
-    //1. Read the root attributes of the xml node as well as the name of the root
-    std::map<QString,QString> dict = Impex::dictFromFile(filename, compress);
-    
-    //   and temporary store properties
-    QString vc_type = dict["Type"];
-    int vc_zorder = dict["ZOrdner"].toInt();
-    QString model_filename = dict["ModelID"];
-    
-    
-    //2. Find the associated model at the model_list (if it was already loaded)
-    Model* vc_model = NULL;
+    //1. Collect models in vector
+    std::vector<Model*> all_models;
     for(int i=0;  i!=m_ui.listModels->count(); ++i)
     {
         QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(i));
         
-        if(     model_item
-            &&  model_item->model()
-            &&  model_item->model()->filename() == model_filename)
+        if(model_item  &&  model_item->model())
         {
-            vc_model = model_item->model();
-            break;
+            all_models.push_back(model_item->model());
         }
     }
     
-    //  If it was not found: Indicate error
-    if(vc_model == NULL)
-    {
-        throw std::runtime_error("Model was not loaded before ViewController loading.");
-    }
+    ViewController * vc = Impex::loadViewController(filename, m_scene);
     
-    //3. Create a controller using the vc_type and the model found above:
-    ViewController* vc = NULL;
-    for(unsigned int i=0; i<m_viewController_factory.size(); ++i)
+    //  If it was not found: Indicate error
+    if(vc != NULL)
     {
-        if(m_viewController_factory[i].viewController_name==vc_type)
+        if(m_ui.btnWorldView->isChecked())
         {
-            vc = m_viewController_factory[i].viewController_fptr(m_scene, vc_model, vc_zorder);
-            break;
+            vc->setTransform(vc->model()->globalTransformation());
         }
-    }
-    //  If it was not found: Indicate error
-    if(vc == NULL)
-    {
-        throw std::runtime_error("ViewController type was not found in the factory.");
-    }
-    
-    //4. Do the impex::load to restore the parameters
-    if(Impex::load(filename, vc, compress))
-    {
+        else
+        {
+            vc->setTransform(vc->model()->localTransformation());
+            m_scene->setSceneRect(m_scene->itemsBoundingRect());
+        }
         connect(vc, SIGNAL(updateStatusText(QString)), this, SLOT(updateStatusText(QString)));
-        connect(vc, SIGNAL(updateStatusDescription(QString)), this, SLOT(updateStatusDescription(QString)));
-
+        connect(vc, SIGNAL(updateStatusDescription(QString)), this,	SLOT(updateStatusDescription(QString)));
+        
         addViewControllerItemToList(vc);
     }
     else
     {
-        throw std::runtime_error("Deserialization of further ViewController properties failed");
+        throw std::runtime_error("ViewController type could not be loaded.");
     }
 }
     
@@ -1401,37 +1364,20 @@ void MainWindow::addToRecentActionList(const QString &filename)
  * \param filename The filename of the model.
  */
 void MainWindow::loadModel(const QString& filename)
-{	
-	Model* model = NULL;
-	
+{
     if(!QFile(filename).exists())
     {
         throw std::runtime_error("Loading model from " + filename.toStdString() + " failed. File does not exists");
     }
     
-    //Try the import functions of every registered model:
-    for(unsigned int i=0; i<m_model_factory.size(); ++i)
+	Model* model = Impex::loadModel(filename);
+    
+    if(model != NULL)
     {
-        bool compress =  (filename.right(2) == "gz");
-        
-        model = m_model_factory[i].model_fptr();
-        
-        if(model)
-        {
-            if(Impex::load(filename, model, compress))
-            {	
-                addModelItemToList(model);
-                addToRecentActionList(filename);
-                break;
-            }
-            else 
-            {
-                delete model;
-                model = NULL;
-            }
-        }
+        addModelItemToList(model);
+        addToRecentActionList(filename);
     }
-    if (!model)	
+    else
     {
         throw std::runtime_error("Failed to load file '"  + filename.toStdString() + "' although it was found as a file!");
     }
@@ -1460,7 +1406,7 @@ void MainWindow::loadFactories()
         report = loadFactoriesFromDirectory(QDir::current(), added_menus);
     }
     m_status_window->updateStatus(report);
-	
+    
 	connect(m_signalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedAlgorithm(int)));
 	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));	
 }
@@ -1506,7 +1452,7 @@ QString MainWindow::loadFactoriesFromDirectory(const QDir & current_dir, QList<Q
                     for(const ModelFactoryItem& item : model_items)
                     {
                         ss += "      <li>" + item.model_type  + "</li>\n";
-                        m_model_factory.push_back(item);
+                        modelFactory.push_back(item);
                         
                         QAction* newAct = new QAction(item.model_type, this);
                         m_ui.menuCreate->addAction(newAct);
@@ -1530,7 +1476,7 @@ QString MainWindow::loadFactoriesFromDirectory(const QDir & current_dir, QList<Q
                     for(const ViewControllerFactoryItem& item : vc_items)
                     {
                         ss += "      <li>" + item.viewController_name + " <i>(for model: " + item.model_type + ")</i></li>\n";
-                        m_viewController_factory.push_back(item);
+                        viewControllerFactory.push_back(item);
                     }
                     
                     ss += "    </ul>\n";
@@ -1550,7 +1496,7 @@ QString MainWindow::loadFactoriesFromDirectory(const QDir & current_dir, QList<Q
                     for(const AlgorithmFactoryItem& item : alg_items)
                     {
                         ss += "      <li>" + item.algorithm_name + " <i>(for topic: " + item.topic_name  + ")</i></li>\n";
-                        m_algorithm_factory.push_back(item);
+                        algorithmFactory.push_back(item);
                         
                         QAction* newAct = new QAction(item.algorithm_name, this);
                         
@@ -1584,7 +1530,7 @@ QString MainWindow::loadFactoriesFromDirectory(const QDir & current_dir, QList<Q
                         }
                         //connect everything
                         connect(newAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-                        m_signalMapper->setMapping(newAct, (unsigned int)(m_algorithm_factory.size()-1));
+                        m_signalMapper->setMapping(newAct, (unsigned int)(algorithmFactory.size()-1));
                     }
                     ss += "    </ul>\n";
                 }

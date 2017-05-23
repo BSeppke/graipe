@@ -34,6 +34,9 @@
 /************************************************************************/
 
 #include "core/viewcontroller.hxx"
+#include "core/globals.hxx"
+
+#include <algorithm>
 
 #include <QPainter>
 #include <QGraphicsObject>
@@ -102,6 +105,9 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
 	//connect other elements to update slot, too:
 	connect(m_parameters, SIGNAL(valueChanged()), this,	SLOT(updateView()));
 	connect(m_model,      SIGNAL(modelChanged()), this, SLOT(updateView()));
+    
+    //Add to global viewControllers list
+    viewControllers.push_back(this);
 }
 
 /**
@@ -111,6 +117,9 @@ ViewController::~ViewController()
 {
     this->scene()->removeItem(this);
     delete m_parameters;
+    
+    //Remove from global viewControllers list
+    viewControllers.erase(std::remove(viewControllers.begin(), viewControllers.end(), this), viewControllers.end());
 }
 
 /**
@@ -443,18 +452,22 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
-        {
+        //Assume, that the deserialized has already read the start node:
+        //if (xmlReader.readNextStartElement())
+        //{
             if(xmlReader.name() == typeName())
             {
                  return m_parameters->deserialize(xmlReader);
             }
-        }
-        else
-        {
-            throw std::runtime_error("Did not find typeName() in XML tree");
-        }
-        throw std::runtime_error("Did not find any start element in XML tree");
+            else
+            {
+                throw std::runtime_error("Did not find typeName() in XML tree");
+            }
+        //}
+        //else
+        //{
+        //  throw std::runtime_error("Did not find any start element in XML tree");
+        //}
     }
     catch(std::runtime_error & e)
     {

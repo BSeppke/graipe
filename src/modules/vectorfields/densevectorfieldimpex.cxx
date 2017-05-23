@@ -266,7 +266,7 @@ void DenseVectorfieldImporter::run()
  */
 DenseVectorfieldExporter::DenseVectorfieldExporter()
 {
-    m_parameters->addParameter("vectorfield", new ModelParameter("Vectorfield",	NULL,  "DenseVectorfield2D, DenseWeightedVectorfield2D"));
+    m_parameters->addParameter("vectorfield", new ModelParameter("Vectorfield",	"DenseVectorfield2D, DenseWeightedVectorfield2D"));
     m_parameters->addParameter("filename", new FilenameParameter(".flo filename", "", NULL));
 }
 

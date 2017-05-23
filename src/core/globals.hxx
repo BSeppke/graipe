@@ -33,36 +33,36 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/module.hxx"
-#include "core/factories.hxx"
+#ifndef GRAIPE_CORE_GLOBALS_HXX
+#define GRAIPE_CORE_GLOBALS_HXX
 
+#include "core/factories.hxx"
+#include "core/model.hxx"
+#include "core/viewcontroller.hxx"
+
+#include <vector>
 
 /**
  * @file
- * @brief Implementation file for the Module class
- *
+ * @brief This file holds all global data structures
  * @addtogroup core
  * @{
  */
-
+ 
 namespace graipe {
 
-/**
- * Default constructor of the Module class
- */
-Module::Module()
-{
-}
- 
-/**
- * Default destructor of the Module class
- */
-Module::~Module()
-{
-}
+//Three global variables for the factories:
+extern ModelFactory modelFactory;
+extern ViewControllerFactory viewControllerFactory;
+extern AlgorithmFactory algorithmFactory;
 
-} //end of namespace graipe
+//And two more holding all currently available Models and ViewControllers:
+extern std::vector<Model*> models;
+extern std::vector<ViewController*> viewControllers;
+}//end of namespace graipe
 
 /**
  * @}
  */
+
+#endif //GRAIPE_CORE_FACTORIES_HXX

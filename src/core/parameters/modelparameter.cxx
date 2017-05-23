@@ -32,7 +32,9 @@
 /*    OTHER DEALINGS IN THE SOFTWARE.                                   */
 /*                                                                      */
 /************************************************************************/
+
 #include "core/parameters/modelparameter.hxx"
+#include "core/globals.hxx"
 
 #include <QtDebug>
 #include <QXmlStreamWriter>
@@ -59,15 +61,12 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * rs_object_stack, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
+ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_cmbDelegate(NULL),
     m_type_filter(type_filter)
 {
-
-    setModelList(rs_object_stack);
 	refresh();
-    
     setValue(value);
     
 }
@@ -179,11 +178,11 @@ bool ModelParameter::fromString(QString& str)
  */
 void ModelParameter::refresh()
 {
-	if(m_modelList)
+	if(models.size())
 	{
 		m_allowed_values.clear();
 		
-		for(Model * model: *m_modelList)
+		for(Model * model: models)
 		{
             
 			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))

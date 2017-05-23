@@ -241,29 +241,6 @@ bool Parameter::deserialize(QXmlStreamReader& xmlReader)
 }
 
 /**
- * Const access to the model list, which is currently assigned to 
- * this parameter.
- *
- * \return A pointer to the current model list.
- */
-const std::vector<Model*> * Parameter::modelList() const
-{
-	return m_modelList;
-}
-
-/**
- * Writing access to the model list, which may be used to assign a new
- * or update the currently used model list of this parameter.
- *
- * \param new_model_list A pointer to the new model list.
- */
-void Parameter::setModelList(const std::vector<Model*> * new_obj_stack)
-{
-	m_modelList = new_obj_stack;
-	refresh();
-}
-
-/**
  * This method is called after each (re-)assignment of the model list
  * e.g. after a call of the setModelList() function. It may be implemented
  * by means of the subclasses to handle these updates.

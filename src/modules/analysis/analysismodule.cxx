@@ -55,7 +55,7 @@ class MeanVectorfield
          */
         MeanVectorfield()
         {
-            m_parameters->addParameter("vf", new MultiModelParameter("(Dense) Vectorfields",	NULL,  "DenseVectorfield2D"));
+            m_parameters->addParameter("vf", new MultiModelParameter("(Dense) Vectorfields",  "DenseVectorfield2D"));
         }
         
         /**
@@ -164,8 +164,8 @@ class Vectorfield2DDenseModelComparison
          */
         Vectorfield2DDenseModelComparison()
         {
-            m_parameters->addParameter("vf1", new ModelParameter("Derived Vectorfield",	NULL,  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
-            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with",	NULL,  "DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf1", new ModelParameter("Derived Vectorfield",	"SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with", "DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("degree", new IntParameter("Use spline interpolation of degree", 0, 5,1));
         }
 	
@@ -317,8 +317,8 @@ class Vectorfield2DGenericComparison
          */
         Vectorfield2DGenericComparison()
         {
-            m_parameters->addParameter("vf1", new ModelParameter("First Vectorfield",	NULL,  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
-            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with",	NULL,  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf1", new ModelParameter("First Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with",  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("n", new IntParameter("use n nearest neighbors in reference vf", 0, 100));
         }
         
@@ -425,7 +425,7 @@ class Vectorfield2DSeparation
          */
         Vectorfield2DSeparation()
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield",	NULL,  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
         }
         
         /**
@@ -522,7 +522,7 @@ class Vectorfield2DCurl
          */
         Vectorfield2DCurl()
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield",	NULL,  "DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
         
@@ -620,7 +620,7 @@ class Vectorfield2DDiv
          */
         Vectorfield2DDiv()
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield",	NULL,  "DenseVectorfield2D | DenseWeightedVectorfield2D"));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
         

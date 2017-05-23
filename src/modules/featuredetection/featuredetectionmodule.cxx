@@ -369,7 +369,7 @@ class CannyFeatureLengthFilter
          */
         CannyFeatureLengthFilter()
         {
-            m_parameters->addParameter("edgels",     new ModelParameter("Edgel Featurelist (2D)", NULL, "EdgelFeatureList2D"));
+            m_parameters->addParameter("edgels",     new ModelParameter("Edgel Featurelist (2D)", "EdgelFeatureList2D"));
             m_parameters->addParameter("min-length", new FloatParameter("Minimal Edgel length", 0,9999999, 0));
             m_parameters->addParameter("radius",     new FloatParameter("Search radius for Edgel-unions", 0,9999999, 1.5));
         }

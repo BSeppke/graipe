@@ -61,7 +61,7 @@ class AddImages
          */
         AddImages()
         {
-            m_parameters->addParameter("images", new MultiModelParameter("Images",	NULL,  "Image"));
+            m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image"));
         }
     
         /**
@@ -255,7 +255,7 @@ class RecursiveSmoothingFilter : public Algorithm
          */
         RecursiveSmoothingFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
             //m_parameters.push_back( new EnumParameter("Border treatment", border_treatment_modes(), 2));
             
@@ -350,7 +350,7 @@ class GaussianSmoothingFilter : public Algorithm
          */
         GaussianSmoothingFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
         }
         
@@ -447,9 +447,9 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
          */
         NormalizedGaussianSmoothingFilter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band",NULL) );
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band"));
         }
     
         /**
@@ -553,8 +553,8 @@ class ApplyMaskToImage
          */
         ApplyMaskToImage()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band",NULL) );
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band"));
             
         }
     
@@ -1120,7 +1120,7 @@ class ImageCropper
          */
         ImageCropper()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image", "Image"));
             m_parameters->addParameter("ul_x", new IntParameter("Upper Left x", 0,999999, 0));
             m_parameters->addParameter("ul_y", new IntParameter("Upper Left y", 0,999999, 0));
             m_parameters->addParameter("lr_x", new IntParameter("Lower Right x", 0,999999, 1000));
@@ -1241,7 +1241,7 @@ class ImageResizer : public Algorithm
          */
         ImageResizer()
         {
-            m_parameters->addParameter("image",  new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image",  new ModelParameter("Image", "Image"));
             m_parameters->addParameter("width",  new IntParameter("New width", 1,999999, 100));
             m_parameters->addParameter("height", new IntParameter("New height ", 1,999999, 100));
             m_parameters->addParameter("degree", new IntParameter("Spline-Interpolation degree ", 0,5, 1));
@@ -1366,7 +1366,7 @@ class ImageInverter
          */
         ImageInverter()
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image", "Image"));
             m_parameters->addParameter("invert", new BoolParameter("Use maximum band value as inverting offset",true));
             m_parameters->addParameter("invert_offset", new IntParameter("Global inverting offset", 0,999999, 255, (*m_parameters)["invert"]));
             

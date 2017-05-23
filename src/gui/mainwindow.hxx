@@ -415,15 +415,6 @@ private:
 
     //a printer (of the view)
     QPrinter* m_printer;
-    
-    //model/model-controller factory
-    ModelFactory m_model_factory;
-
-    //model/view/controller factory
-    ViewControllerFactory m_viewController_factory;
-
-    //algorithms factory
-    AlgorithmFactory m_algorithm_factory;
 
     //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
     QSignalMapper* m_signalMapper;
@@ -445,7 +436,6 @@ private:
     
     QList<QAction*> m_recentFileActions;
     const int       m_recentFileCount;
-    
 };
 
 } //end of namespace graipe

@@ -229,10 +229,10 @@ class FeatureToFeatureMatcher
          */
         FeatureToFeatureMatcher()
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",	NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
-            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",		NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -395,9 +395,9 @@ class FeatureToImageMatcher
          */
         FeatureToImageMatcher()
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",	NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -556,10 +556,10 @@ class ShapeContextMatcher
          */
         ShapeContextMatcher()
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",	NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
-            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",		NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -703,10 +703,10 @@ class SIFTMatcher
          */
         SIFTMatcher()
         {
-            m_parameters->addParameter("image1", new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("sift1", new ModelParameter("SIFT Features (of reference image)",	NULL,  "SIFTFeatureList2D"));
-            m_parameters->addParameter("image2", new ImageBandParameter<float>("Second Image",	NULL));
-            m_parameters->addParameter("sift2", new ModelParameter("SIFT Features (of second image)",		NULL,  "SIFTFeatureList2D"));
+            m_parameters->addParameter("image1", new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("sift1", new ModelParameter("SIFT Features (of reference image)", "SIFTFeatureList2D"));
+            m_parameters->addParameter("image2", new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("sift2", new ModelParameter("SIFT Features (of second image)", "SIFTFeatureList2D"));
             m_parameters->addParameter("max_sift_d", new FloatParameter("Max. distance of point descriptors", 1, 1000000,1000));
             m_parameters->addParameter("max_d", new FloatParameter("Max. geometrical distance of points", 1, 100000,100));
             m_parameters->addParameter("best_n", new IntParameter("Find N best candidates", 1, 50,10));

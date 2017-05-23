@@ -170,22 +170,6 @@ class GRAIPE_CORE_EXPORT Parameter
          * \return True, if the deserialization was successful, else false.
          */
         bool deserialize(QXmlStreamReader& xmlReader);
-
-        /**
-         * Const access to the model list, which is currently assigned to 
-         * this parameter.
-         *
-         * \return A pointer to the current model list.
-         */
-        const std::vector<Model*> * modelList() const;
-        
-        /**
-         * Writing access to the model list, which may be used to assign a new
-         * or update the currently used model list of this parameter.
-         *
-         * \param new_model_list A pointer to the new model list.
-         */
-        void setModelList(const std::vector<Model*> * new_model_list);
         
         /**
          * This method is called after each (re-)assignment of the model list
@@ -261,9 +245,6 @@ class GRAIPE_CORE_EXPORT Parameter
     
         /** Should the enabled/disabled by parent rule be inverted? **/
         bool m_invert_parent;
-    
-        /** The list of all currently loaded models **/
-        const std::vector<Model*> * m_modelList;
 };
 
 } //end of namespace graipe

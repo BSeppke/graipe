@@ -190,9 +190,9 @@ class GenericRegistration
          */
 		GenericRegistration()
 		{
-			m_parameters->addParameter("image1", new ModelParameter("Image to be warped",	NULL,  "Image"));
-			m_parameters->addParameter("image2", new ModelParameter("Reference Image",	NULL,  "Image"));
-			m_parameters->addParameter("vf", new ModelParameter("Correspondence Map",	NULL,  "SparseVectorfield2D"));
+			m_parameters->addParameter("image1", new ModelParameter("Image to be warped",  "Image"));
+			m_parameters->addParameter("image2", new ModelParameter("Reference Image",  "Image"));
+			m_parameters->addParameter("vf", new ModelParameter("Correspondence Map",  "SparseVectorfield2D"));
 		}
 
         /**
