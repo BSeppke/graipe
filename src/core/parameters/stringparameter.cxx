@@ -62,7 +62,7 @@ StringParameter::StringParameter(const QString& name, const QString& value, unsi
 :   Parameter(name, parent, invert_parent),
     m_value(value),
     m_columns(columns),
-    m_lneDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -71,8 +71,8 @@ StringParameter::StringParameter(const QString& name, const QString& value, unsi
  */
 StringParameter::~StringParameter()
 {
-   if(m_lneDelegate != NULL)
-        delete m_lneDelegate;
+   if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -104,9 +104,9 @@ void StringParameter::setValue(const QString & value)
 {
     m_value = value;
     
-    if(m_lneDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_lneDelegate->setText(value);
+        m_delegate->setText(value);
         Parameter::updateValue();
     }
 }
@@ -155,16 +155,16 @@ bool StringParameter::isValid() const
  */
 QWidget*  StringParameter::delegate()
 {
-    if(m_lneDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_lneDelegate = new QLineEdit;
-        m_lneDelegate->setMinimumWidth(m_columns * m_lneDelegate->fontMetrics().width("X"));
-        m_lneDelegate->setText(value());
+        m_delegate = new QLineEdit;
+        m_delegate->setMinimumWidth(m_columns * m_delegate->fontMetrics().width("X"));
+        m_delegate->setText(value());
         
-        connect(m_lneDelegate, SIGNAL(textChanged(const QString&)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(textChanged(const QString&)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_lneDelegate;
+    return m_delegate;
 }
 
 
@@ -175,9 +175,9 @@ QWidget*  StringParameter::delegate()
 void StringParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_lneDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_lneDelegate->text();
+        m_value = m_delegate->text();
         Parameter::updateValue();
     }
 }

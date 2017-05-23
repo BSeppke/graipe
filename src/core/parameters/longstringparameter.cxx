@@ -65,7 +65,7 @@ LongStringParameter::LongStringParameter(const QString& name, const QString& val
     m_value(value),
     m_columns(columns),
     m_lines(lines),
-    m_txtDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -74,8 +74,8 @@ LongStringParameter::LongStringParameter(const QString& name, const QString& val
  */
 LongStringParameter::~LongStringParameter()
 {
-    if(m_txtDelegate != NULL)
-        delete m_txtDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -107,9 +107,9 @@ void LongStringParameter::setValue(const QString & value)
 {
     m_value = value;
     
-    if(m_txtDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_txtDelegate->setPlainText(value);
+        m_delegate->setPlainText(value);
     }
 }
 
@@ -157,18 +157,18 @@ bool LongStringParameter::isValid() const
  */
 QWidget*  LongStringParameter::delegate()
 {
-    if(m_txtDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_txtDelegate = new QPlainTextEdit;
+        m_delegate = new QPlainTextEdit;
     
-        m_txtDelegate->setMinimumWidth(m_columns * m_txtDelegate->fontMetrics().width("X"));
-        m_txtDelegate->setMinimumHeight(m_lines * m_txtDelegate->fontMetrics().lineSpacing());
-        m_txtDelegate->setPlainText(m_value);
+        m_delegate->setMinimumWidth(m_columns * m_delegate->fontMetrics().width("X"));
+        m_delegate->setMinimumHeight(m_lines * m_delegate->fontMetrics().lineSpacing());
+        m_delegate->setPlainText(m_value);
     
-        connect(m_txtDelegate, SIGNAL(textChanged()), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(textChanged()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_txtDelegate;
+    return m_delegate;
 }
 
 /**
@@ -178,9 +178,9 @@ QWidget*  LongStringParameter::delegate()
 void LongStringParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_txtDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_txtDelegate->toPlainText();
+        m_value = m_delegate->toPlainText();
         Parameter::updateValue();
     }
 }

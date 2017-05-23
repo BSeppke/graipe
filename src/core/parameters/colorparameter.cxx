@@ -62,11 +62,8 @@ namespace graipe {
 ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_value(value),
-    m_delegate(new QPushButton(""))
+    m_delegate(NULL)
 {
-    setValue(value);
-    
-    initConnections();
 }
 
 /**
@@ -105,12 +102,17 @@ const QColor& ColorParameter::value() const
  */
 void ColorParameter::setValue(const QColor& value)
 {
-    QPixmap p(32, 32);
-    p.fill(value);
-    m_delegate->setIcon(QIcon(p));
-    
     m_value = value;
-    Parameter::updateValue();
+    
+    if(m_delegate!=NULL)
+    {
+        QPixmap p(32, 32);
+        p.fill(value);
+        m_delegate->setIcon(QIcon(p));
+        m_delegate->setText(toString());
+    
+        Parameter::updateValue();
+    }
 }
 
 /**
@@ -230,7 +232,7 @@ QWidget*  ColorParameter::delegate()
 {
     if (m_delegate == NULL)
     {
-        m_delegate = new QPushButton("");
+        m_delegate = new QPushButton(toString());
         
         QPixmap p(32, 32);
         p.fill(value());
@@ -250,11 +252,15 @@ QWidget*  ColorParameter::delegate()
  */
 void ColorParameter::updateValue()
 {
-    QColor col = QColorDialog::getColor(m_value, m_delegate, name());
-        
-    if(col.isValid())
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_delegate != NULL)
     {
-       setValue(col);
+        QColor col = QColorDialog::getColor(m_value, m_delegate, name());
+        
+        if(col.isValid())
+        {
+            setValue(col);
+        }
     }
 }
 

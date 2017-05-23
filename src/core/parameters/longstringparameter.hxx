@@ -158,7 +158,7 @@ class GRAIPE_CORE_EXPORT LongStringParameter
         unsigned int m_lines;
     
         /** The text editing delegate **/
-        QPointer<QPlainTextEdit> m_txtDelegate;
+        QPointer<QPlainTextEdit> m_delegate;
     
 };
 

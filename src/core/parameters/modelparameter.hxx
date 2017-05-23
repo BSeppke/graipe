@@ -177,7 +177,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
         int m_model_idx;
     
         /** The model's delegate widget **/
-        QPointer<QComboBox> m_cmbDelegate;
+        QPointer<QComboBox> m_delegate;
     
         /** The allowed model pointers **/
         std::vector<Model*>	m_allowed_values;

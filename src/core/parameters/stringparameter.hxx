@@ -155,7 +155,7 @@ class GRAIPE_CORE_EXPORT StringParameter
         unsigned int m_columns;
     
         /** The delegate widget **/
-        QPointer<QLineEdit> m_lneDelegate;
+        QPointer<QLineEdit> m_delegate;
 };
 
 } //end of namespace graipe

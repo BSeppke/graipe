@@ -148,7 +148,7 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
         QDateTime m_value;
     
         /** The delegate widget **/
-        QPointer<QDateTimeEdit> m_dteDelegate;
+        QPointer<QDateTimeEdit> m_delegate;
 };
 
 } //end of namespace graipe

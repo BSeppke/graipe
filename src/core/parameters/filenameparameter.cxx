@@ -194,8 +194,7 @@ void FilenameParameter::updateValue()
     
         if(file.size())
         {
-            m_value = file;
-            Parameter::updateValue();
+            setValue(file);
         }
     }
 }

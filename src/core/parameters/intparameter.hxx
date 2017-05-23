@@ -188,7 +188,7 @@ class GRAIPE_CORE_EXPORT IntParameter
         int m_min_value, m_max_value;
     
         /** The delegate widget **/
-        QPointer<QSpinBox> m_spbDelegate;
+        QPointer<QSpinBox> m_delegate;
 };
 
 } //end of namespace graipe

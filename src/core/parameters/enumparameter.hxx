@@ -160,7 +160,7 @@ class GRAIPE_CORE_EXPORT EnumParameter
         int m_value;
     
         /** The delegate widget **/
-        QPointer<QComboBox> m_cmbDelegate;
+        QPointer<QComboBox> m_delegate;
     
 };
 

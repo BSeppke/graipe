@@ -63,7 +63,7 @@ EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names
 :	Parameter(name, parent, invert_parent),
     m_enum_names(enum_names),
     m_value(value),
-    m_cmbDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -72,8 +72,8 @@ EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names
  */
 EnumParameter::~EnumParameter()
 {
-    if(m_cmbDelegate != NULL)
-        delete m_cmbDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -93,7 +93,7 @@ QString  EnumParameter::typeName() const
  */
 int EnumParameter::value() const
 {
-	return m_value;// m_cmbDelegate->currentIndex();
+	return m_value;// m_delegate->currentIndex();
 }
     
 /**
@@ -105,9 +105,9 @@ void EnumParameter::setValue(int value)
 {
     m_value = value;
     
-    if(m_cmbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-    	m_cmbDelegate->setCurrentIndex(value);
+    	m_delegate->setCurrentIndex(value);
         Parameter::updateValue();
     }
 }
@@ -206,19 +206,19 @@ bool EnumParameter::isValid() const
  */
 QWidget*  EnumParameter::delegate()
 {
-    if(m_cmbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_cmbDelegate = new QComboBox;
+        m_delegate = new QComboBox;
         for(int v=0; v<m_enum_names.size(); ++v)
         {
-            m_cmbDelegate->addItem(m_enum_names[v]);
+            m_delegate->addItem(m_enum_names[v]);
         }
-        m_cmbDelegate->setCurrentIndex(m_value);
+        m_delegate->setCurrentIndex(m_value);
     
-        connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_cmbDelegate;
+    return m_delegate;
 }
 
 /**
@@ -228,9 +228,9 @@ QWidget*  EnumParameter::delegate()
 void EnumParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_cmbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_cmbDelegate->currentIndex();
+        m_value = m_delegate->currentIndex();
         Parameter::updateValue();
     }
 }

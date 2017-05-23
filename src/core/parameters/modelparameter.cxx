@@ -63,7 +63,7 @@ namespace graipe {
  */
 ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_cmbDelegate(NULL),
+    m_delegate(NULL),
     m_type_filter(type_filter)
 {
 	refresh();
@@ -76,8 +76,8 @@ ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* 
  */
 ModelParameter::~ModelParameter()
 {
-    if(m_cmbDelegate != NULL)
-        delete m_cmbDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -126,9 +126,9 @@ void ModelParameter::setValue(Model* value)
         }
     }
     
-    if (found && m_cmbDelegate != NULL)
+    if (found && m_delegate != NULL)
     {
-        m_cmbDelegate->setCurrentIndex(m_model_idx);
+        m_delegate->setCurrentIndex(m_model_idx);
         Parameter::updateValue();
     }
     
@@ -192,16 +192,16 @@ void ModelParameter::refresh()
 		}
 	}
     
-    if(m_cmbDelegate)
+    if(m_delegate)
 	{
-		m_cmbDelegate->clear();
+		m_delegate->clear();
 		
         int i=0;
         
 		for(Model * model: m_allowed_values)
 		{
-			m_cmbDelegate->addItem(model->shortName());
-            m_cmbDelegate->setItemData(i++, model->description(), Qt::ToolTipRole);
+			m_delegate->addItem(model->shortName());
+            m_delegate->setItemData(i++, model->description(), Qt::ToolTipRole);
 		}
     }
     if(m_allowed_values.size() != 0)
@@ -261,17 +261,17 @@ bool ModelParameter::isValid() const
  */
 QWidget*  ModelParameter::delegate()
 {
-    if(m_cmbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_cmbDelegate = new QComboBox;
-        m_cmbDelegate->update();
+        m_delegate = new QComboBox;
+        m_delegate->update();
         refresh();
     
-        connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     
-    return m_cmbDelegate;
+    return m_delegate;
 }
 
 /**
@@ -281,9 +281,9 @@ QWidget*  ModelParameter::delegate()
 void ModelParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_cmbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_model_idx = m_cmbDelegate->currentIndex();
+        m_model_idx = m_delegate->currentIndex();
         Parameter::updateValue();
     }
 }

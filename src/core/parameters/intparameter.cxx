@@ -64,7 +64,7 @@ IntParameter::IntParameter(const QString& name, int low, int upp, int value, Par
     m_value(value),
     m_min_value(low),
     m_max_value(upp),
-    m_spbDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -73,8 +73,8 @@ IntParameter::IntParameter(const QString& name, int low, int upp, int value, Par
  */
 IntParameter::~IntParameter()
 {
-    if(m_spbDelegate != NULL)
-        delete m_spbDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -106,8 +106,8 @@ void IntParameter::setLowerBound(int value)
 {
     m_min_value = value;
 
-    if(m_spbDelegate != NULL)
-        m_spbDelegate->setMinimum(value);
+    if(m_delegate != NULL)
+        m_delegate->setMinimum(value);
 }
 
 /**
@@ -129,8 +129,8 @@ void IntParameter::setUpperBound(int value)
 {
     m_max_value = value;
 
-    if(m_spbDelegate != NULL)
-        m_spbDelegate->setMaximum(value);
+    if(m_delegate != NULL)
+        m_delegate->setMaximum(value);
 }
 
 /**
@@ -164,8 +164,8 @@ void IntParameter::setValue(int value)
 {
     m_value = value;
     
-    if(m_spbDelegate != NULL)
-        m_spbDelegate->setValue(value);
+    if(m_delegate != NULL)
+        m_delegate->setValue(value);
 }
 
 /**
@@ -223,17 +223,17 @@ bool IntParameter::isValid() const
  */
 QWidget*  IntParameter::delegate()
 {
-    if(m_spbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_spbDelegate = new QSpinBox;
+        m_delegate = new QSpinBox;
    
-        m_spbDelegate->setRange(lowerBound(), upperBound());
-        m_spbDelegate->setValue(value());
+        m_delegate->setRange(lowerBound(), upperBound());
+        m_delegate->setValue(value());
         
-        connect(m_spbDelegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(valueChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_spbDelegate;
+    return m_delegate;
 }
 
 /**
@@ -243,9 +243,9 @@ QWidget*  IntParameter::delegate()
 void IntParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_spbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_spbDelegate->value();
+        m_value = m_delegate->value();
         Parameter::updateValue();
     }
 }

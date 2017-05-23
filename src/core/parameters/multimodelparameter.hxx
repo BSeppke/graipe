@@ -189,7 +189,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
         std::vector<int> m_model_idxs;
     
         /** The delegate list widget **/
-        QPointer<QListWidget> m_lstDelegate;
+        QPointer<QListWidget> m_delegate;
     
         /** A vector of all allowed models (listed) **/
         std::vector<Model*>	m_allowed_values;

@@ -64,7 +64,7 @@ DoubleParameter::DoubleParameter(const QString& name, double low, double upp, do
     m_value(value),
     m_min_value(low),
     m_max_value(upp),
-    m_dsbDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -73,8 +73,8 @@ DoubleParameter::DoubleParameter(const QString& name, double low, double upp, do
  */
 DoubleParameter::~DoubleParameter()
 {
-    if(m_dsbDelegate == NULL)
-        delete m_dsbDelegate;
+    if(m_delegate == NULL)
+        delete m_delegate;
 }
 
 /**
@@ -94,7 +94,7 @@ QString  DoubleParameter::typeName() const
  */
 double DoubleParameter::lowerBound() const
 {
-    return m_min_value;//m_dsbDelegate->minimum();
+    return m_min_value;//m_delegate->minimum();
 }
 
 /**
@@ -106,8 +106,8 @@ void DoubleParameter::setLowerBound(double value)
 {
     m_min_value = value;
     
-    if(m_dsbDelegate != NULL)
-        m_dsbDelegate->setMinimum(value);
+    if(m_delegate != NULL)
+        m_delegate->setMinimum(value);
 }
 
 /**
@@ -117,7 +117,7 @@ void DoubleParameter::setLowerBound(double value)
  */
 double DoubleParameter::upperBound() const
 {
-    return m_max_value;//m_dsbDelegate->maximum();
+    return m_max_value;//m_delegate->maximum();
 }
 
 /**
@@ -129,8 +129,8 @@ void DoubleParameter::setUpperBound(double value)
 {
     m_max_value = value;
     
-    if(m_dsbDelegate != NULL)
-        m_dsbDelegate->setMaximum(value);
+    if(m_delegate != NULL)
+        m_delegate->setMaximum(value);
 }
 
 /**
@@ -152,7 +152,7 @@ void DoubleParameter::setRange(double min_value, double max_value)
  */
 double DoubleParameter::value() const
 {
-    return m_value;//m_dsbDelegate->value();
+    return m_value;//m_delegate->value();
 }
 
 /**
@@ -164,9 +164,9 @@ void DoubleParameter::setValue(double value)
 {
     m_value = value;
     
-    if(m_dsbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_dsbDelegate->setValue(value);
+        m_delegate->setValue(value);
         Parameter::updateValue();
     }
 }
@@ -226,18 +226,18 @@ bool DoubleParameter::isValid() const
  */
 QWidget*  DoubleParameter::delegate()
 {
-    if(m_dsbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_dsbDelegate = new QDoubleSpinBox;
+        m_delegate = new QDoubleSpinBox;
     
-        m_dsbDelegate->setDecimals(3);
-        m_dsbDelegate->setRange(lowerBound(),upperBound());
-        m_dsbDelegate->setValue(value());
+        m_delegate->setDecimals(3);
+        m_delegate->setRange(lowerBound(),upperBound());
+        m_delegate->setValue(value());
         
-        connect(m_dsbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_dsbDelegate;
+    return m_delegate;
 }
 
 /**
@@ -247,9 +247,9 @@ QWidget*  DoubleParameter::delegate()
 void DoubleParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_dsbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_dsbDelegate->value();
+        m_value = m_delegate->value();
         Parameter::updateValue();
     }
 }

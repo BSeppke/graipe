@@ -60,7 +60,7 @@ namespace graipe {
 DateTimeParameter::DateTimeParameter(const QString& name, QDateTime value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_value(value),
-    m_dteDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -69,8 +69,8 @@ DateTimeParameter::DateTimeParameter(const QString& name, QDateTime value, Param
  */
 DateTimeParameter::~DateTimeParameter()
 {
-    if(m_dteDelegate != NULL)
-        delete m_dteDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -102,8 +102,8 @@ void DateTimeParameter::setValue(const QDateTime& value)
 {
     m_value = value;
     
-    if (m_dteDelegate != NULL)
-        m_dteDelegate->setDateTime(value);
+    if (m_delegate != NULL)
+        m_delegate->setDateTime(value);
     
     Parameter::updateValue();
 }
@@ -163,18 +163,18 @@ bool DateTimeParameter::isValid() const
  */
 QWidget*  DateTimeParameter::delegate()
 {
-    if(m_dteDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_dteDelegate = new QDateTimeEdit;
+        m_delegate = new QDateTimeEdit;
         
-        m_dteDelegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
-        m_dteDelegate->setDateTime(value());
+        m_delegate->setDisplayFormat("dd.MM.yyyy hh:mm:ss");
+        m_delegate->setDateTime(value());
         
-        connect(m_dteDelegate, SIGNAL(dateTimeChanged(const QDateTime &)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(dateTimeChanged(const QDateTime &)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     
-    return m_dteDelegate;
+    return m_delegate;
 }
 
 /**
@@ -184,9 +184,9 @@ QWidget*  DateTimeParameter::delegate()
 void DateTimeParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_dteDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_dteDelegate->dateTime();
+        m_value = m_delegate->dateTime();
         Parameter::updateValue();
     }
 }

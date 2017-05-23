@@ -63,14 +63,14 @@ namespace graipe {
  */
 MultiModelParameter::MultiModelParameter(const QString& name, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_lstDelegate(new QListWidget),
+    m_delegate(new QListWidget),
     m_allowed_values(models),
 	m_type_filter(type_filter)
 {
-    m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
+    m_delegate->setSelectionMode(QAbstractItemView::MultiSelection);
     refresh();
     
-    connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
+    connect(m_delegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
     Parameter::initConnections();
 }
 
@@ -79,8 +79,8 @@ MultiModelParameter::MultiModelParameter(const QString& name, QString type_filte
  */
 MultiModelParameter::~MultiModelParameter()
 {
-    if(m_lstDelegate != NULL)
-        delete m_lstDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -134,13 +134,13 @@ void MultiModelParameter::setValue(const std::vector<Model*>& value)
             }
         }
         m_model_idxs.push_back(i);
-        if(m_lstDelegate != NULL)
+        if(m_delegate != NULL)
         {
-            m_lstDelegate->item(i)->setSelected(found);
+            m_delegate->item(i)->setSelected(found);
         }
         i++;
     }
-    if(m_lstDelegate != NULL)
+    if(m_delegate != NULL)
     {
         Parameter::updateValue();
     }
@@ -185,14 +185,14 @@ void MultiModelParameter::refresh()
 		}
 	}
     
-	if(m_lstDelegate != NULL)
+	if(m_delegate != NULL)
 	{
-		m_lstDelegate->clear();
+		m_delegate->clear();
 		
 		for(Model* model: m_allowed_values)
 		{
-			m_lstDelegate->addItem(model->shortName());
-            m_lstDelegate->item(m_lstDelegate->count()-1)->setToolTip(model->description());
+			m_delegate->addItem(model->shortName());
+            m_delegate->item(m_delegate->count()-1)->setToolTip(model->description());
 		}
 	}
 }
@@ -253,7 +253,7 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
                         {
                            if (filename == allowed_model->filename())
                            {
-                                m_lstDelegate->item(i)->setSelected(true);
+                                m_delegate->item(i)->setSelected(true);
                                 break;
                             }
                             ++i;
@@ -339,18 +339,18 @@ bool MultiModelParameter::isValid() const
  */
 QWidget*  MultiModelParameter::delegate()
 {
-    if(m_lstDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_lstDelegate = new QListWidget;
+        m_delegate = new QListWidget;
         
-        m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
+        m_delegate->setSelectionMode(QAbstractItemView::MultiSelection);
         refresh();
     
-        connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
     
-    return m_lstDelegate;
+    return m_delegate;
 }
 
 /**
@@ -360,13 +360,13 @@ QWidget*  MultiModelParameter::delegate()
 void MultiModelParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_lstDelegate != NULL)
+    if(m_delegate != NULL)
     {
         m_model_idxs.clear();
         
-        for(int i=0; i<m_lstDelegate->count(); ++i)
+        for(int i=0; i<m_delegate->count(); ++i)
         {
-            if(m_lstDelegate->item(i)->isSelected())
+            if(m_delegate->item(i)->isSelected())
             {
                 m_model_idxs.push_back(i);
             }
