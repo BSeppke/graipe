@@ -56,7 +56,6 @@ ImageSingleBandViewController<T>::ImageSingleBandViewController(QGraphicsScene* 
     m_maxValue(new FloatParameter("Max. value:",-1e20f, 1e20f, 255)),
     m_transparentAboveMax(new BoolParameter("Transp. (> max):", false)),
     m_colorTable(new ColorTableParameter("Color:",colorTables()[2])),
-    m_scalingFunction(NULL),
     m_bandId(new IntParameter("Show band:",0,img->numBands()-1,0)),
     m_showIntensityLegend(new BoolParameter("Show intensity legend:", false)),
     m_legendCaption(new StringParameter("Legend Caption", "intensity", 20, m_showIntensityLegend)),
@@ -64,18 +63,11 @@ ImageSingleBandViewController<T>::ImageSingleBandViewController(QGraphicsScene* 
     m_legendDigits(new IntParameter("Legend digits", 0, 10, 2, m_showIntensityLegend)),
     m_img(img)
 {
-    QStringList scalingFunctions;
-		scalingFunctions.append("linear");
-		scalingFunctions.append("10x log.");
-		scalingFunctions.append("square root");
-    m_scalingFunction = new EnumParameter("Scaling function:", scalingFunctions,0);
-    
     m_parameters->addParameter("minValue", m_minValue);
     m_parameters->addParameter("transMinColor", m_transparentBelowMin);
     m_parameters->addParameter("maxValue", m_maxValue);
     m_parameters->addParameter("transMaxColor", m_transparentAboveMax);
     m_parameters->addParameter("colorTable", m_colorTable);
-    m_parameters->addParameter("scaling", m_scalingFunction);
     
 	this->setZValue(z_order);
 	   
@@ -162,8 +154,6 @@ void ImageSingleBandViewController<T>::updateView()
     if(!m_img->isViewable())
         return;
     
-    m_minValue->setRange(floor(m_stats->intensityStats()[m_bandId->value()].min), ceil(m_stats->intensityStats()[m_bandId->value()].max));
-    m_maxValue->setRange(floor(m_stats->intensityStats()[m_bandId->value()].min), ceil(m_stats->intensityStats()[m_bandId->value()].max));
     
     m_ct = m_colorTable->value();
     
@@ -181,23 +171,16 @@ void ImageSingleBandViewController<T>::updateView()
     int w = m_img->width();
     int h = m_img->height();
     
-    //Function, which we need to rescale:
-    std::function<float (float)> func = [](float x){return x;};
+    float new_min = m_stats->intensityStats()[m_bandId->value()].min;
+    float new_max = m_stats->intensityStats()[m_bandId->value()].max;
     
-    switch(m_scalingFunction->value())
-    {
-         case 1:
-            func   = [](float x){return 10*log(std::max(x, 1e-10f));};
-            break;
-         case 2:
-            func   = [](float x){return sqrt(x);};
-            break;
-    }
+    m_minValue->setRange(floor(new_min), ceil(new_max));
+    m_maxValue->setRange(floor(new_min), ceil(new_max));
     
     
     //Underly colorful gradient of velocity to legend
     m_intensity_legend->setColorTable(m_colorTable->value());
-    m_intensity_legend->setValueRange(func(m_minValue->value()), func(m_maxValue->value()));
+    m_intensity_legend->setValueRange(m_minValue->value(), m_maxValue->value());
     m_intensity_legend->setCaption(m_legendCaption->value());
     m_intensity_legend->setTicks(m_legendTicks->value());
     m_intensity_legend->setDigits(m_legendDigits->value());
@@ -205,13 +188,12 @@ void ImageSingleBandViewController<T>::updateView()
     m_intensity_legend->setVisible(m_showIntensityLegend->value());
     
     
-    float offset = -func(m_minValue->value()),
-          scale  = (func(m_minValue->value()) == func(m_maxValue->value())) ? 1.0 : 255.0 / (func(m_maxValue->value()) - func(m_minValue->value()));
+    float offset = -m_minValue->value(),
+          scale  = m_minValue->value() == m_maxValue->value() ? 1.0 : 255.0 / (m_maxValue->value() - m_minValue->value());
     
     //Generate final conversion function
-    func   = [offset, scale](float x){return scale*(x+offset);};
+    std::function<unsigned char (float)> func = [offset, scale](float x){return std::max(std::min(scale*(x+offset), 255.0f),0.0f);};
     
-    float val;
     m_image = QImage(w,h,QImage::Format_Indexed8);
     
     for (int y = 0; y < h; y++)
@@ -219,8 +201,7 @@ void ImageSingleBandViewController<T>::updateView()
         unsigned char * p = (unsigned char*) m_image.scanLine(y);
         for (int x = 0; x < w; x++)
         {
-            val = std::max(std::min(func(band(x,y)),255.0f),0.0f);
-            *p = (unsigned char) val;
+            *p = (unsigned char) func(band(x,y));
             p++;
         }
     }
@@ -253,29 +234,13 @@ void ImageSingleBandViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent *
         QRgb col = m_image.pixel(x,y);
         float val = m_img->band(m_bandId->value())(x,y);
         
-        //Function, which we need to rescale:
-        std::function<float (float)> func = [](float x){return x;};
-    
-        switch(m_scalingFunction->value())
-        {
-            case 1:
-                func   = [](float x){return 10*log(std::max(x, 1e-10f));};
-                break;
-            case 2:
-                func   = [](float x){return sqrt(x);};
-                break;
-        }
-        
-        float converted_val = func(val);
-        
         emit updateStatusText(m_img->shortName() + QString("[%1,%2] = %3").arg(x).arg(y).arg(val));
         emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                      +	m_img->shortName()
                                      +	QString("</i><br/> at position [%1,%2]").arg(x).arg(y)
                                      +	QString("<br/> <b>Data value: %1</b>").arg(val)
-                                     +	QString("<br/> <b>Converted value: %1</b>").arg(converted_val)
                                      +	QString("<br/> <b>Displayed color value: (%1,%2,%3)</b>").arg(qRed(col)).arg(qGreen(col)).arg(qBlue(col))
-                                     +	QString("<br/> <b>transparency: %1%</b>").arg((255-qAlpha(col))/2.55));
+                                     +	QString("<br/> <b>Transparency: %1%</b>").arg((255-qAlpha(col))/2.55));
     }
 }
 
@@ -298,23 +263,15 @@ ImageRGBViewController<T>::ImageRGBViewController(QGraphicsScene* scene, Image<T
     m_transparentBelowMin(new BoolParameter("Transp. (< min):", false)),
     m_maxValue(new FloatParameter("Max. value:", -1e20f, 1e20f, 255)),
     m_transparentAboveMax(new BoolParameter("Transp. (> max):", false)),
-    m_scalingFunction(NULL),
     m_redBandId(new IntParameter("Red band:",0,img->numBands()-1,0)),
     m_greenBandId(new IntParameter("Green band:",0,img->numBands()-1,(img->numBands()-1)/2)),
     m_blueBandId(new IntParameter("Blue band:",0,img->numBands()-1,img->numBands()-1)),
     m_img(img)
 {
-    QStringList scalingFunctions;
-		scalingFunctions.append("linear");
-		scalingFunctions.append("10x log.");
-		scalingFunctions.append("square root");
-    m_scalingFunction = new EnumParameter("Scaling function:", scalingFunctions,0);
-    
     m_parameters->addParameter("minValue", m_minValue);
     m_parameters->addParameter("transMinColor", m_transparentBelowMin);
     m_parameters->addParameter("maxValue", m_maxValue);
     m_parameters->addParameter("transMaxColor", m_transparentAboveMax);
-    m_parameters->addParameter("scaling", m_scalingFunction);
     
 	this->setZValue(z_order);
     
@@ -392,24 +349,11 @@ void ImageRGBViewController<T>::updateView()
     int w = m_img->width();
     int h = m_img->height();
     
-    //Function, which we need to rescale:
-    std::function<float (float)> func = [](float x){return x;};
-    
-    switch(m_scalingFunction->value())
-    {
-         case 1:
-            func   = [](float x){return 10*log(std::max(x, 1e-10f));};
-            break;
-         case 2:
-            func   = [](float x){return sqrt(x);};
-            break;
-    }
-    
-    float offset = -func(m_minValue->value()),
-          scale  = (func(m_minValue->value()) == func(m_maxValue->value())) ? 1.0 : 255.0 / (func(m_maxValue->value()) - func(m_minValue->value()));
+    float offset = -m_minValue->value(),
+          scale  = (m_minValue->value() == m_maxValue->value()) ? 1.0 : 255.0 / (m_maxValue->value() - m_minValue->value());
     
     //Generate final conversion function
-    func   = [offset, scale](float x){return scale*(x+offset);};
+    std::function<float (float)> func   = [offset, scale](float x){return scale*(x+offset);};
     
     float r_val, g_val, b_val;
     m_image = QImage(w,h,QImage::Format_ARGB32);
@@ -420,7 +364,6 @@ void ImageRGBViewController<T>::updateView()
         
         for (int x = 0; x < w; x++)
         {
-        
             r_val = func(r(x,y));
             g_val = func(g(x,y));
             b_val = func(b(x,y));
@@ -463,30 +406,12 @@ void ImageRGBViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
         float val_red = m_img->band(m_redBandId->value())(x,y);
         float val_green = m_img->band(m_greenBandId->value())(x,y);
         float val_blue = m_img->band(m_blueBandId->value())(x,y);
-    
-        //Function, which we need to rescale:
-        std::function<float (float)> func = [](float x){return x;};
-    
-        switch(m_scalingFunction->value())
-        {
-            case 1:
-                func   = [](float x){return 10*log(std::max(x, 1e-10f));};
-                break;
-            case 2:
-                func   = [](float x){return sqrt(x);};
-                break;
-        }
-    
-        float converted_val_red = func(val_red);
-        float converted_val_green = func(val_green);
-        float converted_val_blue = func(val_blue);
         
         emit updateStatusText(m_img->shortName() + QString("[%1,%2] = (R: %3, G: %4, B: %5)").arg(x).arg(y).arg(val_red).arg(val_green).arg(val_blue));
         emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                      +	m_img->shortName()
                                      +	QString("</i><br/> at position [%1,%2]").arg(x).arg(y)
                                      +	QString("<br/> <b>Data value: (B%3: %4, B%5: %6, B%7: %8)</b>").arg(m_redBandId->value()).arg(val_red).arg(m_greenBandId->value()).arg(val_green).arg(m_blueBandId->value()).arg(val_blue)
-                                     +	QString("<br/> <b>Converted data value: (B%3: %4, B%5: %6, B%7: %8)</b>").arg(m_redBandId->value()).arg(converted_val_red).arg(m_greenBandId->value()).arg(converted_val_green).arg(m_blueBandId->value()).arg(converted_val_blue)
                                      +	QString("<br/> <b>Displayed color value: (%1,%2,%3)</b>").arg(qRed(col)).arg(qGreen(col)).arg(qBlue(col))
                                      +	QString("<br/> <b>transparency: %1%</b>").arg((255-qAlpha(col))/2.55));
     }

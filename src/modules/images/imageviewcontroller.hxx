@@ -111,7 +111,6 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
         FloatParameter*  m_maxValue;
         BoolParameter*   m_transparentAboveMax;
         ColorTableParameter*  m_colorTable;
-        EnumParameter*   m_scalingFunction;
         IntParameter*    m_bandId;
         BoolParameter*   m_showIntensityLegend;
         StringParameter* m_legendCaption;
@@ -194,7 +193,6 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
         BoolParameter*  m_transparentBelowMin;
         FloatParameter* m_maxValue;
         BoolParameter*  m_transparentAboveMax;
-        EnumParameter*  m_scalingFunction;
         IntParameter*   m_redBandId;
         IntParameter*   m_greenBandId;
         IntParameter*   m_blueBandId;
