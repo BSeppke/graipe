@@ -159,10 +159,13 @@ bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
             {
                 for(int i=0; i!=2; ++i)
                 {
+                    xmlReader.readNextStartElement();
+                    
                     if(xmlReader.name() == "Name")
                     {
                         setName(xmlReader.readElementText());
                     }
+                    
                     if(    xmlReader.name() == "Transform"
                         && xmlReader.attributes().hasAttribute("Type")
                         && xmlReader.attributes().value("Type") == "Affine")
@@ -191,18 +194,22 @@ bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
                     }
                 }
             }
+            else
+            {
+                throw std::runtime_error("Did not find typeName() in XML tree");
+            }
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find any start element in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {
         qCritical() << "TransformParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
+    return false;
 }
 
 /**

@@ -120,6 +120,7 @@ public:
     void close();
     void flush();
     qint64 bytesAvailable() const;
+    qint64 pos() const; //0 on the beginning, else: 1
     
 protected:
     qint64 readData(char * data, qint64 maxSize);

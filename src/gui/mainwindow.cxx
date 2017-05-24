@@ -214,7 +214,7 @@ MainWindow::~MainWindow()
                               QMessageBox::Yes)
             == QMessageBox::Yes)
     {
-        saveWorkspace(m_settings_dir + "workspace");
+        saveWorkspace(m_settings_dir + "workspace.xgz");
     }
     delete m_lblMemoryUsage;
     delete m_view;
@@ -741,18 +741,6 @@ void MainWindow::showCurrentModel()
             if(vc_index != -1)
             {
                 ViewController* new_vc = vc_possibilities[vc_index].viewController_fptr(m_scene, model_item->model(), m_ui.listViews->count());
-                if(m_ui.btnWorldView->isChecked())	
-                {
-                    new_vc->setTransform(model_item->model()->globalTransformation());
-                }
-                else
-                {
-                    new_vc->setTransform(model_item->model()->localTransformation());
-                    m_scene->setSceneRect(m_scene->itemsBoundingRect());
-                }
-                connect(new_vc, SIGNAL(updateStatusText(QString)), this, SLOT(updateStatusText(QString)));
-                connect(new_vc, SIGNAL(updateStatusDescription(QString)), this,	SLOT(updateStatusDescription(QString)));
-                
                 addViewControllerItemToList(new_vc);
             }
         }
@@ -919,13 +907,12 @@ void MainWindow::updateView()
  */
 void MainWindow::saveWorkspace()
 {
-    QString suggested_dirname = QString("workspace_") + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm");
-    QString dirname = QFileDialog::getSaveFileName(this, tr("Save Workspace to (new) directory"),
-                                                    suggested_dirname);
+    QString suggested_xmlFilename = QString("workspace_") + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm") + ".xgz";
+    QString xmlFilename = QFileDialog::getSaveFileName(this, tr("Save Workspace to file"), suggested_xmlFilename);
     
-    if(!dirname.isEmpty())
+    if(!xmlFilename.isNull())
     {
-        saveWorkspace(dirname);
+        saveWorkspace(xmlFilename);
     }
 }
 
@@ -934,185 +921,102 @@ void MainWindow::saveWorkspace()
  *
  * \param dirname The dirname of the Workspace serialization.
  */
-void MainWindow::saveWorkspace(const QString& dirname)
+void MainWindow::saveWorkspace(const QString& xmlFilename)
 {
-   try
+    try
     {
-        //-1. Create new directory
-        QDir dir;
-        if( dir.mkpath(dirname) )
+        QIODevice* device = Impex::openFile(xmlFilename, QIODevice::WriteOnly);
+        
+        if(device != NULL)
         {
-            dir.cd(dirname);
+            QString currentModelID;
             
-            //0. If dir is not empty: delete all files inside it
-            dir.setNameFilters(QStringList() << "*.*");
-            dir.setFilter(QDir::Files);
-            for(QString dirFile: dir.entryList())
-            {
-                dir.remove(dirFile);
-            }
-            
-            QString xmlFilename= dir.filePath("workspace.xml");
-            
-            QIODevice* device = Impex::openFile(xmlFilename, QIODevice::WriteOnly);
-            
-            if(device != NULL)
-            {
-                QString currentModelID;
-            
-                int i=0;
-                for(Model* m : models)
-                {
-                    m->setFilename(xmlFilename + QString("/model%1").arg(i++));
-                    if(m == currentModel())
-                    {
-                        currentModelID = m->filename();
-                    }
-                }
-                
-                QString currentViewControllerID;
-                QStringList visibleViewControllerIDs;
-                
-                for(i=0;  i < m_ui.listViews->count(); ++i)
-                {
-                    QListWidgetViewControllerItem* vc_item = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->item(i));
-                    if(vc_item && vc_item->viewController())
-                    {
-                        ViewController* vc = vc_item->viewController();
-                    
-                        vc->setFilename(xmlFilename + QString("/viewController%1").arg(i++));
-                    
-                        if(vc == currentViewController())
-                        {
-                            currentViewControllerID = vc->filename();
-                        }
-                        if(vc_item->checkState() == Qt::CheckState::Checked)
-                        {
-                            visibleViewControllerIDs.append(vc->filename());
-                        }
-                    }
-                }
-                
-                QXmlStreamWriter xmlWriter(device);
-                
-                xmlWriter.setAutoFormatting(true);
-                
-                ParameterGroup w_settings;
-                
-                w_settings.addParameter("geoMode", new BoolParameter("Geographic Mode:",m_displayMode == GeographicMode));
-                
-                w_settings.addParameter("winGeometry", new LongStringParameter("Window Geometry:",QString(saveGeometry().toBase64())));
-                w_settings.addParameter("winState", new LongStringParameter("Window State:",QString(saveState().toBase64())));
-                
-                QPoint scrolling(m_view->horizontalScrollBar()->value(),m_view->verticalScrollBar()->value());
-                w_settings.addParameter("viewScroll", new PointParameter("Viewport Scrolling:",scrolling, scrolling, scrolling));
-                
-                w_settings.addParameter("viewTrans", new TransformParameter("Viewport transformation", m_view->transform()));
-                w_settings.addParameter("currentModel", new FilenameParameter("Current model:", currentModelID));
-                w_settings.addParameter("currentVC", new FilenameParameter("Current viewController:", currentViewControllerID));
-                w_settings.addParameter("activeVCs", new LongStringParameter("Active viewControllers:",visibleViewControllerIDs.join(", ")));
-                
-                xmlWriter.writeStartDocument();
-                
-                xmlWriter.writeStartElement("Workspace");
-                xmlWriter.writeAttribute("ID", xmlFilename);
-                
-                    xmlWriter.writeStartElement("Header");
-                        w_settings.serialize(xmlWriter);
-                    xmlWriter.writeEndElement();
-                
-                    xmlWriter.writeStartElement("Content");
-                        xmlWriter.writeStartElement("Models");
-                            for(Model* m : models)
-                            {
-                                m->serialize(xmlWriter);
-                            }
-                        xmlWriter.writeEndElement();
-                        xmlWriter.writeStartElement("ViewControllers");
-                            for(ViewController* vc : viewControllers)
-                            {
-                                vc->serialize(xmlWriter);
-                            }
-                        xmlWriter.writeEndElement();
-                    xmlWriter.writeEndElement();
-                    
-                xmlWriter.writeEndElement();
-                xmlWriter.writeEndDocument();
-                
-                device->close();
-            }
-            
-            QSettings settings(dir.filePath("workspace.ini"), QSettings::IniFormat);
-            
-            //1. Store each Model
-            int j=0;
-            for(int i=0;  i < m_ui.listModels->count(); ++i)
+            for(int i=0; i<m_ui.listModels->count(); ++i)
             {
                 QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(i));
                 if(model_item && model_item->model())
                 {
                     Model* model = model_item->model();
-                    QString suggested_filename = QString("model_%1.xgz").arg(j);
-                    QString model_filename = dir.filePath(suggested_filename);
+                    model->setFilename(xmlFilename + QString("/model%1").arg(i));
                     
-                    if(!Impex::save(model, model_filename, true))
+                    if(model == currentModel())
                     {
-                        throw std::runtime_error("Model could not be saved to filesystem");
+                        currentModelID = model->filename();
                     }
-                    settings.setValue(QString("Model%1/name").arg(j), model->name());
-                    settings.setValue(QString("Model%1/filename").arg(j), suggested_filename);
-                    settings.setValue(QString("Model%1/current").arg(j),   model == currentModel());
-                    j++;
-                }
-                else
-                {
-                    throw std::runtime_error("Model pointer could not be derived");
                 }
             }
-            settings.setValue("model_count", j);
+            QString currentViewControllerID;
+            QStringList visibleViewControllerIDs;
             
-            //2) Store each View
-            j=0;
-            for(int i=0;  i < m_ui.listViews->count(); ++i)
+            for(int i=0; i<m_ui.listViews->count(); ++i)
             {
                 QListWidgetViewControllerItem* vc_item = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->item(i));
                 if(vc_item && vc_item->viewController())
                 {
-                    ViewController* viewController = vc_item->viewController();
-                    
-                    QString suggested_filename = QString("viewController_%1.xgz").arg(i);
-                    
-                    if(!Impex::save(viewController, dir.filePath(suggested_filename), true))
+                    ViewController* vc = vc_item->viewController();
+                
+                    vc->setFilename(xmlFilename + QString("/viewController%1").arg(i));
+                
+                    if(vc == currentViewController())
                     {
-                        throw std::runtime_error("ViewController could not be saved to filesystem");
+                        currentViewControllerID = vc->filename();
                     }
-                    settings.setValue(QString("ViewController%1/name").arg(j), viewController->name());
-                    settings.setValue(QString("ViewController%1/filename").arg(j), suggested_filename);
-                    settings.setValue(QString("ViewController%1/current").arg(j),  viewController == currentViewController());
-                    settings.setValue(QString("ViewController%1/active").arg(j),   vc_item->checkState() == Qt::CheckState::Checked);
-                    j++;
-                }
-                else
-                {
-                    throw std::runtime_error("ViewController pointer could not be derived");
+                    if(vc_item->checkState() == Qt::CheckState::Checked)
+                    {
+                        visibleViewControllerIDs.append(vc->filename());
+                    }
                 }
             }
-            settings.setValue("viewController_count", j);
-  
-            settings.setValue("geoMode", m_displayMode == GeographicMode);
             
-            settings.setValue("window_geometry", saveGeometry());
-            settings.setValue("window_state", saveState());
+            QXmlStreamWriter xmlWriter(device);
             
-            settings.setValue("view_hscroll",  m_view->horizontalScrollBar()->value());
-            settings.setValue("view_vscroll",  m_view->verticalScrollBar()->value());
+            xmlWriter.setAutoFormatting(true);
             
-            //save the scene's settings to an ini-file
-            QTransform vc_t = m_view->transform();
+            ParameterGroup w_settings;
             
-            settings.setValue("m11", vc_t.m11());    settings.setValue("m12", vc_t.m12());    settings.setValue("m13", vc_t.m13());
-            settings.setValue("m21", vc_t.m21());    settings.setValue("m22", vc_t.m22());    settings.setValue("m23", vc_t.m23());
-            settings.setValue("m31", vc_t.m31());    settings.setValue("m32", vc_t.m32());    settings.setValue("m33", vc_t.m33());
+            w_settings.addParameter("geoMode", new BoolParameter("Geographic Mode:",m_displayMode == GeographicMode));
+            
+            w_settings.addParameter("winGeometry", new LongStringParameter("Window Geometry:",QString(saveGeometry().toBase64())));
+            w_settings.addParameter("winState", new LongStringParameter("Window State:",QString(saveState().toBase64())));
+            
+            QPoint scrolling(m_view->horizontalScrollBar()->value(),m_view->verticalScrollBar()->value());
+            w_settings.addParameter("viewScroll", new PointParameter("Viewport Scrolling:",QPoint(-1e10,-1e10), QPoint(1e10,1e10), scrolling));
+            
+            w_settings.addParameter("viewTrans", new TransformParameter("Viewport transformation", m_view->transform()));
+            w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, m_ui.listModels->count()));
+            w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, m_ui.listViews->count()));
+            w_settings.addParameter("currentModel", new FilenameParameter("Current model:", currentModelID));
+            w_settings.addParameter("currentVC", new FilenameParameter("Current viewController:", currentViewControllerID));
+            w_settings.addParameter("activeVCs", new LongStringParameter("Active viewControllers:",visibleViewControllerIDs.join(", ")));
+            
+            xmlWriter.writeStartDocument();
+            
+            xmlWriter.writeStartElement("Workspace");
+            xmlWriter.writeAttribute("ID", xmlFilename);
+            
+                xmlWriter.writeStartElement("Header");
+                    w_settings.serialize(xmlWriter);
+                xmlWriter.writeEndElement();
+            
+                xmlWriter.writeStartElement("Content");
+                    xmlWriter.writeStartElement("Models");
+                        for(Model* m : models)
+                        {
+                            m->serialize(xmlWriter);
+                        }
+                    xmlWriter.writeEndElement();
+                    xmlWriter.writeStartElement("ViewControllers");
+                        for(ViewController* vc : viewControllers)
+                        {
+                            vc->serialize(xmlWriter);
+                        }
+                    xmlWriter.writeEndElement();
+                xmlWriter.writeEndElement();
+                
+            xmlWriter.writeEndElement();
+            xmlWriter.writeEndDocument();
+            
+            device->close();
         }
     }
     catch (std::exception & e)
@@ -1139,7 +1043,7 @@ void MainWindow::restoreLastWorkspace()
                 == QMessageBox::Yes)
     {
         QApplication::processEvents();
-        restoreWorkspace(m_settings_dir + "workspace");
+        restoreWorkspace(m_settings_dir + "workspace.xgz");
     }
 }
 
@@ -1148,11 +1052,11 @@ void MainWindow::restoreLastWorkspace()
  */
 void MainWindow::restoreWorkspace()
 {
-    QString dirname = QFileDialog::getExistingDirectory(this, tr("Open Workspace from (existing) directory"));
+    QString xmlFilename = QFileDialog::getOpenFileName(this, tr("Open Workspace from file"));
     
-    if(!dirname.isEmpty())
+    if(!xmlFilename.isNull())
     {
-        restoreWorkspace(dirname);
+        restoreWorkspace(xmlFilename);
     }
 }
 
@@ -1161,78 +1065,158 @@ void MainWindow::restoreWorkspace()
  *
  * \param dirname The dirname of the Workspace serialization.
  */
-void MainWindow::restoreWorkspace(const QString& dirname)
+void MainWindow::restoreWorkspace(const QString& xmlFilename)
 {
     try
     {
         reset();
-            
-        QDir dir(dirname);
         
-        if(!QFile(dir.filePath("workspace.ini")).exists())
+        QIODevice* device = Impex::openFile(xmlFilename, QIODevice::ReadOnly);
+        
+        if(device != NULL)
         {
-            throw std::runtime_error("Workspace.ini file was not found");
-        }
-        
-        //open workspace's ini file
-        QSettings settings(dir.filePath("workspace.ini"), QSettings::IniFormat);
-        
-        //1. Read in all the saved models
-        int model_count = settings.value("model_count").toInt();
-        int current_row=0;
-        for(int i=0; i< model_count; ++i)
-        {
-            QString model_filename = settings.value(QString("Model%1/filename").arg(i)).toString();
-            bool current = settings.value(QString("Model%1/current").arg(i)).toBool();
-            loadModel(dir.filePath(model_filename));
+            ParameterGroup w_settings;
+            BoolParameter* p_geoMode = new BoolParameter("Geographic Mode:",m_displayMode == GeographicMode);
+            w_settings.addParameter("geoMode", p_geoMode);
             
-            if(current)
+            LongStringParameter* p_winGeo = new LongStringParameter("Window Geometry:",QString(saveGeometry().toBase64()));
+            w_settings.addParameter("winGeometry", p_winGeo);
+            
+            LongStringParameter* p_winState = new LongStringParameter("Window State:",QString(saveState().toBase64()));
+            w_settings.addParameter("winState", p_winState);
+            
+            QPoint scrolling(m_view->horizontalScrollBar()->value(),m_view->verticalScrollBar()->value());
+            PointParameter* p_viewScroll = new PointParameter("Viewport Scrolling:",QPoint(-1e10,-1e10), QPoint(1e10,1e10), QPoint(0,0));
+            w_settings.addParameter("viewScroll", p_viewScroll);
+            
+            TransformParameter* p_viewTrans = new TransformParameter("Viewport transformation", m_view->transform());
+            w_settings.addParameter("viewTrans", p_viewTrans);
+            
+            IntParameter* p_models = new IntParameter("Model count:", 0, 1e10, 0);
+            w_settings.addParameter("models", p_models);
+            
+            IntParameter* p_viewControllers = new IntParameter("ViewController count:", 0, 1e10, 0);
+            w_settings.addParameter("viewControllers", p_viewControllers);
+            
+            FilenameParameter* p_currentModel = new FilenameParameter("Current model:", "");
+            w_settings.addParameter("currentModel", p_currentModel);
+            
+            FilenameParameter* p_currentVC = new FilenameParameter("Current viewController:", "");
+            w_settings.addParameter("currentVC", p_currentVC);
+            
+            LongStringParameter* p_activeVCs = new LongStringParameter("Active viewControllers:","");
+            w_settings.addParameter("activeVCs",p_activeVCs);
+        
+            QXmlStreamReader xmlReader(device);
+        
+            if(xmlReader.readNextStartElement())
             {
-                current_row = i;
+                if(xmlReader.name() =="Workspace")
+                {
+                    if(xmlReader.readNextStartElement())
+                    {
+                        if(xmlReader.name() =="Header")
+                        {
+                            w_settings.deserialize(xmlReader);
+                        }
+                        //Read until </Header> comes....
+                        while(true)
+                        {
+                            if(!xmlReader.readNext())
+                            {
+                                throw "Error: XML at end before Header End-Tag";
+                            }
+                            
+                            if(xmlReader.isEndElement() && xmlReader.name() == "Header")
+                            {
+                                break;
+                            }
+                        }
+                        if(xmlReader.readNextStartElement())
+                        {
+                            if(xmlReader.name() =="Content")
+                            {
+                                if(xmlReader.readNextStartElement())
+                                {
+                                    //1. Read in all the saved models
+                                    if(xmlReader.name() =="Models")
+                                    {
+                                        for(int i=0; i!=p_models->value(); i++)
+                                        {
+                                            Model* m = Impex::loadModel(xmlReader);
+                                            if(m != NULL)
+                                            {
+                                                addModelItemToList(m);
+                                                if(m->filename() == p_currentModel->value())
+                                                {
+                                                    m_ui.listModels->setCurrentRow(m_ui.listModels->count()-1);
+                                                }
+                                            }
+                                        }
+                                        
+                                        //Read until </Models> comes....
+                                        while(true)
+                                        {
+                                            if(xmlReader.isEndElement() && xmlReader.name() == "Models")
+                                            {
+                                                break;
+                                            }
+                                            if(!xmlReader.readNext())
+                                            {
+                                                throw "Error: XML at end before Models End-Tag";
+                                            }
+                                        }
+                                        if(xmlReader.readNextStartElement())
+                                        {
+                                            //2. Read in all the saved views
+                                            if(xmlReader.name() =="ViewControllers")
+                                            {
+                                                QStringList activeVCs = p_activeVCs->value().split(", ");
+                                            
+                                                for(int i=0; i!=p_viewControllers->value(); i++)
+                                                {
+                                                    ViewController* vc = Impex::loadViewController(xmlReader, m_scene);
+                                                    if(vc != NULL)
+                                                    {
+                                                        addViewControllerItemToList(vc);
+                                                        
+                                                        if(vc->filename() == p_currentVC->value())
+                                                        {
+                                                            m_ui.listViews->setCurrentRow(m_ui.listViews->count()-1);
+                                                        }
+                                                        Qt::CheckState state = Qt::CheckState::Unchecked;
+                                                        if(activeVCs.contains(vc->filename()))
+                                                        {
+                                                            state = Qt::CheckState::Checked;
+                                                        }
+                                                        m_ui.listViews->item(m_ui.listViews->count()-1)->setCheckState(state);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                         }
+                    }
+                    //3. Restore the other vierport and window state settings:
+                    m_ui.btnWorldView->setChecked(p_geoMode->value());
+                    
+                    m_view->setTransform(p_viewTrans->value());
+                    
+                    QByteArray block;
+                    block.append(p_winGeo->value());
+                    restoreGeometry(QByteArray::fromBase64(block));
+                    
+                    block.clear();
+                    block.append(p_winState->value());
+                    restoreState(QByteArray::fromBase64(block));
+        
+                    m_view->horizontalScrollBar()->setValue(p_viewScroll->value().x());
+                    m_view->verticalScrollBar()->setValue(p_viewScroll->value().y());
+                }
             }
         }
-        m_ui.listModels->setCurrentRow(current_row);
-        
-        //2. Read in all the saved views
-        int vc_count = settings.value("viewController_count").toInt();
-        current_row=0;
-        for(int i=0; i< vc_count; ++i)
-        {
-            QString vc_filename = settings.value(QString("ViewController%1/filename").arg(i)).toString();
-            bool current = settings.value(QString("ViewController%1/current").arg(i)).toBool();
-            bool active = settings.value(QString("ViewController%1/active").arg(i)).toBool();
-            loadViewController(dir.filePath(vc_filename));
-            
-            if(current)
-            {
-                current_row = i;
-            }
-            
-            if(!active)
-            {
-                m_ui.listViews->item(i)->setCheckState(Qt::CheckState::Unchecked);
-            }
-        }
-        m_ui.listViews->setCurrentRow(current_row);
-        
-        //3. Restore GeoMode-checked?
-        m_ui.btnWorldView->setChecked(settings.value("geoMode", false).toBool());
-        
-        //4. Restore view transform
-        QTransform vc_t;
-        
-        vc_t.setMatrix(
-            settings.value("m11", 1.0).toFloat(), settings.value("m12", 0.0).toFloat(), settings.value("m13", 0.0).toFloat(),
-            settings.value("m21", 0.0).toFloat(), settings.value("m22", 1.0).toFloat(), settings.value("m23", 0.0).toFloat(),
-            settings.value("m31", 0.0).toFloat(), settings.value("m32", 0.0).toFloat(), settings.value("m33", 1.0).toFloat());
-        m_view->setTransform(vc_t);
-        
-        //5. Restore window geometry & dockWidgets state
-        restoreGeometry( settings.value("window_geometry").toByteArray() );
-        restoreState( settings.value("window_state").toByteArray());
-        
-         m_view->horizontalScrollBar()->setValue(settings.value("view_hscroll").toInt());
-         m_view->verticalScrollBar()->setValue(settings.value("view_vscroll").toInt());
     }
     catch (const std::exception & e)
     {
@@ -1748,6 +1732,18 @@ void MainWindow::addViewControllerItemToList(ViewController* viewController)
     if (viewController && viewController->model())
     {
         Model* model = viewController->model();
+        
+        if(m_ui.btnWorldView->isChecked())
+        {
+            viewController->setTransform(model->globalTransformation());
+        }
+        else
+        {
+            viewController->setTransform(model->localTransformation());
+            m_scene->setSceneRect(m_scene->itemsBoundingRect());
+        }
+        connect(viewController, SIGNAL(updateStatusText(QString)), this, SLOT(updateStatusText(QString)));
+        connect(viewController, SIGNAL(updateStatusDescription(QString)), this,	SLOT(updateStatusDescription(QString)));
 	
         QListWidgetViewControllerItem * vc_item = new QListWidgetViewControllerItem(viewController->typeName() + " of " + model->name(), viewController);
 		vc_item->setCheckState(Qt::Checked);

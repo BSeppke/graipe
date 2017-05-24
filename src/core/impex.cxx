@@ -142,7 +142,7 @@ Model* Impex::loadModel(QXmlStreamReader& xmlReader)
         //  If it was not found: Indicate error
         if(model == NULL)
         {
-            qWarning("Model type was not found in modelFactory.");
+            qWarning("Impex::loadModel: Model type was not found in modelFactory.");
             return NULL;
         }
         
@@ -152,14 +152,14 @@ Model* Impex::loadModel(QXmlStreamReader& xmlReader)
         }
         else
         {
-            qWarning("Deserialization of Model failed");
+            qWarning("Impex::loadModel: Deserialization of Model failed");
             delete model;
             return NULL;
         }
     }
     else
     {
-        qWarning("Could not find a single XML start element!");
+        qWarning("Impex::loadModel: Could not find a single XML start element!");
         return NULL;
     }
     return NULL;
@@ -225,7 +225,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         //  If it was not found: Indicate error
         if(vc_model == NULL)
         {
-            qWarning("Model was not found among available ones.");
+            qWarning("Impex::loadViewController: Model was not found among available ones.");
             return NULL;
         }
         
@@ -241,7 +241,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         //  If it was not found: Indicate error
         if(vc == NULL)
         {
-            qWarning("ViewController type was not found in the factory.");
+            qWarning("Impex::loadViewController: ViewController type was not found in the factory.");
             return NULL;
         }
         
@@ -252,14 +252,14 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         }
         else
         {
-            qWarning("Deserialization of ViewController failed");
+            qWarning("Impex::loadViewController: Deserialization of ViewController failed");
             delete vc;
             return NULL;
         }
     }
     else
     {
-        qWarning("Could not find a single XML start element!");
+        qWarning("Impex::loadViewController: Could not find a single XML start element!");
         return NULL;
     }
     return NULL;

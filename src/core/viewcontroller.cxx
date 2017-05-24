@@ -437,6 +437,7 @@ void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
         xmlWriter.writeStartDocument();
      }
         xmlWriter.writeStartElement(typeName());
+        xmlWriter.writeAttribute("ID", filename());
         xmlWriter.writeAttribute("ModelID", m_model->filename());
         xmlWriter.writeAttribute("ZOrder", QString::number(zValue()));
             m_parameters->serialize(xmlWriter);
@@ -463,9 +464,26 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
         //Assume, that the deserialized has already read the start node:
         //if (xmlReader.readNextStartElement())
         //{
-            if(xmlReader.name() == typeName())
+            if(     xmlReader.name() == typeName()
+                &&  xmlReader.attributes().hasAttribute("ID"))
             {
-                 return m_parameters->deserialize(xmlReader);
+                setFilename(xmlReader.attributes().value("ID").toString());
+                
+                bool success = m_parameters->deserialize(xmlReader);
+                 
+                while(true)
+                {
+                    if(xmlReader.tokenType()==QXmlStreamReader::EndElement && xmlReader.name() == typeName())
+                    {
+                        return true;
+                    }
+                    if(!xmlReader.readNext())
+                    {
+                        throw std::runtime_error("End of XML file reached before closing tag for ViewController.");
+                    }
+                }
+                
+                return success;
             }
             else
             {
