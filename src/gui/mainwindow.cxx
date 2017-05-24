@@ -937,11 +937,11 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
                 if(model_item && model_item->model())
                 {
                     Model* model = model_item->model();
-                    model->setFilename(xmlFilename + QString("/model%1").arg(i));
+                    model->setID(xmlFilename + QString("/model%1").arg(i));
                     
                     if(model == currentModel())
                     {
-                        currentModelID = model->filename();
+                        currentModelID = model->id();
                     }
                 }
             }
@@ -955,15 +955,15 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
                 {
                     ViewController* vc = vc_item->viewController();
                 
-                    vc->setFilename(xmlFilename + QString("/viewController%1").arg(i));
+                    vc->setID(xmlFilename + QString("/viewController%1").arg(i));
                 
                     if(vc == currentViewController())
                     {
-                        currentViewControllerID = vc->filename();
+                        currentViewControllerID = vc->id();
                     }
                     if(vc_item->checkState() == Qt::CheckState::Checked)
                     {
-                        visibleViewControllerIDs.append(vc->filename());
+                        visibleViewControllerIDs.append(vc->id());
                     }
                 }
             }
@@ -1147,7 +1147,7 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                             if(m != NULL)
                                             {
                                                 addModelItemToList(m);
-                                                if(m->filename() == p_currentModel->value())
+                                                if(m->id() == p_currentModel->value())
                                                 {
                                                     m_ui.listModels->setCurrentRow(m_ui.listModels->count()-1);
                                                 }
@@ -1180,12 +1180,12 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                                     {
                                                         addViewControllerItemToList(vc);
                                                         
-                                                        if(vc->filename() == p_currentVC->value())
+                                                        if(vc->id() == p_currentVC->value())
                                                         {
                                                             m_ui.listViews->setCurrentRow(m_ui.listViews->count()-1);
                                                         }
                                                         Qt::CheckState state = Qt::CheckState::Unchecked;
-                                                        if(activeVCs.contains(vc->filename()))
+                                                        if(activeVCs.contains(vc->id()))
                                                         {
                                                             state = Qt::CheckState::Checked;
                                                         }

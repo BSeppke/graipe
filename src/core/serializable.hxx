@@ -200,18 +200,18 @@ class GRAIPE_CORE_EXPORT Serializable
 {
     public:
         /**
-         * Getter for the filename of a serializable
+         * Getter for the id of a serializable
          *
-         * \return the filename or an empty QString if none is assigned
+         * \return the id or an empty QString if none is assigned
          */
-        virtual QString filename() const;
+        virtual QString id() const;
     
         /**
-         * Setter for the filename of a serializable
+         * Setter for the id of a serializable
          *
-         * \param new_filename  the new filename of this serializable
+         * \param new_id  the new id of this serializable
          */
-        virtual void setFilename(const QString& new_filename);
+        virtual void setID(const QString& new_id);
     
         /**
          * Since we want to identify, we assign the Serializable class an uid.
@@ -240,7 +240,7 @@ class GRAIPE_CORE_EXPORT Serializable
     
     protected:
         /** the filename of this serializable instance **/
-        QString m_filename;
+        QString m_id;
 };
     
 }//end of namespace

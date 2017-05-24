@@ -103,7 +103,7 @@ template<class T>
 Image<T>::Image(Size_Type size, 
                 unsigned int numBands,
                 DateTime_Type timestamp,
-                String_Type filename,
+                String_Type id,
                 Comment_Type comment,
                 Units_Type units,
                 Scale_Type scale)
@@ -116,7 +116,7 @@ Image<T>::Image(Size_Type size,
     m_units(new StringParameter("Units:", units))
 {
     appendParameters();
-    setFilename(filename);
+    setID(id);
     setWidth((unsigned int)size[0]);
     setHeight((unsigned int)size[1]);
     setNumBands(numBands);

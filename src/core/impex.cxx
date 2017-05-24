@@ -216,7 +216,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         for(Model* mod : models)
         {
             if(     mod
-                &&  mod->filename() == vc_modelID)
+                &&  mod->id() == vc_modelID)
             {
                 vc_model = mod;
                 break;

@@ -401,11 +401,6 @@ void ViewController::updateView()
  */
 void ViewController::updateParameters(bool /*force_update*/)
 {
-    if(m_model)
-    {
-       //TODO: Check if neccessary
-       //m_model_filename->setValue(m_model->filename());
-    }
 }
 
 /**
@@ -437,8 +432,8 @@ void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
         xmlWriter.writeStartDocument();
      }
         xmlWriter.writeStartElement(typeName());
-        xmlWriter.writeAttribute("ID", filename());
-        xmlWriter.writeAttribute("ModelID", m_model->filename());
+        xmlWriter.writeAttribute("ID", id());
+        xmlWriter.writeAttribute("ModelID", m_model->id());
         xmlWriter.writeAttribute("ZOrder", QString::number(zValue()));
             m_parameters->serialize(xmlWriter);
         xmlWriter.writeEndElement();
@@ -467,7 +462,7 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
             if(     xmlReader.name() == typeName()
                 &&  xmlReader.attributes().hasAttribute("ID"))
             {
-                setFilename(xmlReader.attributes().value("ID").toString());
+                setID(xmlReader.attributes().value("ID").toString());
                 
                 bool success = m_parameters->deserialize(xmlReader);
                  

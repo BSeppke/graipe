@@ -316,7 +316,7 @@ void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
-    xmlWriter.writeTextElement("Filename", m_image->filename());
+    xmlWriter.writeTextElement("Filename", m_image->id());
     xmlWriter.writeTextElement("BandID", QString::number(m_bandId));
     xmlWriter.writeEndElement();
 }
@@ -352,7 +352,7 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
                         
                         for(Image<T>* allowed: m_allowed_images)
                         {
-                            if (allowed->filename() == valueText)
+                            if (allowed->id() == valueText)
                             {
                                 setImage(allowed);
                                 success = true;

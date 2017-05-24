@@ -245,23 +245,23 @@ QString read_from_device_until(QIODevice& dev, const QString& str, bool one_line
 }
 
 /**
- * Getter for the filename of a serializable
+ * Getter for the id of a serializable
  *
- * \return the filename or an empty QString if none is assigned
+ * \return the id or an empty QString if none is assigned
  */
-QString Serializable::filename() const
+QString Serializable::id() const
 {
-    return m_filename;
+    return m_id;
 }
 
 /**
- * Setter for the filename of a serializable
+ * Setter for the id of a serializable
  *
- * \param new_filename  the new filename of this serializable
+ * \param new_id  the new id of this serializable
  */
-void Serializable::setFilename (const QString& new_filename)
+void Serializable::setID(const QString& new_id)
 {
-    m_filename = new_filename;
+    m_id = new_id;
 }
 
 /**

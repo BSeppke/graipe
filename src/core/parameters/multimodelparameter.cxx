@@ -217,7 +217,7 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
     {
         xmlWriter.writeStartElement("Value");
         xmlWriter.writeAttribute("ID", QString::number(i++));
-            xmlWriter.writeCharacters(model->filename());
+            xmlWriter.writeCharacters(model->id());
         xmlWriter.writeEndElement();
     }
     xmlWriter.writeEndElement();
@@ -245,13 +245,13 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
                     }
                     if(xmlReader.name() == "Value")
                     {
-                        QString filename =  xmlReader.readElementText();
+                        QString id =  xmlReader.readElementText();
                         
                         int i=0;
                         
                         for(const Model* allowed_model: m_allowed_values)
                         {
-                           if (filename == allowed_model->filename())
+                           if (id == allowed_model->id())
                            {
                                 m_delegate->item(i)->setSelected(true);
                                 break;
@@ -260,7 +260,7 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
                         }
                         if(i==m_allowed_values.size())
                         {
-                            throw std::runtime_error("Did not find a model with filename: " + filename.toStdString());
+                            throw std::runtime_error("Did not find a model with id: " + id.toStdString());
                         }
                     }
                 }

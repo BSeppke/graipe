@@ -148,7 +148,7 @@ void ModelParameter::setValue(Model* value)
  */
 QString ModelParameter::toString() const
 { 
-	return value()->filename();
+	return value()->id();
 }
 /**
  * Deserialization of a parameter's state from an input device.
@@ -160,7 +160,7 @@ bool ModelParameter::fromString(QString& str)
 {
     for(Model* allowed: m_allowed_values)
     {
-        if (allowed->filename() == str)
+        if (allowed->id() == str)
         {
             setValue(allowed);
             return true;
