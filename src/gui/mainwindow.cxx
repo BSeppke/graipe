@@ -37,6 +37,7 @@
 #include "gui/memorystatus.hxx"
 
 #include "core/updatechecker.hxx"
+#include "core/globals.hxx"
 
 #include <QDir>
 #include <QMutex>
@@ -949,6 +950,96 @@ void MainWindow::saveWorkspace(const QString& dirname)
             for(QString dirFile: dir.entryList())
             {
                 dir.remove(dirFile);
+            }
+            
+            QString xmlFilename= dir.filePath("workspace.xml");
+            
+            QIODevice* device = Impex::openFile(xmlFilename, QIODevice::WriteOnly);
+            
+            if(device != NULL)
+            {
+                QString currentModelID;
+            
+                int i=0;
+                for(Model* m : models)
+                {
+                    m->setFilename(xmlFilename + QString("/model%1").arg(i++));
+                    if(m == currentModel())
+                    {
+                        currentModelID = m->filename();
+                    }
+                }
+                
+                QString currentViewControllerID;
+                QStringList visibleViewControllerIDs;
+                
+                for(i=0;  i < m_ui.listViews->count(); ++i)
+                {
+                    QListWidgetViewControllerItem* vc_item = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->item(i));
+                    if(vc_item && vc_item->viewController())
+                    {
+                        ViewController* vc = vc_item->viewController();
+                    
+                        vc->setFilename(xmlFilename + QString("/viewController%1").arg(i++));
+                    
+                        if(vc == currentViewController())
+                        {
+                            currentViewControllerID = vc->filename();
+                        }
+                        if(vc_item->checkState() == Qt::CheckState::Checked)
+                        {
+                            visibleViewControllerIDs.append(vc->filename());
+                        }
+                    }
+                }
+                
+                QXmlStreamWriter xmlWriter(device);
+                
+                xmlWriter.setAutoFormatting(true);
+                
+                ParameterGroup w_settings;
+                
+                w_settings.addParameter("geoMode", new BoolParameter("Geographic Mode:",m_displayMode == GeographicMode));
+                
+                w_settings.addParameter("winGeometry", new LongStringParameter("Window Geometry:",QString(saveGeometry().toBase64())));
+                w_settings.addParameter("winState", new LongStringParameter("Window State:",QString(saveState().toBase64())));
+                
+                QPoint scrolling(m_view->horizontalScrollBar()->value(),m_view->verticalScrollBar()->value());
+                w_settings.addParameter("viewScroll", new PointParameter("Viewport Scrolling:",scrolling, scrolling, scrolling));
+                
+                w_settings.addParameter("viewTrans", new TransformParameter("Viewport transformation", m_view->transform()));
+                w_settings.addParameter("currentModel", new FilenameParameter("Current model:", currentModelID));
+                w_settings.addParameter("currentVC", new FilenameParameter("Current viewController:", currentViewControllerID));
+                w_settings.addParameter("activeVCs", new LongStringParameter("Active viewControllers:",visibleViewControllerIDs.join(", ")));
+                
+                xmlWriter.writeStartDocument();
+                
+                xmlWriter.writeStartElement("Workspace");
+                xmlWriter.writeAttribute("ID", xmlFilename);
+                
+                    xmlWriter.writeStartElement("Header");
+                        w_settings.serialize(xmlWriter);
+                    xmlWriter.writeEndElement();
+                
+                    xmlWriter.writeStartElement("Content");
+                        xmlWriter.writeStartElement("Models");
+                            for(Model* m : models)
+                            {
+                                m->serialize(xmlWriter);
+                            }
+                        xmlWriter.writeEndElement();
+                        xmlWriter.writeStartElement("ViewControllers");
+                            for(ViewController* vc : viewControllers)
+                            {
+                                vc->serialize(xmlWriter);
+                            }
+                        xmlWriter.writeEndElement();
+                    xmlWriter.writeEndElement();
+                    
+                xmlWriter.writeEndElement();
+                xmlWriter.writeEndDocument();
+                
+                device->close();
             }
             
             QSettings settings(dir.filePath("workspace.ini"), QSettings::IniFormat);

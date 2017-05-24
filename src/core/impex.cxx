@@ -53,6 +53,43 @@
 namespace graipe {
 
 /**
+ * Basic open procedure for compressed and uncompressed files.
+ *
+ * \param filename The filename of the stored object.
+ * \param openMode An openind mode, read/write-only etc.
+ * \return A valid QIODevice Pointer, if the opening was successful esle NULL.
+ */
+QIODevice* Impex::openFile(const QString & filename, QIODevice::OpenModeFlag openMode)
+{
+    QIODevice* device = NULL;
+    bool compress = (filename.right(2) == "gz");
+    
+    if(!filename.isEmpty())
+    {
+        QFile* file = new QFile(filename);
+        
+        if(compress)
+        {
+            QIOCompressor* compressor = new QIOCompressor(file);
+            compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+            if (compressor->open(openMode))
+            {
+                device = compressor;
+            }
+        }
+        else
+        {
+            if(file->open(openMode))
+            {
+                device = file;
+            }
+        }
+    }
+    return device;
+}
+
+/**
  * Basic import procedure for all types, which implements the serializable interface.
  *
  * \param filename The filename of the stored object.
@@ -62,38 +99,16 @@ namespace graipe {
  */
 Model* Impex::loadModel(const QString & filename)
 {
-    bool compress =  (filename.right(2) == "gz");
-    
-    Model* model = NULL;
-    
-    if(!filename.isEmpty())
+   QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+   Model* model = NULL;
+
+    if(device != NULL)
     {
-        QFile file(filename);
-        
-        if(compress)
-        {
-            QIOCompressor compressor(&file);
-            compressor.setStreamFormat(QIOCompressor::GzipFormat);
-            
-            QXmlStreamReader xmlReader(&compressor);
-            
-            if (compressor.open(QIODevice::ReadOnly))
-            {
-                model = loadModel(xmlReader);
-                compressor.close();
-            }
-        }
-        else
-        {
-            QXmlStreamReader xmlReader(&file);
-            
-            if(file.open(QIODevice::ReadOnly))
-            {
-                model = loadModel(xmlReader);
-                file.close();
-            }
-        }
+        QXmlStreamReader xmlReader(device);
+        model = loadModel(xmlReader);
+        device->close();
     }
+    
     return model;
 }
 /**
@@ -160,36 +175,14 @@ Model* Impex::loadModel(QXmlStreamReader& xmlReader)
  */
 ViewController* Impex::loadViewController(const QString & filename, QGraphicsScene* scene)
 {
-    bool compress = (filename.right(2) == "gz");
+    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
     ViewController * vc = NULL;
     
-    if(!filename.isEmpty())
+    if(device != NULL)
     {
-        QFile file(filename);
-        
-        if(compress)
-        {
-            QIOCompressor compressor(&file);
-            compressor.setStreamFormat(QIOCompressor::GzipFormat);
-            
-            QXmlStreamReader xmlReader(&compressor);
-            
-            if (compressor.open(QIODevice::ReadOnly))
-            {
-                vc = loadViewController(xmlReader, scene);
-                compressor.close();
-            }
-        }
-        else
-        {
-            QXmlStreamReader xmlReader(&file);
-            
-            if(file.open(QIODevice::ReadOnly))
-            {
-                vc = loadViewController(xmlReader, scene);
-                file.close();
-            }
-        }
+        QXmlStreamReader xmlReader(device);
+        vc = loadViewController(xmlReader, scene);
+        device->close();
     }
     
     return vc;
@@ -282,43 +275,16 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
  */
 bool Impex::save(Serializable * object, const QString & filename, bool compress)
 {
-    bool success = false;
-	
-    if(!filename.isEmpty())
-	{
-		QFile file(filename);
-		
-        object->setFilename(filename);
-        
-		if(compress)
-		{
-			QIOCompressor compressor(&file);
-			compressor.setStreamFormat(QIOCompressor::GzipFormat);
-		
-            QXmlStreamWriter xmlWriter(&compressor);
-            
-			if (compressor.open(QIODevice::WriteOnly))
-			{
-                object->serialize(xmlWriter);
-				compressor.close();
-				
-				success = true;
-			}
-		}
-		else if(file.open(QIODevice::WriteOnly))
-		{
-            QXmlStreamWriter xmlWriter(&file);
-            object->serialize(xmlWriter);
-			file.close();
-				
-			success = true;
-		}
-	}
+	QIODevice* device = Impex::openFile(filename, QIODevice::WriteOnly);
     
-    if(success && object)
+	if (device != NULL)
     {
+        QXmlStreamWriter xmlWriter(device);
+        object->serialize(xmlWriter);
+		device->close();
+        return true;
     }
-	return success;
+	return false;
 }
 
 }//end of namespace graipe

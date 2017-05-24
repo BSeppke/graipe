@@ -429,15 +429,23 @@ void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
     xmlWriter.setAutoFormattingIndent(4);
+        
+    bool fullFile = (xmlWriter.device()->pos() == 0);
     
-    xmlWriter.writeStartDocument();
+    if (fullFile)
+    {
+        xmlWriter.writeStartDocument();
+     }
         xmlWriter.writeStartElement(typeName());
         xmlWriter.writeAttribute("ModelID", m_model->filename());
         xmlWriter.writeAttribute("ZOrder", QString::number(zValue()));
-    
             m_parameters->serialize(xmlWriter);
         xmlWriter.writeEndElement();
-    xmlWriter.writeEndDocument();
+    
+    if (fullFile)
+    {
+        xmlWriter.writeEndDocument();
+     }
 }
 
 /**

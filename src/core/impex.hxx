@@ -80,6 +80,15 @@ class GRAIPE_CORE_EXPORT Impex
 { 
 	public:
         /**
+         * Basic open procedure for compressed and uncompressed files.
+         *
+         * \param filename The filename of the stored object.
+         * \param openMode An openind mode, read/write-only etc.
+         * \return A valid QIODevice Pointer, if the opening was successful esle NULL.
+         */
+        static QIODevice* openFile(const QString & filename, QIODevice::OpenModeFlag openMode);
+    
+        /**
          * Basic import procedure for all types, which implement the serializable interface
          *
          * \param filename The filename of the stored object.

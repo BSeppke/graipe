@@ -562,7 +562,12 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     xmlWriter.setAutoFormattingIndent(4);
     
-    xmlWriter.writeStartDocument();
+    bool fullFile = (xmlWriter.device()->pos() == 0);
+    
+    if (fullFile)
+    {
+        xmlWriter.writeStartDocument();
+     }
         xmlWriter.writeStartElement(typeName());
         xmlWriter.writeAttribute("ID", filename());
             xmlWriter.writeStartElement("Header");
@@ -571,8 +576,11 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
             xmlWriter.writeStartElement("Content");
                 serialize_content(xmlWriter);
             xmlWriter.writeEndElement();
-        xmlWriter.writeEndElement();
-    xmlWriter.writeEndDocument();
+        xmlWriter.writeEndElement();    
+    if (fullFile)
+    {
+        xmlWriter.writeEndDocument();
+     }
 }
 
 /**
