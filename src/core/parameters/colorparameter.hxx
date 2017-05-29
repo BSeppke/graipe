@@ -104,22 +104,11 @@ class GRAIPE_CORE_EXPORT ColorParameter
         void setValue(const QColor& value);
             
         /**
-         * The value converted to a QString. Please note, that this can vary from the 
-         * serialize() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
+         * The value converted to a QString. This denotes the name of the color.
          *
          * \return The value of the parameter converted to an QString.
          */
         QString toString() const;
-            
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, just: "ColorParameter, " + value().rgba()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization of a parameter's state from an input device.
@@ -127,7 +116,7 @@ class GRAIPE_CORE_EXPORT ColorParameter
          * \param in the input device.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QXmlStreamReader& xmlReader);
+        bool fromString(QString & str);
 
         /**
          * This function indicates whether the value of a parameter is valid or not.

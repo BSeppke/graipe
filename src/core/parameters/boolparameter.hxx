@@ -102,10 +102,7 @@ class GRAIPE_CORE_EXPORT BoolParameter
         void setValue(bool value);
             
         /**
-         * The value converted to a QString. Please note, that this can vary from the 
-         * serialize() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString
+         * The value converted to a QString. Either true or false.
          *
          * \return The value of the parameter converted to an QString
          */

@@ -228,10 +228,8 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
     }
 }
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
+ * The value converted to a QString. This returns a comma-separated list of all
+ * Colors by means of #AARRGGBB values for each color.
  *
  * \return The value of the parameter converted to an QString.
  */
@@ -239,13 +237,20 @@ QString  ColorTableParameter::toString() const
 {
     QVector<QRgb> ct = value();
     
-    QString str = QString::number(ct[0]);
-    for(unsigned int i=1; i<ct.size(); ++i)
+    
+    QString res;
+    
+    if(ct.size() != 0)
     {
-        str += ", " + QString::number(ct[i]);
+        res= QColor(ct[0]).name(QColor::HexArgb);
+    
+        for(unsigned int i=0; i<ct.size(); ++i)
+        {
+            res += ", " + QColor(ct[i]).name(QColor::HexArgb);
+        }
     }
     
-    return str;
+    return res;
 }
 
 /**
@@ -267,11 +272,8 @@ void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
     for(unsigned int i=0; i<ct.size(); ++i)
     {
         xmlWriter.writeStartElement("Color");
-        xmlWriter.writeAttribute("ID", QString::number(i));
-        xmlWriter.writeAttribute("Type", "RGB");
-            xmlWriter.writeTextElement("R", QString::number(QColor(ct[i]).red()));
-            xmlWriter.writeTextElement("G", QString::number(QColor(ct[i]).green()));
-            xmlWriter.writeTextElement("B", QString::number(QColor(ct[i]).blue()));
+            xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeCharacters(QColor(ct[i]).name(QColor::HexArgb));
         xmlWriter.writeEndElement();
     }
     xmlWriter.writeEndElement();
@@ -304,28 +306,11 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
                         ct.resize(xmlReader.readElementText().toInt());
                     }
                     if(    xmlReader.name() == "Color"
-                        && xmlReader.attributes().hasAttribute("ID")
-                        && xmlReader.attributes().hasAttribute("Type")
-                        && xmlReader.attributes().value("Type") == "RGB")
+                        && xmlReader.attributes().hasAttribute("ID"))
                     {
                         int color_id = xmlReader.attributes().value("ID").toInt();
-                        QColor color;
                         
-                        while(xmlReader.readNextStartElement())
-                        {
-                            if(xmlReader.name() == "R")
-                            {
-                                color.setRed(xmlReader.readElementText().toInt());
-                            }
-                            if(xmlReader.name() == "G")
-                            {
-                                color.setGreen(xmlReader.readElementText().toInt());
-                            }
-                            if(xmlReader.name() == "B")
-                            {
-                                color.setBlue(xmlReader.readElementText().toInt());
-                            }
-                        }
+                        QColor color(xmlReader.readElementText());
                         
                         ct[color_id] = color.rgb();
                     }
@@ -333,12 +318,15 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
                 setValue(ct);
                 return true;
             }
+            else
+            {
+                throw std::runtime_error("Did not find typeName() in XML tree");
+            }
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find any start element in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {

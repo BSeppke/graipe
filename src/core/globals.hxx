@@ -59,6 +59,7 @@ extern AlgorithmFactory algorithmFactory;
 //And two more holding all currently available Models and ViewControllers:
 extern std::vector<Model*> models;
 extern std::vector<ViewController*> viewControllers;
+
 }//end of namespace graipe
 
 /**

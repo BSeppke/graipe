@@ -116,37 +116,14 @@ void ColorParameter::setValue(const QColor& value)
 }
 
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
+ * The value converted to a QString. 
+ * This denotes the name of the color in the format #AARRGGBB.
  *
  * \return The value of the parameter converted to an QString.
  */
 QString  ColorParameter::toString() const
 {
-    return m_value.name();
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "ColorParameter, " + value().rgba()
- *
- * \param out The output device on which we serialize the parameter's state.
- */
-void ColorParameter::serialize(QXmlStreamWriter& xmlWriter) const
-{
-    xmlWriter.setAutoFormatting(true);
-    
-    xmlWriter.writeStartElement(typeName());
-        xmlWriter.writeTextElement("Name", name());
-        xmlWriter.writeStartElement("Color");
-        xmlWriter.writeAttribute("Type", "RGB");
-            xmlWriter.writeTextElement("R", QString::number(value().red()));
-            xmlWriter.writeTextElement("G", QString::number(value().green()));
-            xmlWriter.writeTextElement("B", QString::number(value().blue()));
-        xmlWriter.writeEndElement();
-    xmlWriter.writeEndElement();
+    return m_value.name(QColor::HexArgb);
 }
 
 /**
@@ -155,57 +132,18 @@ void ColorParameter::serialize(QXmlStreamWriter& xmlWriter) const
  * \param in the input device.
  * \return True, if the deserialization was successful, else false.
  */
-bool ColorParameter::deserialize(QXmlStreamReader& xmlReader)
+bool ColorParameter::fromString(QString & str)
 {
-    try
+    QColor new_color(str);
+        
+    if(new_color.isValid())
     {
-        if (xmlReader.readNextStartElement())
-        {
-            if(xmlReader.name() == typeName())
-            {
-                while(xmlReader.readNextStartElement())
-                {
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(    xmlReader.name() == "Color"
-                        && xmlReader.attributes().hasAttribute("Type")
-                        && xmlReader.attributes().value("Type") == "RGB")
-                    {
-                        QColor color;
-                        
-                        while(xmlReader.readNextStartElement())
-                        {
-                            if(xmlReader.name() == "R")
-                            {
-                                color.setRed(xmlReader.readElementText().toInt());
-                            }
-                            if(xmlReader.name() == "G")
-                            {
-                                color.setGreen(xmlReader.readElementText().toInt());
-                            }
-                            if(xmlReader.name() == "B")
-                            {
-                                color.setBlue(xmlReader.readElementText().toInt());
-                            }
-                        }
-                        setValue(color);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        else
-        {
-            throw std::runtime_error("Did not find typeName() in XML tree");
-        }
-        throw std::runtime_error("Did not find any start element in XML tree");
+        setValue(new_color);
+        return true;
     }
-    catch(std::runtime_error & e)
+    else
     {
-        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        qDebug() << "ColorParameter deserialize: value has to be in #AARRGGBB or #RRGGBB format, but found: " << str;
         return false;
     }
 }
@@ -217,7 +155,7 @@ bool ColorParameter::deserialize(QXmlStreamReader& xmlReader)
  */
  bool ColorParameter::isValid() const
 {
-    return true;
+    return m_value.isValid();
 }
 
 /**
