@@ -486,21 +486,6 @@ void MainWindow::runAlgorithm(int index)
 	Algorithm* alg = alg_item.algorithm_fptr();
 	alg->setGlobalAlgorithmMutex(&global_algorithm_mutex);
     
-	//Create temporary model list for algorithm
-	vector<Model*>* alg_object_stack = new vector<Model*>;
-
-	for(int i=0; i!=m_ui.listModels->count(); i++)
-	{
-		QListWidgetModelItem * model_item = dynamic_cast<QListWidgetModelItem *>(m_ui.listModels->item(i));
-		if (model_item && model_item->model() ) 
-		{
-			alg_object_stack->push_back( model_item->model() );
-		}
-	}
-	
-	//Refresh object stack for all params
-	alg->parameters()->refresh();
-    
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);
 	parameter_selection.setModal(true);
@@ -538,10 +523,6 @@ void MainWindow::runAlgorithm(int index)
 			
 		}
 	}
-	
-	//After all, we can erase the temporary model stack:
-	delete alg_object_stack;
-	alg_object_stack = NULL;
 }
 
 

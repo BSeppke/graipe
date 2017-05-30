@@ -63,15 +63,22 @@ namespace graipe {
  */
 MultiModelParameter::MultiModelParameter(const QString& name, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_delegate(new QListWidget),
+    m_delegate(NULL),
     m_allowed_values(models),
 	m_type_filter(type_filter)
 {
-    m_delegate->setSelectionMode(QAbstractItemView::MultiSelection);
-    refresh();
-    
-    connect(m_delegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
-    Parameter::initConnections();
+    if(models.size())
+	{
+		m_allowed_values.clear();
+		
+		for(Model* model: models)
+		{
+			if( m_type_filter.contains(model->typeName()))
+			{
+				m_allowed_values.push_back(model);
+			}
+		}
+	}
 }
 
 /**
@@ -166,44 +173,23 @@ QString MultiModelParameter::toString() const
 }
 
 /**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-void MultiModelParameter::refresh()
-{
-	if(models.size())
-	{
-		m_allowed_values.clear();
-		
-		for(Model* model: models)
-		{
-			if( m_type_filter.contains(model->typeName()))
-			{
-				m_allowed_values.push_back(model);
-			}
-		}
-	}
-    
-	if(m_delegate != NULL)
-	{
-		m_delegate->clear();
-		
-		for(Model* model: m_allowed_values)
-		{
-			m_delegate->addItem(model->shortName());
-            m_delegate->item(m_delegate->count()-1)->setToolTip(model->description());
-		}
-	}
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * Writes comman-separated model list the output device, containing the filename
- * for each model, like:
- * "MultModelParameter, file1.bla, file2.blubb"
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <MultiModelParameter>
+ *     <Name>NAME</Name>
+ *     <Values>N</Value>
+ *     <Value ID="0">VALUE_0_ID</Value>
+ *     ...
+ *     <Value ID="N-1">VALUE_N-1_ID</Value>
+ * </MultiModelParameter>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with     NAME = name(),
+ *             N = QString::number(value().size()), and
+ *    VALUE_0_ID = values()[0]->id().
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
 void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
@@ -212,6 +198,7 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Values", QString::number(value().size()));
     int i=0;
     for(const Model* model: value())
     {
@@ -224,9 +211,9 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
 bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
@@ -344,7 +331,12 @@ QWidget*  MultiModelParameter::delegate()
         m_delegate = new QListWidget;
         
         m_delegate->setSelectionMode(QAbstractItemView::MultiSelection);
-        refresh();
+        
+        for(Model* model: m_allowed_values)
+		{
+			m_delegate->addItem(model->shortName());
+            m_delegate->item(m_delegate->count()-1)->setToolTip(model->description());
+		}
     
         connect(m_delegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
         Parameter::initConnections();

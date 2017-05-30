@@ -39,11 +39,7 @@
 #include "core/config.hxx"
 
 #include <QString>
-#include <vector>
-#include <map>
-
 #include <QDateTime>
-#include <QIODevice>
 #include <QXmlStreamWriter>
 
 /**
@@ -69,18 +65,6 @@
 namespace graipe {
 
 /**
- * Splits a string using a given separator.
- *
- * \param str the QString to be splitted
- * \param sep the separator, where we want to split
- *
- * \return If sep is found n times, a QStringList with n+1 items, each QString before the
- *         separator and each QString after the separator. If not found, the list
- *         just contains one element, namely the given string.
- */
-GRAIPE_CORE_EXPORT QStringList split_string(const QString & str, const QString & sep);
-
-/**
  * Splits a string using a given separator on the first occurence only.
  *
  * \param str the QString to be splitted
@@ -91,28 +75,6 @@ GRAIPE_CORE_EXPORT QStringList split_string(const QString & str, const QString &
  *         just contains one element, namely the given string.
  */
 GRAIPE_CORE_EXPORT QStringList split_string_once(const QString & str, const QString & sep);
-
-/**
- * Encodes a QString due to the HTML-Get encoding style. 
- * This is used to store QStrings in models' serializations to get 
- * rid of the newline and other problems.
- *
- * \param str the QString to be encoded
- *
- * \return the URL-encoded QString
- */
-GRAIPE_CORE_EXPORT QString encode_string(const QString & str);
-
-/**
- * Decodes a QString due to the HTML-Get decoding style.
- * This is used to restore QStrings from models' serializations to get
- * rid of the newline and other problems.
- *
- * \param str the URL-encoded QString
- *
- * \return the decoded string
- */
-GRAIPE_CORE_EXPORT QString decode_string(const QString & str);
 
 /**
  * Generate a qDateTime from a satellite_format QString.
@@ -145,39 +107,6 @@ GRAIPE_CORE_EXPORT QDateTime qDateTimeFromNumberDateTime(const QString& str);
  * \return QDateTime representation of this string. May be invalid, if conversion fails.
  */
 GRAIPE_CORE_EXPORT QDateTime qDateTimeFromSatelliteDateTime(const QString& str);
-
-/**
- * Writes a QString onto a QIODevice.
- * We wirte the characters by means of UTF8 encoding.
- *
- * \param str the QString, which shall be written.
- * \param dev the QIODevice, where we read from.
- */
-GRAIPE_CORE_EXPORT void write_on_device(const QString& str, QIODevice& dev);
-
-/**
- * Read a QString of a given length from a QIODevice.
- * We assume, that the QIODevice can read characters by means of UTF8.
- *
- * \param dev the QIODevice, where we read from.
- * \param len How many characters should being read?
- * 
- * \return the QString read from the stream
- */
-GRAIPE_CORE_EXPORT QString read_from_device(QIODevice& dev, int len);
-
-/**
- * Reads from a QIODevice until a certain QString is found or one line is finished.
- * We assume, that the QIODevice can read characters by means of UTF8.
- *
- * \param dev the QIODevice, where we read from.
- * \param str the QString where we stop reading from the device
- * \param one_line If true, only one line is read at maximum.
- *
- * \return All characters read sofar (if the matching was successful, else ""
- */
-GRAIPE_CORE_EXPORT QString read_from_device_until(QIODevice& dev, const QString& str, bool one_line=true);
-
 
 /**
  * The nearly pure interface of something that can be serialized
@@ -222,11 +151,10 @@ class GRAIPE_CORE_EXPORT Serializable
         virtual QString typeName() const = 0;
     
         /**
-         * Deserialization from an input device.
-         * Has to be specialized in inheriting classes.
+         * Deserialization of a parameter's state from an xml file.
          *
-         * \param in The input device.
-         * \return True, if the object could be successfully restored from the device.
+         * \param xmlReader The QXmlStreamReader, where we read from.
+         * \return True, if the deserialization was successful, else false.
          */
         virtual bool deserialize(QXmlStreamReader& xmlReader) = 0;
     
@@ -234,7 +162,7 @@ class GRAIPE_CORE_EXPORT Serializable
          * Serialization on to an output device.
          * Has to be specialized in inheriting classes.
          *
-         * \param out The output device.
+         * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
          */
         virtual void serialize(QXmlStreamWriter& xmlWriter) const = 0;
     

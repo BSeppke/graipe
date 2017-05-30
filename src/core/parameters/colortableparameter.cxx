@@ -254,10 +254,22 @@ QString  ColorTableParameter::toString() const
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "ColorParameter, " + value().rgba()
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <ColorTableParameter>
+ *     <Name>NAME</Name>
+ *     <Colors>COLORCOUNT</Colors>
+ *     <Color ID="0">#AARRGGBB</Color>
+ *     ...
+ *     <Color ID="COLORCOUNT-1">#AARRGGBB</Color>
+ * </ColorTableParameter>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName() and
+ *    COLORCOUNT = ct.size().
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
 void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
@@ -280,9 +292,9 @@ void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
 bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)

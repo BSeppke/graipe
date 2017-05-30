@@ -168,7 +168,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
 		virtual bool deserialize_item(const QString& serial);
     
         /**
-         * Serialize the complete content of the sparse vectorfield to a QIODevice.
+         * Serialize the complete content of the sparse vectorfield to an xml file.
          * Mainly prints:
          *   item_header()
          * and for each vector:
@@ -179,11 +179,11 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
 		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a  sparse vectorfield from a QIODevice.
+         * Deserialization of a  sparse vectorfield from an xml file.
          * The first line is the header as given in item_header(), which is ignored however.
          * Each following line has to be one valid vector serialization.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          * \return True, if the content could be deserialized and the model is not locked.
          */
 		bool deserialize_content(QXmlStreamReader& xmlReader);

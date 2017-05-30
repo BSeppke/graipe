@@ -122,9 +122,9 @@ QString DateTimeParameter::toString() const
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from a string.
  *
- * \param in the input device.
+ * \param str the input QString.
  * \return True, if the deserialization was successful, else false.
  */
 bool DateTimeParameter::fromString(QString& str)

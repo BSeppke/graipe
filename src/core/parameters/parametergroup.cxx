@@ -242,17 +242,30 @@ QString ParameterGroup::valueText(const QString & filter_types) const
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * This serializes each parameter in the group by means of its name and its serialization,
- * one per line, e.g. like:
- * "param1: StringParameter, bla"
- * "param2: PointParmaeter, ...."
+ * Serialization of the parameter groups's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <ParameterGroup>
+ *     <Name>NAME</Name>
+ *     <Parameters>N</Parameters>
+ *     <Parameter ID="ID_PARAM_0">
+ *         PARAM_0_SERIALIZATION
+ *     </Parameter>
+ *     ...
+ *     <Parameter ID="ID_PARAM_N-1">
+ *         PARAM_N-1_SERIALIZATION
+ *      </Parameter>
+ * </ParameterGroup>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with                NAME = name(), and
+ *               ID_PARAM_0 = m_parameters.front()->first.
+ *    PARAM_0_SERIALIZATION = m_parameters.front()->second->serialize().
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
 void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
@@ -273,9 +286,9 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
 bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
@@ -365,19 +378,6 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
         return false;
     }
     return true;
-}
-    
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-void ParameterGroup::refresh()
-{
-    for(storage_type::iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
-    {
-        iter->second->refresh();
-    }
 }
 
 /**

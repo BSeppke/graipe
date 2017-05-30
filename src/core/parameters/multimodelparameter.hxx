@@ -114,28 +114,32 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          * \return The value of the parameter converted to an QString.
          */
         QString toString() const;
-    
-        /**
-         * This method is called after each (re-)assignment of the model list
-         * e.g. after a call of the setModelList() function. 
-         * It synchronizes the list of available models with the widget's list.
-         */
-        void refresh();
             
         /**
-         * Serialization of the parameter's state to an output device.
-         * Writes comman-separated model list the output device, containing the filename
-         * for each model, like:
-         * "MultModelParameter, file1.bla, file2.blubb"
+         * Serialization of the parameter's state to a xml stream.
+         * Writes the following XML code by default:
+         * 
+         * <MultiModelParameter>
+         *     <Name>NAME</Name>
+         *     <Values>N</Value>
+         *     <Value ID="0">VALUE_0_ID</Value>
+         *     ...
+         *     <Value ID="N-1">VALUE_N-1_ID</Value>
+         * </MultiModelParameter>
          *
-         * \param out The output device on which we serialize the parameter's state.
+         * with     NAME = name(),
+         *             N = QString::number(value().size()), and
+         *    VALUE_0_ID = values()[0]->id().
+         *
+         * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+         *                  parameter's type, name and value.
          */
         void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Deserialization of a parameter's state from an xml file.
          *
-         * \param in the input device.
+         * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
         bool deserialize(QXmlStreamReader& xmlReader);

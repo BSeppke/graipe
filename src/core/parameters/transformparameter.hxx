@@ -105,7 +105,7 @@ class GRAIPE_CORE_EXPORT TransformParameter
          * Serialization of the parameter's state to an output device.
          * Writes the following XML on the device:
          * 
-         * <MAGICID>
+         * <TYPENAME>
          *     <Name>NAME</Name>
          *     <Transform Type="Affine">
          *       <m11>value().m11()</m11>
@@ -116,21 +116,21 @@ class GRAIPE_CORE_EXPORT TransformParameter
          *       <m23>value().m23()</m23>
          *       <m31>value().m31()</m31>
          *       <m32>value().m32()</m32>
-         *       <m33>value().m33()</m43>
+         *       <m33>value().m33()</m33>
          *     </Transform>
-         * </MAGICID>
+         * </TYPENAME>
          *
-         * with MAGICID = typeName(),
+         * with TYPENAME = typeName(),
          *         NAME = name().
          *
-         * \param out The output device on which we serialize the parameter's state.
+         * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
          */
         void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Deserialization of a parameter's state from an xml file.
          *
-         * \param in the input device.
+         * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
         bool deserialize(QXmlStreamReader& xmlReader);

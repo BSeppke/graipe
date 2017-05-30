@@ -36,8 +36,6 @@
 #include "images/image.hxx"
 #include "images/imageimpex.hxx"
 
-#include <QIODevice>
-
 namespace graipe {
 
 /**
@@ -417,10 +415,10 @@ void Image<T>::copyData(Model& other) const
 }
 
 /**
- * Serialization of the Image to a QIODevice.
+ * Serialization of the Image to an xml file.
  * The serialization is just a binary stream of all bands, one after the other.
  *
- * \param out The QIODevice, where we will put our output on.
+ * \param xmlWriter The QXmlStreamWriter where we will put our output on.
  */
 template<class T>
 void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
@@ -453,11 +451,11 @@ void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserializion of a list of polygons from a QIODevice.
+ * Deserialization of a list of polygons from an xml file.
  * Since the serialization is just a binary stream of all bands, one after the other
  * and we already know the size and count of bands, it is quite easy the deserialize.
  *
- * \param in The QIODevice, where we will read from.
+ * \param xmlReader The QXmlStreamReader, where we will read from.
  */
 template<class T>
 bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)

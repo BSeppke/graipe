@@ -137,20 +137,20 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
         virtual bool deserialize_item(const QString & serial);
     
         /**
-         * Serialization the list of polygons to a QIODevice.
+         * Serialization the list of polygons to an xml file.
          * The first line is the header as given in item_header(). Each following
          * line represents one polygon serialization.
          *
-         * \param out The QIODevice, where we will put our output on.
+         * \param xmlWriter The QXmlStreamWriter where we will put our output on.
          */
 		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a list of polygons from a QIODevice.
+         * Deserialization of a list of polygons from an xml file.
          * The first line is the header as given in item_header(), which is ignored however.
          * Each following line has to be one valid polygon serialization.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          */
 		bool deserialize_content(QXmlStreamReader& xmlReader);
     

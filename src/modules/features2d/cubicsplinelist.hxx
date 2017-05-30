@@ -138,20 +138,20 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
         virtual bool deserialize_item(const QString & serial);
     
         /**
-         * Serialization the list of 2D cubic splines to a QIODevice.
+         * Serialization the list of 2D cubic splines to an xml file.
          * The first line is the header as given in item_header(). Each following
          * line represents one 2D cubic spline serialization.
          *
-         * \param out The QIODevice, where we will put our output on.
+         * \param xmlWriter The QXmlStreamWriter where we will put our output on.
          */
 		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a list of 2D cubic splines from a QIODevice.
+         * Deserialization of a list of 2D cubic splines from an xml file.
          * The first line is the header as given in item_header(), which is ignored however.
-         * Each following line has to be one valide 2D cubic spline serialization.
+         * Each following line has to be one valid 2D cubic spline serialization.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          */
 		bool deserialize_content(QXmlStreamReader& xmlReader);
 	

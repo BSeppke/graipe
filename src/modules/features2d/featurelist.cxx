@@ -193,7 +193,7 @@ bool PointFeatureList2D::deserialize_item(const QString & serial)
 }
 
 /**
- * Serialize the complete content of the featurelist to a QIODevice.
+ * Serialize the complete content of the featurelist to an xml file.
  * Mainly prints:
  *   item_header()
  * and for each feature:
@@ -215,11 +215,11 @@ void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserializion of a  feature list from a QIODevice.
+ * Deserialization of a  feature list from an xml file.
  * The first line is the header as given in item_header(), which is ignored however.
  * Each following line has to be one valide feature serialization.
  *
- * \param in The QIODevice, where we will read from.
+ * \param xmlReader The QXmlStreamReader, where we will read from.
  */
 bool PointFeatureList2D::deserialize_content(QXmlStreamReader& xmlReader)
 {

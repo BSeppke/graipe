@@ -327,13 +327,27 @@ class GRAIPE_CORE_EXPORT Model
         virtual QString typeName() const;
     
         /**
-         * This function serializes a complete Model to a QString.
-         * To do so, it serializes header first, then the content, like this:
-         *      serialize_header()
-         *      [Content]
-         *      serialize_content();
+         * This function serializes a complete Model to a xml stream.
+         * Writes the following XML code by default:
          *
-         * \param out The output device for the serialization.
+         * <TYPENAME>
+         *     <Header>
+         *         HEADER
+         *     </Header>
+         *     <Content>
+         *         CONTENT
+         *     </Content>
+         * </TYPENAME>
+         *
+         * with TYPENAME = typeName(),
+         *        HEADER = serialize_header(), and
+         *       CONTENT = serialize_content().
+         *
+         * If the device, on which the writer writes, is not on the beginning (pos!=0),
+         * the writeStartDocument() and writeEndDocument() calls will be suppressed in
+         * order to allow multi-object files.
+         *
+         * \param xmlWriter The QXmlStreamWriter used for the serialization.
          */
         void serialize(QXmlStreamWriter& xmlWriter) const;
     
@@ -346,11 +360,10 @@ class GRAIPE_CORE_EXPORT Model
         bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
-         * This function serializes the header of a model like this:
-         *      typeName()
-         *      m_parameters->serialize()
+         * This function serializes the header of a model by means of a serialization of the
+         * models parameters (given as a ParameterGroup in m_parameters).
          *
-         * \param out the output device.
+         * \param xmlWriter The QXmlStreamWriter, where we write on.
          */
         virtual void serialize_header(QXmlStreamWriter& xmlWriter) const;
     
@@ -364,9 +377,9 @@ class GRAIPE_CORE_EXPORT Model
     
         /**
          * This function serializes the content of a model.
-         * Has to be specialized, here always "none\n".
+         * Has to be specialized, here always "".
          *
-         * \param out the output device.
+         * \param xmlWriter The QXmlStreamWriter, on which we write.
          */
         virtual void serialize_content(QXmlStreamWriter& xmlWriter) const;
     

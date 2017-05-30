@@ -232,7 +232,7 @@ bool SparseVectorfield2D::deserialize_item(const QString & serial)
         return false;
         
 	//try to split content into data entries
-	QStringList values = split_string(serial, ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 4)
 	{
 		try
@@ -251,7 +251,7 @@ bool SparseVectorfield2D::deserialize_item(const QString & serial)
 }
 
 /**
- * Serialize the complete content of the sparse vectorfield to a QIODevice.
+ * Serialize the complete content of the sparse vectorfield to an xml file.
  * Mainly prints:
  *   item_header()
  * and for each vector:
@@ -273,12 +273,12 @@ void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserializion of a  sparse vectorfield from a QIODevice.
+ * Deserialization of a  sparse vectorfield from an xml file.
  * The first line is the header as given in item_header(), which is ignored however.
  * Each following line has to be one valid vector serialization.
  * Does nothing if the model is locked.
  *
- * \param in The QIODevice, where we will read from.
+ * \param xmlReader The QXmlStreamReader, where we will read from.
  * \return True, if the content could be deserialized and the model is not locked.
  */
 bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
@@ -479,7 +479,7 @@ bool SparseWeightedVectorfield2D::deserialize_item(const QString & serial)
         return false;
     
 	//try to split content into data entries
-	QStringList values = split_string(serial, ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 5)
 	{
 		try
@@ -861,7 +861,7 @@ QString SparseMultiVectorfield2D::serialize_item(unsigned int index) const
 bool SparseMultiVectorfield2D::deserialize_item(const QString & serial)
 {
     //try to split content into data entries
-	QStringList values = split_string(serial , ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 4)
 	{
 		try
@@ -1227,7 +1227,7 @@ QString SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index) con
 bool SparseWeightedMultiVectorfield2D::deserialize_item(const QString & serial)
 {
     //try to split content into data entries
-	QStringList values = split_string(serial , ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 5)
 	{
 		try

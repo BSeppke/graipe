@@ -125,9 +125,10 @@ QString  StringParameter::toString() const
 }
 
 /**
- * Sets the value using a QString. This is the default method, used by the desearialize .
+ * Deserialization of a parameter's state from a string.
  *
- * \param str The value of the parameter converted to an QString
+ * \param str the input QString.
+ * \return True, if the deserialization was successful, else false.
  */
 bool StringParameter::fromString(QString& str)
 {

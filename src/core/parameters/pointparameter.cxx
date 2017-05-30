@@ -200,18 +200,18 @@ QString  PointParameter::toString() const
  * Serialization of the parameter's state to an output device.
  * Writes the following XML on the device:
  * 
- * <MAGICID>
+ * <TYPENAME>
  *     <Name>NAME</Name>
  *     <x>X</x>
  *     <y>Y</y>
- * </MAGICID>
+ * </TYPENAME>
  *
- * with MAGICID = typeName(),
+ * with TYPENAME = typeName(),
  *         NAME = name(),
  *            X = value().x(), and
  *            Y = value().y().
  *
- * \param out The output device on which we serialize the parameter's state.
+ * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
  */
 void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
@@ -226,9 +226,9 @@ void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
 bool PointParameter::deserialize(QXmlStreamReader& xmlReader)

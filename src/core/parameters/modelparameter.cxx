@@ -66,7 +66,20 @@ ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* 
     m_delegate(NULL),
     m_type_filter(type_filter)
 {
-	refresh();
+    if(models.size())
+	{
+		m_allowed_values.clear();
+		
+		for(Model * model: models)
+		{
+            
+			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
+			{
+				m_allowed_values.push_back(model);
+			}
+		}
+	}
+    
     setValue(value);
     
 }
@@ -150,10 +163,11 @@ QString ModelParameter::toString() const
 { 
 	return value()->id();
 }
+
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from a string.
  *
- * \param in the input device.
+ * \param str the input QString.
  * \return True, if the deserialization was successful, else false.
  */
 bool ModelParameter::fromString(QString& str)
@@ -170,44 +184,6 @@ bool ModelParameter::fromString(QString& str)
     qDebug() << "ModelParameter deserialize: filename does not match any given. Was: '" << str << "'";
     return false;
 }
-
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-void ModelParameter::refresh()
-{
-	if(models.size())
-	{
-		m_allowed_values.clear();
-		
-		for(Model * model: models)
-		{
-            
-			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
-			{
-				m_allowed_values.push_back(model);
-			}
-		}
-	}
-    
-    if(m_delegate)
-	{
-		m_delegate->clear();
-		
-        int i=0;
-        
-		for(Model * model: m_allowed_values)
-		{
-			m_delegate->addItem(model->shortName());
-            m_delegate->setItemData(i++, model->description(), Qt::ToolTipRole);
-		}
-    }
-    if(m_allowed_values.size() != 0)
-        setValue(m_allowed_values[0]);
-}
-
 
 /**
  * This function locks the parameters value. 
@@ -264,8 +240,14 @@ QWidget*  ModelParameter::delegate()
     if(m_delegate == NULL)
     {
         m_delegate = new QComboBox;
-        m_delegate->update();
-        refresh();
+        
+        int i=0;
+        
+		for(Model * model: m_allowed_values)
+		{
+			m_delegate->addItem(model->shortName());
+            m_delegate->setItemData(i++, model->description(), Qt::ToolTipRole);
+		}
     
         connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();

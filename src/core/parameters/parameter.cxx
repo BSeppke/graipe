@@ -33,14 +33,10 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/parameters/parameter.hxx"
 #include "core/parameters/boolparameter.hxx"
 #include "core/model.hxx"
 
 #include <QtDebug>
-#include <QCoreApplication>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -89,13 +85,13 @@ Parameter::~Parameter()
  *
  * \return "Parameter".
  */
-QString  Parameter::typeName() const
+QString Parameter::typeName() const
 {
 	return "Parameter";
 }
 
 /**
- * The name of this parameter. This name is used a label for the parameter.
+ * The name of this parameter. This name is used as a label for the parameter.
  *
  * \return The name of the parameter.
  */
@@ -136,11 +132,11 @@ bool Parameter::invertParent() const
 }
 
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars.
+ * The value converted to a QString. Needs to be specified for inheriting classes.
+ * This is the default method for the value serialization performed by
+ * serialize.
  *
- * \return The value of the parameter converted to an QString
+ * \return The value of the parameter converted to an QString, here "".
  */
 QString Parameter::toString() const
 {
@@ -148,9 +144,12 @@ QString Parameter::toString() const
 }
 
 /**
- * Sets the value using a QString. This is the default method, used by the desearialize .
+ * Sets the value using a QString. 
+ * This is the default method for the value deserialization performed by
+ * deserialize.
  *
  * \param str The value of the parameter converted to an QString
+ * \return True, if the value could be restored. Here, always true.
  */
 bool Parameter::fromString(QString& str)
 {
@@ -158,19 +157,20 @@ bool Parameter::fromString(QString& str)
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Writes the following XML on the device:
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
  * 
- * <MAGICID>
+ * <TYPENAME>
  *     <Name>NAME</Name>
  *     <Value>VALUETEXT</Value>
- * </MAGICID>
+ * </TYPENAME>
  *
- * with MAGICID = typeName(),
+ * with TYPENAME = typeName(),
  *         NAME = name(), and
  *    VALUETEXT = toString().
  *
- * \param out The output device on which we serialize the parameter's state.
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
 void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
@@ -183,9 +183,9 @@ void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml stream.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader from which we read.
  * \return True, if the deserialization was successful, else false.
  */
 bool Parameter::deserialize(QXmlStreamReader& xmlReader)
@@ -238,15 +238,6 @@ bool Parameter::deserialize(QXmlStreamReader& xmlReader)
         qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
-}
-
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. It may be implemented
- * by means of the subclasses to handle these updates.
- */
-void Parameter::refresh()
-{
 }
 
 /**

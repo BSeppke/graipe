@@ -115,18 +115,12 @@ class GRAIPE_CORE_EXPORT ModelParameter
         QString toString() const;
     
         /**
-         * Sets the value using a QString. This is the default method, used by the desearialize .
+         * Deserialization of a parameter's state from a string.
          *
-         * \param str The value of the parameter converted to an QString
+         * \param str the input QString.
+         * \return True, if the deserialization was successful, else false.
          */
         bool fromString(QString& str);
-    
-        /**
-         * This method is called after each (re-)assignment of the model list
-         * e.g. after a call of the setModelList() function. 
-         * It synchronizes the list of available models with the widget's list.
-         */
-        void refresh();
     
         /**
          * This function locks the parameters value. 

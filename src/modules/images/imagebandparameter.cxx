@@ -100,7 +100,6 @@ QWidget* ImageBandParameterBase::delegate()
         layout->addWidget(m_cmbImage);
         layout->addWidget(m_spbBand);
         
-		refresh();
         initConnections();
     }
     return m_delegate;
@@ -154,6 +153,24 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
     m_image(NULL),
     m_bandId(0)
 {
+    if(models.size())
+    {
+        m_allowed_images.clear();
+        Image<T> temp;
+            
+        for(Model* model : models)
+        {
+            if(model->typeName() == temp.typeName())
+            {
+                m_allowed_images.push_back(static_cast<Image<T>*>(model));
+            }
+        }
+            
+        if(m_allowed_images.size())
+        {
+            updateImage();
+        }
+    }
 }
 
 /**
@@ -265,40 +282,6 @@ QString ImageBandParameter<T>::toString() const
 	else
 	{
 		return QString("%1 (band %2)").arg(m_image->name()).arg(m_bandId);
-	}
-}
-
-    
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-template <class T>
-void ImageBandParameter<T>::refresh()
-{
-    if(models.size() && m_cmbImage)
-	{
-		m_allowed_images.clear();
-		m_cmbImage->clear();
-		
-        Image<T> temp;
-		
-        for(Model* model : models)
-		{
-        	if(model->typeName() == temp.typeName())
-			{
-				m_cmbImage->addItem(model->shortName());
-				m_cmbImage->setItemData(m_cmbImage->count()-1, model->description(), Qt::ToolTipRole);
-				m_allowed_images.push_back(static_cast<Image<T>*>(model));
-			}
-		}
-        
-        if(m_allowed_images.size())
-        {
-			m_cmbImage->setCurrentIndex(0);
-            updateImage();
-        }
 	}
 }
 
@@ -436,6 +419,32 @@ template <class T>
 bool ImageBandParameter<T>::isValid() const
 {
 	return	(m_image != NULL) && (m_bandId < m_image->numBands());
+}
+
+/**
+ * Initializes the connections (signal<->slot) between the parameter class and
+ * the delegate widget. This will be done after the first call of the delegate()
+ * function, since the delegate is NULL until then.
+ */
+template <class T>
+void ImageBandParameter<T>::initConnections()
+{
+    m_allowed_images.clear();
+    m_cmbImage->clear();
+            
+    for(Image<T>* image : m_allowed_images)
+    {
+        m_cmbImage->addItem(image->shortName());
+        m_cmbImage->setItemData(m_cmbImage->count()-1, image->description(), Qt::ToolTipRole);
+    }
+    
+    if(m_allowed_images.size() != 0)
+    {
+        m_cmbImage->setCurrentIndex(0);
+        updateImage();
+    }
+    
+    ImageBandParameterBase::initConnections();
 }
 
 /**

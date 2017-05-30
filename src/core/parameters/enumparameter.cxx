@@ -129,10 +129,20 @@ QString EnumParameter::toString() const
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "EnumParameter: " + Index of enum
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <TYPENAME>
+ *     <Name>NAME</Name>
+ *     <Value>VALUETEXT</Value>
+ * </TYPENAME>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName(),
+ *         NAME = name(), and
+ *    VALUETEXT = QString::number(value()).
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
 void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
@@ -140,14 +150,14 @@ void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
     
     xmlWriter.writeStartElement(typeName());
     xmlWriter.writeTextElement("Name", name());
-    xmlWriter.writeTextElement("Value", QString("%1").arg(value()));
+    xmlWriter.writeTextElement("Value", QString::number(value()));
     xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
 bool EnumParameter::deserialize(QXmlStreamReader& xmlReader)
