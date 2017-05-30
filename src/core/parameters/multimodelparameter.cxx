@@ -197,6 +197,7 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID",id());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Values", QString::number(value().size()));
     int i=0;
@@ -220,44 +221,43 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if(xmlReader.name() == typeName())
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            while(xmlReader.readNextStartElement())
             {
-                while(xmlReader.readNextStartElement())
+                if(xmlReader.name() == "Name")
                 {
-                    if(xmlReader.name() == "Name")
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "Value")
+                {
+                    QString id =  xmlReader.readElementText();
+                    
+                    int i=0;
+                    
+                    for(const Model* allowed_model: m_allowed_values)
                     {
-                        setName(xmlReader.readElementText());
+                       if (id == allowed_model->id())
+                       {
+                            m_delegate->item(i)->setSelected(true);
+                            break;
+                        }
+                        ++i;
                     }
-                    if(xmlReader.name() == "Value")
+                    if(i==m_allowed_values.size())
                     {
-                        QString id =  xmlReader.readElementText();
-                        
-                        int i=0;
-                        
-                        for(const Model* allowed_model: m_allowed_values)
-                        {
-                           if (id == allowed_model->id())
-                           {
-                                m_delegate->item(i)->setSelected(true);
-                                break;
-                            }
-                            ++i;
-                        }
-                        if(i==m_allowed_values.size())
-                        {
-                            throw std::runtime_error("Did not find a model with id: " + id.toStdString());
-                        }
+                        throw std::runtime_error("Did not find a model with id: " + id.toStdString());
                     }
                 }
             }
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {

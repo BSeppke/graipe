@@ -218,6 +218,7 @@ void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("x", QString::number(value().x()));
     xmlWriter.writeTextElement("y", QString::number(value().y()));
@@ -235,50 +236,50 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if(xmlReader.name() == typeName())
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            QPoint p;
+            
+            for(int i=0; i!=3; ++i)
             {
-                QPoint p;
+                xmlReader.readNextStartElement();
                 
-                for(int i=0; i!=3; ++i)
+                if(xmlReader.name() == "Name")
                 {
-                    xmlReader.readNextStartElement();
-                    
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(xmlReader.name() == "x")
-                    {
-                       p.setX(xmlReader.readElementText().toInt());
-                    }
-                    if(xmlReader.name() == "y")
-                    {
-                       p.setY(xmlReader.readElementText().toInt());
-                    }
+                    setName(xmlReader.readElementText());
                 }
-                
-                //Read until </PointParameter> comes....
-                while(true)
+                if(xmlReader.name() == "x")
                 {
-                    if(!xmlReader.readNext())
-                    {
-                        return false;
-                    }
-                    
-                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
-                    {
-                        break;
-                    }
+                   p.setX(xmlReader.readElementText().toInt());
                 }
-                setValue(p);
-                return true;
+                if(xmlReader.name() == "y")
+                {
+                   p.setY(xmlReader.readElementText().toInt());
+                }
             }
+            
+            //Read until </PointParameter> comes....
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            setValue(p);
+            return true;
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }

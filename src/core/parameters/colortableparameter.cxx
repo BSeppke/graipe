@@ -278,6 +278,7 @@ void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
         xmlWriter.writeTextElement("Name", name());
         xmlWriter.writeTextElement("Colors", QString::number(ct.size()));
     
@@ -301,43 +302,39 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if(xmlReader.name() == typeName())
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            QVector<QRgb> ct(256);
+            
+            while(xmlReader.readNextStartElement())
             {
-                QVector<QRgb> ct(256);
-                
-                while(xmlReader.readNextStartElement())
+                if(xmlReader.name() == "Name")
                 {
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(xmlReader.name() == "Colors")
-                    {
-                        ct.resize(xmlReader.readElementText().toInt());
-                    }
-                    if(    xmlReader.name() == "Color"
-                        && xmlReader.attributes().hasAttribute("ID"))
-                    {
-                        int color_id = xmlReader.attributes().value("ID").toInt();
-                        
-                        QColor color(xmlReader.readElementText());
-                        
-                        ct[color_id] = color.rgb();
-                    }
+                    setName(xmlReader.readElementText());
                 }
-                setValue(ct);
-                return true;
+                if(xmlReader.name() == "Colors")
+                {
+                    ct.resize(xmlReader.readElementText().toInt());
+                }
+                if(    xmlReader.name() == "Color"
+                    && xmlReader.attributes().hasAttribute("ID"))
+                {
+                    int color_id = xmlReader.attributes().value("ID").toInt();
+                    
+                    QColor color(xmlReader.readElementText());
+                    
+                    ct[color_id] = color.rgb();
+                }
             }
-            else
-            {
-                throw std::runtime_error("Did not find typeName() in XML tree");
-            }
+            setValue(ct);
+            return true;
         }
         else
         {
-            throw std::runtime_error("Did not find any start element in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
     }
     catch(std::runtime_error & e)

@@ -177,6 +177,7 @@ void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Value", toString());
     xmlWriter.writeEndElement();
@@ -194,44 +195,43 @@ bool Parameter::deserialize(QXmlStreamReader& xmlReader)
     
     try
     {
-        if (xmlReader.readNextStartElement())
-        {            
-            if(xmlReader.name() == typeName())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
+        {
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            for(int i=0; i!=2; ++i)
             {
-                for(int i=0; i!=2; ++i)
+                xmlReader.readNextStartElement();
+            
+                if(xmlReader.name() == "Name")
                 {
-                    xmlReader.readNextStartElement();
-                
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(xmlReader.name() == "Value")
-                    {
-                        QString valueText =  xmlReader.readElementText();
-                        success = fromString(valueText);
-                    }
+                    setName(xmlReader.readElementText());
                 }
-                while(true)
+                if(xmlReader.name() == "Value")
                 {
-                    if(!xmlReader.readNext())
-                    {
-                        return false;
-                    }
-                    
-                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
-                    {
-                        break;
-                    }
+                    QString valueText =  xmlReader.readElementText();
+                    success = fromString(valueText);
                 }
-                return success;
             }
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            return success;
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {

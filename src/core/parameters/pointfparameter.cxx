@@ -216,6 +216,7 @@ void PointFParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("x", QString::number(value().x(),'g', 10));
     xmlWriter.writeTextElement("y", QString::number(value().y(),'g', 10));
@@ -232,51 +233,50 @@ bool PointFParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if(xmlReader.name() == typeName())
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            QPointF p;
+            
+            for(int i=0; i!=3; ++i)
             {
-                QPointF p;
-                
-                for(int i=0; i!=3; ++i)
+                xmlReader.readNextStartElement();
+            
+                if(xmlReader.name() == "Name")
                 {
-                    xmlReader.readNextStartElement();
-                
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(xmlReader.name() == "x")
-                    {
-                       p.setX(xmlReader.readElementText().toFloat());
-                    }
-                    if(xmlReader.name() == "y")
-                    {
-                       p.setY(xmlReader.readElementText().toFloat());
-                    }
+                    setName(xmlReader.readElementText());
                 }
-                //Read until </PointFParameter> comes....
-                while(true)
+                if(xmlReader.name() == "x")
                 {
-                    if(!xmlReader.readNext())
-                    {
-                        return false;
-                    }
-                    
-                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
-                    {
-                        break;
-                    }
+                   p.setX(xmlReader.readElementText().toFloat());
                 }
-                setValue(p);
-                return true;
+                if(xmlReader.name() == "y")
+                {
+                   p.setY(xmlReader.readElementText().toFloat());
+                }
             }
+            //Read until </PointFParameter> comes....
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            setValue(p);
+            return true;
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
     }
     catch(std::runtime_error & e)
     {

@@ -152,6 +152,7 @@ void TransformParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
     xmlWriter.writeTextElement("Name", name());
         xmlWriter.writeStartElement("Transform");
         xmlWriter.writeAttribute("Type", "Affine");
@@ -178,55 +179,51 @@ bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if (xmlReader.readNextStartElement())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if(xmlReader.name() == typeName())
-            {
-                for(int i=0; i!=2; ++i)
+            setID(xmlReader.attributes().value("ID").toString());
+            
+           for(int i=0; i!=2; ++i)
+           {
+                xmlReader.readNextStartElement();
+                
+                if(xmlReader.name() == "Name")
                 {
-                    xmlReader.readNextStartElement();
-                    
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    
-                    if(    xmlReader.name() == "Transform"
-                        && xmlReader.attributes().hasAttribute("Type")
-                        && xmlReader.attributes().value("Type") == "Affine")
-                    {
-                        double m11, m12, m13, m21, m22, m23, m31, m32, m33;
-                      
-                        for(int i=0; i!=9; ++i)
-                        {
-  
-                            xmlReader.readNextStartElement();
-                            
-                            if(xmlReader.name() == "m11") m11 = xmlReader.readElementText().toDouble();
-                            if(xmlReader.name() == "m12") m12 = xmlReader.readElementText().toDouble();
-                            if(xmlReader.name() == "m13") m13 = xmlReader.readElementText().toDouble();
-                            
-                            if(xmlReader.name() == "m21") m21 = xmlReader.readElementText().toDouble();
-                            if(xmlReader.name() == "m22") m22 = xmlReader.readElementText().toDouble();
-                            if(xmlReader.name() == "m23") m23 = xmlReader.readElementText().toDouble();
-                            
-                            if(xmlReader.name() == "m31") m31 = xmlReader.readElementText().toDouble();
-                            if(xmlReader.name() == "m32") m32 = xmlReader.readElementText().toDouble();
-                            if(xmlReader.name() == "m33") m33 = xmlReader.readElementText().toDouble();
-                        }
-                        setValue(QTransform(m11, m12, m13,    m21, m22, m23, m31, m32, m33));
-                        return true;
-                    }
+                    setName(xmlReader.readElementText());
                 }
-            }
-            else
-            {
-                throw std::runtime_error("Did not find typeName() in XML tree");
+                
+                if(    xmlReader.name() == "Transform"
+                    && xmlReader.attributes().hasAttribute("Type")
+                    && xmlReader.attributes().value("Type") == "Affine")
+                {
+                    double m11, m12, m13, m21, m22, m23, m31, m32, m33;
+                  
+                    for(int i=0; i!=9; ++i)
+                    {
+
+                        xmlReader.readNextStartElement();
+                        
+                        if(xmlReader.name() == "m11") m11 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m12") m12 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m13") m13 = xmlReader.readElementText().toDouble();
+                        
+                        if(xmlReader.name() == "m21") m21 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m22") m22 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m23") m23 = xmlReader.readElementText().toDouble();
+                        
+                        if(xmlReader.name() == "m31") m31 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m32") m32 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m33") m33 = xmlReader.readElementText().toDouble();
+                    }
+                    setValue(QTransform(m11, m12, m13,    m21, m22, m23, m31, m32, m33));
+                    return true;
+                }
             }
         }
         else
         {
-            throw std::runtime_error("Did not find any start element in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
     }
     catch(std::runtime_error & e)

@@ -298,6 +298,7 @@ void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Filename", m_image->id());
     xmlWriter.writeTextElement("BandID", QString::number(m_bandId));
@@ -365,7 +366,7 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
         throw std::runtime_error("Did not find any start element in XML tree");
     }

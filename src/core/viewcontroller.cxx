@@ -482,7 +482,7 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
             }
             else
             {
-                throw std::runtime_error("Did not find typeName() in XML tree");
+                throw std::runtime_error("Did not find typeName() or id() in XML tree");
             }
         //}
         //else

@@ -546,7 +546,7 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     if (fullFile)
     {
         xmlWriter.writeStartDocument();
-     }
+    }
         xmlWriter.writeStartElement(typeName());
         xmlWriter.writeAttribute("ID", id());
             xmlWriter.writeStartElement("Header");
@@ -559,7 +559,7 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     if (fullFile)
     {
         xmlWriter.writeEndDocument();
-     }
+    }
 }
 
 /**
@@ -577,8 +577,11 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
         //{
         //    qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
             
-            if(xmlReader.name() == typeName())
+            if(     xmlReader.name() == typeName()
+                &&  xmlReader.attributes().hasAttribute("ID"))
             {
+                setID(xmlReader.attributes().value("ID").toString());
+                
                 while(xmlReader.readNextStartElement())
                 {
                     //qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
@@ -615,7 +618,7 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
             }
             else
             {
-                throw std::runtime_error("Did not find typeName() in XML tree");
+                throw std::runtime_error("Did not find typeName() or id() in XML tree");
             }
         //}
         //else

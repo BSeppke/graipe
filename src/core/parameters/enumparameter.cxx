@@ -164,31 +164,31 @@ bool EnumParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
     {
-        if(xmlReader.readNextStartElement())
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if(xmlReader.name() == typeName())
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            while(xmlReader.readNextStartElement())
             {
-                while(xmlReader.readNextStartElement())
+                if(xmlReader.name() == "Name")
                 {
-                    if(xmlReader.name() == "Name")
-                    {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(xmlReader.name() == "Value")
-                    {
-                        QString valueText =  xmlReader.readElementText();
-                        
-                        setValue(valueText.toInt());
-                        return isValid();
-                    }
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "Value")
+                {
+                    QString valueText =  xmlReader.readElementText();
+                    
+                    setValue(valueText.toInt());
+                    return isValid();
                 }
             }
         }
         else
         {
-            throw std::runtime_error("Did not find typeName() in XML tree");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
-        throw std::runtime_error("Did not find any start element in XML tree");
+        return false;
     }
     catch(std::runtime_error & e)
     {

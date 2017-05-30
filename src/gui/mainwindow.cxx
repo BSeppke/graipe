@@ -523,6 +523,15 @@ void MainWindow::runAlgorithm(int index)
 			
 		}
 	}
+    else
+    {
+        for(Model* m : alg->results())
+        {
+            delete m;
+            m=NULL;
+        }
+        alg->results().clear();
+    }
 }
 
 
@@ -1356,7 +1365,7 @@ void MainWindow::updateStatusDescription(QString str)
  */
 void MainWindow::updateMemoryUsage()
 {
-    m_lblMemoryUsage->setText(QString("(Memory: %1 MB, max: %2 MB)").arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
+    m_lblMemoryUsage->setText(QString("%1 Models, %2 Views (Memory: %3 MB, max: %4 MB)").arg(models.size()).arg(viewControllers.size()).arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
 }
 
 /**

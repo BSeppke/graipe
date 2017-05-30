@@ -77,7 +77,7 @@ ParameterGroup::~ParameterGroup()
 {
     for(item_type item: m_parameters)
     {
-         delete item.second;
+        delete item.second;
     }
 }
 
@@ -103,6 +103,7 @@ unsigned int ParameterGroup::addParameter(const QString& id, Parameter* param, b
 {
     unsigned int idx = (unsigned int)m_parameters.size();
     
+    param->setID(id);
     m_parameters.insert(item_type(id, param));
     
     if(!hidden)
@@ -248,13 +249,9 @@ QString ParameterGroup::valueText(const QString & filter_types) const
  * <ParameterGroup>
  *     <Name>NAME</Name>
  *     <Parameters>N</Parameters>
- *     <Parameter ID="ID_PARAM_0">
- *         PARAM_0_SERIALIZATION
- *     </Parameter>
+ *     PARAM_0_SERIALIZATION
  *     ...
- *     <Parameter ID="ID_PARAM_N-1">
- *         PARAM_N-1_SERIALIZATION
- *      </Parameter>
+ *     PARAM_N-1_SERIALIZATION
  * </ParameterGroup>
  *
  * with                NAME = name(), and
@@ -269,6 +266,7 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.setAutoFormatting(true);
     
     xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
     xmlWriter.writeTextElement("Name", name());
     xmlWriter.writeTextElement("Parameters", QString::number(m_parameters.size()));
     
@@ -276,10 +274,7 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
     {
         if (iter->second)
         {
-            xmlWriter.writeStartElement("Parameter");
-            xmlWriter.writeAttribute("ID",iter->first);
-                iter->second->serialize(xmlWriter);
-            xmlWriter.writeEndElement();
+            iter->second->serialize(xmlWriter);
         }
     }
     xmlWriter.writeEndElement();
@@ -320,27 +315,13 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
                         {
                             xmlReader.readNextStartElement();
                             
-                            if(     xmlReader.name() == "Parameter"
-                                &&  xmlReader.attributes().hasAttribute("ID"))
+                            if(xmlReader.attributes().hasAttribute("ID"))
                             {
                                 QString id = xmlReader.attributes().value("ID").toString();
                                
                                 if(!m_parameters[id]->deserialize(xmlReader))
                                 {
                                     throw std::runtime_error("Could not deserialize ID: " + id.toStdString());
-                                }              
-                                //Read until the </Parameter> comes...
-                                while(true)
-                                {
-                                    if(!xmlReader.readNext())
-                                    {
-                                        return false;
-                                    }
-                                    
-                                    if(xmlReader.isEndElement() && xmlReader.name() == "Parameter")
-                                    {
-                                        break;
-                                    }
                                 }
                             }
 
@@ -364,7 +345,7 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
             }
             else
             {
-                throw std::runtime_error("Did not find typeName() in XML tree");
+                throw std::runtime_error("Did not find typeName() or id() in XML tree");
             }
         }
         else
