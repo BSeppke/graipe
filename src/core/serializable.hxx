@@ -167,7 +167,7 @@ class GRAIPE_CORE_EXPORT Serializable
         virtual void serialize(QXmlStreamWriter& xmlWriter) const = 0;
     
     protected:
-        /** the filename of this serializable instance **/
+        /** The id (sometimes used as a filename) of this serializable instance **/
         QString m_id;
 };
     
