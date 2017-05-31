@@ -85,7 +85,7 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
          *         "ImageSingleBandViewController", "IntImageSingleBandViewController" or
          *         "ByteImageSingleBandViewController".
          */
-        QString typeName() const;
+        static QString typeName();
     
         /**
          * Specialization of the update of the view according to the current parameter settings.
@@ -171,7 +171,7 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
          *         "ImageRGBViewController", "IntImageRGBViewController" or
          *         "ByteImageRGBViewController".
          */
-        QString typeName() const;
+        static QString typeName();
     
         /**
          * Specialization of the update of the view according to the current parameter settings.

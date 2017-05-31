@@ -82,7 +82,7 @@ IntParameter::~IntParameter()
  *
  * \return "IntParameter".
  */
-QString  IntParameter::typeName() const
+QString  IntParameter::typeName()
 {
 	return "IntParameter";
 }

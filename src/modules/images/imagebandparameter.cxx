@@ -73,7 +73,7 @@ ImageBandParameterBase::~ImageBandParameterBase()
  *
  * \return "ImageBandParameterBase".
  */
-QString ImageBandParameterBase::typeName() const
+QString ImageBandParameterBase::typeName()
 {
 	return "ImageBandParameterBase";
 }
@@ -162,13 +162,14 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
         {
             if(model->typeName() == temp.typeName())
             {
+                qDebug() << "Adding image " << model->shortName() << " to model list";
                 m_allowed_images.push_back(static_cast<Image<T>*>(model));
             }
         }
             
         if(m_allowed_images.size())
         {
-            updateImage();
+            m_image = m_allowed_images[0];
         }
     }
 }
@@ -188,7 +189,7 @@ ImageBandParameter<T>::~ImageBandParameter()
  * \return Image<T>::typeName() + "BandParameter".
  */
 template <class T>
-QString ImageBandParameter<T>::typeName() const
+QString ImageBandParameter<T>::typeName()
 {
     Image<T> temp;
 	return temp.typeName() + "BandParameter";
@@ -244,7 +245,11 @@ void ImageBandParameter<T>::setImage(Image<T> * image)
         if (m_allowed_images[i] == image)
         {
             m_image = image;
-            m_cmbImage->setCurrentIndex(i);
+            
+            if(m_delegate != NULL)
+            {
+                m_cmbImage->setCurrentIndex(i);
+            }
         }
     }
 }
@@ -430,7 +435,6 @@ bool ImageBandParameter<T>::isValid() const
 template <class T>
 void ImageBandParameter<T>::initConnections()
 {
-    m_allowed_images.clear();
     m_cmbImage->clear();
             
     for(Image<T>* image : m_allowed_images)
@@ -444,8 +448,6 @@ void ImageBandParameter<T>::initConnections()
         m_cmbImage->setCurrentIndex(0);
         updateImage();
     }
-    
-    ImageBandParameterBase::initConnections();
 }
 
 /**
@@ -455,26 +457,29 @@ void ImageBandParameter<T>::initConnections()
 template <class T>
 void ImageBandParameter<T>::handleUpdateImage()
 {
-    int idx = m_cmbImage->currentIndex();
-        
-    if(idx>=0 && idx<(int)m_allowed_images.size())
-    {
-        Image<T>* image = static_cast<Image<T>*>(m_allowed_images[m_cmbImage->currentIndex()]);
-	
-        if(image && image->numBands() != 0)
+    if(m_delegate != NULL)
         {
-            m_image = image;
+        int idx = m_cmbImage->currentIndex();
             
-            m_spbBand->setMinimum(0);
-            m_spbBand->setMaximum(image->numBands()-1);
+        if(idx>=0 && idx<(int)m_allowed_images.size())
+        {
+            Image<T>* image = static_cast<Image<T>*>(m_allowed_images[m_cmbImage->currentIndex()]);
         
-            if((unsigned int)m_spbBand->value() > image->numBands()-1)
+            if(image && image->numBands() != 0)
             {
-                m_spbBand->setValue(0);
-            }
-            else
-            {
-                m_spbBand->setValue(m_spbBand->value());
+                m_image = image;
+                
+                m_spbBand->setMinimum(0);
+                m_spbBand->setMaximum(image->numBands()-1);
+            
+                if((unsigned int)m_spbBand->value() > image->numBands()-1)
+                {
+                    m_spbBand->setValue(0);
+                }
+                else
+                {
+                    m_spbBand->setValue(m_spbBand->value());
+                }
             }
         }
     }

@@ -83,7 +83,7 @@ LongStringParameter::~LongStringParameter()
  *
  * \return "LongStringParameter".
  */
-QString  LongStringParameter::typeName() const
+QString  LongStringParameter::typeName()
 {
     return "LongStringParameter";
 }

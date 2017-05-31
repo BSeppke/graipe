@@ -67,7 +67,7 @@ Vectorfield2D::Vectorfield2D(const Vectorfield2D & vf)
  *
  * \return Always "Vectorfield2D"
  */
-QString Vectorfield2D::typeName() const
+QString Vectorfield2D::typeName()
 { 
 	return	QString("Vectorfield2D");
 }

@@ -80,7 +80,7 @@ BoolParameter::~BoolParameter()
  *
  * \return "BoolParameter".
  */
-QString BoolParameter::typeName() const
+QString BoolParameter::typeName()
 {
 	return "BoolParameter";
 }

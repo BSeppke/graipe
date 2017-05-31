@@ -87,7 +87,7 @@ class GRAIPE_CORE_EXPORT IntParameter
          *
          * \return "IntParameter".
          */
-        QString typeName() const;
+        static QString typeName();
         /**
          * The lowest possible value of this parameter.
          *

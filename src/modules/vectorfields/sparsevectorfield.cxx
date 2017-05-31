@@ -66,7 +66,7 @@ SparseVectorfield2D::SparseVectorfield2D(const SparseVectorfield2D & vf)
  *
  * \return Always "SparseVectorfield2D"
  */
-QString SparseVectorfield2D::typeName() const
+QString SparseVectorfield2D::typeName()
 { 
 	return QString("SparseVectorfield2D");
 }
@@ -199,7 +199,7 @@ void SparseVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y".
  */
-QString SparseVectorfield2D::item_header() const
+QString SparseVectorfield2D::csvHeader() const
 {
 	return "pos_x, pos_y, dir_x, dir_y";
 }
@@ -253,7 +253,7 @@ bool SparseVectorfield2D::deserialize_item(const QString & serial)
 /**
  * Serialize the complete content of the sparse vectorfield to an xml file.
  * Mainly prints:
- *   item_header()
+ *   csvHeader
  * and for each vector:
  *   newline + serialize_item().
  *
@@ -261,7 +261,7 @@ bool SparseVectorfield2D::deserialize_item(const QString & serial)
  */
 void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    xmlWriter.writeTextElement("Legend", item_header());
+    xmlWriter.writeTextElement("Legend", csvHeader());
     
 	for(unsigned int i=0; i < size(); ++i)
     {
@@ -274,7 +274,7 @@ void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 
 /**
  * Deserialization of a  sparse vectorfield from an xml file.
- * The first line is the header as given in item_header(), which is ignored however.
+ * The first line is the header as given in csvHeader, which is ignored however.
  * Each following line has to be one valid vector serialization.
  * Does nothing if the model is locked.
  *
@@ -351,7 +351,7 @@ SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(const SparseWeightedVec
  *
  * \return Always "SparseWeightedVectorfield2D"
  */
-QString SparseWeightedVectorfield2D::typeName() const
+QString SparseWeightedVectorfield2D::typeName()
 { 
 	return QString("SparseWeightedVectorfield2D");
 }
@@ -448,9 +448,9 @@ void SparseWeightedVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y, weight".
  */
-QString SparseWeightedVectorfield2D::item_header() const
+QString SparseWeightedVectorfield2D::csvHeader() const
 {
-	return SparseVectorfield2D::item_header() + ", weight";
+	return SparseVectorfield2D::csvHeader() + ", weight";
 }
 
 /**
@@ -554,7 +554,7 @@ SparseMultiVectorfield2D::SparseMultiVectorfield2D(const SparseMultiVectorfield2
  *
  * \return Always "SparseMultiVectorfield2D"
  */
-QString SparseMultiVectorfield2D::typeName() const
+QString SparseMultiVectorfield2D::typeName()
 { 
 	return	QString("SparseMultiVectorfield2D");
 }
@@ -820,9 +820,9 @@ void SparseMultiVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
  */
-QString SparseMultiVectorfield2D::item_header() const
+QString SparseMultiVectorfield2D::csvHeader() const
 {
-    QString result =  SparseVectorfield2D::item_header();
+    QString result =  SparseVectorfield2D::csvHeader();
 	
 	for( unsigned int i = 0; i<alternatives(); ++i)
 	{
@@ -933,7 +933,7 @@ SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D()
 {
 }
 
-QString SparseWeightedMultiVectorfield2D::typeName() const
+QString SparseWeightedMultiVectorfield2D::typeName()
 {
 	return	QString("SparseWeightedMultiVectorfield2D");
 }
@@ -1185,9 +1185,9 @@ void SparseWeightedMultiVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
  */
-QString SparseWeightedMultiVectorfield2D::item_header() const
+QString SparseWeightedMultiVectorfield2D::csvHeader() const
 {
-    QString result =  SparseVectorfield2D::item_header() + ", weight";
+    QString result =  SparseVectorfield2D::csvHeader() + ", weight";
 	
 	for( unsigned int i = 0; i<alternatives(); ++i)
 	{

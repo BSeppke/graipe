@@ -80,7 +80,7 @@ ColorParameter::~ColorParameter()
  *
  * \return "ColorParameter".
  */
-QString ColorParameter::typeName() const
+QString ColorParameter::typeName()
 {
     return "ColorParameter";
 }

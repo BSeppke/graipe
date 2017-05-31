@@ -50,12 +50,11 @@
 int main(int argc, char** argv)
 {    
     //Install thes logger's message handler
-    //TODO: GET IT WORKING
-    //qInstallMessageHandler(&graipe::Logging::messageHandler);
+    qInstallMessageHandler(&graipe::Logging::messageHandler);
     
     QApplication app(argc,argv);
 
-    graipe::MainWindow m(0,"GRAIPE 1.2");
+    graipe::MainWindow m(0,"GRAIPE 1.0");
 	
     if (	QApplication::desktop()->width() > m.width() + 50
 		 && QApplication::desktop()->height() > m.height() + 50 )

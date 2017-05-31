@@ -90,7 +90,7 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          *
          * \return "ColorTableParameter".
          */
-        virtual QString typeName() const;
+        static QString typeName();
         
         /** 
          * The current value of this parameter in the correct, most special type.

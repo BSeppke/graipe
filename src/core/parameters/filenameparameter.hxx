@@ -87,7 +87,7 @@ class GRAIPE_CORE_EXPORT FilenameParameter
          *
          * \return "FilenameParameter".
          */
-        QString typeName() const;
+        static QString typeName();
         
         /** 
          * The current value of this parameter in the correct, most special type.

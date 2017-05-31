@@ -73,7 +73,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          *
          * \return Always "CubicSplineList2D".
          */
-		QString typeName() const;
+		static QString typeName();
 		
         /**
          * Returns the number of 2D cubic splines in this list.
@@ -117,7 +117,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          *
          * \return Always "dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one 2D cubic spline at a given list index to a string. This function will
@@ -139,7 +139,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
     
         /**
          * Serialization the list of 2D cubic splines to an xml file.
-         * The first line is the header as given in item_header(). Each following
+         * The first line is the header as given in csvHeader. Each following
          * line represents one 2D cubic spline serialization.
          *
          * \param xmlWriter The QXmlStreamWriter where we will put our output on.
@@ -148,7 +148,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
     
         /**
          * Deserialization of a list of 2D cubic splines from an xml file.
-         * The first line is the header as given in item_header(), which is ignored however.
+         * The first line is the header as given in csvHeader, which is ignored however.
          * Each following line has to be one valid 2D cubic spline serialization.
          *
          * \param xmlReader The QXmlStreamReader, where we will read from.
@@ -190,7 +190,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          *
          * \return Always "WeightedCubicSplineList2D".
          */
-        QString typeName() const;
+        static QString typeName();
     
         /**
          * Getter of the weight of a 2D cubic spline at a given index. May throw an error,
@@ -254,7 +254,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          *
          * \return Always "weight, dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one 2D cubic spline at a given list index to a string. This function will

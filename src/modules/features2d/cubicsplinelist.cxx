@@ -64,7 +64,7 @@ CubicSplineList2D::CubicSplineList2D(const CubicSplineList2D& spline_list)
  *
  * \return Always "CubicSplineList2D".
  */
-QString CubicSplineList2D::typeName() const
+QString CubicSplineList2D::typeName()
 {
 	return "CubicSplineList2D";
 }
@@ -138,7 +138,7 @@ void CubicSplineList2D::addSpline(const CubicSplineType& spl)
  *
  * \return Always "dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy".
  */
-QString CubicSplineList2D::item_header() const
+QString CubicSplineList2D::csvHeader() const
 {
 	return "dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy";
 }
@@ -223,14 +223,14 @@ bool CubicSplineList2D::deserialize_item(const QString & serial)
 
 /**
  * Serialization the list of 2D cubic splines to an xml file.
- * The first line is the header as given in item_header(). Each following
+ * The first line is the header as given in csvHeader. Each following
  * line represents one 2D cubic spline serialization.
  *
  * \param xmlWriter The QXmlStreamWriter where we will put our output on.
  */
 void CubicSplineList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    xmlWriter.writeTextElement("Legend", item_header());
+    xmlWriter.writeTextElement("Legend", csvHeader());
     
 	for(unsigned int i=0; i < size(); ++i)
     {
@@ -243,7 +243,7 @@ void CubicSplineList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 
 /**
  * Deserialization of a list of 2D cubic splines from an xml file.
- * The first line is the header as given in item_header(), which is ignored however.
+ * The first line is the header as given in csvHeader, which is ignored however.
  * Each following line has to be one valid 2D cubic spline serialization.
  *
  * \param xmlReader The QXmlStreamReader, where we will read from.
@@ -304,7 +304,7 @@ WeightedCubicSplineList2D::WeightedCubicSplineList2D(const WeightedCubicSplineLi
  *
  * \return Always "WeightedCubicSplineList2D".
  */
-QString WeightedCubicSplineList2D::typeName() const
+QString WeightedCubicSplineList2D::typeName()
 {
 	return "WeightedCubicSplineList2D";
 }
@@ -398,9 +398,9 @@ void WeightedCubicSplineList2D::addSpline(const CubicSplineType& spl, float w)
  *
  * \return Always "weight, dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy".
  */
-QString WeightedCubicSplineList2D::item_header() const
+QString WeightedCubicSplineList2D::csvHeader() const
 {
-    return "weight, " + CubicSplineList2D::item_header();
+    return "weight, " + CubicSplineList2D::csvHeader();
 }
     
 /**

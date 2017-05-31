@@ -100,7 +100,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          *
          * \return Always "DenseVectorfield2D"
          */
-		QString typeName() const;
+		static QString typeName();
 		
         /**
          * The size of this vectorfield. 
@@ -529,7 +529,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          *
          * \return Always "DenseWeightedVectorfield2D"
          */
-		QString typeName() const;
+		static QString typeName();
         
         /**
          * This does not remove all the vectors, but resets their directions 

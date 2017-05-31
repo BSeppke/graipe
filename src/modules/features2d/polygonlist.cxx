@@ -63,7 +63,7 @@ PolygonList2D::PolygonList2D(const PolygonList2D& poly_list)
  *
  * \return Always "PolygonList2D".
  */
-QString PolygonList2D::typeName() const
+QString PolygonList2D::typeName()
 {
 	return "PolygonList2D";
 }
@@ -137,7 +137,7 @@ void PolygonList2D::addPolygon(const PolygonType& poly)
  *
  * \return Always "p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y".
  */
-QString PolygonList2D::item_header() const
+QString PolygonList2D::csvHeader() const
 {
 	return "p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y";
 }
@@ -202,14 +202,14 @@ bool PolygonList2D::deserialize_item(const QString & serial)
 
 /**
  * Serialization the list of polygons to an xml file.
- * The first line is the header as given in item_header(). Each following
+ * The first line is the header as given in csvHeader. Each following
  * line represents one polygon serialization.
  *
  * \param xmlWriter The QXmlStreamWriter where we will put our output on.
  */
 void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    xmlWriter.writeTextElement("Legend", item_header());
+    xmlWriter.writeTextElement("Legend", csvHeader());
     
 	for(unsigned int i=0; i < size(); ++i)
     {
@@ -222,7 +222,7 @@ void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 
 /**
  * Deserialization of a list of polygons from an xml file.
- * The first line is the header as given in item_header(), which is ignored however.
+ * The first line is the header as given in csvHeader, which is ignored however.
  * Each following line has to be one valid polygon serialization.
  *
  * \param xmlReader The QXmlStreamReader, where we will read from.
@@ -282,7 +282,7 @@ WeightedPolygonList2D::WeightedPolygonList2D(const WeightedPolygonList2D& poly_l
  *
  * \return Always "WeightedPolygonList2D".
  */
-QString WeightedPolygonList2D::typeName() const
+QString WeightedPolygonList2D::typeName()
 {
 	return "WeightedPolygonList2D";
 }
@@ -374,9 +374,9 @@ void WeightedPolygonList2D::addPolygon(const PolygonType& poly, float w)
  *
  * \return Always "weight, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y".
  */
-QString WeightedPolygonList2D::item_header() const
+QString WeightedPolygonList2D::csvHeader() const
 {
-	return "weight, " + PolygonList2D::item_header();
+	return "weight, " + PolygonList2D::csvHeader();
 }
 
 /**

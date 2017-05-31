@@ -89,7 +89,7 @@ TransformParameter::~TransformParameter()
  *
  * \return "TransformParameter".
  */
-QString  TransformParameter::typeName() const
+QString  TransformParameter::typeName()
 {
     return "TransformParameter";
 }

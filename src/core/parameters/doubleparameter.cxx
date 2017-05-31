@@ -82,7 +82,7 @@ DoubleParameter::~DoubleParameter()
  *
  * \return "DoubleParameter".
  */
-QString  DoubleParameter::typeName() const
+QString  DoubleParameter::typeName()
 {
 	return "DoubleParameter";
 }

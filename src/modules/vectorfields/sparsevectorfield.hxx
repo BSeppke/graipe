@@ -69,7 +69,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          *
          * \return Always "SparseVectorfield2D"
          */
-		QString typeName() const;
+		static QString typeName();
     
         /**
          * The size of this vectorfield. 
@@ -147,7 +147,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          * 
          * \return Always: "pos_x, pos_y, dir_x, dir_y".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
         
         /**
          * Serialization of a single vector inside the list at a given index.
@@ -170,7 +170,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
         /**
          * Serialize the complete content of the sparse vectorfield to an xml file.
          * Mainly prints:
-         *   item_header()
+         *   csvHeader
          * and for each vector:
          *   newline + serialize_item().
          *
@@ -180,7 +180,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
     
         /**
          * Deserialization of a  sparse vectorfield from an xml file.
-         * The first line is the header as given in item_header(), which is ignored however.
+         * The first line is the header as given in csvHeader, which is ignored however.
          * Each following line has to be one valid vector serialization.
          *
          * \param xmlReader The QXmlStreamReader, where we will read from.
@@ -218,7 +218,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
          *
          * \return Always "SparseWeightedVectorfield2D"
          */
-		QString typeName() const;
+		static QString typeName();
     
         /**
          * The removal of all vectors of this vectorfield.
@@ -277,7 +277,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
          * 
          * \return Always: "pos_x, pos_y, dir_x, dir_y, weight".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
         
         /**
          * Serialization of a single weighted vector inside the list at a given index.
@@ -329,7 +329,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          *
          * \return Always "SparseMultiVectorfield2D"
          */
-		QString typeName() const;
+		static QString typeName();
     
         /**
          * The removal of all vectors of this vectorfield.
@@ -522,7 +522,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          * 
          * \return Always: "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
          */
-		QString item_header() const;
+		QString csvHeader() const;
         
         /**
          * Serialization of a single multi vector inside the list at a given index.
@@ -564,7 +564,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
 		SparseWeightedMultiVectorfield2D(const SparseWeightedMultiVectorfield2D & vf);	
 		SparseWeightedMultiVectorfield2D();
 		
-		QString typeName() const;
+		static QString typeName();
 		
         /**
          * The removal of all vectors of this vectorfield.
@@ -716,7 +716,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
          * 
          * \return Always: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
          */
-		QString item_header() const;
+		QString csvHeader() const;
         
         /**
          * Serialization of a single weighted multi vector inside the list at a given index.

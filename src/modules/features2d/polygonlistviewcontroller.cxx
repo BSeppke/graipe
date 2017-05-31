@@ -123,7 +123,7 @@ QRectF PolygonList2DViewController::boundingRect() const
  *
  * \return Always: "PolygonList2DViewController"
  */
-QString PolygonList2DViewController::typeName() const
+QString PolygonList2DViewController::typeName()
 {
 	return "PolygonList2DViewController";
 }
@@ -333,7 +333,7 @@ QRectF WeightedPolygonList2DViewController::boundingRect() const
  *
  * \return Always: "WeightedPolygonList2DViewController"
  */
-QString WeightedPolygonList2DViewController::typeName() const
+QString WeightedPolygonList2DViewController::typeName()
 {
 	return "WeightedPolygonList2DViewController";
 }

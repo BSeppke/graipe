@@ -324,7 +324,7 @@ class GRAIPE_CORE_EXPORT Model
          *
          * \return "Model"
          */
-        virtual QString typeName() const;
+        static QString typeName();
     
         /**
          * This function serializes a complete Model to a xml stream.
@@ -498,7 +498,7 @@ class GRAIPE_CORE_EXPORT ItemListModel
          *
          * \return T::typeName() + "List"
          */
-        QString typeName() const
+        static QString typeName()
         {
             return T::typeName() + "List";
         }
@@ -767,7 +767,7 @@ class GRAIPE_CORE_EXPORT RasteredModel
          *
          * \return "RasteredModel"
          */
-        QString typeName() const;
+        static QString typeName();
     
     protected:
         /** The additional parameters of this model: **/

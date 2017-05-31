@@ -95,7 +95,7 @@ MultiModelParameter::~MultiModelParameter()
  *
  * \return "MultiModelParameter".
  */
-QString  MultiModelParameter::typeName() const
+QString  MultiModelParameter::typeName()
 {
 	return "MultiModelParameter";
 }

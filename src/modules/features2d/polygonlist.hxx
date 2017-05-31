@@ -72,7 +72,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          *
          * \return Always "PolygonList2D".
          */
-		QString typeName() const;
+		static QString typeName();
     
         /**
          * Returns the number of polygons in this list.
@@ -116,7 +116,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          *
          * \return Always "p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one polygon at a given list index to a string. This function will
@@ -138,7 +138,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
     
         /**
          * Serialization the list of polygons to an xml file.
-         * The first line is the header as given in item_header(). Each following
+         * The first line is the header as given in csvHeader. Each following
          * line represents one polygon serialization.
          *
          * \param xmlWriter The QXmlStreamWriter where we will put our output on.
@@ -147,7 +147,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
     
         /**
          * Deserialization of a list of polygons from an xml file.
-         * The first line is the header as given in item_header(), which is ignored however.
+         * The first line is the header as given in csvHeader, which is ignored however.
          * Each following line has to be one valid polygon serialization.
          *
          * \param xmlReader The QXmlStreamReader, where we will read from.
@@ -188,7 +188,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          *
          * \return Always "WeightedPolygonList2D".
          */
-        QString typeName() const;
+        static QString typeName();
     
         /**
          * Getter of the weight of a polygon at a given index. May throw an error,
@@ -251,7 +251,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          *
          * \return Always "weight, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one polygon at a given list index to a string. This function will

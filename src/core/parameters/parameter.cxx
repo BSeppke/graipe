@@ -85,7 +85,7 @@ Parameter::~Parameter()
  *
  * \return "Parameter".
  */
-QString Parameter::typeName() const
+QString Parameter::typeName()
 {
 	return "Parameter";
 }

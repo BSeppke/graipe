@@ -243,7 +243,7 @@ QRectF DenseVectorfield2DViewController::boundingRect() const
  *
  * \return Always: "DenseVectorfield2DViewController"
  */
-QString DenseVectorfield2DViewController::typeName() const
+QString DenseVectorfield2DViewController::typeName()
 { 
 	return "DenseVectorfield2DViewController"; 
 }
@@ -565,7 +565,7 @@ QRectF DenseVectorfield2DParticleViewController::boundingRect() const
  *
  * \return Always: "DenseVectorfield2DParticleViewController"
  */
-QString DenseVectorfield2DParticleViewController::typeName() const
+QString DenseVectorfield2DParticleViewController::typeName()
 { 
 	return "DenseVectorfield2DParticleView"; 
 }
@@ -925,7 +925,7 @@ void DenseWeightedVectorfield2DViewController::paint(QPainter *painter, const QS
  *
  * \return Always: "DenseWeightedVectorfield2DViewController"
  */
-QString DenseWeightedVectorfield2DViewController::typeName() const
+QString DenseWeightedVectorfield2DViewController::typeName()
 { 
 	return "DenseWeightedVectorfield2DViewController"; 
 }
@@ -1210,7 +1210,7 @@ void DenseWeightedVectorfield2DParticleViewController::paint(QPainter *painter, 
  *
  * \return Always: "DenseWeightedVectorfield2DParticleViewController"
  */
-QString DenseWeightedVectorfield2DParticleViewController::typeName() const
+QString DenseWeightedVectorfield2DParticleViewController::typeName()
 { 
 	return "DenseWeightedVectorfield2DParticleView"; 
 }

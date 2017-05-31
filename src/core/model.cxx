@@ -508,7 +508,7 @@ void Model::copyData(Model& other) const
  *
  * \return "Model"
  */
-QString Model::typeName() const
+QString Model::typeName()
 {
 	return "Model";
 }
@@ -918,7 +918,7 @@ void RasteredModel::copyData(Model& other) const
  *
  * \return "RasteredModel"
  */
-QString RasteredModel::typeName() const
+QString RasteredModel::typeName()
 {
 	return "RasteredModel";
 }

@@ -82,7 +82,7 @@ FloatParameter::~FloatParameter()
  *
  * \return "FloatParameter".
  */
-QString  FloatParameter::typeName() const
+QString FloatParameter::typeName()
 {
 	return "FloatParameter";
 }
