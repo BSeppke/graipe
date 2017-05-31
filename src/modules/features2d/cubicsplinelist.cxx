@@ -152,7 +152,7 @@ QString CubicSplineList2D::csvHeader() const
  * \return A QString containing the searialization of the 2D cubic spline.
  *         The serialization should be given as: dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
  */
-QString CubicSplineList2D::serialize_item(unsigned int index) const
+QString CubicSplineList2D::itemToCSV(unsigned int index) const
 {
 
     CubicSplineType::PointType first_derivative = m_splines[index].derive(0),
@@ -161,7 +161,7 @@ QString CubicSplineList2D::serialize_item(unsigned int index) const
     
     QString result = QString::number(first_derivative.x(), 'g', 10) + ", " + QString::number(first_derivative.y(), 'g', 10);
 	
-	for(unsigned int i=0; i < size(); ++i)
+	for(unsigned int i=0; i < points.size(); ++i)
     {
 		result +=    ", " + QString::number(points[i].x(), 'g', 10)
                    + ", " + QString::number(points[i].y(), 'g', 10);
@@ -178,7 +178,7 @@ QString CubicSplineList2D::serialize_item(unsigned int index) const
  * \param serial A QString containing the searialization of the 2D cubic spline.
  * \return True, if the item could be deserialized and the model is not locked.
  */
-bool CubicSplineList2D::deserialize_item(const QString & serial)
+bool CubicSplineList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;
@@ -220,6 +220,128 @@ bool CubicSplineList2D::deserialize_item(const QString & serial)
     m_splines.push_back(CubicSplineType(points, first_derivative, last_derivative));
     return true;
 }
+/**
+ * Serialization of one 2D cubic spline at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+ *
+ * \param index The index of the 2D cubic spline to be serialized.
+ * \return A QString containing the searialization of the 2D cubic spline.
+ *         The serialization should be given as: dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
+ */
+void CubicSplineList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    CubicSplineType::PointType first_derivative = m_splines[index].derive(0),
+                               last_derivative = m_splines[index].derive(1);
+    CubicSplineType::PointListType points = m_splines[index].points() ;
+    
+        xmlWriter.writeStartElement("Derivative");
+            xmlWriter.writeAttribute("ID", "0");
+            xmlWriter.writeTextElement("x", QString::number(first_derivative.x(), 'g', 10));
+            xmlWriter.writeTextElement("y", QString::number(first_derivative.y(), 'g', 10));
+        xmlWriter.writeEndElement();
+    
+	for(unsigned int i=0; i < points.size(); ++i)
+    {
+        xmlWriter.writeStartElement("Point");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeTextElement("x", QString::number(points[i].x(), 'g', 10));
+            xmlWriter.writeTextElement("y", QString::number(points[i].y(), 'g', 10));
+        xmlWriter.writeEndElement();
+    }
+    
+        xmlWriter.writeStartElement("Derivative");
+            xmlWriter.writeAttribute("ID", QString::number(points.size()-1));
+            xmlWriter.writeTextElement("x", QString::number(last_derivative.x(), 'g', 10));
+            xmlWriter.writeTextElement("y", QString::number(last_derivative.y(), 'g', 10));
+        xmlWriter.writeEndElement();
+}
+
+/**
+ * Deserialization/addition of a 2D cubic spline from a string to this list.
+ *
+ * \param serial A QString containing the searialization of the 2D cubic spline.
+ * \return True, if the item could be deserialized and the model is not locked.
+ */
+bool CubicSplineList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;
+    
+    CubicSplineType::PointType first_derivative, last_derivative;
+    CubicSplineType::PointListType points;
+	
+    if(/*     xmlReader.readNextStartElement()
+        &&*/  xmlReader.name() == "CubicSpline2D"
+        &&  xmlReader.attributes().hasAttribute("Points"))
+    {
+        int size = xmlReader.attributes().value("Points").toInt();
+        points.resize(size);
+        
+        if(     xmlReader.readNextStartElement()
+            && xmlReader.name() == "Derivative"
+            && xmlReader.attributes().hasAttribute("ID")
+            && xmlReader.attributes().value("ID").toInt() == 0)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() == "x")
+            {
+                first_derivative.setX(xmlReader.readElementText().toFloat());
+            }
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() == "y")
+            {
+                first_derivative.setY(xmlReader.readElementText().toFloat());
+            }
+        }
+        
+        for(int i=0; i!=size; ++i)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() == "Point"
+                &&  xmlReader.attributes().hasAttribute("ID")
+                &&  xmlReader.attributes().value("ID").toInt() == i)
+            {
+                
+                if(     xmlReader.readNextStartElement()
+                    &&  xmlReader.name() == "x")
+                {
+                    points[i].setX(xmlReader.readElementText().toFloat());
+                }
+                if(     xmlReader.readNextStartElement()
+                    &&  xmlReader.name() == "y")
+                {
+                    points[i].setY(xmlReader.readElementText().toFloat());
+                }
+            }
+        }
+        
+        if(    xmlReader.readNextStartElement()
+            && xmlReader.name() == "Derivative"
+            && xmlReader.attributes().hasAttribute("ID")
+            && xmlReader.attributes().value("ID").toInt() == size-1)
+        {
+            if(     xmlReader.readNextStartElement()
+               &&   xmlReader.name() == "x")
+            {
+                last_derivative.setX(xmlReader.readElementText().toFloat());
+            }
+            if(     xmlReader.readNextStartElement()
+               &&   xmlReader.name() == "y")
+            {
+                last_derivative.setY(xmlReader.readElementText().toFloat());
+            }
+        }
+        
+    }
+    else
+    {
+        qWarning() << "Did not find matching start attribute";
+        return false;
+    }
+    
+    m_splines.push_back(CubicSplineType(points, first_derivative, last_derivative));
+    return true;
+}
 
 /**
  * Serialization the list of 2D cubic splines to an xml file.
@@ -230,13 +352,13 @@ bool CubicSplineList2D::deserialize_item(const QString & serial)
  */
 void CubicSplineList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    xmlWriter.writeTextElement("Legend", csvHeader());
-    
 	for(unsigned int i=0; i < size(); ++i)
     {
-        xmlWriter.writeStartElement("CubicSpline");
-        xmlWriter.writeAttribute("ID", QString::number(i));
-            xmlWriter.writeCharacters(serialize_item(i));
+        xmlWriter.writeStartElement("CubicSpline2D");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeAttribute("Points", QString::number(m_splines[i].points().size()));
+        
+            serialize_item(i, xmlWriter);
         xmlWriter.writeEndElement();
     }
 }
@@ -260,9 +382,9 @@ bool CubicSplineList2D::deserialize_content(QXmlStreamReader& xmlReader)
     //Read the entries
     while(xmlReader.readNextStartElement())
     {
-        if(xmlReader.name() == "CubicSpline")
+        if(xmlReader.name() == "CubicSpline2D")
         {
-            if(!deserialize_item(xmlReader.readElementText()))
+            if(!deserialize_item(xmlReader))
                 return false;
         }
         else
@@ -271,7 +393,6 @@ bool CubicSplineList2D::deserialize_content(QXmlStreamReader& xmlReader)
         }
     }
     return true;
-    return false;
 }
 
 
@@ -411,9 +532,9 @@ QString WeightedCubicSplineList2D::csvHeader() const
  * \return A QString containing the searialization of the 2D cubic spline.
  *         The serialization should be given as: weight, dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
  */
-QString WeightedCubicSplineList2D::serialize_item(unsigned int index) const
+QString WeightedCubicSplineList2D::itemToCSV(unsigned int index) const
 {
-    return QString("%1, %2").arg(m_weights[index]).arg(CubicSplineList2D::serialize_item(index));
+    return QString("%1, %2").arg(m_weights[index]).arg(CubicSplineList2D::itemToCSV(index));
 }
 
 /**
@@ -422,7 +543,7 @@ QString WeightedCubicSplineList2D::serialize_item(unsigned int index) const
  * \param serial A QString containing the searialization of the 2D cubic spline.
  * \return True, if the item could be deserialized and the model is not locked.
  */
-bool WeightedCubicSplineList2D::deserialize_item(const QString & serial)
+bool WeightedCubicSplineList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;    
@@ -434,7 +555,7 @@ bool WeightedCubicSplineList2D::deserialize_item(const QString & serial)
     {
 		try
         {
-			bool res = CubicSplineList2D::deserialize_item(weight_content[1]);
+			bool res = CubicSplineList2D::itemFromCSV(weight_content[1]);
 			if (res)
             {
                 m_weights.push_back(weight_content[0].toFloat());
@@ -449,6 +570,45 @@ bool WeightedCubicSplineList2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+/**
+ * Serialization of one 2D cubic spline at a given list index to a string. This function will
+ * throw an error if the index is out of range.
+ *
+ * \param index The index of the 2D cubic spline to be serialized.
+ * \return A QString containing the searialization of the 2D cubic spline.
+ *         The serialization should be given as: weight, dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
+ */
+void WeightedCubicSplineList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    CubicSplineList2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("weight",  QString::number(m_weights[index], 'g', 10));
+}
+
+/**
+ * Deserialization/addition of a 2D cubic spline from a string to this list.
+ *
+ * \param serial A QString containing the searialization of the 2D cubic spline.
+ * \return True, if the item could be deserialized and the model is not locked.
+ */
+bool WeightedCubicSplineList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;    
+    
+	if (!CubicSplineList2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+    
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "weight")
+    {
+        m_weights.push_back(xmlReader.readElementText().toFloat());
+        return true;
+    }
+    return false;
 }
     
 } //End of namespace graipe
