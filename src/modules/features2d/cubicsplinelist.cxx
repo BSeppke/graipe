@@ -571,6 +571,7 @@ bool WeightedCubicSplineList2D::itemFromCSV(const QString & serial)
 	}
 	return false;
 }
+
 /**
  * Serialization of one 2D cubic spline at a given list index to a string. This function will
  * throw an error if the index is out of range.

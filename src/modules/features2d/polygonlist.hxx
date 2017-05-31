@@ -125,7 +125,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          * \param index The index of the polygon to be serialized.
          * \return A QString containing the searialization of the polygon.
          */
-        virtual QString serialize_item(unsigned int index) const;
+        virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a polygon from a string to this list.
@@ -134,7 +134,25 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
          */
-        virtual bool deserialize_item(const QString & serial);
+        virtual bool itemFromCSV(const QString & serial);
+    
+        /**
+         * Serialization of one polygon at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+         *
+         * \param index The index of the polygon to be serialized.
+         * \return A QString containing the searialization of the polygon.
+         */
+        virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a polygon from a string to this list.
+         *
+         * \param serial A QString containing the searialization of the polygon.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
+         */
+        virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
         /**
          * Serialization the list of polygons to an xml file.
@@ -260,7 +278,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          * \param index The index of the polygon to be serialized.
          * \return A QString containing the searialization of the polygon.
          */
-        virtual QString serialize_item(unsigned int index) const;
+        virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a polygon from a string to this list.
@@ -269,7 +287,25 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
          */
-        virtual bool deserialize_item(const QString & serial);
+        virtual bool itemFromCSV(const QString & serial);
+    
+        /**
+         * Serialization of one polygon at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+         *
+         * \param index The index of the polygon to be serialized.
+         * \return A QString containing the searialization of the polygon.
+         */
+        virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a polygon from a string to this list.
+         *
+         * \param serial A QString containing the searialization of the polygon.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
+         */
+        virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
     protected:
         //The weights

@@ -149,7 +149,7 @@ QString PolygonList2D::csvHeader() const
  * \param index The index of the polygon to be serialized.
  * \return A QString containing the searialization of the polygon.
  */
-QString PolygonList2D::serialize_item(unsigned int index) const
+QString PolygonList2D::itemToCSV(unsigned int index) const
 {
     QString result;
 	
@@ -174,7 +174,7 @@ QString PolygonList2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
  */
-bool PolygonList2D::deserialize_item(const QString & serial)
+bool PolygonList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;
@@ -199,6 +199,81 @@ bool PolygonList2D::deserialize_item(const QString & serial)
 	}
     return false;
 }
+/**
+ * Serialization of one polygon at a given list index to a string. This function will
+ * throw an error if the index is out of range.
+ *
+ * \param index The index of the polygon to be serialized.
+ * \return A QString containing the searialization of the polygon.
+ */
+void PolygonList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    QString result;
+	
+    PolygonType poly = polygon(index);
+    
+    for(unsigned int i=0; i < poly.size(); ++i)
+    {
+        xmlWriter.writeStartElement("Point");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeTextElement("x", QString::number(poly[i].x(), 'g', 10));
+            xmlWriter.writeTextElement("y", QString::number(poly[i].y(), 'g', 10));
+        xmlWriter.writeEndElement();
+    }
+}
+
+/**
+ * Deserialization/addition of a polygon from a string to this list.
+ *
+ * \param serial A QString containing the searialization of the polygon.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
+ */
+bool PolygonList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;
+    
+    PolygonType poly;
+    
+
+    if(/*     xmlReader.readNextStartElement()
+        &&*/  xmlReader.name() == "Polygon2D"
+        &&  xmlReader.attributes().hasAttribute("Points"))
+    {
+        int size = xmlReader.attributes().value("Points").toInt();
+        poly.resize(size);
+        
+        for(int i=0; i!=size; ++i)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() == "Point"
+                &&  xmlReader.attributes().hasAttribute("ID")
+                &&  xmlReader.attributes().value("ID").toInt() == i)
+            {
+                
+                if(     xmlReader.readNextStartElement()
+                    &&  xmlReader.name() == "x")
+                {
+                    poly[i].setX(xmlReader.readElementText().toFloat());
+                }
+                if(     xmlReader.readNextStartElement()
+                    &&  xmlReader.name() == "y")
+                {
+                    poly[i].setY(xmlReader.readElementText().toFloat());
+                }
+            }
+        }
+    }
+    else
+    {
+        qWarning() << "Did not find matching start attribute";
+        return false;
+    }
+    
+    m_polys.push_back(poly);
+    return true;
+}
 
 /**
  * Serialization the list of polygons to an xml file.
@@ -213,9 +288,10 @@ void PolygonList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
     
 	for(unsigned int i=0; i < size(); ++i)
     {
-        xmlWriter.writeStartElement("Polygon");
+        xmlWriter.writeStartElement("Polygon2D");
+        xmlWriter.writeAttribute("Points", QString::number(m_polys[i].size()));
         xmlWriter.writeAttribute("ID", QString::number(i));
-            xmlWriter.writeCharacters(serialize_item(i));
+            serialize_item(i, xmlWriter);
         xmlWriter.writeEndElement();
     }
 }
@@ -239,9 +315,9 @@ bool PolygonList2D::deserialize_content(QXmlStreamReader& xmlReader)
     //Read the entries
     while(xmlReader.readNextStartElement())
     {
-        if(xmlReader.name() == "Polygon")
+        if(xmlReader.name() == "Polygon2D")
         {
-            if(!deserialize_item(xmlReader.readElementText()))
+            if(!deserialize_item(xmlReader))
                 return false;
         }
         else
@@ -386,9 +462,9 @@ QString WeightedPolygonList2D::csvHeader() const
  * \param index The index of the polygon to be serialized.
  * \return A QString containing the searialization of the polygon.
  */
-QString WeightedPolygonList2D::serialize_item(unsigned int index) const
+QString WeightedPolygonList2D::itemToCSV(unsigned int index) const
 {
-    return QString::number(weight(index), 'g', 10) + ", " + PolygonList2D::serialize_item(index);
+    return QString::number(weight(index), 'g', 10) + ", " + PolygonList2D::itemToCSV(index);
 }
 
 /**
@@ -398,7 +474,7 @@ QString WeightedPolygonList2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
  */
-bool WeightedPolygonList2D::deserialize_item(const QString & serial)
+bool WeightedPolygonList2D::itemFromCSV(const QString & serial)
 {
 
     if(locked())
@@ -411,7 +487,7 @@ bool WeightedPolygonList2D::deserialize_item(const QString & serial)
     {
 		try
         {
-			bool res = PolygonList2D::deserialize_item(weight_content[1]);
+			bool res = PolygonList2D::itemFromCSV(weight_content[1]);
 			if (res)
             {
                 m_weights.push_back(weight_content[0].toFloat());
@@ -426,6 +502,46 @@ bool WeightedPolygonList2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+
+/**
+ * Serialization of one polygon at a given list index to a string. This function will
+ * throw an error if the index is out of range.
+ *
+ * \param index The index of the polygon to be serialized.
+ * \return A QString containing the searialization of the polygon.
+ */
+void WeightedPolygonList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    PolygonList2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("weight",  QString::number(m_weights[index], 'g', 10));
+}
+
+/**
+ * Deserialization/addition of a polygon from a string to this list.
+ *
+ * \param serial A QString containing the searialization of the polygon.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
+ */
+bool WeightedPolygonList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;    
+    
+	if (!PolygonList2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+    
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "weight")
+    {
+        m_weights.push_back(xmlReader.readElementText().toFloat());
+        return true;
+    }
+    return false;
 }
     
 } //End of namespace graipe
