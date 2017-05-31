@@ -63,7 +63,7 @@ PolygonList2D::PolygonList2D(const PolygonList2D& poly_list)
  *
  * \return Always "PolygonList2D".
  */
-QString PolygonList2D::typeName()
+QString PolygonList2D::typeName() const
 {
 	return "PolygonList2D";
 }
@@ -282,7 +282,7 @@ WeightedPolygonList2D::WeightedPolygonList2D(const WeightedPolygonList2D& poly_l
  *
  * \return Always "WeightedPolygonList2D".
  */
-QString WeightedPolygonList2D::typeName()
+QString WeightedPolygonList2D::typeName() const
 {
 	return "WeightedPolygonList2D";
 }

@@ -73,7 +73,7 @@ ImageBandParameterBase::~ImageBandParameterBase()
  *
  * \return "ImageBandParameterBase".
  */
-QString ImageBandParameterBase::typeName()
+QString ImageBandParameterBase::typeName() const
 {
 	return "ImageBandParameterBase";
 }
@@ -156,11 +156,15 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
     if(models.size())
     {
         m_allowed_images.clear();
-        Image<T> temp;
-            
+        
+        Image<T> * img = new Image<T>;
+        QString typeName = img->typeName();
+        delete img;
+        img=NULL;
+        
         for(Model* model : models)
         {
-            if(model->typeName() == temp.typeName())
+            if(model->typeName() ==typeName)
             {
                 qDebug() << "Adding image " << model->shortName() << " to model list";
                 m_allowed_images.push_back(static_cast<Image<T>*>(model));
@@ -186,10 +190,10 @@ ImageBandParameter<T>::~ImageBandParameter()
 /**
  * The (immutable) type name of this parameter class.
  *
- * \return Image<T>::typeName() + "BandParameter".
+ * \return Image<T>::typeName() const + "BandParameter".
  */
 template <class T>
-QString ImageBandParameter<T>::typeName()
+QString ImageBandParameter<T>::typeName() const
 {
     Image<T> temp;
 	return temp.typeName() + "BandParameter";

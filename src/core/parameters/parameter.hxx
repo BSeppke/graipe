@@ -99,7 +99,7 @@ class GRAIPE_CORE_EXPORT Parameter
          *
          * \return "Parameter".
          */
-        static QString typeName();
+        virtual QString typeName() const;
     
         /**
          * The name of this parameter. This name is used as a label for the parameter.

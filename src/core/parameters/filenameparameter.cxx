@@ -83,7 +83,7 @@ FilenameParameter::~FilenameParameter()
  *
  * \return "FilenameParameter".
  */
-QString  FilenameParameter::typeName()
+QString  FilenameParameter::typeName() const
 {
     return "FilenameParameter";
 }

@@ -136,10 +136,9 @@ void ImageSingleBandViewController<T>::paint(QPainter *painter, const QStyleOpti
  *         "ByteImageSingleBandViewController".
  */
 template <class T>
-QString ImageSingleBandViewController<T>::typeName()
+QString ImageSingleBandViewController<T>::typeName() const
 {
     Image<T> temp;
-    
     return temp.typeName() + "SingleBandViewController";
 }
 /**
@@ -324,10 +323,10 @@ void ImageRGBViewController<T>::paint(QPainter *painter, const QStyleOptionGraph
  *         "ByteImageRGBViewController".
  */
 template <class T>
-QString ImageRGBViewController<T>::typeName()
+QString ImageRGBViewController<T>::typeName() const
 {
     Image<T> temp;
-    
+
     return temp.typeName() + "RGBViewController";
 }
 

@@ -87,7 +87,7 @@ PointFParameter::~PointFParameter()
  *
  * \return "PointFParameter".
  */
-QString  PointFParameter::typeName()
+QString  PointFParameter::typeName() const
 {
     return "PointFParameter";
 }

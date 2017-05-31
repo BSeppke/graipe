@@ -86,7 +86,7 @@ ParameterGroup::~ParameterGroup()
  *
  * \return "ParameterGroup".
  */
-QString ParameterGroup::typeName()
+QString ParameterGroup::typeName() const
 {
 	return "ParameterGroup";
 }

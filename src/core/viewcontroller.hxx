@@ -212,7 +212,7 @@ class GRAIPE_CORE_EXPORT ViewController
          *
          * \return "ViewController"
          */
-        static QString typeName();
+        virtual QString typeName() const;
     
         /**
          * This function serializes a complete ViewController to an output device.

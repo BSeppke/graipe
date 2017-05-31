@@ -98,7 +98,7 @@ ModelParameter::~ModelParameter()
  *
  * \return "ModelParameter".
  */
-QString  ModelParameter::typeName()
+QString  ModelParameter::typeName() const
 {
 	return "ModelParameter";
 }

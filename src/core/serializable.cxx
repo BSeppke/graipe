@@ -155,7 +155,7 @@ void Serializable::setID(const QString& new_id)
  *
  * \return "Serializable" as a QString
  */
-QString Serializable::typeName()
+QString Serializable::typeName() const
 {
     return "Serializable";
 }

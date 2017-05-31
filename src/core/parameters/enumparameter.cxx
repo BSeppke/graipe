@@ -81,7 +81,7 @@ EnumParameter::~EnumParameter()
  *
  * \return "EnumParameter".
  */
-QString  EnumParameter::typeName()
+QString  EnumParameter::typeName() const
 {
 	return "EnumParameter";
 }

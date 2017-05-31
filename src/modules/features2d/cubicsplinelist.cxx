@@ -64,7 +64,7 @@ CubicSplineList2D::CubicSplineList2D(const CubicSplineList2D& spline_list)
  *
  * \return Always "CubicSplineList2D".
  */
-QString CubicSplineList2D::typeName()
+QString CubicSplineList2D::typeName() const
 {
 	return "CubicSplineList2D";
 }
@@ -304,7 +304,7 @@ WeightedCubicSplineList2D::WeightedCubicSplineList2D(const WeightedCubicSplineLi
  *
  * \return Always "WeightedCubicSplineList2D".
  */
-QString WeightedCubicSplineList2D::typeName()
+QString WeightedCubicSplineList2D::typeName() const
 {
 	return "WeightedCubicSplineList2D";
 }

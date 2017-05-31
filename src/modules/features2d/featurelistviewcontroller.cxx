@@ -163,7 +163,7 @@ QRectF PointFeatureList2DViewController::boundingRect() const
  *
  * \return Always: "PointFeatureList2DViewController"
  */
-QString PointFeatureList2DViewController::typeName()
+QString PointFeatureList2DViewController::typeName() const
 {
     return "PointFeatureList2DViewController";
 }
@@ -445,7 +445,7 @@ QRectF WeightedPointFeatureList2DViewController::boundingRect() const
  *
  * \return Always: "WeightedPointFeatureList2DViewController"
  */
-QString WeightedPointFeatureList2DViewController::typeName()
+QString WeightedPointFeatureList2DViewController::typeName() const
 {
 	return "WeightedPointFeatureList2DViewController";
 }
@@ -714,7 +714,7 @@ void EdgelFeatureList2DViewController::paint(QPainter *painter, const QStyleOpti
  *
  * \return Always: "EdgelList2DViewController"
  */
-QString EdgelFeatureList2DViewController::typeName()
+QString EdgelFeatureList2DViewController::typeName() const
 {
 	return "EdgelFeatureList2DViewController";
 }
@@ -958,7 +958,7 @@ void SIFTFeatureList2DViewController::paint(QPainter *painter, const QStyleOptio
  *
  * \return Always: "SIFTFeatureList2DViewController"
  */
-QString SIFTFeatureList2DViewController::typeName()
+QString SIFTFeatureList2DViewController::typeName() const
 {
 	return "SIFTFeatureList2DViewController"; 
 }

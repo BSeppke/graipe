@@ -49,7 +49,7 @@ Polygon2D::~Polygon2D()
  *
  * \return Always: "Polygon2D"
  */
-QString Polygon2D::typeName()
+QString Polygon2D::typeName() const
 {
 	return "Polygon2D";
 }

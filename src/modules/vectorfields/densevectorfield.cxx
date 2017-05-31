@@ -105,7 +105,7 @@ DenseVectorfield2D::DenseVectorfield2D(const ArrayViewType & u, const ArrayViewT
  *
  * \return Always "DenseVectorfield2D"
  */
-QString DenseVectorfield2D::typeName()
+QString DenseVectorfield2D::typeName() const
 { 
     return	QString("DenseVectorfield2D");
 }
@@ -804,7 +804,7 @@ DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, c
  *
  * \return Always "DenseWeightedVectorfield2D"
  */
-QString DenseWeightedVectorfield2D::typeName()
+QString DenseWeightedVectorfield2D::typeName() const
 { 
 	return QString("DenseWeightedVectorfield2D");
 }

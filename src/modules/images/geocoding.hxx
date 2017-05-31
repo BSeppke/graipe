@@ -249,7 +249,7 @@ class GCP
             return hasId();
         }
 
-        static QString typeName()
+        virtual QString typeName() const
         {
             return "GCP";
         }

@@ -78,7 +78,7 @@ DateTimeParameter::~DateTimeParameter()
  *
  * \return "DateTimeParameter".
  */
-QString  DateTimeParameter::typeName()
+QString  DateTimeParameter::typeName() const
 {
     return "DateTimeParameter";
 }

@@ -240,7 +240,7 @@ QRectF SparseVectorfield2DViewController::boundingRect () const
  *
  * \return Always: "SparseVectorfield2DViewController"
  */
-QString SparseVectorfield2DViewController::typeName()
+QString SparseVectorfield2DViewController::typeName() const
 { 
 	return "SparseVectorfield2DViewController";
 }
@@ -608,7 +608,7 @@ void SparseWeightedVectorfield2DViewController::paint(QPainter *painter, const Q
  *
  * \return Always: "SparseWeightedVectorfield2DViewController"
  */
-QString SparseWeightedVectorfield2DViewController::typeName()
+QString SparseWeightedVectorfield2DViewController::typeName() const
 { 
 	return "SparseWeightedVectorfield2DViewController"; 
 }
@@ -952,7 +952,7 @@ void SparseMultiVectorfield2DViewController::paint(QPainter *painter, const QSty
  *
  * \return Always: "SparseMultiVectorfield2DViewController"
  */
-QString SparseMultiVectorfield2DViewController::typeName()
+QString SparseMultiVectorfield2DViewController::typeName() const
 { 
 	return "SparseMultiVectorfield2DViewController"; 
 }
@@ -1317,7 +1317,7 @@ void SparseWeightedMultiVectorfield2DViewController::paint(QPainter *painter, co
  *
  * \return Always: "SparseWeightedMultiVectorfield2DViewController"
  */
-QString SparseWeightedMultiVectorfield2DViewController::typeName()
+QString SparseWeightedMultiVectorfield2DViewController::typeName() const
 { 
 	return "SparseWeightedMultiVectorfield2DViewController";
 }

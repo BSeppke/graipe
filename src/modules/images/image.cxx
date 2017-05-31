@@ -138,7 +138,7 @@ Image<T>::~Image()
  * \return Always "Image".
  */
 template<>
-QString Image<float>::typeName()
+QString Image<float>::typeName() const
 {
     return "Image";
 }
@@ -150,7 +150,7 @@ QString Image<float>::typeName()
  * \return Always "IntImage".
  */
 template<>
-QString Image<int>::typeName()
+QString Image<int>::typeName() const
 {
     return "IntImage";
 }
@@ -162,7 +162,7 @@ QString Image<int>::typeName()
  * \return Always "ByteImage".
  */
 template<>
-QString Image<unsigned char>::typeName()
+QString Image<unsigned char>::typeName() const
 {
     return "ByteImage";
 }

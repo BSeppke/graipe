@@ -66,7 +66,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          *
          * \return Always "PointFeatureList2D"
          */
-		static QString typeName();
+		virtual QString typeName() const;
 		
         /**
          * Returns the number of features in this list.
@@ -209,7 +209,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          *
          * \return Always "WeightedPointFeatureList2D"
          */
-        static QString typeName();
+        virtual QString typeName() const;
 		
         /**
          * Completely erases this list of weighted features. Does nothing if the list is locked.
@@ -335,7 +335,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D
          *
          * \return Always "EdgelFeatureList2D"
          */
-		static QString typeName();
+		virtual QString typeName() const;
 	
         /**
          * Completely erases this list of edgel features. Does nothing if the list is locked.
@@ -485,7 +485,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
          *
          * \return Always "SIFTFeatureList2D"
          */
-		static QString typeName();
+		virtual QString typeName() const;
 	
         /**
          * Completely erases this list of SIFT features. Does nothing if the list is locked.

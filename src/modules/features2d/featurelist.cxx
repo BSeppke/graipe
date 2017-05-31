@@ -52,7 +52,7 @@ PointFeatureList2D::PointFeatureList2D()
  *
  * \return Always "PointFeatureList2D"
  */
-QString PointFeatureList2D::typeName()
+QString PointFeatureList2D::typeName() const
 {
 	return "PointFeatureList2D";
 }
@@ -328,7 +328,7 @@ WeightedPointFeatureList2D::WeightedPointFeatureList2D()
  *
  * \return Always "WeightedPointFeatureList2D"
  */
-QString WeightedPointFeatureList2D::typeName()
+QString WeightedPointFeatureList2D::typeName() const
 {
 	return "WeightedPointFeatureList2D";
 }
@@ -532,7 +532,7 @@ EdgelFeatureList2D::EdgelFeatureList2D()
  *
  * \return Always "EdgelFeatureList2D"
  */
-QString EdgelFeatureList2D::typeName()
+QString EdgelFeatureList2D::typeName() const
 {
 	return "EdgelFeatureList2D";
 }
@@ -764,7 +764,7 @@ SIFTFeatureList2D::SIFTFeatureList2D()
  *
  * \return Always "SIFTFeatureList2D"
  */
-QString SIFTFeatureList2D::typeName()
+QString SIFTFeatureList2D::typeName() const
 {
 	return "SIFTFeatureList2D";
 }

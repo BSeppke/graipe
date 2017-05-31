@@ -75,7 +75,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameterBase
          *
          * \return "ImageBandParameterBase".
          */
-        static QString typeName();
+        virtual QString typeName() const;
         
         /**
          * The delegate widget of this parameter. 
@@ -160,7 +160,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          *
          * \return "ImageBandParameter".
          */
-        static QString typeName();        
+        virtual QString typeName() const;        
     
         /**
          * The current value of this parameter in the correct, most special type.

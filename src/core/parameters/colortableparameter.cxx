@@ -83,7 +83,7 @@ ColorTableParameter::~ColorTableParameter()
  *
  * \return "ColorTableParameter".
  */
-QString ColorTableParameter::typeName()
+QString ColorTableParameter::typeName() const
 {
     return "ColorTableParameter";
 }

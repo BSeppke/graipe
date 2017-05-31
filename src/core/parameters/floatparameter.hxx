@@ -87,7 +87,7 @@ class GRAIPE_CORE_EXPORT FloatParameter
          *
          * \return "FloatParameter".
          */
-        static QString typeName();
+        virtual QString typeName() const;
         
         /**
          * The lowest possible value of this parameter.

@@ -91,7 +91,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
          *
          * \return Always: "PointFeatureList2DViewController"
          */
-        static QString typeName();
+        virtual QString typeName() const;
         
     protected:
         /**
@@ -165,7 +165,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
          *
          * \return Always: "WeightedPointFeatureList2DViewController"
          */
-		static QString typeName();
+		virtual QString typeName() const;
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -255,7 +255,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController
          *
          * \return Always: "EdgelList2DViewController"
          */
-		static QString typeName();
+		virtual QString typeName() const;
 
 	protected:
         /**
@@ -315,7 +315,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
          *
          * \return Always: "SIFTFeatureList2DViewController"
          */
-		static QString typeName();
+		virtual QString typeName() const;
     
 	protected:
         /**

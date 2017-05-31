@@ -73,7 +73,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          *
          * \return Always "CubicSplineList2D".
          */
-		static QString typeName();
+		virtual QString typeName() const;
 		
         /**
          * Returns the number of 2D cubic splines in this list.
@@ -190,7 +190,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          *
          * \return Always "WeightedCubicSplineList2D".
          */
-        static QString typeName();
+        virtual QString typeName() const;
     
         /**
          * Getter of the weight of a 2D cubic spline at a given index. May throw an error,

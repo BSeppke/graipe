@@ -408,7 +408,7 @@ void ViewController::updateParameters(bool /*force_update*/)
  *
  * \return "ViewController"
  */
-QString ViewController::typeName()
+QString ViewController::typeName() const
 {
     return "ViewController";
 }

@@ -69,7 +69,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          *
          * \return Always "SparseVectorfield2D"
          */
-		static QString typeName();
+		virtual QString typeName() const;
     
         /**
          * The size of this vectorfield. 
@@ -218,7 +218,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
          *
          * \return Always "SparseWeightedVectorfield2D"
          */
-		static QString typeName();
+		virtual QString typeName() const;
     
         /**
          * The removal of all vectors of this vectorfield.
@@ -329,7 +329,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          *
          * \return Always "SparseMultiVectorfield2D"
          */
-		static QString typeName();
+		virtual QString typeName() const;
     
         /**
          * The removal of all vectors of this vectorfield.
@@ -564,7 +564,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
 		SparseWeightedMultiVectorfield2D(const SparseWeightedMultiVectorfield2D & vf);	
 		SparseWeightedMultiVectorfield2D();
 		
-		static QString typeName();
+		virtual QString typeName() const;
 		
         /**
          * The removal of all vectors of this vectorfield.

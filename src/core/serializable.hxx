@@ -148,7 +148,7 @@ class GRAIPE_CORE_EXPORT Serializable
          *
          * \return "Serializable" as a QString
          */
-        static QString typeName();
+        virtual QString typeName() const;
     
         /**
          * Deserialization of a parameter's state from an xml file.

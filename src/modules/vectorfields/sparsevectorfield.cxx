@@ -66,7 +66,7 @@ SparseVectorfield2D::SparseVectorfield2D(const SparseVectorfield2D & vf)
  *
  * \return Always "SparseVectorfield2D"
  */
-QString SparseVectorfield2D::typeName()
+QString SparseVectorfield2D::typeName() const
 { 
 	return QString("SparseVectorfield2D");
 }
@@ -351,7 +351,7 @@ SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(const SparseWeightedVec
  *
  * \return Always "SparseWeightedVectorfield2D"
  */
-QString SparseWeightedVectorfield2D::typeName()
+QString SparseWeightedVectorfield2D::typeName() const
 { 
 	return QString("SparseWeightedVectorfield2D");
 }
@@ -554,7 +554,7 @@ SparseMultiVectorfield2D::SparseMultiVectorfield2D(const SparseMultiVectorfield2
  *
  * \return Always "SparseMultiVectorfield2D"
  */
-QString SparseMultiVectorfield2D::typeName()
+QString SparseMultiVectorfield2D::typeName() const
 { 
 	return	QString("SparseMultiVectorfield2D");
 }
@@ -933,7 +933,7 @@ SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D()
 {
 }
 
-QString SparseWeightedMultiVectorfield2D::typeName()
+QString SparseWeightedMultiVectorfield2D::typeName() const
 {
 	return	QString("SparseWeightedMultiVectorfield2D");
 }

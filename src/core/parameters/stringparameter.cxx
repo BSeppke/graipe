@@ -80,7 +80,7 @@ StringParameter::~StringParameter()
  *
  * \return "StringParameter".
  */
-QString  StringParameter::typeName()
+QString  StringParameter::typeName() const
 {
 	return "StringParameter";
 }
