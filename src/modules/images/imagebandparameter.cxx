@@ -166,7 +166,6 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
         {
             if(model->typeName() ==typeName)
             {
-                qDebug() << "Adding image " << model->shortName() << " to model list";
                 m_allowed_images.push_back(static_cast<Image<T>*>(model));
             }
         }
@@ -462,7 +461,7 @@ template <class T>
 void ImageBandParameter<T>::handleUpdateImage()
 {
     if(m_delegate != NULL)
-        {
+    {
         int idx = m_cmbImage->currentIndex();
             
         if(idx>=0 && idx<(int)m_allowed_images.size())
