@@ -277,8 +277,39 @@ bool SparseVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
     if(locked())
         return false;
     
-    //TODO
-    return false;
+    PointType ori;
+    PointType dir;
+    
+    for(int i=0; i!=4; i++)
+    {
+        if(xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == "x")
+            {
+                ori.setX(xmlReader.readElementText().toFloat());
+            }
+            if(xmlReader.name() == "y")
+            {
+                ori.setY(xmlReader.readElementText().toFloat());
+            }
+            if(xmlReader.name() == "u")
+            {
+                dir.setX(xmlReader.readElementText().toFloat());
+            }
+            if(xmlReader.name() == "v")
+            {
+                dir.setY(xmlReader.readElementText().toFloat());
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    m_origins.push_back(ori);
+    m_directions.push_back(dir);
+    
+    return true;
 }
 
 /**
@@ -534,8 +565,9 @@ bool SparseWeightedVectorfield2D::itemFromCSV(const QString & serial)
  */
 void SparseWeightedVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
-	//TODO
+    xmlWriter.writeTextElement("w", QString::number(m_weights[index], 'g', 10));
 }
+
 
 /**
  * Deserialization/addition of a weihgted vector from a string to this list.
@@ -549,7 +581,19 @@ bool SparseWeightedVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
     if (locked())
         return false;
     
-	//TODO
+    if(!SparseVectorfield2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+    
+    if(xmlReader.readNextStartElement())
+    {
+        if(xmlReader.name() == "w")
+        {
+            m_weights.push_back(xmlReader.readElementText().toFloat());
+            return true;
+        }
+    }
     return false;
 }
 
@@ -954,7 +998,21 @@ bool SparseMultiVectorfield2D::itemFromCSV(const QString & serial)
  */
 void SparseMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
-	//TODO
+    SparseVectorfield2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("altDirections", QString::number(alternatives()));
+    
+    for( unsigned int i = 1; i<=alternatives(); ++i)
+	{
+        const PointType & dir = altDirection(index, i);
+        
+        xmlWriter.writeStartElement("altDirection");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+        
+            xmlWriter.writeTextElement("u", QString::number(dir.x(), 'g', 10));
+            xmlWriter.writeTextElement("v", QString::number(dir.y(), 'g', 10));
+        xmlWriter.writeEndElement();
+	}
 }
 
 /**
@@ -969,8 +1027,60 @@ bool SparseMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
     if (locked())
         return false;
     
-	//TODO
-    return false;
+    if(!SparseVectorfield2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "altDirections"
+        &&  xmlReader.readElementText().toInt() == alternatives())
+    {
+        //The parameters should have been deserialized before, so we can use the properties:
+        std::vector<PointType> alt_dirs(alternatives());
+        
+        for( unsigned int i = 1; i<=alternatives(); ++i)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() =="altDirection"
+                &&  xmlReader.attributes().hasAttribute("ID")
+                &&  xmlReader.attributes().value("ID").toInt() == i)
+            {
+                PointType dir;
+        
+                for(int j=0; j!=2; ++j)
+                {
+                    if(xmlReader.readNextStartElement())
+                    {
+                        if(xmlReader.name() =="u")
+                        {
+                            dir.setX(xmlReader.readElementText().toFloat());
+                        }
+                        if(xmlReader.name() =="v")
+                        {
+                            dir.setY(xmlReader.readElementText().toFloat());
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                alt_dirs.push_back(dir);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        m_alt_directions.push_back(alt_dirs);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /**
@@ -1354,7 +1464,23 @@ bool SparseWeightedMultiVectorfield2D::itemFromCSV(const QString & serial)
  */
 void SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
-	//TODO
+    SparseVectorfield2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("w", QString::number(weight(index), 'g', 10));
+    xmlWriter.writeTextElement("altDirections", QString::number(alternatives()));
+    
+    for(int i = 1; i<=alternatives(); ++i)
+	{
+        const PointType & dir = altDirection(index, i);
+        
+        xmlWriter.writeStartElement("altDirection");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+        
+            xmlWriter.writeTextElement("u", QString::number(dir.x(), 'g', 10));
+            xmlWriter.writeTextElement("v", QString::number(dir.y(), 'g', 10));
+            xmlWriter.writeTextElement("w", QString::number(m_alt_weights[index][i-1], 'g', 10));
+        xmlWriter.writeEndElement();
+	}
 }
 
 /**
@@ -1369,8 +1495,78 @@ bool SparseWeightedMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlRea
     if (locked())
         return false;
     
-	//TODO
-    return false;
+    if(!SparseVectorfield2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "w")
+    {
+        m_weights.push_back(xmlReader.readElementText().toFloat());
+    }
+    else
+    {
+        return false;
+    }
+    
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "altDirections"
+        &&  xmlReader.readElementText().toInt() == alternatives())
+    {
+        //The parameters should have been deserialized before, so we can use the properties:
+        std::vector<PointType> alt_dirs(alternatives());
+        std::vector<float> alt_weights(alternatives());
+        
+        for( unsigned int i = 1; i<=alternatives(); ++i)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() =="altDirection"
+                &&  xmlReader.attributes().hasAttribute("ID")
+                &&  xmlReader.attributes().value("ID").toInt() == i)
+            {
+                PointType dir;
+                float w;
+                
+                for(int j=0; j!=3; ++j)
+                {
+                    if(xmlReader.readNextStartElement())
+                    {
+                        if(xmlReader.name() =="u")
+                        {
+                            dir.setX(xmlReader.readElementText().toFloat());
+                        }
+                        if(xmlReader.name() =="v")
+                        {
+                            dir.setY(xmlReader.readElementText().toFloat());
+                        }
+                        if(xmlReader.name() =="w")
+                        {
+                            w = xmlReader.readElementText().toFloat();
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                alt_dirs.push_back(dir);
+                alt_weights.push_back(w);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        m_alt_directions.push_back(alt_dirs);
+        m_alt_weights.push_back(alt_weights);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 /**
  * This slot is called, whenever some parameter is changed.
