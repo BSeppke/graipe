@@ -36,8 +36,6 @@
 #include "core/serializable.hxx"
 #include "core/impex.hxx"
 
-#include <QUrl>
-
 /**
  * @file
  * @brief This file implements the needed serialization procedures.
@@ -47,20 +45,6 @@
  */
  
 namespace graipe {
-/**
- * Splits a string using a given separator.
- *
- * \param str the QString to be splitted
- * \param sep the separator, where we want to split
- *
- * \return If sep is found n times, a QStringList with n+1 items, each QString before the
- *         separator and each QString after the separator. If not found, the list
- *         just contains one element, namely the given string.
- */
-QStringList split_string(const QString & str, const QString & sep)
-{
-    return str.split(sep);
-}
 
 /**
  * Splits a string using a given separator on the first occurence only.
@@ -89,34 +73,6 @@ QStringList split_string_once(const QString & str, const QString & sep)
     }
     
     return result;
-}
-
-/**
- * Encodes a QString due to the HTML-Get encoding style. 
- * This is used to store QStrings in models' serializations to get 
- * rid of the newline and other problems.
- *
- * \param str the QString to be encoded
- *
- * \return the URL-encoded QString
- */
-QString encode_string(const QString & str)
-{
-    return QUrl::toPercentEncoding(str.toUtf8());
-}
-
-/**
- * Decodes a QString due to the HTML-Get decoding style.
- * This is used to restore QStrings from models' serializations to get
- * rid of the newline and other problems.
- *
- * \param str the URL-encoded QString
- *
- * \return the decoded string
- */
-QString decode_string(const QString & str)
-{
-    return QUrl::fromPercentEncoding(str.toUtf8());
 }
 
 /**
@@ -173,95 +129,24 @@ QDateTime qDateTimeFromSatelliteDateTime(const QString& str)
         return qDateTimeFromNumberDateTime(str);
 }
 
-
 /**
- * Writes a QString onto a QIODevice.
- * We wirte the characters by means of UTF8 encoding.
+ * Getter for the id of a serializable
  *
- * \param str the QString, which shall be written.
- * \param dev the QIODevice, where we read from.
+ * \return the id or an empty QString if none is assigned
  */
-void write_on_device(const QString& str, QIODevice& dev)
+QString Serializable::id() const
 {
-    dev.write(str.toUtf8());
+    return m_id;
 }
 
 /**
- * Read a QString of a given length from a QIODevice.
- * We assume, that the QIODevice can read characters by means of UTF8.
+ * Setter for the id of a serializable
  *
- * \param dev the QIODevice, where we read from.
- * \param len How many characters should being read?
- * 
- * \return the QString read from the stream
+ * \param new_id  the new id of this serializable
  */
-QString read_from_device(QIODevice& dev, int len)
+void Serializable::setID(const QString& new_id)
 {
-    QByteArray arr = dev.read(len);
-    return QString::fromUtf8(arr);
-}
-
-/**
- * Reads from a QIODevice until a certain QString is found or one line is finished.
- * We assume, that the QIODevice can read characters by means of UTF8.
- *
- * \param dev the QIODevice, where we read from.
- * \param str the QString where we stop reading from the device
- * \param one_line If true, only one line is read at maximum.
- *
- * \return All characters read sofar (if the matching was successful, else ""
- */
-QString read_from_device_until(QIODevice& dev, const QString& str, bool one_line)
-{
-    int match_pos=0;
-    
-    QString sofar;
-    
-    while(!dev.atEnd() || match_pos == str.size())
-    {
-        QByteArray arr = dev.read(1);
-        QString current = QString::fromUtf8(arr);
-     
-        sofar += current;
-        
-        //break on lines
-        if (one_line && current == "\n")
-            return "";
-        
-        //current char matches next char to be found
-        if (current == str.at(match_pos))
-        {
-            match_pos++;
-        }
-        else
-        {
-            match_pos=0;
-        }
-        if(match_pos == str.size())
-            return sofar;
-    }
-    
-    return "";
-}
-
-/**
- * Getter for the filename of a serializable
- *
- * \return the filename or an empty QString if none is assigned
- */
-QString Serializable::filename() const
-{
-    return m_filename;
-}
-
-/**
- * Setter for the filename of a serializable
- *
- * \param new_filename  the new filename of this serializable
- */
-void Serializable::setFilename (const QString& new_filename)
-{
-    m_filename = new_filename;
+    m_id = new_id;
 }
 
 /**

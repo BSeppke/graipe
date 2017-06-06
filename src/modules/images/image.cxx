@@ -101,7 +101,7 @@ template<class T>
 Image<T>::Image(Size_Type size, 
                 unsigned int numBands,
                 DateTime_Type timestamp,
-                String_Type filename,
+                String_Type id,
                 Comment_Type comment,
                 Units_Type units,
                 Scale_Type scale)
@@ -114,7 +114,7 @@ Image<T>::Image(Size_Type size,
     m_units(new StringParameter("Units:", units))
 {
     appendParameters();
-    setFilename(filename);
+    setID(id);
     setWidth((unsigned int)size[0]);
     setHeight((unsigned int)size[1]);
     setNumBands(numBands);
@@ -415,38 +415,52 @@ void Image<T>::copyData(Model& other) const
 }
 
 /**
- * Serialization of the Image to a QIODevice.
+ * Serialization of the Image to an xml file.
  * The serialization is just a binary stream of all bands, one after the other.
  *
- * \param out The QIODevice, where we will put our output on.
+ * \param xmlWriter The QXmlStreamWriter where we will put our output on.
  */
 template<class T>
-void Image<T>::serialize_content(QIODevice& out) const
+void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    qint64 channel_size = this->width()*this->height()*sizeof(T);
-    
-    for(unsigned int c=0; c<m_imagebands.size(); ++c)
+    try
     {
+    
+        xmlWriter.writeTextElement("Width",    QString::number(this->width()));
+        xmlWriter.writeTextElement("Height",   QString::number(this->height()));
+        xmlWriter.writeTextElement("Channels", QString::number(this->numBands()));
+        xmlWriter.writeTextElement("Order",   "Row-major");
+        xmlWriter.writeTextElement("Encoding", "Base64");
         
-        qint64 written_bytes = out.write((const char*)m_imagebands[c].data(),channel_size);
-        
-        if (written_bytes != channel_size)
+        qint64 channel_size = this->width()*this->height()*sizeof(T);
+
+        for(unsigned int c=0; c<m_imagebands.size(); ++c)
         {
-            qCritical() << "Image<T>::serialize_content: Error while writing band " << c << ". Expected to write " << channel_size << "bytes, but only wrote " << written_bytes << " bytes";
+            QByteArray block((const char*)m_imagebands[c].data(),channel_size);
+            
+            xmlWriter.writeStartElement("Channel");
+            xmlWriter.writeAttribute("ID", QString::number(c));
+                xmlWriter.writeCharacters(block.toBase64());
+            xmlWriter.writeEndElement();
         }
+    }
+    catch(...)
+    {
+        qCritical() << "Image<T>::serialize_content failed!";
     }
 }
 
 /**
- * Deserializion of a list of polygons from a QIODevice.
+ * Deserialization of a list of polygons from an xml file.
  * Since the serialization is just a binary stream of all bands, one after the other
  * and we already know the size and count of bands, it is quite easy the deserialize.
  *
- * \param in The QIODevice, where we will read from.
+ * \param xmlReader The QXmlStreamReader, where we will read from.
  */
 template<class T>
-bool Image<T>::deserialize_content(QIODevice& in)
+bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
 {
+
     if(this->width() == 0 || this->height()==0 || this->numBands() ==0)
     {
         qCritical("Image<T>::deserialize_content: Image has zero size!");
@@ -457,24 +471,86 @@ bool Image<T>::deserialize_content(QIODevice& in)
     
     m_imagebands.clear();
     m_imagebands.resize(numBands());
-    
-    //Prepare everything:
+        
+    //Prepare all bands:
     for(unsigned int c=0; c<m_imagebands.size(); ++c)
     {
         m_imagebands[c] = vigra::MultiArray<2,T>(width(),height());
     }
     
-    for(unsigned int c=0; c<m_imagebands.size(); ++c)
+    try
     {
-        qint64  read_bytes = in.read((char*)(m_imagebands[c].data()), channel_size);
-        
-        if (read_bytes != channel_size)
-        {
-            qCritical() << "Image<T>::deserialize_content: Error while reading band " << c << ". Expected to read " << channel_size << "bytes, but got " << read_bytes << " bytes";
-            return false;
+        while(xmlReader.readNextStartElement())
+        {            
+            if (xmlReader.name() == "Width")
+            {
+                int w = xmlReader.readElementText().toInt();
+                
+                if(w != width())
+                {
+                    throw std::runtime_error("Width does not match Header info.");
+                }
+            }            
+            if (xmlReader.name() == "Height")
+            {
+                int h = xmlReader.readElementText().toInt();
+                
+                if(h != height())
+                {
+                    throw std::runtime_error("Height does not match Header info.");
+                }
+            }
+            
+            if (xmlReader.name() == "Channels")
+            {
+                int c = xmlReader.readElementText().toInt();
+                
+                if(c != numBands())
+                {
+                    throw std::runtime_error("Number of Channels does not match Header info.");
+                }
+            }
+            
+            if (xmlReader.name() == "Order" && xmlReader.readElementText() != "Row-major")
+            {
+                throw std::runtime_error("Order of data has to be 'Row-major'.");
+            }
+            
+            
+            if (xmlReader.name() == "Encoding" && xmlReader.readElementText() != "Base64")
+            {
+                throw std::runtime_error("Encoding of data has to be 'Base64'.");
+            }
+            
+            if(xmlReader.name() == "Channel" && xmlReader.attributes().hasAttribute("ID"))
+            {
+                int id = xmlReader.attributes().value("ID").toInt();
+                
+                if (id < 0 || id >= numBands())
+                {
+                    throw std::runtime_error("Channel id not found in image");
+                }
+                
+                QByteArray block;
+                block.append(xmlReader.readElementText());
+                block = QByteArray::fromBase64(block);
+                
+                if(block.size() == channel_size)
+                {
+                    memcpy((char*)m_imagebands[id].data(), block.data(), channel_size);
+                }
+                else
+                {
+                    throw std::runtime_error("Channel serialization was of wrong size in XML after Base64 decoding.");
+                }
+            }
         }
     }
-        
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Image<T>::deserialize_content failed! Error: " << e.what();
+        return false;
+    }
     return true;
 }
 

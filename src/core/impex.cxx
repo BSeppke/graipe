@@ -34,9 +34,13 @@
 /************************************************************************/
 
 #include "core/impex.hxx"
+#include "core/globals.hxx"
 
 #include <QFile>
 #include "core/qt_ext/qiocompressor.hxx"
+#include "core/factories.hxx"
+
+#include "core/parameters/longstringparameter.hxx"
 
 /**
  * @file
@@ -47,7 +51,44 @@
  */
 
 namespace graipe {
+
+/**
+ * Basic open procedure for compressed and uncompressed files.
+ *
+ * \param filename The filename of the stored object.
+ * \param openMode An openind mode, read/write-only etc.
+ * \return A valid QIODevice Pointer, if the opening was successful esle NULL.
+ */
+QIODevice* Impex::openFile(const QString & filename, QIODevice::OpenModeFlag openMode)
+{
+    QIODevice* device = NULL;
+    bool compress = (filename.right(2) == "gz");
     
+    if(!filename.isEmpty())
+    {
+        QFile* file = new QFile(filename);
+        
+        if(compress)
+        {
+            QIOCompressor* compressor = new QIOCompressor(file);
+            compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+            if (compressor->open(openMode))
+            {
+                device = compressor;
+            }
+        }
+        else
+        {
+            if(file->open(openMode))
+            {
+                device = file;
+            }
+        }
+    }
+    return device;
+}
+
 /**
  * Basic import procedure for all types, which implements the serializable interface.
  *
@@ -56,100 +97,97 @@ namespace graipe {
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-bool Impex::load(const QString & filename, Serializable * object, bool compress)
+Model* Impex::loadModel(const QString & filename)
 {
-    bool success=false;
-    
-    if(!filename.isEmpty())
+   QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+   Model* model = NULL;
+
+    if(device != NULL)
     {
-        QFile file(filename);
+        QXmlStreamReader xmlReader(device);
+        model = loadModel(xmlReader);
+        device->close();
+    }
+    
+    return model;
+}
+/**
+ * Basic import procedure for all types, which implements the serializable interface.
+ *
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
+ * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
+ */
+Model* Impex::loadModel(QXmlStreamReader& xmlReader)
+{
+    //1. Read the name of the xml root
+    if(xmlReader.readNextStartElement())
+    {
+        //First start element: ViewController's name
+        QString mod_type = xmlReader.name().toString();
+
+        //3. Create a model using the mod_type and the modelFactory:
+        Model* model = NULL;
         
-        if(compress)
+        for(unsigned int i=0; i<modelFactory.size(); ++i)
         {
-            QIOCompressor compressor(&file);
-            compressor.setStreamFormat(QIOCompressor::GzipFormat);
-            
-            if (compressor.open(QIODevice::ReadOnly))
+            if(modelFactory[i].model_type==mod_type)
             {
-                success = object->deserialize(compressor);
-                compressor.close();
+                model = modelFactory[i].model_fptr();
+                break;
             }
+        }
+        
+        //  If it was not found: Indicate error
+        if(model == NULL)
+        {
+            qWarning("Impex::loadModel: Model type was not found in modelFactory.");
+            return NULL;
+        }
+        
+        if(model->deserialize(xmlReader))
+        {
+            return model;
         }
         else
         {
-            if(file.open(QIODevice::ReadOnly))
-            {
-                success = object->deserialize(file);
-                file.close();
-            }
+            qWarning("Impex::loadModel: Deserialization of Model failed");
+            delete model;
+            return NULL;
         }
     }
-    
-    return success;
-}
-
-/**
- * Reads the content of (maybe compressed) file to a QString.
- * Mainly needed for views and their serialization.
- *
- * \param filename The filename to be read.
- * \param compress If true, the file will be read using the GZip decompressor.
- */
-QString Impex::readToString(const QString & filename, bool compress)
-{
-    QString result;
-    
-    if(!filename.isEmpty())
+    else
     {
-        QFile file(filename);
-        
-        if(compress)
-        {
-            QIOCompressor compressor(&file);
-            compressor.setStreamFormat(QIOCompressor::GzipFormat);
-            
-            if (compressor.open(QIODevice::ReadOnly))
-            {
-                const QByteArray text = compressor.readAll();
-                result = QString(text);
-                compressor.close();
-            }
-            else
-            {
-                compressor.close();
-            }
-        }
-        else
-        {
-            if(file.open(QIODevice::ReadOnly))
-            {
-                const QByteArray text = file.readAll();
-                result = QString(text);
-                file.close();
-            }
-            else
-            {
-                file.close();
-            }
-        }
+        qWarning("Impex::loadModel: Could not find a single XML start element!");
+        return NULL;
     }
-    return result;
+    return NULL;
 }
 
 /**
- * Basic import procedure of a settings dictionary from a file.
- * A dictionary is defined by means of a mapping from QString keys
- * to QString values.
+ * Basic import procedure for all types, which implements the serializable interface.
  *
- * \param filename The filename to be read.
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
  * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
  */
-std::map<QString,QString> Impex::dictFromFile(const QString & filename, bool compress)
+ViewController* Impex::loadViewController(const QString & filename, QGraphicsScene* scene)
 {
+    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+    ViewController * vc = NULL;
     
-    QString contents = Impex::readToString(filename, compress);
-    return Impex::dictFromString(contents);
+    if(device != NULL)
+    {
+        QXmlStreamReader xmlReader(device);
+        vc = loadViewController(xmlReader, scene);
+        device->close();
+    }
+    
+    return vc;
 }
+
 
 /**
  * Basic import procedure of a settings dictionary from a given QString
@@ -159,32 +197,72 @@ std::map<QString,QString> Impex::dictFromFile(const QString & filename, bool com
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-std::map<QString,QString> Impex::dictFromString(const QString & contents, QString separator)
+ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene)
 {
-    std::map<QString,QString> result;
-    QStringList lines = contents.split("\n");
-    
-    if (lines.size() !=0)
+    ViewController * vc = NULL;
+
+    //1. Read the root attributes of the xml node as well as the name of the root
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.attributes().hasAttribute("ModelID")
+        &&  xmlReader.attributes().hasAttribute("ZOrder"))
     {
-        // [Graipe::XXXXXXXXXX]
-        QString temp = lines[0];
-        //remove [Graipe:: and the last char
-        temp = temp.mid(9,temp.size()-10);
-        
-        result.insert(std::pair<QString,QString>("type", temp));
-    
-        for(int i=1; i<lines.size(); ++i)
+        //First start element: ViewController's name
+        QString vc_type = xmlReader.name().toString();
+        QString vc_modelID = xmlReader.attributes().value("ModelID").toString();
+        int vc_zorder = xmlReader.attributes().value("ZOrder").toInt();
+
+        //2. Find the associated model at the model_list (if it was already loaded)
+        Model* vc_model = NULL;
+        for(Model* mod : models)
         {
-            //Important here: do not trim the QStrings!
-            QStringList key_value =  split_string_once(lines[i], separator);
-            
-            if(key_value.size() == 2)
+            if(     mod
+                &&  mod->id() == vc_modelID)
             {
-                result.insert(std::pair<QString,QString>(key_value[0], decode_string(key_value[1])));
+                vc_model = mod;
+                break;
             }
         }
+        //  If it was not found: Indicate error
+        if(vc_model == NULL)
+        {
+            qWarning("Impex::loadViewController: Model was not found among available ones.");
+            return NULL;
+        }
+        
+         //3. Create a controller using the vc_type and the model found above:
+        for(unsigned int i=0; i<viewControllerFactory.size(); ++i)
+        {
+            if(viewControllerFactory[i].viewController_name==vc_type)
+            {
+                vc = viewControllerFactory[i].viewController_fptr(scene, vc_model, vc_zorder);
+                break;
+            }
+        }
+        //  If it was not found: Indicate error
+        if(vc == NULL)
+        {
+            qWarning("Impex::loadViewController: ViewController type was not found in the factory.");
+            return NULL;
+        }
+        
+        //4. Restore the parameters
+        if(vc->deserialize(xmlReader))
+        {
+            return vc;
+        }
+        else
+        {
+            qWarning("Impex::loadViewController: Deserialization of ViewController failed");
+            delete vc;
+            return NULL;
+        }
     }
-    return result;
+    else
+    {
+        qWarning("Impex::loadViewController: Could not find a single XML start element!");
+        return NULL;
+    }
+    return NULL;
 }
 
 /**
@@ -197,40 +275,16 @@ std::map<QString,QString> Impex::dictFromString(const QString & contents, QStrin
  */
 bool Impex::save(Serializable * object, const QString & filename, bool compress)
 {
-    bool success = false;
-	
-    if(!filename.isEmpty())
-	{
-		QFile file(filename);
-		
-        object->setFilename(filename);
-        
-		if(compress)
-		{
-			QIOCompressor compressor(&file);
-			compressor.setStreamFormat(QIOCompressor::GzipFormat);
-		
-			if (compressor.open(QIODevice::WriteOnly))
-			{
-                object->serialize(compressor);
-				compressor.close();
-				
-				success = true;
-			}
-		}
-		else if(file.open(QIODevice::WriteOnly))
-		{
-            object->serialize(file);
-			file.close();
-				
-			success = true;
-		}
-	}
+	QIODevice* device = Impex::openFile(filename, QIODevice::WriteOnly);
     
-    if(success && object)
+	if (device != NULL)
     {
+        QXmlStreamWriter xmlWriter(device);
+        object->serialize(xmlWriter);
+		device->close();
+        return true;
     }
-	return success;
+	return false;
 }
 
 }//end of namespace graipe

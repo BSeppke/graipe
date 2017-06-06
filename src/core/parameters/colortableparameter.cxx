@@ -131,6 +131,11 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
         }
     }
     
+    if(ct_idx != -1)
+    {
+        return ct_idx;
+    }
+    
     //search in extra (user defined) color tables
     for(unsigned int i=0; i != m_extra_tables.size(); ++i)
     {
@@ -140,7 +145,6 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
             break;
         }
     }
-    
     return ct_idx;
 }
 
@@ -165,7 +169,14 @@ void ColorTableParameter::setValue(const QVector<QRgb>& value)
     }
     else
     {
-        qDebug("ColorTableParameter::setValue: Could not find value to set in colortables");
+        qDebug("ColorTableParameter::setValue: Could not find value to set in colortables. Creating a new one");
+        m_ct_idx = addCustomColorTable(value);
+        if(m_delegate != NULL)
+        {
+            m_delegate->setCurrentIndex(ct_idx);
+            Parameter::updateValue();
+        }
+        
     }
 }
 
@@ -208,7 +219,7 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
                 img.setColorTable(ct);
                 m_delegate->insertItem(m_delegate->count()-1, QPixmap::fromImage(img),"");
             }
-            return m_delegate->count()-2;
+            return colorTables().size() + m_extra_tables.size()-1;
         }
     }
     else
@@ -217,74 +228,120 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
     }
 }
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
+ * The value converted to a QString. This returns a comma-separated list of all
+ * Colors by means of #AARRGGBB values for each color.
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  ColorTableParameter::valueText() const
+QString  ColorTableParameter::toString() const
 {
     QVector<QRgb> ct = value();
     
-    QString str = QString::number(ct[0]);
-    for(unsigned int i=1; i<ct.size(); ++i)
-    {
-        str += ", " + QString::number(ct[i]);
-    }
     
-    return str;
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "ColorTableParameter, " + valueText()
- *
- * \param out The output device on which we serialize the parameter's state.
- */
-void ColorTableParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + valueText(), out);
-}
-
-/**
- * Deserialization of a parameter's state from an input device.
- *
- * \param in the input device.
- * \return True, if the deserialization was successful, else false.
- */
-bool ColorTableParameter::deserialize(QIODevice& in)
-{
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
+    QString res;
     
-    QString content(in.readLine().trimmed());
-    QStringList content_list = split_string(content, ", ");
-    try
+    if(ct.size() != 0)
     {
-        if(content_list.size() != 256)
-        {
-            throw std::runtime_error("Error: Did not find 256 entries");
-        }
-        
-        QVector<QRgb> ct(256);
+        res= QColor(ct[0]).name(QColor::HexArgb);
+    
         for(unsigned int i=0; i<ct.size(); ++i)
         {
-            ct[i] = content_list[i].toUInt();
+            res += ", " + QColor(ct[i]).name(QColor::HexArgb);
         }
-        setValue(ct);
-        
-        return true;
     }
-    catch (...)
+    
+    return res;
+}
+
+/**
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <ColorTableParameter>
+ *     <Name>NAME</Name>
+ *     <Colors>COLORCOUNT</Colors>
+ *     <Color ID="0">#AARRGGBB</Color>
+ *     ...
+ *     <Color ID="COLORCOUNT-1">#AARRGGBB</Color>
+ * </ColorTableParameter>
+ *
+ * with TYPENAME = typeName() and
+ *    COLORCOUNT = ct.size().
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
+ */
+void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
+{
+    QVector<QRgb> ct = value();
+    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+        xmlWriter.writeTextElement("Name", name());
+        xmlWriter.writeTextElement("Colors", QString::number(ct.size()));
+    
+    for(unsigned int i=0; i<ct.size(); ++i)
     {
-        qDebug() << "ColorTableParameter deserialize: value has to be an integer list in file, but found: " << content;
+        xmlWriter.writeStartElement("Color");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeCharacters(QColor(ct[i]).name(QColor::HexArgb));
+        xmlWriter.writeEndElement();
     }
-    return false;
+    xmlWriter.writeEndElement();
+}
+
+/**
+ * Deserialization of a parameter's state from an xml file.
+ *
+ * \param xmlReader The QXmlStreamReader, where we read from.
+ * \return True, if the deserialization was successful, else false.
+ */
+bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
+{
+    try
+    {
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
+        {
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            QVector<QRgb> ct(256);
+            
+            while(xmlReader.readNextStartElement())
+            {
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "Colors")
+                {
+                    ct.resize(xmlReader.readElementText().toInt());
+                }
+                if(    xmlReader.name() == "Color"
+                    && xmlReader.attributes().hasAttribute("ID"))
+                {
+                    int color_id = xmlReader.attributes().value("ID").toInt();
+                    
+                    QColor color(xmlReader.readElementText());
+                    
+                    ct[color_id] = color.rgb();
+                }
+            }
+            setValue(ct);
+            return true;
+        }
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
+    }
 }
 
 /**
@@ -344,6 +401,7 @@ QWidget*  ColorTableParameter::delegate()
         connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_delegate;
 }
 

@@ -44,6 +44,7 @@
 #include <QTransform>
 #include <QObject>
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -143,20 +144,7 @@ class GRAIPE_CORE_EXPORT Model
          * \param new_description The new description of the model.
          */
 		virtual void setDescription(const QString & new_description);
-	
-        /**
-         * Const accessor for the model filename QString.
-         *
-         * \return The filename of the model.
-         */
-		virtual QString filename() const;
-    
-        /**
-         * Set the model's filename to a new QString.
-         *
-         * \param new_filename The new filename of the model.
-         */
-		virtual void setFilename(const QString & new_filename);
+
     
 		/**
          * Const accessor for the left (x-coordinate) of a Model.
@@ -339,23 +327,29 @@ class GRAIPE_CORE_EXPORT Model
         virtual QString typeName() const;
     
         /**
-         * This function returns the automagically generated first header line for model
-         * serialization.
+         * This function serializes a complete Model to a xml stream.
+         * Writes the following XML code by default:
          *
-         * \return The first Header line, namely: "[Graipe::" + typeName() + "]"
-         */
-        QString magicID() const;
-    
-        /**
-         * This function serializes a complete Model to a QString.
-         * To do so, it serializes header first, then the content, like this:
-         *      serialize_header()
-         *      [Content]
-         *      serialize_content();
+         * <TYPENAME>
+         *     <Header>
+         *         HEADER
+         *     </Header>
+         *     <Content>
+         *         CONTENT
+         *     </Content>
+         * </TYPENAME>
          *
-         * \param out The output device for the serialization.
+         * with TYPENAME = typeName(),
+         *        HEADER = serialize_header(), and
+         *       CONTENT = serialize_content().
+         *
+         * If the device, on which the writer writes, is not on the beginning (pos!=0),
+         * the writeStartDocument() and writeEndDocument() calls will be suppressed in
+         * order to allow multi-object files.
+         *
+         * \param xmlWriter The QXmlStreamWriter used for the serialization.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the model by means of its header and content
@@ -363,16 +357,15 @@ class GRAIPE_CORE_EXPORT Model
          * \param  in The input device.
          * \return True, if the Model could be restored,
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
-         * This function serializes the header of a model like this:
-         *      magicID()
-         *      m_parameters->serialize()
+         * This function serializes the header of a model by means of a serialization of the
+         * models parameters (given as a ParameterGroup in m_parameters).
          *
-         * \param out the output device.
+         * \param xmlWriter The QXmlStreamWriter, where we write on.
          */
-        virtual void serialize_header(QIODevice& out) const;
+        virtual void serialize_header(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the Model's header.
@@ -380,15 +373,15 @@ class GRAIPE_CORE_EXPORT Model
          * \param  in The input device.
          * \return True, if the Model's header could be restored,
          */
-        virtual bool deserialize_header(QIODevice& in);
+        virtual bool deserialize_header(QXmlStreamReader& xmlReader);
     
         /**
          * This function serializes the content of a model.
-         * Has to be specialized, here always "none\n".
+         * Has to be specialized, here always "".
          *
-         * \param out the output device.
+         * \param xmlWriter The QXmlStreamWriter, on which we write.
          */
-        virtual void serialize_content(QIODevice& out) const;
+        virtual void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * This function deserializes the Model's content.
@@ -396,7 +389,7 @@ class GRAIPE_CORE_EXPORT Model
          * \param  in The input device.
          * \return True, if the Model's content could be restored,
          */
-        virtual bool deserialize_content(QIODevice& in);
+        virtual bool deserialize_content(QXmlStreamReader& xmlReader);
     
         /**
          * Models may be locked (to read only access), while algorithms are using them e.g.
@@ -452,7 +445,6 @@ class GRAIPE_CORE_EXPORT Model
         //The parameters of this model:
         StringParameter	    * m_name;
         LongStringParameter	* m_description;
-        LongStringParameter	* m_save_filename;
         PointParameter	    * m_ul, * m_lr;
         PointFParameter	    * m_global_ul, * m_global_lr;
     
@@ -504,11 +496,12 @@ class GRAIPE_CORE_EXPORT ItemListModel
         /**
          * The type of this model (same for every instance oif same templates).
          *
-         * \return T::typeName() + "List"
+         * \return T::typeName() const + "List"
          */
-        QString typeName() const
+        virtual QString typeName() const
         {
-            return T::typeName() + "List";
+            T temp;
+            return temp.typeName() + "List";
         }
     
         /**
@@ -611,14 +604,19 @@ class GRAIPE_CORE_EXPORT ItemListModel
          *
          * \param out The output device, where the serialization will take place.
          */
-        void serialize_content(QIODevice & out) const
+        void serialize_content(QXmlStreamWriter& xmlWriter) const
         {
-            write_on_device(T::headerCSV(), out);
+            xmlWriter.writeTextElement("Legend", T::headerCSV()());
     
+            int i=0;
             for(const item_type& item : m_data)
             {
-                write_on_device("\n" + item.toCSV(), out);
+                xmlWriter.writeStartElement("Item");
+                xmlWriter.writeAttribute("ID", QString::number(i++));
+                    xmlWriter.writeCharacters(item.toCSV());
+                xmlWriter.writeEndElement();
             }
+
         }
     
         /**
@@ -629,33 +627,32 @@ class GRAIPE_CORE_EXPORT ItemListModel
          * \param in The input device, where we read from.
          ± \return true, if the complete content could be deserialized from the input device.
          */
-        bool deserialize_content(QIODevice& in)
+        bool deserialize_content(QXmlStreamReader& xmlReader)
         {
             if (locked())
                 return false;
-                
-            //Read in header line and then throw it away immideately
-            if(!in.atEnd())
-                in.readLine();
 
             //Clean up
             clear();
             updateModel();
-
+            
             //Read the entries
-            while(!in.atEnd())
+            while(xmlReader.readNextStartElement())
             {
-                QString line(in.readLine());
-                
-                if(!line.isEmpty() && !line.startsWith(";"))
+                if(xmlReader.name() == "Item")
                 {
                     item_type new_item;
-                    if (!new_item.fromCSV(line))
+                    QString text = xmlReader.readElementText();
+                    if (!new_item.fromCSV(text))
                      {
-                        qCritical() << typeName() << "::deserialize_content: Item could not be deserialized from: '" << line << "'";
+                        qCritical() << typeName() << "::deserialize_content: Item could not be deserialized from: '" << text << "'";
                         return false;
                     }
                     append(new_item);
+                }
+                else
+                {
+                    xmlReader.skipCurrentElement();
                 }
             }
             return true;
@@ -771,7 +768,7 @@ class GRAIPE_CORE_EXPORT RasteredModel
          *
          * \return "RasteredModel"
          */
-        QString typeName() const;
+        virtual QString typeName() const;
     
     protected:
         /** The additional parameters of this model: **/

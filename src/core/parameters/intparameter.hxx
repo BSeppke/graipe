@@ -87,7 +87,7 @@ class GRAIPE_CORE_EXPORT IntParameter
          *
          * \return "IntParameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
         /**
          * The lowest possible value of this parameter.
          *
@@ -137,32 +137,24 @@ class GRAIPE_CORE_EXPORT IntParameter
          * \param value The new value of this parameter.
          */
         void setValue(int value);
-    
+            
         /**
          * The value converted to a QString. Please note, that this can vary from the 
          * serialize() result, which also returns a QString. This is due to the fact,
          * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
+         * inside the QString
          *
-         * \return The value of the parameter converted to an QString.
+         * \return The value of the parameter converted to an QString
          */
-        QString valueText() const;
+        QString toString() const;
     
         /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, just: "IntParameter, " + valueText()
+         * Deserialization of a parameter's state from a string.
          *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
-    
-        /**
-         * Deserialization of a parameter's state from an input device.
-         *
-         * \param in the input device.
+         * \param str the input QString.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool fromString(QString& str);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -196,7 +188,7 @@ class GRAIPE_CORE_EXPORT IntParameter
         int m_min_value, m_max_value;
     
         /** The delegate widget **/
-        QPointer<QSpinBox> m_spbDelegate;
+        QPointer<QSpinBox> m_delegate;
 };
 
 } //end of namespace graipe

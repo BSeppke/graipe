@@ -88,7 +88,7 @@ class GRAIPE_CORE_EXPORT StringParameter
          *
          * \return "StringParameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
         
         /** 
          * The current value of this parameter in the correct, most special type.
@@ -104,31 +104,24 @@ class GRAIPE_CORE_EXPORT StringParameter
          */
         void setValue(const QString& value);
             
+            
         /**
          * The value converted to a QString. Please note, that this can vary from the 
          * serialize() result, which also returns a QString. This is due to the fact,
          * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
+         * inside the QString
          *
-         * \return The value of the parameter converted to an QString.
+         * \return The value of the parameter converted to an QString
          */
-        QString valueText() const;
-            
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, it's just: "StringParameter" + encode_string(value())
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
+        QString toString() const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Deserialization of a parameter's state from a string.
          *
-         * \param in the input device.
+         * \param str the input QString.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool fromString(QString& str);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.
@@ -162,7 +155,7 @@ class GRAIPE_CORE_EXPORT StringParameter
         unsigned int m_columns;
     
         /** The delegate widget **/
-        QPointer<QLineEdit> m_lneDelegate;
+        QPointer<QLineEdit> m_delegate;
 };
 
 } //end of namespace graipe

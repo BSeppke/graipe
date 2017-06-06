@@ -98,7 +98,8 @@ VECTORFIELD_CLASS* computeGlobalMotionOfVectorfield(const VECTORFIELD_CLASS* vf)
                          mat(0,1), mat(1,1), mat(2,1),
                          mat(0,2), mat(1,2), mat(2,2));
 
-    QString mat_str = TransformParameter::valueText(transform);
+    QString mat_str = "";
+        //TODO:TransformParameter::valueText(transform);
     
 	result_vf->setGlobalMotion(transform);
 	result_vf->setName(QString("Separated motion of: ") + vf->name());
@@ -107,7 +108,7 @@ VECTORFIELD_CLASS* computeGlobalMotionOfVectorfield(const VECTORFIELD_CLASS* vf)
 	
 	ss  << "Separated motion of: " <<  vf->name() << "\n"
 		<< "Matrix was:\n"
-		<< mat_str;
+        << mat_str;
 	
 	result_vf->setDescription(ss.readAll());
 							  

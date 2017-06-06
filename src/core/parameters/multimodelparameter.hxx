@@ -77,7 +77,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        MultiModelParameter(const QString& name, const std::vector<Model*> * allowed_models, QString type_filter="", std::vector<Model*>* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
+        MultiModelParameter(const QString& name, QString type_filter="", std::vector<Model*>* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * Destructor of the MultiModel class
@@ -89,7 +89,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \return "MultiModelParameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
         
         /** 
          * The current value of this parameter in the correct, most special type.
@@ -113,32 +113,36 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
-    
-        /**
-         * This method is called after each (re-)assignment of the model list
-         * e.g. after a call of the setModelList() function. 
-         * It synchronizes the list of available models with the widget's list.
-         */
-        void refresh();
+        QString toString() const;
             
         /**
-         * Serialization of the parameter's state to an output device.
-         * Writes comman-separated model list the output device, containing the filename
-         * for each model, like:
-         * "MultModelParameter, file1.bla, file2.blubb"
+         * Serialization of the parameter's state to a xml stream.
+         * Writes the following XML code by default:
+         * 
+         * <MultiModelParameter>
+         *     <Name>NAME</Name>
+         *     <Values>N</Value>
+         *     <Value ID="0">VALUE_0_ID</Value>
+         *     ...
+         *     <Value ID="N-1">VALUE_N-1_ID</Value>
+         * </MultiModelParameter>
          *
-         * \param out The output device on which we serialize the parameter's state.
+         * with     NAME = name(),
+         *             N = QString::number(value().size()), and
+         *    VALUE_0_ID = values()[0]->id().
+         *
+         * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+         *                  parameter's type, name and value.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Deserialization of a parameter's state from an xml file.
          *
-         * \param in the input device.
+         * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function locks the parameters value. 
@@ -189,7 +193,7 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
         std::vector<int> m_model_idxs;
     
         /** The delegate list widget **/
-        QPointer<QListWidget> m_lstDelegate;
+        QPointer<QListWidget> m_delegate;
     
         /** A vector of all allowed models (listed) **/
         std::vector<Model*>	m_allowed_values;

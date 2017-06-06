@@ -122,39 +122,21 @@ void FilenameParameter::setValue(const QString & value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  FilenameParameter::valueText() const
+QString  FilenameParameter::toString() const
 {
     return value();
 }
 
-/**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "FilenameParameter, " + encode_string(value())
- *
- * \param out The output device on which we serialize the parameter's state.
- */
-void FilenameParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + encode_string(value()), out);
-}
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from a string.
  *
- * \param in the input device.
+ * \param str the input QString.
  * \return True, if the deserialization was successful, else false.
  */
-bool FilenameParameter::deserialize(QIODevice& in)
+bool FilenameParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    setValue(decode_string(content));
-    
+    setValue(str);
     return true;
 }
 
@@ -195,6 +177,7 @@ QWidget*  FilenameParameter::delegate()
         connect(m_btnDelegate,  SIGNAL(clicked()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_delegate;
 }
 
@@ -211,8 +194,7 @@ void FilenameParameter::updateValue()
     
         if(file.size())
         {
-            m_value = file;
-            Parameter::updateValue();
+            setValue(file);
         }
     }
 }

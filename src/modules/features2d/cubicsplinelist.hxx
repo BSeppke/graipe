@@ -73,7 +73,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          *
          * \return Always "CubicSplineList2D".
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 		
         /**
          * Returns the number of 2D cubic splines in this list.
@@ -117,7 +117,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          *
          * \return Always "dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one 2D cubic spline at a given list index to a string. This function will
@@ -126,7 +126,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          * \param index The index of the 2D cubic spline to be serialized.
          * \return A QString containing the searialization of the 2D cubic spline.
          */
-        virtual QString serialize_item(unsigned int index) const;
+        virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a 2D cubic spline from a string to this list.
@@ -135,25 +135,43 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
          */
-        virtual bool deserialize_item(const QString & serial);
+        virtual bool itemFromCSV(const QString & serial);
     
         /**
-         * Serialization the list of 2D cubic splines to a QIODevice.
-         * The first line is the header as given in item_header(). Each following
+         * Serialization of one 2D cubic spline at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+         *
+         * \param index The index of the 2D cubic spline to be serialized.
+         * \return A QString containing the searialization of the 2D cubic spline.
+         */
+        virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a 2D cubic spline from a string to this list.
+         *
+         * \param serial A QString containing the searialization of the 2D cubic spline.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
+         */
+        virtual bool deserialize_item(QXmlStreamReader& xmlReader);
+    
+        /**
+         * Serialization the list of 2D cubic splines to an xml file.
+         * The first line is the header as given in csvHeader. Each following
          * line represents one 2D cubic spline serialization.
          *
-         * \param out The QIODevice, where we will put our output on.
+         * \param xmlWriter The QXmlStreamWriter where we will put our output on.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a list of 2D cubic splines from a QIODevice.
-         * The first line is the header as given in item_header(), which is ignored however.
-         * Each following line has to be one valide 2D cubic spline serialization.
+         * Deserialization of a list of 2D cubic splines from an xml file.
+         * The first line is the header as given in csvHeader, which is ignored however.
+         * Each following line has to be one valid 2D cubic spline serialization.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
 	
     protected:
         //The list of 2D cubic splines
@@ -190,7 +208,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          *
          * \return Always "WeightedCubicSplineList2D".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
     
         /**
          * Getter of the weight of a 2D cubic spline at a given index. May throw an error,
@@ -254,7 +272,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          *
          * \return Always "weight, dp0/dx, dp0/dy, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y, dpN/dx, dpN/dy".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one 2D cubic spline at a given list index to a string. This function will
@@ -264,7 +282,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          * \return A QString containing the searialization of the 2D cubic spline.
          *         The serialization should be given as: weight, dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
          */
-        virtual QString serialize_item(unsigned int index) const;
+        virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a 2D cubic spline from a string to this list.
@@ -272,7 +290,25 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          * \param serial A QString containing the searialization of the 2D cubic spline.
          * \return True, if the item could be deserialized and the model is not locked.
          */
-        virtual bool deserialize_item(const QString & serial);
+        virtual bool itemFromCSV(const QString & serial);
+    
+        /**
+         * Serialization of one 2D cubic spline at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+         *
+         * \param index The index of the 2D cubic spline to be serialized.
+         * \return A QString containing the searialization of the 2D cubic spline.
+         *         The serialization should be given as: weight, dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
+         */
+        virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a 2D cubic spline from a string to this list.
+         *
+         * \param serial A QString containing the searialization of the 2D cubic spline.
+         * \return True, if the item could be deserialized and the model is not locked.
+         */
+        virtual bool deserialize_item(QXmlStreamReader& xmlReader);
         
     protected:
         //The list of weights:

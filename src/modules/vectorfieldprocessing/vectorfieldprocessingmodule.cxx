@@ -53,7 +53,7 @@ class VectorfieldSmoother
          */
         VectorfieldSmoother()
         {
-            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield",	NULL,  "SparseWeightedMultiVectorfield2D"));
+            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield", "SparseWeightedMultiVectorfield2D"));
             m_parameters->addParameter("radius",           new FloatParameter("radius for smoothing", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",          new FloatParameter("weight threshold", 0.0, 9999, 0.0));
             m_parameters->addParameter("iterations",       new IntParameter("iterations", 1, 9999, 10));
@@ -145,7 +145,7 @@ class VectorfieldRelaxer : public Algorithm
          */
         VectorfieldRelaxer()
         {
-            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield",	NULL,  "SparseWeightedMultiVectorfield2D"));
+            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield", "SparseWeightedMultiVectorfield2D"));
             m_parameters->addParameter("radius",           new FloatParameter("radius for smoothing", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",          new FloatParameter("weight threshold", 0.0, 9999, 0.0));
             m_parameters->addParameter("iterations",       new IntParameter("iterations", 1, 9999, 10));
@@ -237,7 +237,7 @@ class VectorfieldClustererGreedy : public Algorithm
          */
         VectorfieldClustererGreedy()
         {
-            m_parameters->addParameter("vf",  new ModelParameter("Vectorfield",	NULL,  "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D"));
+            m_parameters->addParameter("vf",  new ModelParameter("Vectorfield", "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D"));
             m_parameters->addParameter("weight-dir", new FloatParameter("weight direction for clustering", 0.0, 9999, 1.0));
             m_parameters->addParameter("radius", new FloatParameter("radius for clustering sizes", 0.0, 9999, 10));
             m_parameters->addParameter("weightT", new FloatParameter("weight threshold", 0.0, 9999, 0.0));
@@ -343,7 +343,7 @@ class VectorfieldClustererKMeans
          */
         VectorfieldClustererKMeans()
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield",	NULL,  "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D"));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D"));
             m_parameters->addParameter("weight-dir", new FloatParameter("weight direction for clustering", 0.0, 9999, 1.0));
             m_parameters->addParameter("k", new IntParameter("k (count of clusters)", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",  new FloatParameter("weight threshold", 0.0, 9999, 0.0));

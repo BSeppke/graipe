@@ -142,7 +142,7 @@ class BlockWiseImageMatcher
                     
                     qint64 processing_time = timer.elapsed();
                     
-                    new_block_matching_vectorfield->setName(QString("I->I block matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    new_block_matching_vectorfield->setName(QString("I->I block matching with ") + param_imageBand1->toString() + QString(" and ") + param_imageBand2->toString());
                     
                     QString descr("The following parameters were used to calculate the Block Matching (Image->Image):\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -151,7 +151,7 @@ class BlockWiseImageMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
                     
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -229,10 +229,10 @@ class FeatureToFeatureMatcher
          */
         FeatureToFeatureMatcher()
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",	NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
-            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",		NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -306,7 +306,7 @@ class FeatureToFeatureMatcher
                     
                     qint64 processing_time = timer.elapsed();
                     
-                    new_vectorfield->setName(QString("F->F matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    new_vectorfield->setName(QString("F->F matching with ") + param_imageBand1->toString() + QString(" and ") + param_imageBand2->toString());
                     
                     QString descr("The following parameters were used to calculate the NCC (Features->Features):\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -315,7 +315,7 @@ class FeatureToFeatureMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -395,9 +395,9 @@ class FeatureToImageMatcher
          */
         FeatureToImageMatcher()
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",	NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -468,7 +468,7 @@ class FeatureToImageMatcher
                     
                     qint64 processing_time = timer.elapsed();
                     
-                    new_vectorfield->setName(QString("F->I Matching with ") + param_imageBand1->valueText() + QString(" and ") + param_imageBand2->valueText());
+                    new_vectorfield->setName(QString("F->I Matching with ") + param_imageBand1->toString() + QString(" and ") + param_imageBand2->toString());
                     
                     QString descr("The following parameters were used to calculate the matching (Features->Image):\n");
                     descr += m_parameters->valueText("ModelParameter");
@@ -477,7 +477,7 @@ class FeatureToImageMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -556,10 +556,10 @@ class ShapeContextMatcher
          */
         ShapeContextMatcher()
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",	NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
-            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",		NULL,  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -635,7 +635,7 @@ class ShapeContextMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"
@@ -703,10 +703,10 @@ class SIFTMatcher
          */
         SIFTMatcher()
         {
-            m_parameters->addParameter("image1", new ImageBandParameter<float>("Reference image",	NULL));
-            m_parameters->addParameter("sift1", new ModelParameter("SIFT Features (of reference image)",	NULL,  "SIFTFeatureList2D"));
-            m_parameters->addParameter("image2", new ImageBandParameter<float>("Second Image",	NULL));
-            m_parameters->addParameter("sift2", new ModelParameter("SIFT Features (of second image)",		NULL,  "SIFTFeatureList2D"));
+            m_parameters->addParameter("image1", new ImageBandParameter<float>("Reference image"));
+            m_parameters->addParameter("sift1", new ModelParameter("SIFT Features (of reference image)", "SIFTFeatureList2D"));
+            m_parameters->addParameter("image2", new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("sift2", new ModelParameter("SIFT Features (of second image)", "SIFTFeatureList2D"));
             m_parameters->addParameter("max_sift_d", new FloatParameter("Max. distance of point descriptors", 1, 1000000,1000));
             m_parameters->addParameter("max_d", new FloatParameter("Max. geometrical distance of points", 1, 100000,100));
             m_parameters->addParameter("best_n", new IntParameter("Find N best candidates", 1, 50,10));
@@ -789,7 +789,7 @@ class SIFTMatcher
                                          mat(0,1), mat(1,1), mat(2,1),
                                          mat(0,2), mat(1,2), mat(2,2));
 
-                    QString mat_str = TransformParameter::valueText(transform);
+                    QString mat_str = "";//TODO:TransformParameter::valueText(transform);
                     
                     descr += QString(   "Computed global motion matrix (I1 -> I2): %1\n"
                                         "rotation accuracy: %2\n"

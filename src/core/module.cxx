@@ -34,6 +34,8 @@
 /************************************************************************/
 
 #include "core/module.hxx"
+#include "core/factories.hxx"
+
 
 /**
  * @file
@@ -44,7 +46,7 @@
  */
 
 namespace graipe {
-    
+
 /**
  * Default constructor of the Module class
  */

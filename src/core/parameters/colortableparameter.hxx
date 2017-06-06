@@ -40,6 +40,7 @@
 #include "core/parameters/parameter.hxx"
 #include "core/parameters/parametergroup.hxx"
 
+#include <QPointer>
 #include <QComboBox>
 
 /**
@@ -131,23 +132,35 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
-            
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, just: "ColorTableParameter, " + valueText()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
+        QString toString() const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Serialization of the parameter's state to a xml stream.
+         * Writes the following XML code by default:
+         * 
+         * <ColorTableParameter>
+         *     <Name>NAME</Name>
+         *     <Colors>COLORCOUNT</Colors>
+         *     <Color ID="0">#AARRGGBB</Color>
+         *     ...
+         *     <Color ID="COLORCOUNT-1">#AARRGGBB</Color>
+         * </ColorTableParameter>
          *
-         * \param in the input device.
+         * with TYPENAME = typeName() and
+         *    COLORCOUNT = ct.size().
+         *
+         * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+         *                  parameter's type, name and value.
+         */
+        void serialize(QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization of a parameter's state from an xml file.
+         *
+         * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
 
         /**
          * This function indicates whether the value of a parameter is valid or not.

@@ -668,6 +668,18 @@ bool QIOCompressor::checkGzipSupport(const char * const versionString)
 
     return true;
 }
+qint64 QIOCompressor::pos() const //0 on the beginning, else: 1
+{
+    Q_D(const QIOCompressor);
+    if(d->state == QIOCompressorPrivate::NoBytesWritten)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
 
 }//end of namespace graipe
 

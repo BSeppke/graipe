@@ -36,12 +36,15 @@
 #ifndef GRAIPE_CORE_IMPEX_HXX
 #define GRAIPE_CORE_IMPEX_HXX
 
-#include "core/model.hxx"
 #include "core/config.hxx"
+
+#include "core/model.hxx"
+#include "core/viewcontroller.hxx"
 
 #include <map>
 
 #include <QString>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -77,6 +80,15 @@ class GRAIPE_CORE_EXPORT Impex
 { 
 	public:
         /**
+         * Basic open procedure for compressed and uncompressed files.
+         *
+         * \param filename The filename of the stored object.
+         * \param openMode An openind mode, read/write-only etc.
+         * \return A valid QIODevice Pointer, if the opening was successful esle NULL.
+         */
+        static QIODevice* openFile(const QString & filename, QIODevice::OpenModeFlag openMode);
+    
+        /**
          * Basic import procedure for all types, which implement the serializable interface
          *
          * \param filename The filename of the stored object.
@@ -84,27 +96,28 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static bool load(const QString & filename, Serializable * rs_obj, bool compress=true);
+        static Model* loadModel(const QString & filename);
     
         /**
-         * Reads the content of (maybe compressed) file to a QString.
-         * Mainly needed for views and their serialization.
+         * Basic import procedure for all types, which implement the serializable interface
          *
-         * \param filename The filename to be read.
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
          * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
          */
-        static QString readToString(const QString & filename, bool compress=true);
+        static Model* loadModel(QXmlStreamReader & xmlReader);
     
         /**
-         * Basic import procedure of a settings dictionary from a file.
-         * A dictionary is defined by means of a mapping from QString keys
-         * to QString values.
+         * Basic import procedure for all types, which implement the serializable interface
          *
-         * \param filename The filename to be read.
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
          * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
          */
-        static std::map<QString,QString> dictFromFile(const QString & filename, bool compress=true);
-    
+        static ViewController* loadViewController(const QString & filename, QGraphicsScene* scene);
+
         /**
          * Basic import procedure of a settings dictionary from a given QString
          * A dictionary is defined by means of a mapping from QString keys
@@ -113,7 +126,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param contents The input QString.
          * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
          */
-         static std::map<QString,QString> dictFromString(const QString & contents, QString separator=": ");
+        static ViewController* loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene);
             
         /**
          * Standard exporter for everything, which implements the Serializable interface.

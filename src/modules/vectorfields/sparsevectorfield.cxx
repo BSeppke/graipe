@@ -199,7 +199,7 @@ void SparseVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y".
  */
-QString SparseVectorfield2D::item_header() const
+QString SparseVectorfield2D::csvHeader() const
 {
 	return "pos_x, pos_y, dir_x, dir_y";
 }
@@ -211,7 +211,7 @@ QString SparseVectorfield2D::item_header() const
  * \param index Index of the vector to be serialized.
  * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y".
  */
-QString SparseVectorfield2D::serialize_item(unsigned int index) const
+QString SparseVectorfield2D::itemToCSV(unsigned int index) const
 {
 	return   QString::number(m_origins[index].x(), 'g', 10)    + ", "
            + QString::number(m_origins[index].y(), 'g', 10)    + ", "
@@ -226,13 +226,13 @@ QString SparseVectorfield2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y
  */
-bool SparseVectorfield2D::deserialize_item(const QString & serial)
+bool SparseVectorfield2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;
         
 	//try to split content into data entries
-	QStringList values = split_string(serial, ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 4)
 	{
 		try
@@ -251,59 +251,116 @@ bool SparseVectorfield2D::deserialize_item(const QString & serial)
 }
 
 /**
- * Serialize the complete content of the sparse vectorfield to a QIODevice.
+ * Serialization of a single vector inside the list at a given index.
+ * The vector will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the vector to be serialized.
+ * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y".
+ */
+void SparseVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    xmlWriter.writeTextElement("x", QString::number(m_origins[index].x(), 'g', 10));
+    xmlWriter.writeTextElement("y",  QString::number(m_origins[index].y(), 'g', 10));
+    xmlWriter.writeTextElement("u", QString::number(m_directions[index].x(), 'g', 10));
+    xmlWriter.writeTextElement("v", QString::number(m_directions[index].y(), 'g', 10));
+}
+
+/**
+ * Deserialization/addition of a vector from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the vector.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y
+ */
+bool SparseVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;
+    
+    PointType ori;
+    PointType dir;
+    
+    for(int i=0; i!=4; i++)
+    {
+        if(xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == "x")
+            {
+                ori.setX(xmlReader.readElementText().toFloat());
+            }
+            if(xmlReader.name() == "y")
+            {
+                ori.setY(xmlReader.readElementText().toFloat());
+            }
+            if(xmlReader.name() == "u")
+            {
+                dir.setX(xmlReader.readElementText().toFloat());
+            }
+            if(xmlReader.name() == "v")
+            {
+                dir.setY(xmlReader.readElementText().toFloat());
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    m_origins.push_back(ori);
+    m_directions.push_back(dir);
+    
+    return true;
+}
+
+/**
+ * Serialize the complete content of the sparse vectorfield to an xml file.
  * Mainly prints:
- *   item_header()
+ *   csvHeader
  * and for each vector:
  *   newline + serialize_item().
  *
  * \param out The output device for serialization.
  */
-void SparseVectorfield2D::serialize_content(QIODevice& out) const
+void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-     write_on_device(item_header(), out);
-    
 	for(unsigned int i=0; i < size(); ++i)
     {
-		write_on_device("\n" + serialize_item(i), out);
-	}
+        xmlWriter.writeStartElement("Vector2D");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+            serialize_item(i, xmlWriter);
+        xmlWriter.writeEndElement();
+    }
 }
 
 /**
- * Deserializion of a  sparse vectorfield from a QIODevice.
- * The first line is the header as given in item_header(), which is ignored however.
+ * Deserialization of a  sparse vectorfield from an xml file.
+ * The first line is the header as given in csvHeader, which is ignored however.
  * Each following line has to be one valid vector serialization.
  * Does nothing if the model is locked.
  *
- * \param in The QIODevice, where we will read from.
+ * \param xmlReader The QXmlStreamReader, where we will read from.
  * \return True, if the content could be deserialized and the model is not locked.
  */
-bool SparseVectorfield2D::deserialize_content(QIODevice& in)
+bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    if(locked())
+    if (locked())
         return false;
-        
-    //Read in header line and then throw it away immideately
-    if(!in.atEnd())
-        in.readLine();
-    
+
     //Clean up
 	clear();
     updateModel();
-			
+    
     //Read the entries
-    while(!in.atEnd())
+    while(xmlReader.readNextStartElement())
     {
-        QString line = QString(in.readLine());
-        
-        //ignore comments and empty lines
-        if(!line.isEmpty() && !line.startsWith(";"))
+        if(xmlReader.name() == "Vector2D")
         {
-            if (!deserialize_item(line))
-            {
-                qCritical() << "Vectorfield2D::deserialize_content: Vector could not be deserialized from: '" << line << "'";
+            if(!deserialize_item(xmlReader))
                 return false;
-            }
+        }
+        else
+        {
+            xmlReader.skipCurrentElement();
         }
     }
     return true;
@@ -451,9 +508,9 @@ void SparseWeightedVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y, weight".
  */
-QString SparseWeightedVectorfield2D::item_header() const
+QString SparseWeightedVectorfield2D::csvHeader() const
 {
-	return SparseVectorfield2D::item_header() + ", weight";
+	return SparseVectorfield2D::csvHeader() + ", weight";
 }
 
 /**
@@ -463,9 +520,9 @@ QString SparseWeightedVectorfield2D::item_header() const
  * \param index Index of the vector to be serialized.
  * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight".
  */
-QString SparseWeightedVectorfield2D::serialize_item(unsigned int index) const
+QString SparseWeightedVectorfield2D::itemToCSV(unsigned int index) const
 {
-	return SparseVectorfield2D::serialize_item(index) + ", "
+	return SparseVectorfield2D::itemToCSV(index) + ", "
            + QString::number(m_weights[index], 'g', 10);
 }
 
@@ -476,18 +533,18 @@ QString SparseWeightedVectorfield2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, weight
  */
-bool SparseWeightedVectorfield2D::deserialize_item(const QString & serial)
+bool SparseWeightedVectorfield2D::itemFromCSV(const QString & serial)
 {
     if (locked())
         return false;
     
 	//try to split content into data entries
-	QStringList values = split_string(serial, ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 5)
 	{
 		try
 		{
-			SparseVectorfield2D::deserialize_item(serial);
+			SparseVectorfield2D::itemFromCSV(serial);
 			m_weights.push_back(values[4].toFloat());
 			return true;
 		}
@@ -498,6 +555,46 @@ bool SparseWeightedVectorfield2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+/**
+ * Serialization of a single weighted vector inside the list at a given index.
+ * The vector will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the vector to be serialized.
+ * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight".
+ */
+void SparseWeightedVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    xmlWriter.writeTextElement("w", QString::number(m_weights[index], 'g', 10));
+}
+
+
+/**
+ * Deserialization/addition of a weihgted vector from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the vector.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, weight
+ */
+bool SparseWeightedVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if (locked())
+        return false;
+    
+    if(!SparseVectorfield2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+    
+    if(xmlReader.readNextStartElement())
+    {
+        if(xmlReader.name() == "w")
+        {
+            m_weights.push_back(xmlReader.readElementText().toFloat());
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -823,9 +920,9 @@ void SparseMultiVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
  */
-QString SparseMultiVectorfield2D::item_header() const
+QString SparseMultiVectorfield2D::csvHeader() const
 {
-    QString result =  SparseVectorfield2D::item_header();
+    QString result =  SparseVectorfield2D::csvHeader();
 	
 	for( unsigned int i = 0; i<alternatives(); ++i)
 	{
@@ -842,9 +939,9 @@ QString SparseMultiVectorfield2D::item_header() const
  * \param index Index of the vector to be serialized.
  * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
  */
-QString SparseMultiVectorfield2D::serialize_item(unsigned int index) const
+QString SparseMultiVectorfield2D::itemToCSV(unsigned int index) const
 {
-	QString result = SparseVectorfield2D::serialize_item(index);
+	QString result = SparseVectorfield2D::itemToCSV(index);
     
 	for( unsigned int i = 1; i<=alternatives(); ++i)
 	{
@@ -861,15 +958,15 @@ QString SparseMultiVectorfield2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y
  */
-bool SparseMultiVectorfield2D::deserialize_item(const QString & serial)
+bool SparseMultiVectorfield2D::itemFromCSV(const QString & serial)
 {
     //try to split content into data entries
-	QStringList values = split_string(serial , ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 4)
 	{
 		try
 		{
-			if(SparseVectorfield2D::deserialize_item(serial))
+			if(SparseVectorfield2D::itemFromCSV(serial))
             {
                 //The parameters should have been deserialized before, so we can use the properties:
                 std::vector<PointType> alt_dirs(alternatives());
@@ -890,6 +987,100 @@ bool SparseMultiVectorfield2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+
+/**
+ * Serialization of a single multi vector inside the list at a given index.
+ * The vector will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the vector to be serialized.
+ * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
+ */
+void SparseMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    SparseVectorfield2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("altDirections", QString::number(alternatives()));
+    
+    for( unsigned int i = 1; i<=alternatives(); ++i)
+	{
+        const PointType & dir = altDirection(index, i);
+        
+        xmlWriter.writeStartElement("altDirection");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+        
+            xmlWriter.writeTextElement("u", QString::number(dir.x(), 'g', 10));
+            xmlWriter.writeTextElement("v", QString::number(dir.y(), 'g', 10));
+        xmlWriter.writeEndElement();
+	}
+}
+
+/**
+ * Deserialization/addition of a multi vector from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the vector.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y
+ */
+bool SparseMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if (locked())
+        return false;
+    
+    if(!SparseVectorfield2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "altDirections"
+        &&  xmlReader.readElementText().toInt() == alternatives())
+    {
+        //The parameters should have been deserialized before, so we can use the properties:
+        std::vector<PointType> alt_dirs(alternatives());
+        
+        for( unsigned int i = 1; i<=alternatives(); ++i)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() =="altDirection"
+                &&  xmlReader.attributes().hasAttribute("ID")
+                &&  xmlReader.attributes().value("ID").toInt() == i)
+            {
+                PointType dir;
+        
+                for(int j=0; j!=2; ++j)
+                {
+                    if(xmlReader.readNextStartElement())
+                    {
+                        if(xmlReader.name() =="u")
+                        {
+                            dir.setX(xmlReader.readElementText().toFloat());
+                        }
+                        if(xmlReader.name() =="v")
+                        {
+                            dir.setY(xmlReader.readElementText().toFloat());
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                alt_dirs.push_back(dir);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        m_alt_directions.push_back(alt_dirs);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 /**
@@ -1188,9 +1379,9 @@ void SparseWeightedMultiVectorfield2D::removeVector(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
  */
-QString SparseWeightedMultiVectorfield2D::item_header() const
+QString SparseWeightedMultiVectorfield2D::csvHeader() const
 {
-    QString result =  SparseVectorfield2D::item_header() + ", weight";
+    QString result =  SparseVectorfield2D::csvHeader() + ", weight";
 	
 	for( unsigned int i = 0; i<alternatives(); ++i)
 	{
@@ -1207,9 +1398,9 @@ QString SparseWeightedMultiVectorfield2D::item_header() const
  * \param index Index of the vector to be serialized.
  * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
  */
-QString SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index) const
+QString SparseWeightedMultiVectorfield2D::itemToCSV(unsigned int index) const
 {
-	QString result = SparseVectorfield2D::serialize_item(index) + ", " + QString::number(weight(index), 'g', 10);
+	QString result = SparseVectorfield2D::itemToCSV(index) + ", " + QString::number(weight(index), 'g', 10);
     
 	for( unsigned int i = 0; i<alternatives(); ++i)
 	{
@@ -1227,15 +1418,15 @@ QString SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index) con
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization is ordered as: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
  */
-bool SparseWeightedMultiVectorfield2D::deserialize_item(const QString & serial)
+bool SparseWeightedMultiVectorfield2D::itemFromCSV(const QString & serial)
 {
     //try to split content into data entries
-	QStringList values = split_string(serial , ", "); 
+	QStringList values = serial.split(", ");
 	if(values.size() >= 5)
 	{
 		try
 		{
-			if(SparseVectorfield2D::deserialize_item(serial))
+			if(SparseVectorfield2D::itemFromCSV(serial))
             {
                 m_weights.push_back(values[4].toFloat());
                 
@@ -1264,6 +1455,119 @@ bool SparseWeightedMultiVectorfield2D::deserialize_item(const QString & serial)
 	return false;
 }
 
+/**
+ * Serialization of a single weighted multi vector inside the list at a given index.
+ * The vector will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the vector to be serialized.
+ * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
+ */
+void SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    SparseVectorfield2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("w", QString::number(weight(index), 'g', 10));
+    xmlWriter.writeTextElement("altDirections", QString::number(alternatives()));
+    
+    for(int i = 1; i<=alternatives(); ++i)
+	{
+        const PointType & dir = altDirection(index, i);
+        
+        xmlWriter.writeStartElement("altDirection");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+        
+            xmlWriter.writeTextElement("u", QString::number(dir.x(), 'g', 10));
+            xmlWriter.writeTextElement("v", QString::number(dir.y(), 'g', 10));
+            xmlWriter.writeTextElement("w", QString::number(m_alt_weights[index][i-1], 'g', 10));
+        xmlWriter.writeEndElement();
+	}
+}
+
+/**
+ * Deserialization/addition of a weighted multi vector from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the vector.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization is ordered as: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
+ */
+bool SparseWeightedMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if (locked())
+        return false;
+    
+    if(!SparseVectorfield2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "w")
+    {
+        m_weights.push_back(xmlReader.readElementText().toFloat());
+    }
+    else
+    {
+        return false;
+    }
+    
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "altDirections"
+        &&  xmlReader.readElementText().toInt() == alternatives())
+    {
+        //The parameters should have been deserialized before, so we can use the properties:
+        std::vector<PointType> alt_dirs(alternatives());
+        std::vector<float> alt_weights(alternatives());
+        
+        for( unsigned int i = 1; i<=alternatives(); ++i)
+        {
+            if(     xmlReader.readNextStartElement()
+                &&  xmlReader.name() =="altDirection"
+                &&  xmlReader.attributes().hasAttribute("ID")
+                &&  xmlReader.attributes().value("ID").toInt() == i)
+            {
+                PointType dir;
+                float w;
+                
+                for(int j=0; j!=3; ++j)
+                {
+                    if(xmlReader.readNextStartElement())
+                    {
+                        if(xmlReader.name() =="u")
+                        {
+                            dir.setX(xmlReader.readElementText().toFloat());
+                        }
+                        if(xmlReader.name() =="v")
+                        {
+                            dir.setY(xmlReader.readElementText().toFloat());
+                        }
+                        if(xmlReader.name() =="w")
+                        {
+                            w = xmlReader.readElementText().toFloat();
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                alt_dirs.push_back(dir);
+                alt_weights.push_back(w);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        m_alt_directions.push_back(alt_dirs);
+        m_alt_weights.push_back(alt_weights);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 /**
  * This slot is called, whenever some parameter is changed.
  * It rearranges the size of the weight alternatives' vector.

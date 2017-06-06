@@ -34,8 +34,10 @@
 /************************************************************************/
 
 #include "core/parameters/multimodelparameter.hxx"
+#include "core/globals.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -59,17 +61,24 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<Model*> * allowed_values, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
+MultiModelParameter::MultiModelParameter(const QString& name, QString type_filter, std::vector<Model*> *  /*value*/, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
-    m_lstDelegate(new QListWidget),
-    m_allowed_values(*allowed_values),
+    m_delegate(NULL),
+    m_allowed_values(models),
 	m_type_filter(type_filter)
 {
-    m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
-    refresh();
-    
-    connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
-    Parameter::initConnections();
+    if(models.size())
+	{
+		m_allowed_values.clear();
+		
+		for(Model* model: models)
+		{
+			if( m_type_filter.contains(model->typeName()))
+			{
+				m_allowed_values.push_back(model);
+			}
+		}
+	}
 }
 
 /**
@@ -77,8 +86,8 @@ MultiModelParameter::MultiModelParameter(const QString& name, const std::vector<
  */
 MultiModelParameter::~MultiModelParameter()
 {
-    if(m_lstDelegate != NULL)
-        delete m_lstDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -132,13 +141,13 @@ void MultiModelParameter::setValue(const std::vector<Model*>& value)
             }
         }
         m_model_idxs.push_back(i);
-        if(m_lstDelegate != NULL)
+        if(m_delegate != NULL)
         {
-            m_lstDelegate->item(i)->setSelected(found);
+            m_delegate->item(i)->setSelected(found);
         }
         i++;
     }
-    if(m_lstDelegate != NULL)
+    if(m_delegate != NULL)
     {
         Parameter::updateValue();
     }
@@ -152,7 +161,7 @@ void MultiModelParameter::setValue(const std::vector<Model*>& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString MultiModelParameter::valueText() const
+QString MultiModelParameter::toString() const
 { 
 	QString res;
     
@@ -164,87 +173,96 @@ QString MultiModelParameter::valueText() const
 }
 
 /**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-void MultiModelParameter::refresh()
-{
-	if(m_modelList != NULL)
-	{
-		m_allowed_values.clear();
-		
-		for(Model* model: *m_modelList)
-		{
-			if( m_type_filter.contains(model->typeName()))
-			{
-				m_allowed_values.push_back(model);
-			}
-		}
-	}
-    
-	if(m_lstDelegate != NULL)
-	{
-		m_lstDelegate->clear();
-		
-		for(Model* model: m_allowed_values)
-		{
-			m_lstDelegate->addItem(model->shortName());
-            m_lstDelegate->item(m_lstDelegate->count()-1)->setToolTip(model->description());
-		}
-	}
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * Writes comman-separated model list the output device, containing the filename
- * for each model, like:
- * "MultModelParameter, file1.bla, file2.blubb"
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <MultiModelParameter>
+ *     <Name>NAME</Name>
+ *     <Values>N</Value>
+ *     <Value ID="0">VALUE_0_ID</Value>
+ *     ...
+ *     <Value ID="N-1">VALUE_N-1_ID</Value>
+ * </MultiModelParameter>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with     NAME = name(),
+ *             N = QString::number(value().size()), and
+ *    VALUE_0_ID = values()[0]->id().
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
-void MultiModelParameter::serialize(QIODevice& out) const
+void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
     
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID",id());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Values", QString::number(value().size()));
+    int i=0;
     for(const Model* model: value())
     {
-        write_on_device(", " + encode_string(model->filename()), out);
+        xmlWriter.writeStartElement("Value");
+        xmlWriter.writeAttribute("ID", QString::number(i++));
+            xmlWriter.writeCharacters(model->id());
+        xmlWriter.writeEndElement();
     }
+    xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool MultiModelParameter::deserialize(QIODevice& in)
+bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
-        return false;
-    }
-
-    QString content(in.readLine().trimmed());
-    
-    QStringList model_filenames = content.split(", ");
-
-    unsigned int i=0;
-    
-    for(const Model* allowed_model: m_allowed_values)
-    {
-        bool found = false;
-        for(QString model_filename: model_filenames)
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            if (decode_string(model_filename) == allowed_model->filename())
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            while(xmlReader.readNextStartElement())
             {
-                found = true;
-                break;
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "Value")
+                {
+                    QString id =  xmlReader.readElementText();
+                    
+                    int i=0;
+                    
+                    for(const Model* allowed_model: m_allowed_values)
+                    {
+                       if (id == allowed_model->id())
+                       {
+                            m_delegate->item(i)->setSelected(true);
+                            break;
+                        }
+                        ++i;
+                    }
+                    if(i==m_allowed_values.size())
+                    {
+                        throw std::runtime_error("Did not find a model with id: " + id.toStdString());
+                    }
+                }
             }
         }
-        m_lstDelegate->item(i)->setSelected(found);
-        ++i;
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
     }
     return true;
 }
@@ -308,17 +326,23 @@ bool MultiModelParameter::isValid() const
  */
 QWidget*  MultiModelParameter::delegate()
 {
-    if(m_lstDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_lstDelegate = new QListWidget;
+        m_delegate = new QListWidget;
         
-        m_lstDelegate->setSelectionMode(QAbstractItemView::MultiSelection);
-        refresh();
+        m_delegate->setSelectionMode(QAbstractItemView::MultiSelection);
+        
+        for(Model* model: m_allowed_values)
+		{
+			m_delegate->addItem(model->shortName());
+            m_delegate->item(m_delegate->count()-1)->setToolTip(model->description());
+		}
     
-        connect(m_lstDelegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(selectionChanged()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_lstDelegate;
+    
+    return m_delegate;
 }
 
 /**
@@ -328,13 +352,13 @@ QWidget*  MultiModelParameter::delegate()
 void MultiModelParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_lstDelegate != NULL)
+    if(m_delegate != NULL)
     {
         m_model_idxs.clear();
         
-        for(int i=0; i<m_lstDelegate->count(); ++i)
+        for(int i=0; i<m_delegate->count(); ++i)
         {
-            if(m_lstDelegate->item(i)->isSelected())
+            if(m_delegate->item(i)->isSelected())
             {
                 m_model_idxs.push_back(i);
             }

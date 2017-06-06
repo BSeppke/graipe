@@ -144,7 +144,7 @@ void PointFeatureList2D::removeFeature(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y"
  */
-QString PointFeatureList2D::item_header() const
+QString PointFeatureList2D::csvHeader() const
 {
 	return "pos_x, pos_y";
 }
@@ -156,7 +156,7 @@ QString PointFeatureList2D::item_header() const
  * \param index Index of the feature to be serialized.
  * \return QString of the feature, ordered as: x, y.
  */
- QString PointFeatureList2D::serialize_item(unsigned int index) const
+QString PointFeatureList2D::itemToCSV(unsigned int index) const
 {
 	return   QString::number(m_points[index].x(), 'g', 10) + ", "
            + QString::number(m_points[index].y(), 'g', 10);
@@ -169,7 +169,7 @@ QString PointFeatureList2D::item_header() const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization should be given as: x, y
  */
-bool PointFeatureList2D::deserialize_item(const QString & serial)
+bool PointFeatureList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;
@@ -191,54 +191,124 @@ bool PointFeatureList2D::deserialize_item(const QString & serial)
 	}
 	return false;
 }
+		
 
 /**
- * Serialize the complete content of the featurelist to a QIODevice.
+ * Serialization of a single feature inside the list at a given index.
+ * The feature will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the feature to be serialized.
+ * \return QString of the feature, namely "x, y"
+ */
+void PointFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+    xmlWriter.writeTextElement("x", QString::number(m_points[index].x(), 'g', 10));
+    xmlWriter.writeTextElement("y", QString::number(m_points[index].y(), 'g', 10));
+}
+
+/**
+ * Deserialization/addition of a feature from a string to this list.
+ * Does nothing if the model is locked.
+ *
+ * \param serial A QString containing the serialization of the feature.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization is ordered as: x, y
+ */
+bool PointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    PointType new_p;
+    
+    //Read two start elements
+    for(int i=0; i<2; ++i)
+    {
+        if (xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == "x")
+            {
+                new_p.setX(xmlReader.readElementText().toFloat());
+            }
+            else if (xmlReader.name() == "y")
+            {
+                new_p.setY(xmlReader.readElementText().toFloat());
+            }
+            else
+            {
+                qWarning() << "Searching for x and y tags, but found:" << xmlReader.name();
+                return false;
+            }
+        }
+        else
+        {
+            qWarning() << "Did not find at least two start elements";
+            return false;
+        }
+    }
+    m_points.push_back(new_p);
+    return true;
+}
+/**
+ * Serialize the complete content of the featurelist to an xml file.
  * Mainly prints:
- *   item_header()
+ *   csvHeader
  * and for each feature:
  *   newline + serialize_item().
  *
  * \param out The output device for serialization.
  */
-void PointFeatureList2D::serialize_content(QIODevice & out) const
+void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    write_on_device(item_header(), out);
-    
 	for(unsigned int i=0; i < size(); ++i)
     {
-		write_on_device("\n" + serialize_item(i), out);
-	}
+        xmlWriter.writeStartElement("Feature");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+            serialize_item(i, xmlWriter);
+        xmlWriter.writeEndElement();
+    }
 }
 
 /**
- * Deserializion of a  feature list from a QIODevice.
- * The first line is the header as given in item_header(), which is ignored however.
+ * Deserialization of a  feature list from an xml file.
+ * The first line is the header as given in csvHeader, which is ignored however.
  * Each following line has to be one valide feature serialization.
  *
- * \param in The QIODevice, where we will read from.
+ * \param xmlReader The QXmlStreamReader, where we will read from.
  */
-bool PointFeatureList2D::deserialize_content(QIODevice& in)
+bool PointFeatureList2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
     if (locked())
         return false;
-        
-    //Read in header line and then throw it away immideately
-    if(!in.atEnd())
-        in.readLine();
-    
+
     //Clean up
 	clear();
     updateModel();
     
     //Read the entries
-    while(!in.atEnd())
+    while(xmlReader.readNextStartElement())
     {
-        QString line(in.readLine());
-        if(!line.isEmpty() && !line.startsWith(";"))
+        if(xmlReader.name() == "Feature")
         {
-           deserialize_item(line);
+            if(!deserialize_item(xmlReader))
+                return false;
         }
+        else
+        {
+            qWarning() << "Found non 'Feature' tag in serialization of elements";
+            return false;
+        }
+        //Read until </Feature> comes...
+        while(true)
+        {
+            if(!xmlReader.readNext())
+            {
+                return false;
+            }
+            
+            if(xmlReader.isEndElement() && xmlReader.name() == "Feature")
+            {
+                break;
+            }
+        }
+
     }
     return true;
 }
@@ -357,9 +427,9 @@ void WeightedPointFeatureList2D::removeFeature(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, weight"
  */
-QString WeightedPointFeatureList2D::item_header() const
+QString WeightedPointFeatureList2D::csvHeader() const
 {
-	return PointFeatureList2D::item_header() + ", weight";
+	return PointFeatureList2D::csvHeader() + ", weight";
 }
     
 /**
@@ -369,9 +439,9 @@ QString WeightedPointFeatureList2D::item_header() const
  * \param index Index of the weighted feature to be serialized.
  * \return QString of the weighted feature, ordered as: x, y, weight.
  */
-QString WeightedPointFeatureList2D::serialize_item(unsigned int index) const
+QString WeightedPointFeatureList2D::itemToCSV(unsigned int index) const
 {
-	return PointFeatureList2D::serialize_item(index) + ", " + QString::number(m_weights[index], 'g', 10);
+	return PointFeatureList2D::itemToCSV(index) + ", " + QString::number(m_weights[index], 'g', 10);
 }
 
 /**
@@ -381,7 +451,7 @@ QString WeightedPointFeatureList2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization should be given as: x, y, weight
  */
-bool WeightedPointFeatureList2D::deserialize_item(const QString & serial)
+bool WeightedPointFeatureList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;
@@ -394,7 +464,7 @@ bool WeightedPointFeatureList2D::deserialize_item(const QString & serial)
 		try
         {
             m_weights.push_back(values[2].toFloat());
-            PointFeatureList2D::deserialize_item(serial);
+            PointFeatureList2D::itemFromCSV(serial);
 			return true;
 		}
 		catch(...)
@@ -403,6 +473,48 @@ bool WeightedPointFeatureList2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+/**
+ * Serialization of a single weighted feature inside the list at a given index.
+ * The weighted feature will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the weighted feature to be serialized.
+ * \return QString of the weighted feature, ordered as: x, y, weight.
+ */
+void WeightedPointFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+	PointFeatureList2D::serialize_item(index, xmlWriter);
+    xmlWriter.writeTextElement("weight", QString::number(m_weights[index], 'g', 10));
+}
+
+/**
+ * Deserialization/addition of a weighted feature from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the weighted feature.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization should be given as: x, y, weight
+ */
+bool WeightedPointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;
+    
+    if(!PointFeatureList2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+	
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "weight")
+    {
+        m_weights.push_back(xmlReader.readElementText().toFloat());
+        return true;
+    }
+    else
+    {
+        qWarning() << "Did not find a start element for feature weight";
+        return false;
+    }
 }
 
 
@@ -546,9 +658,9 @@ void EdgelFeatureList2D::removeFeature(unsigned int index)
  * 
  * \return Always: "pos_x, pos_y, weight, orientation"
  */
-QString EdgelFeatureList2D::item_header() const
+QString EdgelFeatureList2D::csvHeader() const
 {
-	return WeightedPointFeatureList2D::item_header() + ", orientation";
+	return WeightedPointFeatureList2D::csvHeader() + ", orientation";
 }
 
 /**
@@ -558,9 +670,9 @@ QString EdgelFeatureList2D::item_header() const
  * \param index Index of the edgel feature to be serialized.
  * \return QString of the edgel feature, ordered  as: x, y, weight, orientation.
  */
-QString EdgelFeatureList2D::serialize_item(unsigned int index) const
+QString EdgelFeatureList2D::itemToCSV(unsigned int index) const
 {
-	return WeightedPointFeatureList2D::serialize_item(index) + ", " + QString::number(m_orientations[index], 'g', 10);
+	return WeightedPointFeatureList2D::itemToCSV(index) + ", " + QString::number(m_orientations[index], 'g', 10);
 }
 
 /**
@@ -570,7 +682,7 @@ QString EdgelFeatureList2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization should be given as: x, y, weight, orientation
  */
-bool EdgelFeatureList2D::deserialize_item(const QString & serial)
+bool EdgelFeatureList2D::itemFromCSV(const QString & serial)
 {	
     if(locked())
         return false;
@@ -582,7 +694,7 @@ bool EdgelFeatureList2D::deserialize_item(const QString & serial)
 		try
         {
             m_orientations.push_back(values[3].toFloat());
-            WeightedPointFeatureList2D::deserialize_item(serial);
+            WeightedPointFeatureList2D::itemFromCSV(serial);
 			return true;
 		}
 		catch(...)
@@ -591,6 +703,49 @@ bool EdgelFeatureList2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+
+/**
+ * Serialization of a single edgel feature inside the list at a given index.
+ * The edgelfeature will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the edgel feature to be serialized.
+ * \return QString of the edgel feature, ordered  as: x, y, weight, orientation.
+ */
+void EdgelFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+	WeightedPointFeatureList2D::serialize_item(index, xmlWriter);
+    xmlWriter.writeTextElement("orientation", QString::number(m_orientations[index], 'g', 10));
+}
+
+/**
+ * Deserialization/addition of a edgel feature from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the edgel feature.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization should be given as: x, y, weight, orientation
+ */
+bool EdgelFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{	
+    if(locked())
+        return false;
+    
+    if(!WeightedPointFeatureList2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+	
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.name() == "orientation")
+    {
+        m_orientations.push_back(xmlReader.readElementText().toFloat());
+        return true;
+    }
+    else
+    {
+        qWarning() << "Did not find a start element for feature orientation";
+        return false;
+    }
 }
 
 
@@ -782,9 +937,9 @@ void SIFTFeatureList2D::removeFeature(unsigned int index)
  * 
  * \return Always: "x, y, weight, orientation, scale, descr_0, ..., descr_N"
  */
-QString SIFTFeatureList2D::item_header() const
+QString SIFTFeatureList2D::csvHeader() const
 {
-	return EdgelFeatureList2D::item_header() + ", scale, descr_0, ..., descr_N";
+	return EdgelFeatureList2D::csvHeader() + ", scale, descr_0, ..., descr_N";
 }
 
 /**
@@ -794,9 +949,9 @@ QString SIFTFeatureList2D::item_header() const
  * \param index Index of the SIFT feature to be serialized.
  * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
  */
-QString SIFTFeatureList2D::serialize_item(unsigned int index) const
+QString SIFTFeatureList2D::itemToCSV(unsigned int index) const
 {
-	QString result = QString("%1, %2").arg(EdgelFeatureList2D::serialize_item(index)).arg(m_scales[index]);
+	QString result = QString("%1, %2").arg(EdgelFeatureList2D::itemToCSV(index)).arg(m_scales[index]);
     
     for(unsigned int i=0; i< (unsigned int)m_descriptors[index].size(); ++i)
     {
@@ -813,7 +968,7 @@ QString SIFTFeatureList2D::serialize_item(unsigned int index) const
  * \return True, if the item could be deserialized and the model is not locked.
  *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
  */
-bool SIFTFeatureList2D::deserialize_item(const QString & serial)
+bool SIFTFeatureList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
         return false;
@@ -840,7 +995,7 @@ bool SIFTFeatureList2D::deserialize_item(const QString & serial)
             
             m_descriptors.push_back(desc);
             
-            EdgelFeatureList2D::deserialize_item(serial);
+            EdgelFeatureList2D::itemFromCSV(serial);
 			
 			return true;
 		}
@@ -850,6 +1005,93 @@ bool SIFTFeatureList2D::deserialize_item(const QString & serial)
 		}
 	}
 	return false;
+}
+
+/**
+ * Serialization of a single SIFT feature inside the list at a given index.
+ * The SIFT will be serialized by means of comma separated values.
+ * 
+ * \param index Index of the SIFT feature to be serialized.
+ * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
+ */
+void SIFTFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
+{
+	EdgelFeatureList2D::serialize_item(index, xmlWriter);
+    
+    xmlWriter.writeTextElement("scale", QString::number(m_scales[index], 'g', 10));
+    
+    xmlWriter.writeStartElement("descriptor");
+    xmlWriter.writeAttribute("size", QString::number(m_descriptors[index].size()));
+    
+    for(unsigned int i=0; i< (unsigned int)m_descriptors[index].size(); ++i)
+    {
+		xmlWriter.writeStartElement("value");
+        xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeCharacters(QString::number((m_descriptors[index])[i], 'g', 10));
+        xmlWriter.writeEndElement();
+	}
+}
+    
+/**
+ * Deserialization/addition of a SIFT feature from a string to this list.
+ *
+ * \param serial A QString containing the serialization of the SIFT feature.
+ * \return True, if the item could be deserialized and the model is not locked.
+ *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
+ */
+bool SIFTFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
+{
+    if(locked())
+        return false;
+    
+    if(!EdgelFeatureList2D::deserialize_item(xmlReader))
+    {
+        return false;
+    }
+    //Read two more starting tags
+	for(int i=0; i!=2; i++)
+    {
+        if(xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == "scale")
+            {
+                m_scales.push_back(xmlReader.readElementText().toFloat());
+            }
+            else if(   xmlReader.name() == "descriptor"
+                    && xmlReader.attributes().hasAttribute("size"))
+            {
+                int d_size = xmlReader.attributes().value("size").toInt();
+                QVector<float> desc(d_size);
+                
+                //Read the descriptor
+                for(int d_i=0; d_i!=d_size; d_i++)
+                {
+                    if(     xmlReader.readNextStartElement()
+                        &&  xmlReader.name() == "value")
+                    {
+                        desc[d_i] = xmlReader.readElementText().toFloat();
+                    }
+                    else
+                    {
+                        qWarning() << "Did not find enough descriptor fields, needed"  << xmlReader.attributes().value("size") << " stopped at: " << d_i ;
+                        return false;
+                    }
+                }
+                m_descriptors.push_back(desc);
+            }
+            else
+            {
+                qWarning() << "Did find a different start element for SIFT features:" <<  xmlReader.name();
+                return false;
+            }
+        }
+        else
+        {
+            qWarning() << "Did not find at least two more start element for SIFT features";
+            return false;
+        }
+    }
+    return true;
 }
 
 } //End of namespace graipe

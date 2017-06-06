@@ -115,9 +115,8 @@ ParameterSelection::~ParameterSelection()
  * 
  * \param parent      The parent widget, to make this selection modal.
  * \param model       The model, for which the selection shall be generated.
- * \param modelList The modelList of all models to copy the parameters from.
  */
-ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model, const std::vector<Model*> * modelList)
+ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model)
 :	QDialog(parent),
     m_radNewParameters(NULL),
     m_radCopyParameters(NULL),
@@ -145,7 +144,7 @@ ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model, 
     connect(m_radNewParameters, SIGNAL(toggled(bool)), m_scrParameters, SLOT(setEnabled(bool)));
     connect(m_radCopyParameters, SIGNAL(toggled(bool)), m_scrParameters, SLOT(setDisabled(bool)));
     
-    m_otherModel = new ModelParameter("Model:", modelList, model->typeName());
+    m_otherModel = new ModelParameter("Model:", model->typeName());
     
     QHBoxLayout * layoutOtherModel = new QHBoxLayout(this);
     layoutOtherModel->addWidget(new QLabel(m_otherModel->name()));

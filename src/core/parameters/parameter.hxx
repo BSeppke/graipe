@@ -99,10 +99,10 @@ class GRAIPE_CORE_EXPORT Parameter
          *
          * \return "Parameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
     
         /**
-         * The name of this parameter. This name is used a label for the parameter.
+         * The name of this parameter. This name is used as a label for the parameter.
          *
          * \return The name of the parameter.
          */
@@ -131,60 +131,49 @@ class GRAIPE_CORE_EXPORT Parameter
         virtual bool invertParent() const;
     
         /**
-         * The value converted to a QString. Please note, that this can vary from the 
-         * serialize() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars.
+         * The value converted to a QString. Needs to be specified for inheriting classes.
+         * This is the default method for the value serialization performed by
+         * serialize.
          *
-         * \return The value of the parameter converted to an QString
+         * \return The value of the parameter converted to an QString, here "".
          */
-        virtual QString valueText() const;
+        virtual QString toString() const;
     
         /**
-         * The magicID of this parameter class. 
-         * Implemented to fullfil the Serializable interface.
+         * Sets the value using a QString. 
+         * This is the default method for the value deserialization performed by
+         * deserialize.
          *
-         * \return The same as the typeName() function.
+         * \param str The value of the parameter converted to an QString
+         * \return True, if the value could be restored. Here, always true.
          */
-        QString magicID() const;
-    
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Just writes the magicID a.k.a. typeName() on the device.
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
-    
-        /**
-         * Deserialization of a parameter's state from an input device.
-         *
-         * \param in the input device.
-         * \return True, if the deserialization was successful, else false.
-         */
-        bool deserialize(QIODevice& in);
+        virtual bool fromString(QString& str);
 
         /**
-         * Const access to the model list, which is currently assigned to 
-         * this parameter.
+         * Serialization of the parameter's state to a xml stream.
+         * Writes the following XML code by default:
+         * 
+         * <TYPENAME>
+         *     <Name>NAME</Name>
+         *     <Value>VALUETEXT</Value>
+         * </TYPENAME>
          *
-         * \return A pointer to the current model list.
-         */
-        const std::vector<Model*> * modelList() const;
-        
-        /**
-         * Writing access to the model list, which may be used to assign a new
-         * or update the currently used model list of this parameter.
+         * with TYPENAME = typeName(),
+         *         NAME = name(), and
+         *    VALUETEXT = toString().
          *
-         * \param new_model_list A pointer to the new model list.
+         * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+         *                  parameter's type, name and value.
          */
-        void setModelList(const std::vector<Model*> * new_model_list);
-        
+        void serialize(QXmlStreamWriter& xmlWriter) const;
+    
         /**
-         * This method is called after each (re-)assignment of the model list
-         * e.g. after a call of the setModelList() function. It may be implemented
-         * by means of the subclasses to handle these updates.
+         * Deserialization of a parameter's state from an xml stream.
+         *
+         * \param xmlReader The QXmlStreamReader from which we read.
+         * \return True, if the deserialization was successful, else false.
          */
-        virtual void refresh();
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function locks the parameters value. 
@@ -212,22 +201,6 @@ class GRAIPE_CORE_EXPORT Parameter
          * \return True, if the parameter's value is valid.
          */
         virtual bool isValid() const;
-    
-        /**
-         * Sets a parameter to be hidden. 
-         * Hidden parameters behave like visible parameters unless they are added to a
-         * parameter group, where their delegates will not be shown.
-         *
-         * \param hide If true, the parameter will be hidden in a parameter group.
-         */
-        virtual void hide(bool hide);
-    
-        /**
-         * Is a parameter marked as "hidden" with respect to a parameter group?
-         *
-         * \return True, if the parameter will be hidden in a parameter group.
-         */
-        virtual bool isHidden() const;
     
         /**
          * The delegate widget of this parameter. 
@@ -269,12 +242,6 @@ class GRAIPE_CORE_EXPORT Parameter
     
         /** Should the enabled/disabled by parent rule be inverted? **/
         bool m_invert_parent;
-    
-        /** Shall the parameter be hidden inside a parameter group? **/
-        bool m_hide;
-    
-        /** The list of all currently loaded models **/
-        const std::vector<Model*> * m_modelList;
 };
 
 } //end of namespace graipe

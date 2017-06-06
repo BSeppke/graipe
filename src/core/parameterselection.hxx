@@ -113,9 +113,8 @@ public:
      * 
      * \param parent      The parent widget, to make this selection modal.
      * \param model       The model, for which the selection shall be generated.
-     * \param modelList The modelList of all models to copy the parameters from.
      */
-    ModelParameterSelection(QWidget *parent, Model* model, const std::vector<Model*> * modelList);
+    ModelParameterSelection(QWidget *parent, Model* model);
 
     /**
      * Destructor of the parameter selection. This destructor returns the

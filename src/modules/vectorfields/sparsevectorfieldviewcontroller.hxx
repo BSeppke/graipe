@@ -91,7 +91,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
          *
          * \return Always: "SparseVectorfield2DViewController"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -189,7 +189,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
          *
          * \return Always: "SparseWeightedVectorfield2DViewController"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 	
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -276,7 +276,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
          *
          * \return Always: "SparseMultiVectorfield2DViewController"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 		
 	
         /**
@@ -357,7 +357,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          *
          * \return Always: "SparseWeightedMultiVectorfield2DViewController"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 	
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current

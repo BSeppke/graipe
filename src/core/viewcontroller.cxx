@@ -34,6 +34,9 @@
 /************************************************************************/
 
 #include "core/viewcontroller.hxx"
+#include "core/globals.hxx"
+
+#include <algorithm>
 
 #include <QPainter>
 #include <QGraphicsObject>
@@ -61,7 +64,6 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
 :	m_model(model),
     m_name(new StringParameter("Name", "")),
     m_description(new LongStringParameter("Description:", "ViewController of model", 20, 6, NULL)),
-    m_model_filename(new LongStringParameter("Model filename:", model->filename(), 20, 2, NULL)),
     m_showAxis(new BoolParameter("Show axis?")),
     m_axisLineWidth(new FloatParameter("Line width:", 0,100,1,m_showAxis)),
     m_axisLineColor(new ColorParameter("Line color:", Qt::black, m_showAxis)),
@@ -86,9 +88,6 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
     m_parameters->addParameter("name",m_name);
     m_parameters->addParameter("description",m_description);
     
-    m_model_filename->hide(true);
-    m_parameters->addParameter("modelFilename",m_model_filename);
-    
     m_parameters->addParameter("showAx",m_showAxis);
     m_parameters->addParameter("axLineWidth", m_axisLineWidth);
     m_parameters->addParameter("axLineColor", m_axisLineColor);
@@ -106,6 +105,9 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
 	//connect other elements to update slot, too:
 	connect(m_parameters, SIGNAL(valueChanged()), this,	SLOT(updateView()));
 	connect(m_model,      SIGNAL(modelChanged()), this, SLOT(updateView()));
+    
+    //Add to global viewControllers list
+    viewControllers.push_back(this);
 }
 
 /**
@@ -115,6 +117,9 @@ ViewController::~ViewController()
 {
     this->scene()->removeItem(this);
     delete m_parameters;
+    
+    //Remove from global viewControllers list
+    viewControllers.erase(std::remove(viewControllers.begin(), viewControllers.end(), this), viewControllers.end());
 }
 
 /**
@@ -396,11 +401,6 @@ void ViewController::updateView()
  */
 void ViewController::updateParameters(bool /*force_update*/)
 {
-    if(m_model)
-    {
-       //TODO: Check if neccessary
-       //m_model_filename->setValue(m_model->filename());
-    }
 }
 
 /**
@@ -414,27 +414,34 @@ QString ViewController::typeName() const
 }
 
 /**
- * This function returns the automagiacally generated first header line for ViewController
- * serialization.
- *
- * \return The first Header line, namely: "[Graipe::" + typeName() + "]"
- */
-QString ViewController::magicID() const
-{
-    return  QString("[Graipe::") + typeName() + "]";
-}
-
-/**
  * This function serializes a complete ViewController to an output device.
- * To do so, it serializes the magicID(), then the model denoted by the model's
+ * To do so, it serializes the typeName(), then the model denoted by the model's
  * filename and eventually the parameter set.
  *
  * \param out The output device, where we serialize to.
  */
-void ViewController::serialize(QIODevice& out) const
+void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
 {
-	write_on_device(magicID() + "\n", out);
-    m_parameters->serialize(out);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.setAutoFormattingIndent(4);
+        
+    bool fullFile = (xmlWriter.device()->pos() == 0);
+    
+    if (fullFile)
+    {
+        xmlWriter.writeStartDocument();
+     }
+        xmlWriter.writeStartElement(typeName());
+        xmlWriter.writeAttribute("ID", id());
+        xmlWriter.writeAttribute("ModelID", m_model->id());
+        xmlWriter.writeAttribute("ZOrder", QString::number(zValue()));
+            m_parameters->serialize(xmlWriter);
+        xmlWriter.writeEndElement();
+    
+    if (fullFile)
+    {
+        xmlWriter.writeEndDocument();
+     }
 }
 
 /**
@@ -445,17 +452,50 @@ void ViewController::serialize(QIODevice& out) const
  * \param  in The input device, where we read the serialization of this ViewController class from.
  * \return True, if the parameters could be restored,
  */
-bool ViewController::deserialize(QIODevice& in)
+bool ViewController::deserialize(QXmlStreamReader& xmlReader)
 {
-    QString firstLine(in.readLine());
-    
-    if(firstLine.trimmed() == magicID())
+    try
     {
-        //Deserialize parameters beginning from the third line on...
-        return m_parameters->deserialize(in);
+        //Assume, that the deserialized has already read the start node:
+        //if (xmlReader.readNextStartElement())
+        //{
+            if(     xmlReader.name() == typeName()
+                &&  xmlReader.attributes().hasAttribute("ID"))
+            {
+                setID(xmlReader.attributes().value("ID").toString());
+                
+                bool success = m_parameters->deserialize(xmlReader);
+                 
+                while(true)
+                {
+                    if(xmlReader.tokenType()==QXmlStreamReader::EndElement && xmlReader.name() == typeName())
+                    {
+                        return true;
+                    }
+                    if(!xmlReader.readNext())
+                    {
+                        throw std::runtime_error("End of XML file reached before closing tag for ViewController.");
+                    }
+                }
+                
+                return success;
+            }
+            else
+            {
+                throw std::runtime_error("Did not find typeName() or id() in XML tree");
+            }
+        //}
+        //else
+        //{
+        //  throw std::runtime_error("Did not find any start element in XML tree");
+        //}
     }
-    
-    return false;
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
+    }
+    return  false;
 }
 
 } //end of namespace graipe

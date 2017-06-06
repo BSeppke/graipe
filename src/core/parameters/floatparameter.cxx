@@ -64,7 +64,7 @@ FloatParameter::FloatParameter(const QString& name, float low, float upp, float 
     m_value(value),
     m_min_value(low),
     m_max_value(upp),
-    m_dsbDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -73,8 +73,8 @@ FloatParameter::FloatParameter(const QString& name, float low, float upp, float 
  */
 FloatParameter::~FloatParameter()
 {
-    if(m_dsbDelegate != NULL)
-        delete m_dsbDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -82,7 +82,7 @@ FloatParameter::~FloatParameter()
  *
  * \return "FloatParameter".
  */
-QString  FloatParameter::typeName() const
+QString FloatParameter::typeName() const
 {
 	return "FloatParameter";
 }
@@ -106,8 +106,8 @@ void FloatParameter::setLowerBound(float value)
 {
     m_min_value = value;
     
-    if(m_dsbDelegate != NULL)
-        m_dsbDelegate->setMinimum(value);
+    if(m_delegate != NULL)
+        m_delegate->setMinimum(value);
 }
 
 /**
@@ -129,8 +129,8 @@ void FloatParameter::setUpperBound(float value)
 {
     m_max_value = value;
     
-    if(m_dsbDelegate != NULL)
-        m_dsbDelegate->setMaximum(value);
+    if(m_delegate != NULL)
+        m_delegate->setMaximum(value);
 }
 
 /**
@@ -152,7 +152,7 @@ void FloatParameter::setRange(float min_value, float max_value)
  */
 float FloatParameter::value() const
 {
-    return m_value;//m_dsbDelegate->value();
+    return m_value;//m_delegate->value();
 }
 
 /**
@@ -164,9 +164,9 @@ void FloatParameter::setValue(float value)
 {
     m_value = value;
     
-    if(m_dsbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_dsbDelegate->setValue(value);
+        m_delegate->setValue(value);
         Parameter::updateValue();
     }
 }
@@ -179,52 +179,33 @@ void FloatParameter::setValue(float value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  FloatParameter::valueText() const
+QString  FloatParameter::toString() const
 {
 	return QString::number(value(),'g', 10);
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "FloatParameter, " + valueText()
+ * Deserialization of a parameter's state from a string.
  *
- * \param out The output device on which we serialize the parameter's state.
- */
-void FloatParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + valueText(), out);
-}
-
-/**
- * Deserialization of a parameter's state from an input device.
- *
- * \param in the input device.
+ * \param str the input QString.
  * \return True, if the deserialization was successful, else false.
  */
-bool FloatParameter::deserialize(QIODevice& in)
+bool FloatParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
     try
     {
-        
-        float val = content.toFloat();
+        double val = str.toFloat();
         setValue(val);
         
         return true;
     }
     catch (...)
     {
-        qCritical() << "FloatParameter deserialize: value could not be imported from: '" << content << "'";
+        qCritical() << "FloatParameter deserialize: value could not be imported from: '" << str << "'";
     }
     return false;
 }
+
 
 /**
  * This function indicates whether the value of a parameter is valid or not.
@@ -246,18 +227,18 @@ bool FloatParameter::isValid() const
  */
 QWidget*  FloatParameter::delegate()
 {
-    if(m_dsbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_dsbDelegate = new QDoubleSpinBox;
+        m_delegate = new QDoubleSpinBox;
    
-        m_dsbDelegate->setDecimals(3);
-        m_dsbDelegate->setRange(lowerBound(), upperBound());
-        m_dsbDelegate->setValue(value());
+        m_delegate->setDecimals(3);
+        m_delegate->setRange(lowerBound(), upperBound());
+        m_delegate->setValue(value());
         
-        connect(m_dsbDelegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(valueChanged(double)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_dsbDelegate;
+    return m_delegate;
 }
 
 /**
@@ -267,9 +248,9 @@ QWidget*  FloatParameter::delegate()
 void FloatParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_dsbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_dsbDelegate->value();
+        m_value = m_delegate->value();
         Parameter::updateValue();
     }
 }

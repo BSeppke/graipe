@@ -36,6 +36,7 @@
 #include "core/parameters/enumparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -62,7 +63,7 @@ EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names
 :	Parameter(name, parent, invert_parent),
     m_enum_names(enum_names),
     m_value(value),
-    m_cmbDelegate(NULL)
+    m_delegate(NULL)
 {
 }
 
@@ -71,8 +72,8 @@ EnumParameter::EnumParameter(const QString& name, const QStringList & enum_names
  */
 EnumParameter::~EnumParameter()
 {
-    if(m_cmbDelegate != NULL)
-        delete m_cmbDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -92,7 +93,7 @@ QString  EnumParameter::typeName() const
  */
 int EnumParameter::value() const
 {
-	return m_value;// m_cmbDelegate->currentIndex();
+	return m_value;// m_delegate->currentIndex();
 }
     
 /**
@@ -104,9 +105,9 @@ void EnumParameter::setValue(int value)
 {
     m_value = value;
     
-    if(m_cmbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-    	m_cmbDelegate->setCurrentIndex(value);
+    	m_delegate->setCurrentIndex(value);
         Parameter::updateValue();
     }
 }
@@ -119,7 +120,7 @@ void EnumParameter::setValue(int value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString EnumParameter::valueText() const
+QString EnumParameter::toString() const
 {
     if (isValid())
     	return m_enum_names[value()];
@@ -128,47 +129,73 @@ QString EnumParameter::valueText() const
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "EnumParameter: " + Index of enum
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <TYPENAME>
+ *     <Name>NAME</Name>
+ *     <Value>VALUETEXT</Value>
+ * </TYPENAME>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName(),
+ *         NAME = name(), and
+ *    VALUETEXT = QString::number(value()).
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
-void EnumParameter::serialize(QIODevice& out) const
+void EnumParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", " + QString("%1").arg(value()), out);
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Value", QString::number(value()));
+    xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool EnumParameter::deserialize(QIODevice& in)
+bool EnumParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
     try
     {
-        QString content(in.readLine().trimmed());
-        
-        unsigned int idx = content.toUInt();
-        setValue(idx);
-        
-        return true;
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
+        {
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            while(xmlReader.readNextStartElement())
+            {
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "Value")
+                {
+                    QString valueText =  xmlReader.readElementText();
+                    
+                    setValue(valueText.toInt());
+                    return isValid();
+                }
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
+        return false;
     }
-    catch (...)
+    catch(std::runtime_error & e)
     {
-        qDebug("EnumParameter deserialize: enum value could not be imported from file");
+        qCritical() << "EnumParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
     }
-    
-    return false;
 }
-    
 /**
  * This function indicates whether the value of a parameter is valid or not.
  *
@@ -189,19 +216,19 @@ bool EnumParameter::isValid() const
  */
 QWidget*  EnumParameter::delegate()
 {
-    if(m_cmbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_cmbDelegate = new QComboBox;
+        m_delegate = new QComboBox;
         for(int v=0; v<m_enum_names.size(); ++v)
         {
-            m_cmbDelegate->addItem(m_enum_names[v]);
+            m_delegate->addItem(m_enum_names[v]);
         }
-        m_cmbDelegate->setCurrentIndex(m_value);
+        m_delegate->setCurrentIndex(m_value);
     
-        connect(m_cmbDelegate, SIGNAL(clicked()), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_cmbDelegate;
+    return m_delegate;
 }
 
 /**
@@ -211,9 +238,9 @@ QWidget*  EnumParameter::delegate()
 void EnumParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_cmbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_value = m_cmbDelegate->currentIndex();
+        m_value = m_delegate->currentIndex();
         Parameter::updateValue();
     }
 }

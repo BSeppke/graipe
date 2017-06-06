@@ -246,18 +246,15 @@ void DenseVectorfieldImporter::run()
         else 
         {
             emit errorMessage(QString("Explainable error occured: Dense vectorfield could not be imported"));
-            m_results.clear();
         }
     }
     catch(std::exception& e)
     {
         emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-        m_results.clear();
     }
     catch(...)
     {
-        emit errorMessage(QString("Non-explainable error occured"));		
-        m_results.clear();
+        emit errorMessage(QString("Non-explainable error occured"));
     }
 }
 
@@ -266,7 +263,7 @@ void DenseVectorfieldImporter::run()
  */
 DenseVectorfieldExporter::DenseVectorfieldExporter()
 {
-    m_parameters->addParameter("vectorfield", new ModelParameter("Vectorfield",	NULL,  "DenseVectorfield2D, DenseWeightedVectorfield2D"));
+    m_parameters->addParameter("vectorfield", new ModelParameter("Vectorfield",	"DenseVectorfield2D, DenseWeightedVectorfield2D"));
     m_parameters->addParameter("filename", new FilenameParameter(".flo filename", "", NULL));
 }
 

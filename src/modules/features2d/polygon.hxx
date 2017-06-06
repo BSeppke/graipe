@@ -62,7 +62,7 @@ class GRAIPE_FEATURES2D_EXPORT Polygon2D
          *
          * \return Always: "Polygon2D"
          */
-        QString typeName() const;
+        virtual QString typeName() const;
 		
         /**
          * Check if the polygon is closed.

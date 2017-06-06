@@ -124,89 +124,113 @@ void TransformParameter::setValue(const QTransform& value)
 }
 
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
-QString TransformParameter::valueText() const
-{
-    return valueText(value());
-}
-
-/**
- * Static function to convert a transformation into a list
- * of numbers with 10 digit precision. The order is as follows:
- * m11, m12, m13, m21, m22, m23, m31, m32, m33.
- *
- * \param trans The QTransform
- * \return A comma separated tring w.r.t. the order given above.
- */
-QString TransformParameter::valueText(const QTransform & trans)
-{
-
-    return   QString::number(trans.m11(), 'g', 10) + ", "
-           + QString::number(trans.m12(), 'g', 10) + ", "
-           + QString::number(trans.m13(), 'g', 10) + ", "
-           + QString::number(trans.m21(), 'g', 10) + ", "
-           + QString::number(trans.m22(), 'g', 10) + ", "
-           + QString::number(trans.m23(), 'g', 10) + ", "
-           + QString::number(trans.m31(), 'g', 10) + ", "
-           + QString::number(trans.m32(), 'g', 10) + ", "
-           + QString::number(trans.m33(), 'g', 10);
-}
-
-/**
  * Serialization of the parameter's state to an output device.
- * Basically it's just: "TransformParameter, " + valueText()
+ * Writes the following XML on the device:
+ * 
+ * <TYPENAME>
+ *     <Name>NAME</Name>
+ *     <Transform Type="Affine">
+ *       <m11>value().m11()</m11>
+ *       <m12>value().m12()</m12>
+ *       <m13>value().m13()</m13>
+ *       <m21>value().m21()</m21>
+ *       <m22>value().m22()</m22>
+ *       <m23>value().m23()</m23>
+ *       <m31>value().m31()</m31>
+ *       <m32>value().m32()</m32>
+ *       <m33>value().m33()</m33>
+ *     </Transform>
+ * </TYPENAME>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName(),
+ *         NAME = name().
+ *
+ * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
  */
-void TransformParameter::serialize(QIODevice& out) const
+void TransformParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", "+ valueText(), out);
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+    xmlWriter.writeTextElement("Name", name());
+        xmlWriter.writeStartElement("Transform");
+        xmlWriter.writeAttribute("Type", "Affine");
+            xmlWriter.writeTextElement("m11", QString::number(value().m11(), 'g', 10));
+            xmlWriter.writeTextElement("m12", QString::number(value().m12(), 'g', 10));
+            xmlWriter.writeTextElement("m13", QString::number(value().m13(), 'g', 10));
+            xmlWriter.writeTextElement("m21", QString::number(value().m21(), 'g', 10));
+            xmlWriter.writeTextElement("m22", QString::number(value().m22(), 'g', 10));
+            xmlWriter.writeTextElement("m23", QString::number(value().m23(), 'g', 10));
+            xmlWriter.writeTextElement("m31", QString::number(value().m31(), 'g', 10));
+            xmlWriter.writeTextElement("m32", QString::number(value().m32(), 'g', 10));
+            xmlWriter.writeTextElement("m33", QString::number(value().m33(), 'g', 10));
+        xmlWriter.writeEndElement();
+    xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool TransformParameter::deserialize(QIODevice& in)
+bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
+        {
+            setID(xmlReader.attributes().value("ID").toString());
+            
+           for(int i=0; i!=2; ++i)
+           {
+                xmlReader.readNextStartElement();
+                
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                
+                if(    xmlReader.name() == "Transform"
+                    && xmlReader.attributes().hasAttribute("Type")
+                    && xmlReader.attributes().value("Type") == "Affine")
+                {
+                    double m11, m12, m13, m21, m22, m23, m31, m32, m33;
+                  
+                    for(int i=0; i!=9; ++i)
+                    {
+
+                        xmlReader.readNextStartElement();
+                        
+                        if(xmlReader.name() == "m11") m11 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m12") m12 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m13") m13 = xmlReader.readElementText().toDouble();
+                        
+                        if(xmlReader.name() == "m21") m21 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m22") m22 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m23") m23 = xmlReader.readElementText().toDouble();
+                        
+                        if(xmlReader.name() == "m31") m31 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m32") m32 = xmlReader.readElementText().toDouble();
+                        if(xmlReader.name() == "m33") m33 = xmlReader.readElementText().toDouble();
+                    }
+                    setValue(QTransform(m11, m12, m13,    m21, m22, m23, m31, m32, m33));
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "TransformParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
-    
-    using namespace ::std;
-
-    QTransform trans;
-    
-    QString content(in.readLine().trimmed());
-    
-    QStringList values = content.split(", ");
-    
-    if(values.size() == 9)
-    {
-        try
-        {
-            trans.setMatrix(values[0].toDouble(), values[1].toDouble(), values[2].toDouble(),
-                            values[3].toDouble(), values[4].toDouble(), values[5].toDouble(),
-                            values[6].toDouble(), values[7].toDouble(), values[8].toDouble());
-            setValue(trans);
-            return true;
-        }
-        catch(...)
-        {
-        }
-    }
-    
-    qDebug("TransformParameter deserialize: date could not be imported from file using format 'dd.MM.yyyy hh:mm:ss'");
     return false;
 }
 

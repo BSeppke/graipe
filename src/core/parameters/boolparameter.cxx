@@ -36,6 +36,8 @@
 #include "core/parameters/boolparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -109,53 +111,31 @@ void BoolParameter::setValue(bool value)
 }
 
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString
+ * The value converted to a QString. Either true or false.
  *
  * \return The value of the parameter converted to an QString
  */
-QString BoolParameter::valueText() const
+QString BoolParameter::toString() const
 {
     return (value()?"true":"false");
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "BoolParameter, " + valueText()
+ * Deserialization of a parameter's state from a string.
  *
- * \param out The output device on which we serialize the parameter's state.
- */
-void BoolParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + valueText(), out);
-}
-
-/**
- * Deserialization of a parameter's state from an input device.
- *
- * \param in the input device.
+ * \param str The input QString.
  * \return True, if the deserialization was successful, else false.
  */
-bool BoolParameter::deserialize(QIODevice& in)
+bool BoolParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
+    if (str == "true" || str == "false")
     {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
-    if (content == "true" || content == "false")
-    {
-        setValue(content == "true");
+        setValue(str == "true");
         return true;
     }
     else
     {
-        qDebug() << "BoolParameter deserialize: value has to be either 'true' or 'false' in file, but found: " << content;
+        qDebug() << "BoolParameter deserialize: value has to be either 'true' or 'false' in file, but found: " << str;
     }
     return false;
 }

@@ -32,9 +32,12 @@
 /*    OTHER DEALINGS IN THE SOFTWARE.                                   */
 /*                                                                      */
 /************************************************************************/
+
 #include "core/parameters/modelparameter.hxx"
+#include "core/globals.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -58,14 +61,24 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * rs_object_stack, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
+ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
-    m_cmbDelegate(NULL),
+    m_delegate(NULL),
     m_type_filter(type_filter)
 {
-
-    setModelList(rs_object_stack);
-	refresh();
+    if(models.size())
+	{
+		m_allowed_values.clear();
+		
+		for(Model * model: models)
+		{
+            
+			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
+			{
+				m_allowed_values.push_back(model);
+			}
+		}
+	}
     
     setValue(value);
     
@@ -76,8 +89,8 @@ ModelParameter::ModelParameter(const QString &name, const std::vector<Model*> * 
  */
 ModelParameter::~ModelParameter()
 {
-    if(m_cmbDelegate != NULL)
-        delete m_cmbDelegate;
+    if(m_delegate != NULL)
+        delete m_delegate;
 }
 
 /**
@@ -126,9 +139,9 @@ void ModelParameter::setValue(Model* value)
         }
     }
     
-    if (found && m_cmbDelegate != NULL)
+    if (found && m_delegate != NULL)
     {
-        m_cmbDelegate->setCurrentIndex(m_model_idx);
+        m_delegate->setCurrentIndex(m_model_idx);
         Parameter::updateValue();
     }
     
@@ -146,94 +159,30 @@ void ModelParameter::setValue(Model* value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString ModelParameter::valueText() const
+QString ModelParameter::toString() const
 { 
-	return value()->name();
+	return value()->id();
 }
 
 /**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-void ModelParameter::refresh()
-{
-	if(m_modelList)
-	{
-		m_allowed_values.clear();
-		
-		for(Model * model: *m_modelList)
-		{
-            
-			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
-			{
-				m_allowed_values.push_back(model);
-			}
-		}
-	}
-    
-    if(m_cmbDelegate)
-	{
-		m_cmbDelegate->clear();
-		
-        int i=0;
-        
-		for(Model * model: m_allowed_values)
-		{
-			m_cmbDelegate->addItem(model->shortName());
-            m_cmbDelegate->setItemData(i++, model->description(), Qt::ToolTipRole);
-		}
-    }
-    if(m_allowed_values.size() != 0)
-        setValue(m_allowed_values[0]);
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * Basically: "ModelParameter, " + model->fielname()
+ * Deserialization of a parameter's state from a string.
  *
- * \param out The output device on which we serialize the parameter's state.
- */
-void ModelParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + encode_string(value()->filename()), out);
-}
-
-/**
- * Deserialization of a parameter's state from an input device.
- *
- * \param in the input device.
+ * \param str the input QString.
  * \return True, if the deserialization was successful, else false.
  */
-bool ModelParameter::deserialize(QIODevice& in)
+bool ModelParameter::fromString(QString& str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    bool found = false;
-    unsigned int i=0;
-    
-    QString content(in.readLine().trimmed());
-    
     for(Model* allowed: m_allowed_values)
     {
-        if (allowed->filename() == decode_string(content))
+        if (allowed->id() == str)
         {
             setValue(allowed);
-            found = true;
+            return true;
         }
-        i++;
     }
     
-    if (!found)
-    {
-        qDebug() << "ModelParameter deserialize: filename does not match any given. Was: '" << content << "'";
-    }
-    
-    return found;
+    qDebug() << "ModelParameter deserialize: filename does not match any given. Was: '" << str << "'";
+    return false;
 }
 
 /**
@@ -288,16 +237,23 @@ bool ModelParameter::isValid() const
  */
 QWidget*  ModelParameter::delegate()
 {
-    if(m_cmbDelegate == NULL)
+    if(m_delegate == NULL)
     {
-        m_cmbDelegate = new QComboBox;
-        m_cmbDelegate->update();
-        refresh();
+        m_delegate = new QComboBox;
+        
+        int i=0;
+        
+		for(Model * model: m_allowed_values)
+		{
+			m_delegate->addItem(model->shortName());
+            m_delegate->setItemData(i++, model->description(), Qt::ToolTipRole);
+		}
     
-        connect(m_cmbDelegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
+        connect(m_delegate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
-    return m_cmbDelegate;
+    
+    return m_delegate;
 }
 
 /**
@@ -307,9 +263,9 @@ QWidget*  ModelParameter::delegate()
 void ModelParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
-    if(m_cmbDelegate != NULL)
+    if(m_delegate != NULL)
     {
-        m_model_idx = m_cmbDelegate->currentIndex();
+        m_model_idx = m_delegate->currentIndex();
         Parameter::updateValue();
     }
 }

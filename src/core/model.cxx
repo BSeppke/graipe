@@ -36,10 +36,13 @@
 #include "core/model.hxx"
 #include "core/impex.hxx"
 #include "core/parameters.hxx"
+#include "core/globals.hxx"
 
 #include <cmath>
+#include <algorithm>
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 
 /**
  * @file
@@ -59,7 +62,6 @@ Model::Model()
     Serializable(),
     m_name(new StringParameter("Name:", "", 20, NULL)),
     m_description(new LongStringParameter("Description:", "", 20, 6, NULL)),
-    m_save_filename(new LongStringParameter("Filename:", "", 20, 3, NULL)),
     m_ul(new PointParameter("Local upper-left (px.):", QPoint(0,0), QPoint(100000,100000), QPoint(0,0), NULL)),
     m_lr(new PointParameter("Local lower-right (px.):", QPoint(0,0),QPoint(100000,100000), QPoint(0,0), NULL)),
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(0,0), NULL)),
@@ -72,9 +74,6 @@ Model::Model()
     m_parameters->addParameter("name", m_name);
     m_parameters->addParameter("descr", m_description);
     
-    m_save_filename->hide(true);
-    m_parameters->addParameter("filename", m_save_filename);
-    
     m_parameters->addParameter("ul", m_ul);
     m_parameters->addParameter("lr", m_lr);
     
@@ -82,6 +81,9 @@ Model::Model()
     m_parameters->addParameter("global_lr", m_global_lr);
     
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
+    
+    //Add to global Models list
+    models.push_back(this);
 }
 
 /**
@@ -94,7 +96,6 @@ Model::Model(const Model& model)
     Serializable(),
     m_name(new StringParameter("Name:", model.name(),20, NULL)),
     m_description(new LongStringParameter("Description:", model.description(), 20, 6, NULL)),
-    m_save_filename(new LongStringParameter("Filename:", model.filename(), 20, 3, NULL)),
     m_ul(new PointParameter("Local upper-left:", QPoint(0,0), QPoint(100000,100000), QPoint(model.left(), model.top()), NULL)),
     m_lr(new PointParameter("Local lower-right:", QPoint(0,0),QPoint(100000,100000), QPoint(model.right(), model.bottom()), NULL)),
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(model.globalLeft(), model.globalTop()), NULL)),
@@ -104,9 +105,6 @@ Model::Model(const Model& model)
     m_parameters->addParameter("name", m_name);
     m_parameters->addParameter("descr", m_description);
     
-    m_save_filename->hide(true);
-    m_parameters->addParameter("filename", m_save_filename);
-    
     m_parameters->addParameter("ul", m_ul);
     m_parameters->addParameter("lr", m_lr);
     
@@ -114,6 +112,9 @@ Model::Model(const Model& model)
     m_parameters->addParameter("global_lr", m_global_lr);
     
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
+    
+    //Add to global Models list
+    models.push_back(this);
 }
 
 /**
@@ -123,6 +124,9 @@ Model::~Model()
 {
     //Delete the parameters
     delete m_parameters;
+    
+    //Remove from global models list
+    models.erase(std::remove(models.begin(), models.end(), this), models.end());
 }
 
 /**
@@ -188,32 +192,6 @@ void Model::setDescription(const QString & new_description)
         return;
     
     m_description->setValue(new_description);
-    updateModel();
-}
-
-/**
- * Const accessor for the model filename QString.
- *
- * \return The filename of the model.
- */
-QString Model::filename() const
-{
-	return m_save_filename->value();
-}
-
-/**
- * Set the model's filename to a new QString.
- *
- * \param new_filename The new filename of the model.
- */
-void Model::setFilename(const QString & new_filename)
-{
-    if(locked())
-        return;
-    
-    m_save_filename->setValue(new_filename);
-    m_filename = new_filename;
-    
     updateModel();
 }
 
@@ -508,7 +486,6 @@ void Model::copyMetadata(Model& other) const
 		
 		other.setName(name());
 		other.setDescription(description());
-		other.setFilename(filename());
 	}
 }
 
@@ -537,30 +514,52 @@ QString Model::typeName() const
 }
 
 /**
- * This function returns the automagically generated first header line for model
- * serialization.
+ * This function serializes a complete Model to a xml stream.
+ * Writes the following XML code by default:
  *
- * \return The first Header line, namely: "[Graipe::" + typeName() + "]"
- */
-QString Model::magicID() const
-{
-    return  QString("[Graipe::") + typeName() + "]";
-}
-
-/**
- * This function serializes a complete Model to an output device.
- * To do so, it serializes header first, then the content, like this:
- *      serialize_header()
- *      [Content]
- *      serialize_content();
+ * <TYPENAME>
+ *     <Header>
+ *         HEADER
+ *     </Header>
+ *     <Content>
+ *         CONTENT
+ *     </Content>
+ * </TYPENAME>
  *
- * \param out The output device for the serialization.
+ * with TYPENAME = typeName(),
+ *        HEADER = serialize_header(), and
+ *       CONTENT = serialize_content().
+ *
+ * If the device, on which the writer writes, is not on the beginning (pos!=0),
+ * the writeStartDocument() and writeEndDocument() calls will be suppressed in
+ * order to allow multi-object files.
+ *
+ * \param xmlWriter The QXmlStreamWriter used for the serialization.
  */
-void Model::serialize(QIODevice& out) const
+void Model::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    serialize_header(out);
-    write_on_device("\n[Content]\n", out);
-    serialize_content(out);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.setAutoFormattingIndent(4);
+    
+    bool fullFile = (xmlWriter.device()->pos() == 0);
+    
+    if (fullFile)
+    {
+        xmlWriter.writeStartDocument();
+    }
+        xmlWriter.writeStartElement(typeName());
+        xmlWriter.writeAttribute("ID", id());
+            xmlWriter.writeStartElement("Header");
+                serialize_header(xmlWriter);
+            xmlWriter.writeEndElement();
+            xmlWriter.writeStartElement("Content");
+                serialize_content(xmlWriter);
+            xmlWriter.writeEndElement();
+        xmlWriter.writeEndElement();    
+    if (fullFile)
+    {
+        xmlWriter.writeEndDocument();
+    }
 }
 
 /**
@@ -569,37 +568,81 @@ void Model::serialize(QIODevice& out) const
  * \param  in The input device.
  * \return True, if the Model could be restored,
  */
-bool Model::deserialize(QIODevice& in)
+bool Model::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(deserialize_header(in))
+    try
     {
-        //Note: deserialize_header already used the (single) newline
-        //      as its break criterion.
-        
-        //Thus, we can now search for [Content] keyword directly
-        QString content(in.readLine().trimmed());
-        
-        if(content != "[Content]")
-        {
-            qCritical() << "Model::deserialize failed. Did not find [Content] preamble, but: " << content ;
-            return false;
-        }
-        return deserialize_content(in);
+        //Assume, that the deserialized has already read the start node:
+        //if (xmlReader.readNextStartElement())
+        //{
+        //    qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
+            
+            if(     xmlReader.name() == typeName()
+                &&  xmlReader.attributes().hasAttribute("ID"))
+            {
+                setID(xmlReader.attributes().value("ID").toString());
+                
+                while(xmlReader.readNextStartElement())
+                {
+                    //qDebug() << "Model::deserialize: readNextStartElement" << xmlReader.name();
+            
+                    if(xmlReader.name() == "Header")
+                    {
+                         if(!deserialize_header(xmlReader))
+                         {
+                            return false;
+                        }
+                        //Read until </Header> comes....
+                        while(true)
+                        {
+                            if(!xmlReader.readNext())
+                            {
+                                return false;
+                            }
+                            
+                            if(xmlReader.isEndElement() && xmlReader.name() == "Header")
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if(xmlReader.name() == "Content")
+                    {
+                        if(!deserialize_content(xmlReader))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                throw std::runtime_error("Did not find typeName() or id() in XML tree");
+            }
+        //}
+        //else
+        //{
+        //  throw std::runtime_error("Did not find any start element in XML tree");
+        //}
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
     }
     return  false;
 }
 
 /**
- * This function serializes the header of a model like this:
- *      magicID()
- *      m_parameters->serialize()
+ * This function serializes the header of a model by means of a serialization of the
+ * models parameters (given as a ParameterGroup in m_parameters).
  *
- * \param out the output device.
+ * \param xmlWriter The QXmlStreamWriter, on which we write.
  */
-void Model::serialize_header(QIODevice& out) const
+void Model::serialize_header(QXmlStreamWriter& xmlWriter) const
 {
-	write_on_device(magicID() + "\n", out);
-    m_parameters->serialize(out);
+    m_parameters->serialize(xmlWriter);
 }
 
 /**
@@ -608,21 +651,16 @@ void Model::serialize_header(QIODevice& out) const
  * \param  in The input device.
  * \return True, if the Model's header could be restored,
  */
-bool Model::deserialize_header(QIODevice& in)
+bool Model::deserialize_header(QXmlStreamReader& xmlReader)
 {
     if(locked())
-        return false;
-        
-    QString firstLine(in.readLine());
-    
-    if (!(firstLine.trimmed() == magicID()))
     {
         return false;
     }
-    
+
     disconnect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
     
-    bool res = m_parameters->deserialize(in);
+    bool res = m_parameters->deserialize(xmlReader);
     
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
         
@@ -631,13 +669,12 @@ bool Model::deserialize_header(QIODevice& in)
 
 /**
  * This function serializes the content of a model.
- * Has to be specialized, here always "none\n".
+ * Has to be specialized, here always "".
  *
- * \param out the output device.
+ * \param xmlWriter The QXmlStreamWriter, on which we write.
  */
-void Model::serialize_content(QIODevice& out) const
+void Model::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
-    write_on_device("none\n", out);
 }
 
 /**
@@ -646,10 +683,9 @@ void Model::serialize_content(QIODevice& out) const
  * \param  in The input device.
  * \return True, if the Model's content could be restored,
  */
-bool Model::deserialize_content(QIODevice& in)
+bool Model::deserialize_content(QXmlStreamReader& xmlReader)
 {
-    QString content(in.readLine().trimmed());
-    return (content=="none");
+    return true;
 }
 
 /**

@@ -77,7 +77,7 @@ ParameterGroup::~ParameterGroup()
 {
     for(item_type item: m_parameters)
     {
-         delete item.second;
+        delete item.second;
     }
 }
 
@@ -86,7 +86,7 @@ ParameterGroup::~ParameterGroup()
  *
  * \return "ParameterGroup".
  */
-QString  ParameterGroup::typeName() const
+QString ParameterGroup::typeName() const
 {
 	return "ParameterGroup";
 }
@@ -103,19 +103,15 @@ unsigned int ParameterGroup::addParameter(const QString& id, Parameter* param, b
 {
     unsigned int idx = (unsigned int)m_parameters.size();
     
+    param->setID(id);
     m_parameters.insert(item_type(id, param));
+    
     if(!hidden)
     {
         m_parameter_order.push_back(id);
+        
     }
     
-    if(m_delegate != NULL && !hidden)
-    {
-        param->delegate()->setMaximumSize(9999,9999);
-        param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred));
-        m_layout->addRow(param->name(), param->delegate());
-        connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
-    }
     return idx;
 }
 
@@ -203,7 +199,7 @@ unsigned int ParameterGroup::size() const
  *
  * \return The value of the parameter converted to an QString.
  */
-QString ParameterGroup::valueText() const
+QString ParameterGroup::toString() const
 {
     QString report;
     
@@ -212,7 +208,7 @@ QString ParameterGroup::valueText() const
         Parameter * p = iter->second;
         if (p)
         {
-            report += p->name() + ": " + p->valueText() + QString("\n");
+            report += p->name() + ": " + p->toString() + QString("\n");
         }
     }
     
@@ -239,7 +235,7 @@ QString ParameterGroup::valueText(const QString & filter_types) const
         {
             if(!filter_types.contains(p->typeName()))
             {
-                report += p->name() + ": " + p->valueText() + QString("\n");
+                report += p->name() + ": " + p->toString() + QString("\n");
             }
         }
     }
@@ -247,85 +243,122 @@ QString ParameterGroup::valueText(const QString & filter_types) const
 }
 
 /**
- * The magicID of this parameter class. 
- * Implemented to fullfil the Serializable interface.
+ * Serialization of the parameter groups's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <ParameterGroup>
+ *     <Name>NAME</Name>
+ *     <Parameters>N</Parameters>
+ *     PARAM_0_SERIALIZATION
+ *     ...
+ *     PARAM_N-1_SERIALIZATION
+ * </ParameterGroup>
  *
- * \return "", since a parameter group does not use any magicIDs.
- */
-QString ParameterGroup::magicID() const
-{
-    return "";
-}
-
-/**
- * Serialization of the parameter's state to an output device.
- * This serializes each parameter in the group by means of its name and its serialization,
- * one per line, e.g. like:
- * "param1: StringParameter, bla"
- * "param2: PointParmaeter, ...."
+ * with                NAME = name(), and
+ *               ID_PARAM_0 = m_parameters.front()->first.
+ *    PARAM_0_SERIALIZATION = m_parameters.front()->second->serialize().
  *
- * \param out The output device on which we serialize the parameter's state.
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
-void ParameterGroup::serialize(QIODevice& out) const
+void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
 {
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Parameters", QString::number(m_parameters.size()));
+    
     for(storage_type::const_iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
     {
         if (iter->second)
         {
-            write_on_device(iter->first + ": ", out);
-            iter->second->serialize(out);
-            write_on_device("\n", out);
+            iter->second->serialize(xmlWriter);
         }
     }
+    xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool ParameterGroup::deserialize(QIODevice& in)
+bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
 {
-    while(!in.atEnd())
+    try
     {
-        //1. Try to get the Id of the parameter
-        QString id = read_from_device_until(in, ": ");
-        
-        if(id.isEmpty())
-            break;
-        
-        id = id.left(id.size()-2);
-        
-        //2. Find the correct Parameter for this id
-        for(storage_type::iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
+        if (xmlReader.readNextStartElement())
         {
-            //3. Parameter found in m_parameters
-            if (iter->first == id)
+            if(xmlReader.name() == typeName())
             {
-                //4. Try to serialize the found parameter using the serial
-                if(!iter->second->deserialize(in))
+                for(int j=0; j!=2; ++j)
                 {
-                    qCritical() << "ParameterGroup deserialize: Unable to deserialize '" << id << "' for parameter '" << iter->second->name() << "'";
-                    return false;
+                    xmlReader.readNextStartElement();
+                    
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Parameters")
+                    {
+                        int parameter_count = xmlReader.readElementText().toInt();
+                        
+                        if(parameter_count != m_parameters.size())
+                        {
+                            throw std::runtime_error("Parameter count mismatch");
+                        }
+                        
+                        for (int i=0; i!= parameter_count; ++i)
+                        {
+                            xmlReader.readNextStartElement();
+                            
+                            if(xmlReader.attributes().hasAttribute("ID"))
+                            {
+                                QString id = xmlReader.attributes().value("ID").toString();
+                               
+                                if(!m_parameters[id]->deserialize(xmlReader))
+                                {
+                                    throw std::runtime_error("Could not deserialize ID: " + id.toStdString());
+                                }
+                            }
+
+                        }                            
+                        //Read until </ParameterGroup> comes...
+                        while(true)
+                        {
+                            if(!xmlReader.readNext())
+                            {
+                                return false;
+                            }
+                            
+                            if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                            {
+                                break;
+                            }
+                        }
+                        return true;
+                    }
                 }
             }
+            else
+            {
+                throw std::runtime_error("Did not find typeName() or id() in XML tree");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find any start element in XML tree");
         }
     }
-    return true;
-}
-    
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-void ParameterGroup::refresh()
-{
-    for(storage_type::iterator iter = m_parameters.begin();  iter != m_parameters.end(); ++iter)
+    catch(std::runtime_error & e)
     {
-        iter->second->setModelList(m_modelList);
+        qCritical() << "ParameterGroup::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
     }
+    return true;
 }
 
 /**
@@ -349,16 +382,13 @@ QWidget * ParameterGroup::delegate()
         for( QString id : m_parameter_order)
         {
             Parameter* param = m_parameters.at(id);
+            QWidget* p_delegate = param->delegate();
             
-            if(param->delegate())
+            if(p_delegate)
             {
-                param->delegate()->setMaximumSize(9999,9999);
-                param->delegate()->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-                
-                if(!param->isHidden())
-                {
-                    m_layout->addRow(param->name(), param->delegate());
-                }
+                m_layout->addRow(param->name(), p_delegate);
+                p_delegate->setMaximumSize(9999,9999);
+                p_delegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
                 connect(param, SIGNAL(valueChanged()), this, SLOT(updateValue()));
             }
         }

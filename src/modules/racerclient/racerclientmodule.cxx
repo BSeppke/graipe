@@ -79,7 +79,7 @@ class RacerInterpreter
          */
         RacerInterpreter()
         { 
-            m_param_measured_vectorfield = new ModelParameter("Derived Current Vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D");
+            m_param_measured_vectorfield = new ModelParameter("Derived Current Vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D");
             m_param_tbox_filename = new FilenameParameter("T-Box in Racer-format");
             
             m_param_velocity1	=  new FloatParameter("low velocity [cm/s] <= ", 0,999999, 10);
@@ -91,10 +91,10 @@ class RacerInterpreter
             m_param_distance3 = new FloatParameter("far distance [km] <=", 0,999999, 10);
             
             m_param_use_wind = new BoolParameter("Wind vectorfield available?", false);
-            m_param_wind_vectorfield = new ModelParameter("Wind vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_wind);
+            m_param_wind_vectorfield = new ModelParameter("Wind vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_wind);
             
             m_param_use_modelled_currents = new BoolParameter("Modelled current available?", false);
-            m_param_modelled_vectorfield = new ModelParameter("Modelled current vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_modelled_currents);
+            m_param_modelled_vectorfield = new ModelParameter("Modelled current vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_modelled_currents);
 
             m_param_save_abox = new BoolParameter("Save resulting A-Box?", false);
             m_param_abox_filename = new FilenameParameter("A-Box in Racer-format", "", m_param_save_abox);	
@@ -701,8 +701,8 @@ class RacerClusteredInterpreter
          */
         RacerClusteredInterpreter()
         { 
-            m_param_measured_vectorfield = new ModelParameter("Clustered Current Vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D");
-            m_param_clusters = new ModelParameter("Weighted Cluster borders", NULL, "WeightedPolygonList2D");
+            m_param_measured_vectorfield = new ModelParameter("Clustered Current Vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D");
+            m_param_clusters = new ModelParameter("Weighted Cluster borders", "WeightedPolygonList2D");
             m_param_tbox_filename = new FilenameParameter("T-Box in Racer-format");
             
             m_param_smoothness_threshold	=  new FloatParameter("smoothness threshold ", 0,999999, 10);
@@ -716,10 +716,10 @@ class RacerClusteredInterpreter
             m_param_distance3 = new FloatParameter("far distance [km] <=", 0,999999, 10);
             
             m_param_use_wind = new BoolParameter("Wind vectorfield available?", false);
-            m_param_wind_vectorfield = new ModelParameter("Wind vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_wind);
+            m_param_wind_vectorfield = new ModelParameter("Wind vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_wind);
             
             m_param_use_modelled_currents = new BoolParameter("Modelled current available?", false);
-            m_param_modelled_vectorfield = new ModelParameter("Modelled current vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_modelled_currents);
+            m_param_modelled_vectorfield = new ModelParameter("Modelled current vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_modelled_currents);
 
             m_param_save_abox = new BoolParameter("Save resulting A-Box?", false);
             m_param_abox_filename = new FilenameParameter("A-Box in Racer-format", "", m_param_save_abox);	
@@ -1330,8 +1330,8 @@ class ClusteredABox
          */
         ClusteredABox()
         { 
-            m_param_measured_vectorfield = new ModelParameter("Clustered Current Vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D");
-            m_param_clusters = new ModelParameter("Weighted Cluster borders", NULL, "WeightedPolygonList2D");
+            m_param_measured_vectorfield = new ModelParameter("Clustered Current Vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D");
+            m_param_clusters = new ModelParameter("Weighted Cluster borders", "WeightedPolygonList2D");
             
             m_param_smoothness_threshold	=  new FloatParameter("smoothness threshold ", 0,999999, 10);
             
@@ -1344,10 +1344,10 @@ class ClusteredABox
             m_param_distance3 = new FloatParameter("far distance [km] <=", 0,999999, 10);
             
             m_param_use_wind = new BoolParameter("Wind vectorfield available?", false);
-            m_param_wind_vectorfield = new ModelParameter("Wind vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_wind);
+            m_param_wind_vectorfield = new ModelParameter("Wind vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_wind);
             
             m_param_use_modelled_currents = new BoolParameter("Modelled current available?", false);
-            m_param_modelled_vectorfield = new ModelParameter("Modelled current vectorfield", NULL, "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_modelled_currents);
+            m_param_modelled_vectorfield = new ModelParameter("Modelled current vectorfield", "SparseVectorfield2D|SparseMultiVectorfield2D|SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D|DenseVectorfield2D|DenseWeightedVectorfield2D", NULL, m_param_use_modelled_currents);
 
             m_param_abox_filename = new FilenameParameter("A-Box in Racer-format", "");	
             

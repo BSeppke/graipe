@@ -240,7 +240,7 @@ QRectF SparseVectorfield2DViewController::boundingRect () const
  *
  * \return Always: "SparseVectorfield2DViewController"
  */
-QString SparseVectorfield2DViewController::typeName()  const
+QString SparseVectorfield2DViewController::typeName() const
 { 
 	return "SparseVectorfield2DViewController";
 }
@@ -378,7 +378,7 @@ void SparseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent 
             }
             else
             {
-                vectors_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>length</td> <td>angle</td> <td>dist</td> </tr>")
+                vectors_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>length</th> <th>angle</th> <th>dist</th> </tr>")
                 +	vectors_in_reach
                 +	QString("</table>");
             }
@@ -386,7 +386,7 @@ void SparseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent 
             emit updateStatusText(vf->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	vf->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	vectors_in_reach);
             
             event->accept();
@@ -750,7 +750,7 @@ void SparseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHov
             }
             else
             {
-                vectors_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>length</td> <td>angle</td> <td>weight</td> <td>dist</td> </tr>")
+                vectors_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>length</th> <th>angle</th> <th>weight</th> <th>dist</th> </tr>")
                 +	vectors_in_reach
                 +	QString("</table>");
             }
@@ -758,7 +758,7 @@ void SparseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHov
             emit updateStatusText(vf->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	vf->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	vectors_in_reach);
             
             event->accept();
@@ -1090,7 +1090,7 @@ void SparseMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverE
             }
             else
             {
-                vectors_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>length</td> <td>angle</td> <td>dist</td> </tr>")
+                vectors_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>length</th> <th>angle</th> <th>dist</th> </tr>")
                 +	vectors_in_reach
                 +	QString("</table>");
             }
@@ -1098,7 +1098,7 @@ void SparseMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverE
             emit updateStatusText(vf->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	vf->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	vectors_in_reach);
                                          
             event->accept();
@@ -1460,7 +1460,7 @@ void SparseWeightedMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSce
             }
             else
             {
-                vectors_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>length</td> <td>angle</td> <td>weight</td> <td>dist</td> </tr>")
+                vectors_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>length</th> <th>angle</th> <th>weight</th> <th>dist</th> </tr>")
                 +	vectors_in_reach
                 +	QString("</table>");
             }
@@ -1468,7 +1468,7 @@ void SparseWeightedMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSce
             emit updateStatusText(vf->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	vf->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	vectors_in_reach);
             
             event->accept();

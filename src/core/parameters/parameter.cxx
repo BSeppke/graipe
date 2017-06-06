@@ -33,7 +33,6 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/parameters/parameter.hxx"
 #include "core/parameters/boolparameter.hxx"
 #include "core/model.hxx"
 
@@ -86,13 +85,13 @@ Parameter::~Parameter()
  *
  * \return "Parameter".
  */
-QString  Parameter::typeName() const
+QString Parameter::typeName() const
 {
 	return "Parameter";
 }
 
 /**
- * The name of this parameter. This name is used a label for the parameter.
+ * The name of this parameter. This name is used as a label for the parameter.
  *
  * \return The name of the parameter.
  */
@@ -133,95 +132,112 @@ bool Parameter::invertParent() const
 }
 
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars.
+ * The value converted to a QString. Needs to be specified for inheriting classes.
+ * This is the default method for the value serialization performed by
+ * serialize.
  *
- * \return The value of the parameter converted to an QString
+ * \return The value of the parameter converted to an QString, here "".
  */
-QString  Parameter::valueText() const
+QString Parameter::toString() const
 {
 	return "";
 }
 
-
 /**
- * The magicID of this parameter class. 
- * Implemented to fullfil the Serializable interface.
+ * Sets the value using a QString. 
+ * This is the default method for the value deserialization performed by
+ * deserialize.
  *
- * \return The same as the typeName() function.
+ * \param str The value of the parameter converted to an QString
+ * \return True, if the value could be restored. Here, always true.
  */
-QString Parameter::magicID() const
+bool Parameter::fromString(QString& str)
 {
-    return typeName();
+    return true;
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Just writes the magicID a.k.a. typeName() on the device.
+ * Serialization of the parameter's state to a xml stream.
+ * Writes the following XML code by default:
+ * 
+ * <TYPENAME>
+ *     <Name>NAME</Name>
+ *     <Value>VALUETEXT</Value>
+ * </TYPENAME>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName(),
+ *         NAME = name(), and
+ *    VALUETEXT = toString().
+ *
+ * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
+ *                  parameter's type, name and value.
  */
-void Parameter::serialize(QIODevice& out) const
+void Parameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    write_on_device(magicID(), out);
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Value", toString());
+    xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml stream.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader from which we read.
  * \return True, if the deserialization was successful, else false.
  */
-bool Parameter::deserialize(QIODevice & in)
+bool Parameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    //Read the first bytes, needed for the magicID
-    QString id_str(in.read(magicID().size()));
+    bool success = false;
     
-    //read the ", " too!
-    in.read(2);
-    
-    if(id_str.trimmed() == magicID())
+    try
     {
-        return true;
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
+        {
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            for(int i=0; i!=2; ++i)
+            {
+                xmlReader.readNextStartElement();
+            
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "Value")
+                {
+                    QString valueText =  xmlReader.readElementText();
+                    success = fromString(valueText);
+                }
+            }
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            return success;
+        }
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
     }
-    else
+    catch(std::runtime_error & e)
     {
-        qCritical() << "Parameter::deserialize failed! Was looking for magicID: " << magicID() << " but got: " << id_str.trimmed();
+        qCritical() << "Parameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
-}
-
-/**
- * Const access to the model list, which is currently assigned to 
- * this parameter.
- *
- * \return A pointer to the current model list.
- */
-const std::vector<Model*> * Parameter::modelList() const
-{
-	return m_modelList;
-}
-
-/**
- * Writing access to the model list, which may be used to assign a new
- * or update the currently used model list of this parameter.
- *
- * \param new_model_list A pointer to the new model list.
- */
-void Parameter::setModelList(const std::vector<Model*> * new_obj_stack)
-{
-	m_modelList = new_obj_stack;
-	refresh();
-}
-
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. It may be implemented
- * by means of the subclasses to handle these updates.
- */
-void Parameter::refresh()
-{
 }
 
 /**
@@ -256,28 +272,6 @@ void Parameter::unlock()
 bool Parameter::isValid() const
 {
     return false;
-}
-
-/**
- * Sets a parameter to be hidden. 
- * Hidden parameters behave like visible parameters unless they are added to a
- * parameter group, where their delegates will not be shown.
- *
- * \param hide If true, the parameter will be hidden in a parameter group.
- */
-void Parameter::hide(bool hide)
-{
-    m_hide = hide;
-}
-
-/**
- * Is a parameter marked as "hidden" with respect to a parameter group?
- *
- * \return True, if the parameter will be hidden in a parameter group.
- */
-bool Parameter::isHidden() const
-{
-    return m_hide;
 }
 
 /**
@@ -332,6 +326,7 @@ void Parameter::initConnections()
             }
         }
     }
+    
 }
 
 } //end of namespace graipe

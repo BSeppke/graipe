@@ -72,7 +72,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          *
          * \return Always "PolygonList2D".
          */
-		QString typeName() const;
+		virtual QString typeName() const;
     
         /**
          * Returns the number of polygons in this list.
@@ -116,7 +116,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          *
          * \return Always "p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one polygon at a given list index to a string. This function will
@@ -125,7 +125,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          * \param index The index of the polygon to be serialized.
          * \return A QString containing the searialization of the polygon.
          */
-        virtual QString serialize_item(unsigned int index) const;
+        virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a polygon from a string to this list.
@@ -134,25 +134,43 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
          */
-        virtual bool deserialize_item(const QString & serial);
+        virtual bool itemFromCSV(const QString & serial);
     
         /**
-         * Serialization the list of polygons to a QIODevice.
-         * The first line is the header as given in item_header(). Each following
+         * Serialization of one polygon at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+         *
+         * \param index The index of the polygon to be serialized.
+         * \return A QString containing the searialization of the polygon.
+         */
+        virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a polygon from a string to this list.
+         *
+         * \param serial A QString containing the searialization of the polygon.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
+         */
+        virtual bool deserialize_item(QXmlStreamReader& xmlReader);
+    
+        /**
+         * Serialization the list of polygons to an xml file.
+         * The first line is the header as given in csvHeader. Each following
          * line represents one polygon serialization.
          *
-         * \param out The QIODevice, where we will put our output on.
+         * \param xmlWriter The QXmlStreamWriter where we will put our output on.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a list of polygons from a QIODevice.
-         * The first line is the header as given in item_header(), which is ignored however.
+         * Deserialization of a list of polygons from an xml file.
+         * The first line is the header as given in csvHeader, which is ignored however.
          * Each following line has to be one valid polygon serialization.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
     
     protected:
         //The polygons
@@ -188,7 +206,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          *
          * \return Always "WeightedPolygonList2D".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
     
         /**
          * Getter of the weight of a polygon at a given index. May throw an error,
@@ -251,7 +269,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          *
          * \return Always "weight, p0_x, p0_y, p1_x, p1_y, ... , pN_x, pN_y".
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
     
         /**
          * Serialization of one polygon at a given list index to a string. This function will
@@ -260,7 +278,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          * \param index The index of the polygon to be serialized.
          * \return A QString containing the searialization of the polygon.
          */
-        virtual QString serialize_item(unsigned int index) const;
+        virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a polygon from a string to this list.
@@ -269,7 +287,25 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
          */
-        virtual bool deserialize_item(const QString & serial);
+        virtual bool itemFromCSV(const QString & serial);
+    
+        /**
+         * Serialization of one polygon at a given list index to a string. This function will
+         * throw an error if the index is out of range.
+         *
+         * \param index The index of the polygon to be serialized.
+         * \return A QString containing the searialization of the polygon.
+         */
+        virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a polygon from a string to this list.
+         *
+         * \param serial A QString containing the searialization of the polygon.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
+         */
+        virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
     protected:
         //The weights

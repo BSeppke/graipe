@@ -120,6 +120,7 @@ Logging::Logging()
         outputDirname = preferredDirname;
     }
     
+    
     //2. Assign class memebers
     m_file = new QFile(outputDirname+outputFilename);
     
@@ -127,6 +128,7 @@ Logging::Logging()
     {
         m_textStream = new QTextStream(m_file);
     }
+    qInfo() << "Starting log session";
 }
 
 /**
@@ -162,6 +164,7 @@ void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, cons
             abort();
     }
     *m_textStream << txt << "\n";
+    m_textStream->flush();
 }
 
 }//end of namespace graipe

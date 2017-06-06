@@ -437,7 +437,7 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 				global_bottom = global_top  + (global_bottom - global_top)*rescale.second;
 				
 				//Set filename in each case!
-				image.setFilename(filename);
+				image.setID(filename);
 				
                 QFileInfo fi(filename);
                 
@@ -612,18 +612,15 @@ void ImageImporter::run()
         else 
         {
             emit errorMessage(QString("Explainable error occured: Image could not be imported"));
-            m_results.clear();
         }
     }
     catch(std::exception& e)
     {
         emit errorMessage(QString("Explainable error occured: ") + QString::fromStdString(e.what()));
-        m_results.clear();
     }
     catch(...)
     {
-        emit errorMessage(QString("Non-explainable error occured"));		
-        m_results.clear();
+        emit errorMessage(QString("Non-explainable error occured"));
     }
 }
 
@@ -633,7 +630,9 @@ void ImageImporter::run()
  */
 void ImageImporter::pixelTypeChanged()
 {
+    delete m_results[0];
     m_results.clear();
+    
     switch(m_pixeltype->value())
     {
         case 0:
@@ -658,7 +657,7 @@ ImageExporter::ImageExporter()
 		format_names.append("JPEG"); format_names.append("netCDF");
 		format_names.append("PNG"); format_names.append("XYZ");
 
-    m_parameters->addParameter("image", new ModelParameter("Image",	NULL,  "Image, IntImage, ByteImage"));
+    m_parameters->addParameter("image", new ModelParameter("Image",	"Image, IntImage, ByteImage"));
     m_parameters->addParameter("filename", new FilenameParameter("Image filename", "", NULL));
     m_parameters->addParameter("format", new EnumParameter("File format", format_names));
 }
@@ -682,20 +681,20 @@ void ImageExporter::run()
         {
             res = ImageImpex::exportImage(*static_cast<Image<float>*>(param_image->value()),
                                           param_filename->value(),
-                                          param_fileformat->valueText());
+                                          param_fileformat->toString());
         }
         
         if(param_image->value()->typeName() == "IntImage")
         {
             res = ImageImpex::exportImage(*static_cast<Image<int>*>(param_image->value()),
                                           param_filename->value(),
-                                          param_fileformat->valueText());
+                                          param_fileformat->toString());
         }
         else if(param_image->value()->typeName() == "ByteImage")
         {
             res = ImageImpex::exportImage(*static_cast<Image<unsigned char>*>(param_image->value()),
                                           param_filename->value(),
-                                          param_fileformat->valueText());
+                                          param_fileformat->toString());
         }
         
         if(res)

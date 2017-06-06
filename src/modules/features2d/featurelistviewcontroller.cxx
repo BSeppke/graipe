@@ -211,7 +211,7 @@ void PointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
             }
             else
             {
-                features_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>dist</td> </tr>")
+                features_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>dist</th> </tr>")
                 +	features_in_reach
                 +	QString("</table>");
             }
@@ -219,7 +219,7 @@ void PointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
             emit updateStatusText(features->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	features->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	features_in_reach);
              
         }
@@ -542,7 +542,7 @@ void WeightedPointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHove
             }
             else
             {
-                features_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>weight</td> <td>dist</td> </tr>")
+                features_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>weight</th> <th>dist</th> </tr>")
                 +	features_in_reach
                 +	QString("</table>");
             }
@@ -550,7 +550,7 @@ void WeightedPointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHove
             emit updateStatusText(features->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	features->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	features_in_reach);
              
         }
@@ -762,7 +762,7 @@ void EdgelFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
             }
             else
             {
-                features_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>weight</td> <td>angle</td> <td>dist</td> </tr>")
+                features_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>weight</th> <th>angle</th> <th>dist</th> </tr>")
                 +	features_in_reach
                 +	QString("</table>");
             }
@@ -770,7 +770,7 @@ void EdgelFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
             emit updateStatusText(features->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	features->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	features_in_reach);
         }
     }
@@ -1006,7 +1006,7 @@ void SIFTFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * 
             }
             else
             {
-                features_in_reach =		QString("<table align='center' border='1'><tr> <td>Idx</td> <td>x</td> <td>y</td> <td>weight</td> <td>angle</td>  <td>scale</td> <td>dist</td> </tr>")
+                features_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>weight</th> <th>angle</th>  <th>scale</th> <th>dist</th> </tr>")
                 +	features_in_reach
                 +	QString("</table>");
             }
@@ -1014,7 +1014,7 @@ void SIFTFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * 
             emit updateStatusText(features->shortName() + QString("[%1,%2]").arg(x).arg(y));
             emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
                                          +	features->shortName()
-                                         +	QString("</i><br/>at position [%1,%2]").arg(x).arg(y)
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
                                          +	features_in_reach);
         }
     }

@@ -100,7 +100,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          *
          * \return Always "DenseVectorfield2D"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 		
         /**
          * The size of this vectorfield. 
@@ -407,22 +407,22 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
         void setV(const ArrayViewType& new_v);
     
         /**
-         * Serialize the complete content of the dense vectorfield to a QIODevice.
+         * Serialize the complete content of the dense vectorfield to an xml file.
          * The serialization is just a binary stream of m_u followed by m_v.
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a  dense vectorfield from a QIODevice.
+         * Deserialization of a  dense vectorfield from an xml file.
          * Since the serialization is just a binary stream of m_u and m_v
          * and we already know the size, it is quite easy the deserialize.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          * \return True, if the content could be deserialized and the model is not locked.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
     
     protected slots:
         /**
@@ -529,7 +529,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          *
          * \return Always "DenseWeightedVectorfield2D"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
         
         /**
          * This does not remove all the vectors, but resets their directions 
@@ -595,22 +595,22 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
 		virtual void setWeight(unsigned int x, unsigned int y, float new_w);
 		
         /**
-         * Serialize the complete content of the dense weighted vectorfield to a QIODevice.
+         * Serialize the complete content of the dense weighted vectorfield to an xml file.
          * The serialization is just a binary stream of m_u followed by m_v and m_w.
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a  dense vectorfield from a QIODevice.
+         * Deserialization of a  dense vectorfield from an xml file.
          * Since the serialization is just a binary stream of m_u, m_v and m_w
          * and we already know the size, it is quite easy the deserialize.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          * \return True, if the content could be deserialized and the model is not locked.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
 		
         /**
          * Constant reading access to the weights of each direction

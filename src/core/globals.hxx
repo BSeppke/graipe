@@ -33,39 +33,37 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/logging.hxx"
-#include "gui/mainwindow.hxx"
+#ifndef GRAIPE_CORE_GLOBALS_HXX
+#define GRAIPE_CORE_GLOBALS_HXX
 
-#include <QApplication>
-#include <QDesktopWidget>
+#include "core/factories.hxx"
+#include "core/model.hxx"
+#include "core/viewcontroller.hxx"
+
+#include <vector>
 
 /**
- * This is the main method of the complete GRAIPE GUI application
- * everything starts here...
- *
- * \param argc The calling argument count.
- * \param argv An array of c-strings containing the calling arguments.
- * \return 0, if nothing went wrong. Else: Anything else.
+ * @file
+ * @brief This file holds all global data structures
+ * @addtogroup core
+ * @{
  */
-int main(int argc, char** argv)
-{    
-    //Install thes logger's message handler
-    qInstallMessageHandler(&graipe::Logging::messageHandler);
-    
-    QApplication app(argc,argv);
+ 
+namespace graipe {
 
-    graipe::MainWindow m(0,"GRAIPE 1.0");
-	
-    if (	QApplication::desktop()->width() > m.width() + 50
-		 && QApplication::desktop()->height() > m.height() + 50 )
-	{
-		m.show();
-    }
-	else
-	{
-		m.showMaximized();
-    }
-	
-    QObject::connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
-    return app.exec();
-}
+//Three global variables for the factories:
+extern ModelFactory modelFactory;
+extern ViewControllerFactory viewControllerFactory;
+extern AlgorithmFactory algorithmFactory;
+
+//And two more holding all currently available Models and ViewControllers:
+extern std::vector<Model*> models;
+extern std::vector<ViewController*> viewControllers;
+
+}//end of namespace graipe
+
+/**
+ * @}
+ */
+
+#endif //GRAIPE_CORE_FACTORIES_HXX

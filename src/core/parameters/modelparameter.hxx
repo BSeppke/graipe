@@ -77,7 +77,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        ModelParameter(const QString& name, const std::vector<Model*> * allowed_models, QString type_filter="", Model* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
+        ModelParameter(const QString& name, QString type_filter="", Model* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
     
         /**
          * The destructor of the ModelParameter class
@@ -89,7 +89,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
          *
          * \return "ModelParameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
         
         /** 
          * The current value of this parameter in the correct, most special type.
@@ -104,39 +104,23 @@ class GRAIPE_CORE_EXPORT ModelParameter
          * \param value The new value of this parameter.
          */
         void setValue(Model* value);
-            
+    
         /**
          * The value converted to a QString. Please note, that this can vary from the 
          * serialize() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
+         * that serialize also may perform encoding of QStrings to avoid special chars.
          *
-         * \return The value of the parameter converted to an QString.
+         * \return The value of the parameter converted to an QString
          */
-        QString valueText() const;
+        QString toString() const;
     
         /**
-         * This method is called after each (re-)assignment of the model list
-         * e.g. after a call of the setModelList() function. 
-         * It synchronizes the list of available models with the widget's list.
-         */
-        void refresh();
-        
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically: "ModelParameter, " + model->fielname()
+         * Deserialization of a parameter's state from a string.
          *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
-    
-        /**
-         * Deserialization of a parameter's state from an input device.
-         *
-         * \param in the input device.
+         * \param str the input QString.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool fromString(QString& str);
     
         /**
          * This function locks the parameters value. 
@@ -187,7 +171,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
         int m_model_idx;
     
         /** The model's delegate widget **/
-        QPointer<QComboBox> m_cmbDelegate;
+        QPointer<QComboBox> m_delegate;
     
         /** The allowed model pointers **/
         std::vector<Model*>	m_allowed_values;

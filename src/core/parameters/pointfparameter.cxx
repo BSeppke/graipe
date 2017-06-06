@@ -190,58 +190,99 @@ void PointFParameter::setValue(const QPointF& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  PointFParameter::valueText() const
+QString  PointFParameter::toString() const
 {
     return QString("(") + QString::number(value().x(),'g', 10) + "x" + QString::number(value().y(),'g', 10) + ")";
 }
-
 /**
  * Serialization of the parameter's state to an output device.
- * Basically, it's just: "PointFParameter" + valueText()
+ * Writes the following XML on the device:
+ * 
+ * <TYPENAME>
+ *     <Name>NAME</Name>
+ *     <x>X</x>
+ *     <y>Y</y>
+ * </TYPENAME>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName(),
+ *         NAME = name(),
+ *            X = value().x(), and
+ *            Y = value().y().
+ *
+ * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
  */
-void PointFParameter::serialize(QIODevice& out) const
+void PointFParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", "+ valueText(), out);
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("x", QString::number(value().x(),'g', 10));
+    xmlWriter.writeTextElement("y", QString::number(value().y(),'g', 10));
+    xmlWriter.writeEndElement();
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool PointFParameter::deserialize(QIODevice& in)
+bool PointFParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
-    //Cut off "(" and ")"
-    QString tmp = content.mid(1, content.size()-2);
-    
-    //Split QString
-    QStringList xy = tmp.split("x");
-    
-    //Check and read in data if possible
-    if(xy.size()==2)
-    {
-        try
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            setValue(QPointF(xy[0].toFloat(),xy[1].toFloat()));
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            QPointF p;
+            
+            for(int i=0; i!=3; ++i)
+            {
+                xmlReader.readNextStartElement();
+            
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "x")
+                {
+                   p.setX(xmlReader.readElementText().toFloat());
+                }
+                if(xmlReader.name() == "y")
+                {
+                   p.setY(xmlReader.readElementText().toFloat());
+                }
+            }
+            //Read until </PointFParameter> comes....
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            setValue(p);
             return true;
         }
-        catch (...)
+        else
         {
-            qDebug() << "PointFParameter deserialize: point could not be imported from file. Was: '" << content << "'";
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
     }
-    return false;
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "PointFParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
+    }
 }
 
 /**

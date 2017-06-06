@@ -36,6 +36,7 @@
 #include "core/parameters/colorparameter.hxx"
 
 #include <QtDebug>
+#include <QXmlStreamWriter>
 #include <QObject>
 
 /**
@@ -61,11 +62,8 @@ namespace graipe {
 ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_value(value),
-    m_delegate(new QPushButton(""))
+    m_delegate(NULL)
 {
-    setValue(value);
-    
-    initConnections();
 }
 
 /**
@@ -104,67 +102,50 @@ const QColor& ColorParameter::value() const
  */
 void ColorParameter::setValue(const QColor& value)
 {
-    QPixmap p(32, 32);
-    p.fill(value);
-    m_delegate->setIcon(QIcon(p));
-    
     m_value = value;
-    Parameter::updateValue();
+    
+    if(m_delegate!=NULL)
+    {
+        QPixmap p(32, 32);
+        p.fill(value);
+        m_delegate->setIcon(QIcon(p));
+        m_delegate->setText(toString());
+    
+        Parameter::updateValue();
+    }
 }
 
 /**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
+ * The value converted to a QString. 
+ * This denotes the name of the color in the format #AARRGGBB.
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  ColorParameter::valueText() const
+QString  ColorParameter::toString() const
 {
-    return m_value.name();
+    return m_value.name(QColor::HexArgb);
 }
 
 /**
- * Serialization of the parameter's state to an output device.
- * Basically, just: "ColorParameter, " + value().rgba()
+ * Deserialization of a parameter's state from a string.
  *
- * \param out The output device on which we serialize the parameter's state.
- */
-void ColorParameter::serialize(QIODevice& out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + QString("%1").arg(value().rgba()), out);
-}
-
-/**
- * Deserialization of a parameter's state from an input device.
- *
- * \param in the input device.
+ * \param str The input QString.
  * \return True, if the deserialization was successful, else false.
  */
-bool ColorParameter::deserialize(QIODevice& in)
+bool ColorParameter::fromString(QString & str)
 {
-    if(!Parameter::deserialize(in))
-    {
-        return false;
-    }
-    
-    
-    QString content(in.readLine().trimmed());
-    
-    try
-    {
-        QRgb col_rgb = content.toUInt();
-        setValue(QColor::fromRgb(col_rgb));
+    QColor new_color(str);
         
+    if(new_color.isValid())
+    {
+        setValue(new_color);
         return true;
     }
-    catch (...)
+    else
     {
-        qDebug() << "ColorParameter deserialize: value has to be an integer in file, but found: " << content;
+        qDebug() << "ColorParameter deserialize: value has to be in #AARRGGBB or #RRGGBB format, but found: " << str;
+        return false;
     }
-    return false;
 }
 
 /**
@@ -174,7 +155,7 @@ bool ColorParameter::deserialize(QIODevice& in)
  */
  bool ColorParameter::isValid() const
 {
-    return true;
+    return m_value.isValid();
 }
 
 /**
@@ -189,7 +170,7 @@ QWidget*  ColorParameter::delegate()
 {
     if (m_delegate == NULL)
     {
-        m_delegate = new QPushButton("");
+        m_delegate = new QPushButton(toString());
         
         QPixmap p(32, 32);
         p.fill(value());
@@ -198,6 +179,7 @@ QWidget*  ColorParameter::delegate()
         connect(m_delegate, SIGNAL(clicked()), this, SLOT(updateValue()));
         Parameter::initConnections();
     }
+    
     return m_delegate;
 }
 
@@ -208,11 +190,15 @@ QWidget*  ColorParameter::delegate()
  */
 void ColorParameter::updateValue()
 {
-    QColor col = QColorDialog::getColor(m_value, m_delegate, name());
-        
-    if(col.isValid())
+    //Should not happen - otherwise, better safe than sorry:
+    if(m_delegate != NULL)
     {
-       setValue(col);
+        QColor col = QColorDialog::getColor(m_value, m_delegate, name());
+        
+        if(col.isValid())
+        {
+            setValue(col);
+        }
     }
 }
 

@@ -85,7 +85,7 @@ class GRAIPE_CORE_EXPORT TransformParameter
          *
          * \return "TransformParameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
         
         /** 
          * The current value of this parameter in the correct, most special type.
@@ -100,42 +100,40 @@ class GRAIPE_CORE_EXPORT TransformParameter
          * \param value The new value of this parameter.
          */
         void setValue(const QTransform& value);
-            
-        /**
-         * The value converted to a QString. Please note, that this can vary from the 
-         * serialize() result, which also returns a QString. This is due to the fact,
-         * that serialize also may perform encoding of QStrings to avoid special chars
-         * inside the QString.
-         *
-         * \return The value of the parameter converted to an QString.
-         */
-        QString valueText() const;
     
-        /**
-         * Static function to convert a transformation into a list
-         * of numbers with 10 digit precision. The order is as follows:
-         * m11, m12, m13, m21, m22, m23, m31, m32, m33.
-         *
-         * \param trans The QTransform
-         * \return A comma separated tring w.r.t. the order given above.
-         */
-        static QString valueText(const QTransform& trans);
-
         /**
          * Serialization of the parameter's state to an output device.
-         * Basically it's just: "TransformParameter, " + valueText()
+         * Writes the following XML on the device:
+         * 
+         * <TYPENAME>
+         *     <Name>NAME</Name>
+         *     <Transform Type="Affine">
+         *       <m11>value().m11()</m11>
+         *       <m12>value().m12()</m12>
+         *       <m13>value().m13()</m13>
+         *       <m21>value().m21()</m21>
+         *       <m22>value().m22()</m22>
+         *       <m23>value().m23()</m23>
+         *       <m31>value().m31()</m31>
+         *       <m32>value().m32()</m32>
+         *       <m33>value().m33()</m33>
+         *     </Transform>
+         * </TYPENAME>
          *
-         * \param out The output device on which we serialize the parameter's state.
+         * with TYPENAME = typeName(),
+         *         NAME = name().
+         *
+         * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Deserialization of a parameter's state from an xml file.
          *
-         * \param in the input device.
+         * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.

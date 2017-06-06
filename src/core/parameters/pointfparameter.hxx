@@ -86,7 +86,7 @@ class GRAIPE_CORE_EXPORT PointFParameter
          *
          * \return "PointFParameter".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
     
         /**
          * The lowest possible value of this parameter.
@@ -146,23 +146,34 @@ class GRAIPE_CORE_EXPORT PointFParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
-            
-        /**
-         * Serialization of the parameter's state to an output device.
-         * Basically, it's just: "PointFParameter" + valueText()
-         *
-         * \param out The output device on which we serialize the parameter's state.
-         */
-        void serialize(QIODevice& out) const;
+        QString toString() const;
     
         /**
-         * Deserialization of a parameter's state from an input device.
+         * Serialization of the parameter's state to an output device.
+         * Writes the following XML on the device:
+         * 
+         * <TYPENAME>
+         *     <Name>NAME</Name>
+         *     <x>X</x>
+         *     <y>Y</y>
+         * </TYPENAME>
          *
-         * \param in the input device.
+         * with TYPENAME = typeName(),
+         *         NAME = name(),
+         *            X = value().x(), and
+         *            Y = value().y().
+         *
+         * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
+         */
+        void serialize(QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization of a parameter's state from an xml file.
+         *
+         * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function indicates whether the value of a parameter is valid or not.

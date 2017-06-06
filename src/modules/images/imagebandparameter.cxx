@@ -34,6 +34,7 @@
 /************************************************************************/
 
 #include "images/imagebandparameter.hxx"
+#include "core/globals.hxx"
 
 namespace graipe {
 
@@ -99,7 +100,6 @@ QWidget* ImageBandParameterBase::delegate()
         layout->addWidget(m_cmbImage);
         layout->addWidget(m_spbBand);
         
-		refresh();
         initConnections();
     }
     return m_delegate;
@@ -153,6 +153,28 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
     m_image(NULL),
     m_bandId(0)
 {
+    if(models.size())
+    {
+        m_allowed_images.clear();
+        
+        Image<T> * img = new Image<T>;
+        QString typeName = img->typeName();
+        delete img;
+        img=NULL;
+        
+        for(Model* model : models)
+        {
+            if(model->typeName() ==typeName)
+            {
+                m_allowed_images.push_back(static_cast<Image<T>*>(model));
+            }
+        }
+            
+        if(m_allowed_images.size())
+        {
+            m_image = m_allowed_images[0];
+        }
+    }
 }
 
 /**
@@ -167,7 +189,7 @@ ImageBandParameter<T>::~ImageBandParameter()
 /**
  * The (immutable) type name of this parameter class.
  *
- * \return Image<T>::typeName() + "BandParameter".
+ * \return Image<T>::typeName() const + "BandParameter".
  */
 template <class T>
 QString ImageBandParameter<T>::typeName() const
@@ -226,7 +248,11 @@ void ImageBandParameter<T>::setImage(Image<T> * image)
         if (m_allowed_images[i] == image)
         {
             m_image = image;
-            m_cmbImage->setCurrentIndex(i);
+            
+            if(m_delegate != NULL)
+            {
+                m_cmbImage->setCurrentIndex(i);
+            }
         }
     }
 }
@@ -255,7 +281,7 @@ void ImageBandParameter<T>::setBandId(unsigned int bandid)
  * \return The value of the parameter converted to an QString.
  */
 template <class T>
-QString ImageBandParameter<T>::valueText() const
+QString ImageBandParameter<T>::toString() const
 {
 	if(!isValid())
 	{
@@ -267,52 +293,24 @@ QString ImageBandParameter<T>::valueText() const
 	}
 }
 
-    
-/**
- * This method is called after each (re-)assignment of the model list
- * e.g. after a call of the setModelList() function. 
- * It synchronizes the list of available models with the widget's list.
- */
-template <class T>
-void ImageBandParameter<T>::refresh()
-{
-    if(m_modelList && m_cmbImage)
-	{
-		m_allowed_images.clear();
-		m_cmbImage->clear();
-		
-        Image<T> temp;
-		
-        for(Model* model : *m_modelList)
-		{
-        	if(model->typeName() == temp.typeName())
-			{
-				m_cmbImage->addItem(model->shortName());
-				m_cmbImage->setItemData(m_cmbImage->count()-1, model->description(), Qt::ToolTipRole);
-				m_allowed_images.push_back(static_cast<Image<T>*>(model));
-			}
-		}
-        
-        if(m_allowed_images.size())
-        {
-			m_cmbImage->setCurrentIndex(0);
-            updateImage();
-        }
-	}
-}
-
 /**
  * Serialization of the parameter's state to a string. Please note, that this can 
- * vary from the valueText() result, which also returns a string. This is due to the fact,
+ * vary from the toString() result, which also returns a string. This is due to the fact,
  * that serialize also may perform encoding of strings to avoid special chars.
  *
  * \return The serialization of the parameter's state.
  */
 template <class T>
-void ImageBandParameter<T>::serialize(QIODevice & out) const
-{
-    Parameter::serialize(out);
-    write_on_device(", " + encode_string(m_image->filename()) + ", " + m_bandId, out);
+void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
+{    
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("Filename", m_image->id());
+    xmlWriter.writeTextElement("BandID", QString::number(m_bandId));
+    xmlWriter.writeEndElement();
 }
 
 /**
@@ -322,51 +320,69 @@ void ImageBandParameter<T>::serialize(QIODevice & out) const
  * \return True, if the deserialization was successful, else false.
  */
 template <class T>
-bool ImageBandParameter<T>::deserialize(QIODevice & in)
+bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
 {
-
-    if (!Parameter::deserialize(in))
+    bool success = false;
+    
+    try
     {
+        if (xmlReader.readNextStartElement())
+        {            
+            if(xmlReader.name() == typeName())
+            {
+                for(int i=0; i!=3; ++i)
+                {
+                    xmlReader.readNextStartElement();
+                
+                    if(xmlReader.name() == "Name")
+                    {
+                        setName(xmlReader.readElementText());
+                    }
+                    if(xmlReader.name() == "Filename")
+                    {
+                        QString valueText =  xmlReader.readElementText();
+                        
+                        for(Image<T>* allowed: m_allowed_images)
+                        {
+                            if (allowed->id() == valueText)
+                            {
+                                setImage(allowed);
+                                success = true;
+                            }
+                        }
+                    }
+                    if(xmlReader.name() == "BandID")
+                    {
+                        QString valueText =  xmlReader.readElementText();
+                        setBandId(valueText.toInt());
+                    }
+                }
+                while(true)
+                {
+                    if(!xmlReader.readNext())
+                    {
+                        return false;
+                    }
+                    
+                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                    {
+                        break;
+                    }
+                }
+                return success;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
+        throw std::runtime_error("Did not find any start element in XML tree");
+    }
+    catch(std::runtime_error & e)
+    {
+        qCritical() << typeName() << "::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
         return false;
     }
-    
-    bool found = false;
-    unsigned int i=0;
-    
-    QString content(in.readLine());
-    
-    QStringList fname_bandId = split_string_once(content, ", ");
-    
-    if(fname_bandId.size() ==2)
-    {
-        QString filename = decode_string(fname_bandId[0]);
-        unsigned int bandId = fname_bandId[1].toUInt();
-    
-        for(Image<T>* image: m_allowed_images)
-        {
-            if(image->filename() == filename && image->numBands() > bandId)
-            {
-                m_image = image;
-                m_bandId = bandId;
-                
-                if(m_cmbImage != NULL)
-                {
-                    m_cmbImage->setCurrentIndex(i);
-                    m_spbBand->setValue(bandId);
-                }
-                found = true;
-            }
-            i++;
-        }
-        
-        if (!found)
-        {
-            qDebug() << "ImageBandParameter deserialize: filename does not match any given or bandId was erroneous! Was:'" << content << "'";
-        }
-        
-        return found;
-    }
-    return false;
 }
 
 /**
@@ -415,32 +431,58 @@ bool ImageBandParameter<T>::isValid() const
 }
 
 /**
+ * Initializes the connections (signal<->slot) between the parameter class and
+ * the delegate widget. This will be done after the first call of the delegate()
+ * function, since the delegate is NULL until then.
+ */
+template <class T>
+void ImageBandParameter<T>::initConnections()
+{
+    m_cmbImage->clear();
+            
+    for(Image<T>* image : m_allowed_images)
+    {
+        m_cmbImage->addItem(image->shortName());
+        m_cmbImage->setItemData(m_cmbImage->count()-1, image->description(), Qt::ToolTipRole);
+    }
+    
+    if(m_allowed_images.size() != 0)
+    {
+        m_cmbImage->setCurrentIndex(0);
+        updateImage();
+    }
+}
+
+/**
  * This slot is called everytime, the delegate has changed. It has to synchronize
  * the internal value of the parameter with the current delegate's value
  */
 template <class T>
 void ImageBandParameter<T>::handleUpdateImage()
 {
-    int idx = m_cmbImage->currentIndex();
-        
-    if(idx>=0 && idx<(int)m_allowed_images.size())
+    if(m_delegate != NULL)
     {
-        Image<T>* image = static_cast<Image<T>*>(m_allowed_images[m_cmbImage->currentIndex()]);
-	
-        if(image && image->numBands() != 0)
-        {
-            m_image = image;
+        int idx = m_cmbImage->currentIndex();
             
-            m_spbBand->setMinimum(0);
-            m_spbBand->setMaximum(image->numBands()-1);
+        if(idx>=0 && idx<(int)m_allowed_images.size())
+        {
+            Image<T>* image = static_cast<Image<T>*>(m_allowed_images[m_cmbImage->currentIndex()]);
         
-            if((unsigned int)m_spbBand->value() > image->numBands()-1)
+            if(image && image->numBands() != 0)
             {
-                m_spbBand->setValue(0);
-            }
-            else
-            {
-                m_spbBand->setValue(m_spbBand->value());
+                m_image = image;
+                
+                m_spbBand->setMinimum(0);
+                m_spbBand->setMaximum(image->numBands()-1);
+            
+                if((unsigned int)m_spbBand->value() > image->numBands()-1)
+                {
+                    m_spbBand->setValue(0);
+                }
+                else
+                {
+                    m_spbBand->setValue(m_spbBand->value());
+                }
             }
         }
     }

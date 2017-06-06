@@ -395,7 +395,7 @@ QRectF WeightedCubicSplineList2DViewController::boundingRect() const
  *
  * \return Always: "WeightedCubicSplineList2DViewController"
  */
-QString WeightedCubicSplineList2DViewController::typeName()  const
+QString WeightedCubicSplineList2DViewController::typeName() const
 {
 	return "WeightedCubicSplineList2DViewController";
 }

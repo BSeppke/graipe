@@ -191,58 +191,103 @@ void PointParameter::setValue(const QPoint& value)
  *
  * \return The value of the parameter converted to an QString.
  */
-QString  PointParameter::valueText() const
+QString  PointParameter::toString() const
 {
     return QString("(%1x%2)").arg(value().x()).arg(value().y());
 }
 
 /**
  * Serialization of the parameter's state to an output device.
- * Basically, it's just: "PointParameter" + valueText()
+ * Writes the following XML on the device:
+ * 
+ * <TYPENAME>
+ *     <Name>NAME</Name>
+ *     <x>X</x>
+ *     <y>Y</y>
+ * </TYPENAME>
  *
- * \param out The output device on which we serialize the parameter's state.
+ * with TYPENAME = typeName(),
+ *         NAME = name(),
+ *            X = value().x(), and
+ *            Y = value().y().
+ *
+ * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
  */
-void PointParameter::serialize(QIODevice& out) const
+void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
-    Parameter::serialize(out);
-    write_on_device(", "+ valueText(), out);
+    xmlWriter.setAutoFormatting(true);
+    
+    xmlWriter.writeStartElement(typeName());
+    xmlWriter.writeAttribute("ID", id());
+    xmlWriter.writeTextElement("Name", name());
+    xmlWriter.writeTextElement("x", QString::number(value().x()));
+    xmlWriter.writeTextElement("y", QString::number(value().y()));
+    xmlWriter.writeEndElement();
+
 }
 
 /**
- * Deserialization of a parameter's state from an input device.
+ * Deserialization of a parameter's state from an xml file.
  *
- * \param in the input device.
+ * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool PointParameter::deserialize(QIODevice& in)
+bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
 {
-    if(!Parameter::deserialize(in))
+    try
     {
-        return false;
-    }
-    
-    QString content(in.readLine().trimmed());
-    
-    //Cut off "(" and ")"
-    QString tmp = content.mid(1, content.size()-2);
-    
-    //Split QString
-    QStringList xy = tmp.split("x");
-    
-    //Check and read in data if possible
-    if(xy.size()==2)
-    {
-        try
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
         {
-            setValue(QPoint(xy[0].toInt(),xy[1].toInt()));
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            QPoint p;
+            
+            for(int i=0; i!=3; ++i)
+            {
+                xmlReader.readNextStartElement();
+                
+                if(xmlReader.name() == "Name")
+                {
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "x")
+                {
+                   p.setX(xmlReader.readElementText().toInt());
+                }
+                if(xmlReader.name() == "y")
+                {
+                   p.setY(xmlReader.readElementText().toInt());
+                }
+            }
+            
+            //Read until </PointParameter> comes....
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            setValue(p);
             return true;
         }
-        catch (...)
+        else
         {
-            qDebug("PointParameter deserialize: point could not be imported from file");
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
         }
+        throw std::runtime_error("Did not find any start element in XML tree");
     }
-    return false;
+    catch(std::runtime_error & e)
+    {
+        qCritical() << "PointParameter::deserialize failed! Was looking for typeName(): " << typeName() << "Error: " << e.what();
+        return false;
+    }
 }
 
 /**
@@ -274,12 +319,11 @@ QWidget*  PointParameter::delegate()
 
         m_spbXDelegate->setMaximumSize(9999,9999);
         m_spbXDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-    
-        m_spbYDelegate->setMaximumSize(9999,9999);
-        m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
-        
         m_spbXDelegate->setRange(m_min_value.x(), m_max_value.x());
         m_spbXDelegate->setValue(m_value.x());
+        
+        m_spbYDelegate->setMaximumSize(9999,9999);
+        m_spbYDelegate->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
         m_spbYDelegate->setRange(m_min_value.y(), m_max_value.y());
         m_spbYDelegate->setValue(m_value.y());
         

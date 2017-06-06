@@ -75,7 +75,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameterBase
          *
          * \return "ImageBandParameterBase".
          */
-        QString typeName() const;
+        virtual QString typeName() const;
         
         /**
          * The delegate widget of this parameter. 
@@ -160,7 +160,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          *
          * \return "ImageBandParameter".
          */
-        QString typeName() const;        
+        virtual QString typeName() const;        
     
         /**
          * The current value of this parameter in the correct, most special type.
@@ -205,23 +205,16 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          *
          * \return The value of the parameter converted to an QString.
          */
-        QString valueText() const;
-    
-        /**
-         * This method is called after each (re-)assignment of the model list
-         * e.g. after a call of the setModelList() function. 
-         * It synchronizes the list of available models with the widget's list.
-         */
-        void refresh();
+        QString toString() const;
     
 	    /**
          * Serialization of the parameter's state to a string. Please note, that this can 
-         * vary from the valueText() result, which also returns a string. This is due to the fact,
+         * vary from the toString() result, which also returns a string. This is due to the fact,
          * that serialize also may perform encoding of strings to avoid special chars.
          *
          * \return The serialization of the parameter's state.
          */
-        void serialize(QIODevice& out) const;
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization of a parameter's state from a string.
@@ -229,7 +222,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          * \param str The serialization of this parameter's state.
          * \return True, if the deserialization was successful, else false.
          */
-        bool deserialize(QIODevice& in);
+        bool deserialize(QXmlStreamReader& xmlReader);
     
         /**
          * This function locks the parameters value. 
@@ -259,6 +252,13 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
         virtual bool isValid() const;
         
     protected:
+        /**
+         * Initializes the connections (signal<->slot) between the parameter class and
+         * the delegate widget. This will be done after the first call of the delegate()
+         * function, since the delegate is NULL until then.
+         */
+        void initConnections();
+        
         /**
          * This slot is called everytime, the delegate has changed. It has to synchronize
          * the internal value of the parameter with the current delegate's value

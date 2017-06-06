@@ -66,7 +66,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          *
          * \return Always "PointFeatureList2D"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 		
         /**
          * Returns the number of features in this list.
@@ -120,7 +120,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          * 
          * \return Always: "pos_x, pos_y"
          */
-		virtual QString item_header() const;
+		virtual QString csvHeader() const;
         
         /**
          * Serialization of a single feature inside the list at a given index.
@@ -129,7 +129,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          * \param index Index of the feature to be serialized.
          * \return QString of the feature, namely "x, y"
          */
-		virtual QString serialize_item(unsigned int index) const;
+		virtual QString itemToCSV(unsigned int index) const;
         
         /**
          * Deserialization/addition of a feature from a string to this list.
@@ -139,28 +139,47 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization is ordered as: x, y
          */
-		virtual bool deserialize_item(const QString& serial);
+		virtual bool itemFromCSV(const QString& serial);
+        
+        /**
+         * Serialization of a single feature inside the list at a given index.
+         * The feature will be serialized by means of comma separated values.
+         * 
+         * \param index Index of the feature to be serialized.
+         * \return QString of the feature, namely "x, y"
+         */
+		virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+        
+        /**
+         * Deserialization/addition of a feature from a string to this list.
+         * Does nothing if the model is locked.
+         *
+         * \param serial A QString containing the serialization of the feature.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization is ordered as: x, y
+         */
+		virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
         /**
-         * Serialize the complete content of the featurelist to a QIODevice.
+         * Serialize the complete content of the featurelist to an xml file.
          * Mainly prints:
-         *   item_header()
+         *   csvHeader
          * and for each feature:
          *   newline + serialize_item().
          *
          * \param out The output device for serialization.
          */
-		void serialize_content(QIODevice& out) const;
+		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
         /**
-         * Deserializion of a  feature list from a QIODevice.
-         * The first line is the header as given in item_header(), which is ignored however.
+         * Deserialization of a  feature list from an xml file.
+         * The first line is the header as given in csvHeader, which is ignored however.
          * Each following line has to be one valide feature serialization.
          * Does nothing if the model is locked.
          *
-         * \param in The QIODevice, where we will read from.
+         * \param xmlReader The QXmlStreamReader, where we will read from.
          */
-		bool deserialize_content(QIODevice& in);
+		bool deserialize_content(QXmlStreamReader& xmlReader);
 	
 	protected:
 		//The pointlist
@@ -190,7 +209,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          *
          * \return Always "WeightedPointFeatureList2D"
          */
-        QString typeName() const;
+        virtual QString typeName() const;
 		
         /**
          * Completely erases this list of weighted features. Does nothing if the list is locked.
@@ -247,7 +266,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          * 
          * \return Always: "pos_x, pos_y, weight"
          */
-		QString item_header() const;
+		QString csvHeader() const;
     
         /**
          * Serialization of a single weighted feature inside the list at a given index.
@@ -256,7 +275,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          * \param index Index of the weighted feature to be serialized.
          * \return QString of the weighted feature, ordered as: x, y, weight.
          */
-		QString serialize_item(unsigned int index) const;
+		virtual QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a weighted feature from a string to this list.
@@ -266,7 +285,26 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: x, y, weight
          */
-		bool deserialize_item(const QString& serial);
+		bool itemFromCSV(const QString& serial);
+    
+        /**
+         * Serialization of a single weighted feature inside the list at a given index.
+         * The weighted feature will be serialized by means of comma separated values.
+         * 
+         * \param index Index of the weighted feature to be serialized.
+         * \return QString of the weighted feature, ordered as: x, y, weight.
+         */
+		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a weighted feature from a string to this list.
+         * Does nothing if the model is locked.
+         *
+         * \param serial A QString containing the serialization of the weighted feature.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: x, y, weight
+         */
+		bool deserialize_item(QXmlStreamReader& xmlReader);
     
 		
 	protected:
@@ -297,7 +335,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D
          *
          * \return Always "EdgelFeatureList2D"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 	
         /**
          * Completely erases this list of edgel features. Does nothing if the list is locked.
@@ -380,26 +418,45 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D
          * 
          * \return Always: "pos_x, pos_y, weight, orientation"
          */
-		QString item_header() const;
+		QString csvHeader() const;
     
         /**
-         * Serialization of a single edgel feature inside the list at a given index.
-         * The edgelfeature will be serialized by means of comma separated values.
+         * Serialization of a single weighted feature inside the list at a given index.
+         * The weighted feature will be serialized by means of comma separated values.
          * 
-         * \param index Index of the edgel feature to be serialized.
-         * \return QString of the edgel feature, ordered  as: x, y, weight, orientation.
+         * \param index Index of the weighted feature to be serialized.
+         * \return QString of the weighted feature, ordered as: x, y, weight, orientation.
          */
-		QString serialize_item(unsigned int index) const;
+		virtual QString itemToCSV(unsigned int index) const;
     
         /**
-         * Deserialization/addition of a edgel feature from a string to this list.
+         * Deserialization/addition of a weighted feature from a string to this list.
          * Does nothing if the model is locked.
          *
-         * \param serial A QString containing the serialization of the edgel feature.
+         * \param serial A QString containing the serialization of the weighted feature.
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: x, y, weight, orientation
          */
-		bool deserialize_item(const QString& serial);
+		bool itemFromCSV(const QString& serial);
+    
+        /**
+         * Serialization of a single weighted feature inside the list at a given index.
+         * The weighted feature will be serialized by means of comma separated values.
+         * 
+         * \param index Index of the weighted feature to be serialized.
+         * \return QString of the weighted feature, ordered as: x, y, weight, orientation.
+         */
+		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a weighted feature from a string to this list.
+         * Does nothing if the model is locked.
+         *
+         * \param serial A QString containing the serialization of the weighted feature.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: x, y, weight, orientation
+         */
+		bool deserialize_item(QXmlStreamReader& xmlReader);
 		
 	protected:
         //Aditional orientations
@@ -428,7 +485,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
          *
          * \return Always "SIFTFeatureList2D"
          */
-		QString typeName() const;
+		virtual QString typeName() const;
 	
         /**
          * Completely erases this list of SIFT features. Does nothing if the list is locked.
@@ -541,7 +598,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
          * 
          * \return Always: "x, y, weight, orientation, scale, descr_0, ..., descr_N"
          */
-		QString item_header() const;
+		QString csvHeader() const;
     
         /**
          * Serialization of a single SIFT feature inside the list at a given index.
@@ -550,7 +607,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
          * \param index Index of the SIFT feature to be serialized.
          * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
          */
-		QString serialize_item(unsigned int index) const;
+		QString itemToCSV(unsigned int index) const;
     
         /**
          * Deserialization/addition of a SIFT feature from a string to this list.
@@ -559,7 +616,25 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
          * \return True, if the item could be deserialized and the model is not locked.
          *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
          */
-		bool deserialize_item(const QString& serial);
+		bool itemFromCSV(const QString& serial);
+    
+        /**
+         * Serialization of a single SIFT feature inside the list at a given index.
+         * The SIFT will be serialized by means of comma separated values.
+         * 
+         * \param index Index of the SIFT feature to be serialized.
+         * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
+         */
+		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
+    
+        /**
+         * Deserialization/addition of a SIFT feature from a string to this list.
+         *
+         * \param serial A QString containing the serialization of the SIFT feature.
+         * \return True, if the item could be deserialized and the model is not locked.
+         *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
+         */
+		bool deserialize_item(QXmlStreamReader& xmlReader);
 		
 	protected:
         //Additional scales and feature descriptors
