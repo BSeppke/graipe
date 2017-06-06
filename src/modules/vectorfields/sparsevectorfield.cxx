@@ -38,6 +38,7 @@
 
 namespace graipe {
 
+#if 0
 /**
  * Default constructor. Creates an empty sparse vectorfield.
  */
@@ -1586,5 +1587,5 @@ void SparseWeightedMultiVectorfield2D::updateModel()
     }
     SparseMultiVectorfield2D::updateModel();
 }
-    
+#endif    
 } //end of namespace graipe

@@ -86,38 +86,34 @@ SparseVectorfield2DStatistics::SparseVectorfield2DStatistics(const SparseVectorf
     m_length.max    = min_val;
     m_length.mean    = m_length.stddev    = zero_val;
     
-    for (unsigned int i=0; i<vf->size(); ++i)
+    for(const Vector2D& v : *vf)
     {
-        const PointType& o = vf->origin(i);
-        m_origin.min = std::min(m_origin.min, o);
-        m_origin.max = std::max(m_origin.max, o);
-        m_origin.mean +=  o;
+        m_origin.min = std::min(m_origin.min, v.origin);
+        m_origin.max = std::max(m_origin.max, v.origin);
+        m_origin.mean +=  v.origin;
         
-        const PointType& d = vf->direction(i);
-        m_direction.min = std::min(m_direction.min, d);
-        m_direction.max = std::max(m_direction.max, d);
-        m_direction.mean +=  d;
+        m_direction.min = std::min(m_direction.min, v.direction);
+        m_direction.max = std::max(m_direction.max, v.direction);
+        m_direction.mean +=  v.direction;
         
-        double len=vf->length(i);
-        m_length.min = std::min(len, m_length.min);
-        m_length.max = std::max(len, m_length.max);
-        m_length.mean +=  len;
+        m_length.min = std::min((double)v.direction.length(), m_length.min);
+        m_length.max = std::max((double)v.direction.length(), m_length.max);
+        m_length.mean +=  v.direction.length();
     }
     
     m_origin.mean /= vf->size();
     m_direction.mean /= vf->size();
     m_length.mean /= vf->size();
     
-    for (unsigned int i=0; i< vf->size(); ++i)
+    for(const Vector2D& v : *vf)
     {
-        PointType o=(m_origin.mean - vf->origin(i));
+        PointType o=(m_origin.mean - v.origin);
         m_origin.stddev += PointType(o.x()*o.x(), o.y()*o.y());
         
-        PointType d=(m_direction.mean - vf->direction(i));
+        PointType d=(m_direction.mean - v.direction);
         m_direction.stddev += PointType(d.x()*d.x(), d.y()*d.y());
         
-        float len=vf->length(i);
-        m_length.stddev += vigra::pow(m_length.mean - len, 2.0);
+        m_length.stddev += vigra::pow(m_length.mean - v.direction.length(), 2.0);
     }
     
     m_origin.stddev = m_origin.stddev/vf->size();
@@ -187,7 +183,7 @@ SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics()
  * \param vf The vectorfield, for which we want the statistics.
  */
 SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics(const SparseWeightedVectorfield2D* vf)
-: SparseVectorfield2DStatistics(vf)
+: m_vf(vf)
 {
     float min_val  = vigra::NumericTraits<float>::min();
     float max_val  = vigra::NumericTraits<float>::max();
@@ -196,25 +192,70 @@ SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics(con
     m_weight.min    = max_val;
     m_weight.max    = min_val;
     m_weight.mean   = m_weight.stddev    =  zero_val;
+        
+    m_origin.min    = PointType(max_val, max_val);
+    m_origin.max    = PointType(min_val, min_val);
+    m_origin.mean    = m_origin.stddev    = PointType(zero_val, zero_val);
     
-    for (unsigned int i=0; i<vf->size(); ++i)
+    m_direction.min    = PointType(max_val, max_val);
+    m_direction.max    = PointType(min_val, min_val);
+    m_direction.mean    = m_direction.stddev    = PointType(zero_val, zero_val);
+    
+    m_length.min    = max_val;
+    m_length.max    = min_val;
+    m_length.mean    = m_length.stddev    = zero_val;
+    
+    for(const WeightedVector2D& v : *vf)
     {
-        double w = vf->weight(i);
+        m_origin.min = std::min(m_origin.min, v.origin);
+        m_origin.max = std::max(m_origin.max, v.origin);
+        m_origin.mean +=  v.origin;
         
-        m_weight.min = std::min(w, m_weight.min);
-        m_weight.max = std::max(w, m_weight.max);
+        m_direction.min = std::min(m_direction.min, v.direction);
+        m_direction.max = std::max(m_direction.max, v.direction);
+        m_direction.mean +=  v.direction;
         
-        m_weight.mean += w;
+        m_length.min = std::min((double)v.direction.length(), m_length.min);
+        m_length.max = std::max((double)v.direction.length(), m_length.max);
+        m_length.mean +=  v.direction.length();
+        
+        m_weight.min = std::min((double)v.weight, m_weight.min);
+        m_weight.max = std::max((double)v.weight, m_weight.max);
+        m_weight.mean +=  v.weight;
+        
     }
     
-    m_weight.mean /= vf->size();
+    m_origin.mean    /= vf->size();
+    m_direction.mean /= vf->size();
+    m_length.mean    /= vf->size();
+    m_weight.mean    /= vf->size();
     
-    for (unsigned int i=0; i<vf->size(); ++i)
+    for(const WeightedVector2D& v : *vf)
     {
-        m_weight.stddev += pow(m_weight.mean - vf->weight(i),2.0f);
+        PointType o=(m_origin.mean - v.origin);
+        m_origin.stddev += PointType(o.x()*o.x(), o.y()*o.y());
+        
+        PointType d=(m_direction.mean - v.direction);
+        m_direction.stddev += PointType(d.x()*d.x(), d.y()*d.y());
+        
+        m_length.stddev += vigra::pow(m_length.mean - v.direction.length(), 2.0);
+        
+        m_weight.stddev += vigra::pow(m_weight.mean - v.weight, 2.0);
     }
+    
+    m_origin.stddev = m_origin.stddev/vf->size();
+    m_origin.stddev.setX(sqrt(m_origin.stddev.x()));
+    m_origin.stddev.setY(sqrt(m_origin.stddev.y()));
+    
+    m_direction.stddev = m_direction.stddev/vf->size();
+    m_direction.stddev.setX(sqrt(m_direction.stddev.x()));
+    m_direction.stddev.setY(sqrt(m_direction.stddev.y()));
+    
+    m_length.stddev = sqrt(m_length.stddev/vf->size());
+    
     m_weight.stddev = sqrt(m_weight.stddev/vf->size());
 }
+
 
 /**
  * Returns statistics of the weights of this vectorfield.
@@ -226,7 +267,37 @@ const BasicStatistics<double>& SparseWeightedVectorfield2DStatistics::weightStat
 	return m_weight;
 }
 
+#if 0
 
+/**
+ * Returns statistics of the origins of this vectorfield.
+ *
+ * \return Statistics of the origins of this vectorfield.
+ */
+const BasicStatistics<Vectorfield2D::PointType>& SparseVectorfield2DStatistics::originStats() const
+{
+	return m_origin;
+}
+
+/**
+ * Returns statistics of the directions of this vectorfield.
+ *
+ * \return Statistics of the directions of this vectorfield.
+ */
+const BasicStatistics<Vectorfield2D::PointType>& SparseVectorfield2DStatistics::directionStats() const
+{
+	return m_direction;
+}
+
+/**
+ * Returns statistics of the lengths of this vectorfield.
+ *
+ * \return Statistics of the lengths of this vectorfield.
+ */
+const BasicStatistics<double>& SparseVectorfield2DStatistics::lengthStats() const
+{	
+	return m_length;
+}
 
 /**
  * Default constructor. Constructs an empty sparse multi vectorfield statistic with
@@ -513,5 +584,7 @@ const BasicStatistics<double>& SparseWeightedMultiVectorfield2DStatistics::combi
 {
     return m_combined_weight;
 }
+
+#endif
 
 }//end of namespace graipe

@@ -54,7 +54,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DStatistics
 {
     public:
         //The used point type
-        typedef SparseVectorfield2D::PointType PointType;
+        typedef SparseVectorfield2D::item_type::PointType PointType;
     
         /**
          * Default constructor. Constructs an empty sparse vectorfield statistic with
@@ -102,22 +102,45 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DStatistics
     
 class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DStatistics
 :   public SparseVectorfield2DStatistics
-{
-    public:
+{    public:
+        //The used point type
+        typedef SparseVectorfield2D::item_type::PointType PointType;
+    
         /**
-         * Default constructor. Constructs an empty sparse weighted vectorfield statistic with
+         * Default constructor. Constructs an empty sparse vectorfield statistic with
          * a NULL pointer to the vectorfield.
          */
         SparseWeightedVectorfield2DStatistics();
     
         /**
          * A more useful constructor. Collects the statistics of a given 
-         * sparse weighted vectorfield and stores the pointer, too.
+         * sparse vectorfield and stores the pointer, too.
          *
          * \param vf The vectorfield, for which we want the statistics.
          */
         SparseWeightedVectorfield2DStatistics(const SparseWeightedVectorfield2D* vf);
-            
+
+        /**
+         * Returns statistics of the origins of this vectorfield.
+         *
+         * \return Statistics of the origins of this vectorfield.
+         */
+        const BasicStatistics<PointType>& originStats() const;
+        
+        /**
+         * Returns statistics of the directions of this vectorfield.
+         *
+         * \return Statistics of the directions of this vectorfield.
+         */
+        const BasicStatistics<PointType>& directionStats() const;
+        
+        /**
+         * Returns statistics of the lengths of this vectorfield.
+         *
+         * \return Statistics of the lengths of this vectorfield.
+         */
+        const BasicStatistics<double>& lengthStats() const;
+    
         /**
          * Returns statistics of the weights of this vectorfield.
          *
@@ -130,10 +153,13 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DStatistics
         //Pointer to the vectorfield
         const SparseWeightedVectorfield2D* m_vf;
     
-        //Statistics storage
+        //Statistics storages
+        BasicStatistics<PointType> m_origin, m_direction;
+        BasicStatistics<double> m_length;
         BasicStatistics<double> m_weight;
 };
 
+#if 0
     
 class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DStatistics
 :   public SparseVectorfield2DStatistics
@@ -245,6 +271,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DStatistics
         BasicStatistics<double> m_combined_weight;
 };
 
+#endif
 } //end of namespace graipe
 
 #endif //GRAIPE_VECTORFIELDS_SPARSEVECTORFIELDSTATISTICS_HXX

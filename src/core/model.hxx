@@ -518,6 +518,9 @@ class GRAIPE_CORE_EXPORT ItemListModel
          */
         void clear()
         {
+            if (locked())
+                return;
+                
             m_data.clear();
             updateModel();
         }
@@ -570,6 +573,9 @@ class GRAIPE_CORE_EXPORT ItemListModel
          */
         void remove(unsigned int idx)
         {
+            if (locked())
+                return;
+            
             m_data.remove(idx);
             updateModel();
         }
@@ -582,6 +588,9 @@ class GRAIPE_CORE_EXPORT ItemListModel
          */
         void replace(unsigned int idx, const item_type& item)
         {
+            if (locked())
+                return;
+            
             m_data.replace(idx,item);
             updateModel();
         }
@@ -593,6 +602,9 @@ class GRAIPE_CORE_EXPORT ItemListModel
          */
         void append(const item_type& item)
         {
+            if (locked())
+                return;
+
             m_data.append(item);
             updateModel();
         }
@@ -606,14 +618,14 @@ class GRAIPE_CORE_EXPORT ItemListModel
          */
         void serialize_content(QXmlStreamWriter& xmlWriter) const
         {
-            xmlWriter.writeTextElement("Legend", T::headerCSV()());
+            //xmlWriter.writeTextElement("Legend", T::headerCSV()());
     
             int i=0;
             for(const item_type& item : m_data)
             {
                 xmlWriter.writeStartElement("Item");
                 xmlWriter.writeAttribute("ID", QString::number(i++));
-                    xmlWriter.writeCharacters(item.toCSV());
+                    item.serialize(xmlWriter);//.writeCharacters(item.toCSV());
                 xmlWriter.writeEndElement();
             }
 
@@ -642,10 +654,10 @@ class GRAIPE_CORE_EXPORT ItemListModel
                 if(xmlReader.name() == "Item")
                 {
                     item_type new_item;
-                    QString text = xmlReader.readElementText();
-                    if (!new_item.fromCSV(text))
+                    //QString text = xmlReader.readElementText();
+                    if (!new_item.deserialize(xmlReader))//fromCSV(text))
                      {
-                        qCritical() << typeName() << "::deserialize_content: Item could not be deserialized from: '" << text << "'";
+                        qCritical() << typeName() << "::deserialize_content: Item could not be deserialized";
                         return false;
                     }
                     append(new_item);

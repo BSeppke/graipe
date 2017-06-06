@@ -211,7 +211,7 @@ class VectorfieldsModule
         static ViewController* createSparseVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
             if(model->typeName() == "SparseVectorfield2D")
             {
-                return new SparseVectorfield2DViewController(scene, static_cast<SparseVectorfield2D*> (model), z_order);
+                return new SparseVectorfield2DViewController(scene, static_cast<SparseVectorfield2D*>(model), z_order);
             }
             return NULL;
         }
