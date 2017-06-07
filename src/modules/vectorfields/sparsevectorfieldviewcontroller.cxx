@@ -37,9 +37,316 @@
 
 namespace graipe {
 
+/**
+ * Specialization of the SparseVectorfield2DViewController's
+ * constructor.
+ *
+ * \param scene The scene, where this View shall be carried out.
+ * \param vf The sparse weighted vectorfield, which we want to show.
+ * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
+ */
+SparseVectorfield2DViewController::SparseVectorfield2DViewController(QGraphicsScene * scene, SparseVectorfield2D* vf, int z_value)
+:	SparseVectorfield2DViewControllerBase(scene, vf, z_value),
+    m_stats(vf)
+{
+    //update parameters according to statistics:
+    m_headSize->setValue(m_stats.lengthStats().mean*0.3);
+   
+    m_minLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_minLength->setValue(m_stats.lengthStats().min);
+    m_maxLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_maxLength->setValue(m_stats.lengthStats().max);
+    
+    //create and position Legend:	
+    QPointF legend_xy(0, vf->height());
+    
+    if(vf->scale()!=0)
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min*vf->scale(), m_stats.lengthStats().max*vf->scale(),
+                                        m_velocityLegendTicks->value(),
+                                        true,
+                                        this);
+    }
+    else
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min, m_stats.lengthStats().max,
+                                        m_velocityLegendTicks->value(),
+                                        false,
+                                        this);
+    }
+    
+    m_velocity_legend->setTransform(transform());
+    m_velocity_legend->setVisible(false);
+    m_velocity_legend->setCaption(m_velocityLegendCaption->value());
+    m_velocity_legend->setTicks(m_velocityLegendTicks->value());
+    m_velocity_legend->setDigits(m_velocityLegendDigits->value());
+    m_velocity_legend->setZValue(z_value);
+    
+    updateView();
+}
+
 
 /**
- * specialization of the SparseVectorfield2DViewController's
+ * Implementation/specialization of the ViewController's paint procedure. This is called
+ * by the QGraphicsView on every re-draw request.
+ *
+ * \param painter Pointer to the painter, which is used for drawing.
+ * \param option Further style options for this GraphicsItem's drawing.
+ * \param widget The widget, where we will draw onto.
+ */
+void SparseVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{ 
+    ViewController::paintBefore(painter, option, widget);
+    
+    SparseVectorfield2D * vf = static_cast<SparseVectorfield2D *>(model());
+    
+    if(vf->isViewable())
+    {
+        painter->save();
+        
+        QPointFX origin, direction, target;
+        QColor current_color;
+        
+        for(const Vector2D& v : *vf)
+        {
+            float current_length = v.direction.length();
+            
+            if(current_length!=0 && (current_length>= m_minLength->value()) && (current_length <= m_maxLength->value()))
+            {
+                origin = v.origin;
+                
+                switch( m_displayMotionMode->value() )
+                {/*
+                    case GlobalMotion:
+                        direction = vf->globalDirection(i);
+                        break;
+                        
+                    case LocalMotion:
+                        direction = vf->localDirection(i);
+                        break;
+                   TODO*/
+                    case CompleteMotion:
+                    default:
+                        direction = v.direction;
+                        break;
+                }
+                
+                float len = direction.length();
+                
+                if(len!=0)
+                {
+                    if(m_normalizeLength->value() && m_normalizedLength->value()!= 0)
+                    {
+                        direction=direction/len*m_normalizedLength->value();
+                    }
+                    
+                    target = origin + direction;
+                    
+                    float normalized_weight = std::min(1.0f,std::max(0.0f,(current_length - m_minLength->value())/(m_maxLength->value() - m_minLength->value())));
+                    m_vector_drawer.paint(painter, origin, target,normalized_weight);
+                }
+            }
+        }
+        
+        painter->restore();
+    }
+    
+    ViewController::paintAfter(painter, option, widget);
+}
+
+
+
+/**
+ * The bounding rect of the sparse vectorfield.
+ *
+ * \return The bounding rectangle of this view.
+ */
+QRectF SparseVectorfield2DViewController::boundingRect() const
+{
+    qreal maxLength = m_stats.lengthStats().max;
+    if(m_normalizeLength->value() && m_normalizedLength->value() != 0)
+    {
+        maxLength = m_normalizedLength->value();
+    }
+    //Always return rect in local coordinates -> global coords will be computed
+    //by the scene by means of the sceneTransform of the item, which is handled
+    //elsewhere.
+    QRectF rect(QPointF( - maxLength,
+                         - maxLength),
+                  QPointF(m_model->width()  + maxLength,
+                          m_model->height() + maxLength));
+
+    return rect.united(ViewController::boundingRect());
+}
+
+/**
+ * Specialization of the update of  the parameters of this ViewController according to the current
+ * model's parameters. This is necessary, if something may have changed 
+ * the model in meantime.
+ * 
+ * \param force_update If true, force every single parameter to update.
+ */
+void SparseVectorfield2DViewController::updateParameters(bool force_update)
+{
+    ViewController::updateParameters(force_update);
+
+    SparseVectorfield2D* vf = static_cast<SparseVectorfield2D*>(model());
+    
+    SparseVectorfield2DStatistics new_stats = SparseVectorfield2DStatistics(vf);
+    
+    //Check if min-max-statistics have changed:
+    if(    new_stats.lengthStats().min != m_stats.lengthStats().min
+        || new_stats.lengthStats().max != m_stats.lengthStats().max
+        || force_update)
+    {
+        m_stats = new_stats;
+        
+        m_minLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+        m_maxLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    }
+}
+
+/**
+ * Implementation/specialization of the handling of a mouse-move event
+ *
+ * \param event The mouse event which triggered this function.
+ */
+void SparseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
+{	
+    QGraphicsItem::hoverMoveEvent(event);
+    
+    if(acceptHoverEvents())
+    {
+        SparseVectorfield2D * vf = static_cast<SparseVectorfield2D *> (model());
+        
+        if(!vf->isViewable())
+            return;
+        
+        QPointF p = event->pos();
+        float	x = p.x(),
+                y = p.y();
+        SparseVectorfield2D::PointType mouse_pos(x,y);
+        
+        unsigned int i=0;
+        
+        if(		x >= 0 && x < vf->width() 
+           &&	y >= 0 && y < vf->height())
+        {
+            QString vectors_in_reach;
+            for(const Vector2D& v: *vf)
+            {
+                SparseVectorfield2D::PointType ori = v.origin;
+                float d2 = QPointFX(ori-mouse_pos).squaredLength();
+                
+                if( d2 <= std::max(2.0f, m_lineWidth->value()*m_lineWidth->value()) )
+                {
+                    vectors_in_reach = vectors_in_reach + QString("<tr> <td>%1</td> <td>%2</td> <td>%3</td> <td>%4</td> <td>%5</td> <td>%6</td> </tr>").arg(i).arg(ori.x()).arg(ori.y()).arg(v.direction.length()).arg(v.direction.angle()).arg(sqrt(d2));
+                }
+                ++i;
+            }
+            if (vectors_in_reach.isEmpty()) 
+            {
+                vectors_in_reach = QString("<b>no vectors in reach</b>");
+            }
+            else
+            {
+                vectors_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>length</th> <th>angle</th> <th>dist</th> </tr>")
+                +	vectors_in_reach
+                +	QString("</table>");
+            }
+            
+            emit updateStatusText(vf->shortName() + QString("[%1,%2]").arg(x).arg(y));
+            emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
+                                         +	vf->shortName()
+                                         +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
+                                         +	vectors_in_reach);
+            
+            event->accept();
+        }
+    }
+}
+
+/**
+ * Implementation/specialization of the handling of a mouse-pressed event
+ *
+ * \param event The mouse event which triggered this function.
+ */
+void SparseVectorfield2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+    QGraphicsItem::mousePressEvent(event);
+    
+    if(acceptHoverEvents())
+    {
+        SparseVectorfield2D * vf = static_cast<SparseVectorfield2D *> (model());
+        
+        if(!vf->isViewable())
+            return;
+        
+        QPointF p = event->pos();
+        float	x = p.x(),
+                y = p.y();
+        SparseVectorfield2D::PointType mouse_pos(x,y);
+        
+        if(   x >= 0 && x < vf->width()
+           && y >= 0 && y < vf->height())
+        {                
+            switch (m_mode->value())
+            {
+                case 0:
+                    break;
+                case 1:
+                {
+                    bool ok;
+                    double dir_x = QInputDialog::getDouble(NULL, QString("Values for new vector at (%1, %2) -> (?, dir_y)").arg(x).arg(y), QString("x-direction (px) of new vector"), 0.0, -999999.99, 999999.99, 2, &ok);
+                    if(ok)
+                    {
+                        double dir_y = QInputDialog::getDouble(NULL, QString("Values for new vector at (%1, %2) -> (%3, dir_y)").arg(x).arg(y).arg(dir_x), QString("y-direction (px) of new vector"), 0.0, -999999.99, 999999.99, 2, &ok);
+                        if(ok)
+                        {
+                            Vector2D new_v;
+                                new_v.origin=mouse_pos;
+                                new_v.direction=SparseVectorfield2D::PointType(dir_x, dir_y);
+                            vf->append(new_v);
+                        }
+                    }
+                }
+                    break;
+                case 2:
+                    for(unsigned int i=0; i< vf->size(); ++i)
+                    {
+                        SparseVectorfield2D::PointType ori = vf->item(i).origin;
+                        SparseVectorfield2D::PointType dir = vf->item(i).direction;
+                        float d2 = QPointFX(ori-mouse_pos).squaredLength();
+                        
+                        if( d2 <= std::max(2.0f, m_lineWidth->value()*m_lineWidth->value()) )
+                        {
+                            QString delete_string = QString("Do you want to delete vector: %1 at (%2, %3) -> (%4, %5)?").arg(i).arg(ori.x()).arg(ori.y()).arg(dir.x()).arg(dir.y());
+                            if ( QMessageBox::question(NULL, QString("Delete vector?"), delete_string, QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes )
+                            {
+                                vf->remove(i);
+                            }
+                        }
+                    }
+                    break;
+            }
+            updateParameters();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+/**
+ * specialization of the SparseWeightedVectorfield2DViewController's
  * constructor.
  *
  * \param scene The scene, where this View shall be carried out.
@@ -48,6 +355,7 @@ namespace graipe {
  */
 SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewController(QGraphicsScene* scene, SparseWeightedVectorfield2D * vf, int z_value)
  :	SparseVectorfield2DViewControllerBase(scene, vf, z_value),
+    m_stats(SparseWeightedVectorfield2DStatistics(vf)),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
     m_maxWeight(new FloatParameter("Max. weight:",-1.0e10,1.0e10,1)),
     m_showWeightLegend(new BoolParameter("Show weight legend?", false)),
@@ -57,16 +365,48 @@ SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewContro
     m_useColorForWeight(new BoolParameter("Use colors for weights?",false)),
     m_weight_legend(NULL)
 {
-    //create statistics
-	delete m_stats;
-	SparseWeightedVectorfield2DStatistics* stats = new SparseWeightedVectorfield2DStatistics(vf);
-	m_stats = stats;
+    //update parameters according to statistics:
+    m_headSize->setValue(m_stats.lengthStats().mean*0.3);
+   
+    m_minLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_minLength->setValue(m_stats.lengthStats().min);
+    m_maxLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_maxLength->setValue(m_stats.lengthStats().max);
+    
+    //create and position Legend:	
+    QPointF legend_xy(0, vf->height());
+    
+    if(vf->scale()!=0)
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min*vf->scale(), m_stats.lengthStats().max*vf->scale(),
+                                        m_velocityLegendTicks->value(),
+                                        true,
+                                        this);
+    }
+    else
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min, m_stats.lengthStats().max,
+                                        m_velocityLegendTicks->value(),
+                                        false,
+                                        this);
+    }
+    
+    m_velocity_legend->setTransform(transform());
+    m_velocity_legend->setVisible(false);
+    m_velocity_legend->setCaption(m_velocityLegendCaption->value());
+    m_velocity_legend->setTicks(m_velocityLegendTicks->value());
+    m_velocity_legend->setDigits(m_velocityLegendDigits->value());
+    m_velocity_legend->setZValue(z_value);
     
     //update according to weight statistics:
-    m_minWeight->setRange(floor(stats->weightStats().min), ceil(stats->weightStats().max));
-    m_minWeight->setValue(stats->weightStats().min);
-    m_maxWeight->setRange(floor(stats->weightStats().min), ceil(stats->weightStats().max));
-    m_maxWeight->setValue(stats->weightStats().max);
+    m_minWeight->setRange(floor(m_stats.weightStats().min), ceil(m_stats.weightStats().max));
+    m_minWeight->setValue(m_stats.weightStats().min);
+    m_maxWeight->setRange(floor(m_stats.weightStats().min), ceil(m_stats.weightStats().max));
+    m_maxWeight->setValue(m_stats.weightStats().max);
     
     m_parameters->addParameter("minWeight",m_minWeight);
     m_parameters->addParameter("maxWeight",m_maxWeight);
@@ -79,7 +419,7 @@ SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewContro
 	//create and position Legend:	
 	m_weight_legend = new QLegend(m_velocity_legend->rect().right()+5, m_velocity_legend->rect().top(),
                                   150, 50,
-                                  stats->weightStats().min,stats->weightStats().max,
+                                  m_stats.weightStats().min,m_stats.weightStats().max,
                                   m_weightLegendTicks->value(),
                                   false,
                                   this);
@@ -181,16 +521,6 @@ void SparseWeightedVectorfield2DViewController::paint(QPainter *painter, const Q
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "SparseWeightedVectorfield2DViewController"
- */
-QString SparseWeightedVectorfield2DViewController::typeName() const
-{ 
-	return "SparseWeightedVectorfield2DViewController"; 
-}
-
-/**
  * Specialization of the update of  the parameters of this ViewController according to the current
  * model's parameters. This is necessary, if something may have changed 
  * the model in meantime.
@@ -203,24 +533,22 @@ void SparseWeightedVectorfield2DViewController::updateParameters(bool force_upda
     
     SparseWeightedVectorfield2D* vf = static_cast<SparseWeightedVectorfield2D*>(model());
     
-    SparseWeightedVectorfield2DStatistics* old_stats = static_cast<SparseWeightedVectorfield2DStatistics*>(m_stats);
-    SparseWeightedVectorfield2DStatistics* new_stats = new SparseWeightedVectorfield2DStatistics(vf);
+    SparseWeightedVectorfield2DStatistics new_stats(vf);
 	
     //Check if min-max-statistics have changed:
-    if( old_stats && new_stats &&
-       (   new_stats->weightStats().min != old_stats->weightStats().min
-        || new_stats->weightStats().max != old_stats->weightStats().max
-        || force_update) )
+    if(    m_stats.lengthStats().min != new_stats.lengthStats().min
+        || m_stats.lengthStats().max != new_stats.lengthStats().max
+        || m_stats.weightStats().min != new_stats.weightStats().min
+        || m_stats.weightStats().max != new_stats.weightStats().max
+        || force_update)
     {
         m_stats = new_stats;
-        delete old_stats;
         
-        m_minWeight->setRange(floor(new_stats->weightStats().min), ceil(new_stats->weightStats().max));
-        m_maxWeight->setRange(floor(new_stats->weightStats().min), ceil(new_stats->weightStats().max));
-    }
-    else
-    {
-        delete new_stats;
+        m_minLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+        m_maxLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+        
+        m_minWeight->setRange(floor(new_stats.weightStats().min), ceil(new_stats.weightStats().max));
+        m_maxWeight->setRange(floor(new_stats.weightStats().min), ceil(new_stats.weightStats().max));
     }
 }
 
@@ -231,7 +559,7 @@ void SparseWeightedVectorfield2DViewController::updateView()
 {
 	SparseVectorfield2DViewControllerBase::updateView();
 	
-    SparseWeightedVectorfield2D *		vf		= static_cast<SparseWeightedVectorfield2D*> (model());
+    SparseWeightedVectorfield2D* vf	= static_cast<SparseWeightedVectorfield2D*> (model());
 	
 	//If the colors shall be used for weight coding
 	if(m_useColorForWeight->value())
@@ -294,7 +622,7 @@ void SparseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHov
 	
 	if(acceptHoverEvents())
     {
-        SparseWeightedVectorfield2D * vf = static_cast<SparseWeightedVectorfield2D *> (model());
+        SparseWeightedVectorfield2D* vf = static_cast<SparseWeightedVectorfield2D *> (model());
 	
         if(!vf->isViewable())
             return;
@@ -430,21 +758,49 @@ void SparseWeightedVectorfield2DViewController::mousePressEvent (QGraphicsSceneM
  */
 SparseMultiVectorfield2DViewController::SparseMultiVectorfield2DViewController(QGraphicsScene* scene, SparseMultiVectorfield2D * vf, int z_value)
 :	SparseVectorfield2DViewControllerBase(scene, vf, z_value),
+    m_stats(vf),
     m_showAlternative(new IntParameter("Show alt. (0=best):",0,0,0))
 {
-
-    //create statistics
-	//delete m_stats;
-	//SparseMultiVectorfield2DStatistics* stats = new SparseMultiVectorfield2DStatistics(vf);
-	//m_stats = stats;
+    //update parameters according to statistics:
+    m_headSize->setValue(m_stats.lengthStats().mean*0.3);
+   
+    m_minLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_minLength->setValue(m_stats.lengthStats().min);
+    m_maxLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_maxLength->setValue(m_stats.lengthStats().max);
+    
+    //create and position Legend:	
+    QPointF legend_xy(0, vf->height());
+    
+    if(vf->scale()!=0)
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min*vf->scale(), m_stats.lengthStats().max*vf->scale(),
+                                        m_velocityLegendTicks->value(),
+                                        true,
+                                        this);
+    }
+    else
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min, m_stats.lengthStats().max,
+                                        m_velocityLegendTicks->value(),
+                                        false,
+                                        this);
+    }
+    
+    m_velocity_legend->setTransform(transform());
+    m_velocity_legend->setVisible(false);
+    m_velocity_legend->setCaption(m_velocityLegendCaption->value());
+    m_velocity_legend->setTicks(m_velocityLegendTicks->value());
+    m_velocity_legend->setDigits(m_velocityLegendDigits->value());
+    m_velocity_legend->setZValue(z_value);
     
     m_parameters->addParameter("alt", m_showAlternative);
     
-	int directionCount = 0;
-	//if(vf->size())
-	//	directionCount = vf->alternatives()+1;
-	
-	m_showAlternative->setRange(0,directionCount);
+	m_showAlternative->setRange(0,m_stats.altDirectionStats().size());
 
 	updateView();
 }
@@ -529,16 +885,6 @@ void SparseMultiVectorfield2DViewController::paint(QPainter *painter, const QSty
     
 	ViewController::paintAfter(painter, option, widget);
 }
-            
-/**
- * The typename of this ViewController
- *
- * \return Always: "SparseMultiVectorfield2DViewController"
- */
-QString SparseMultiVectorfield2DViewController::typeName() const
-{ 
-	return "SparseMultiVectorfield2DViewController"; 
-}
 
 /**
  * Specialization of the update of  the parameters of this ViewController according to the current
@@ -551,29 +897,20 @@ void SparseMultiVectorfield2DViewController::updateParameters(bool force_update)
 {
     ViewController::updateParameters(force_update);
 
-    /*TODO:
     SparseMultiVectorfield2D* vf = static_cast<SparseMultiVectorfield2D*>(model());
     
-    SparseMultiVectorfield2DStatistics* old_stats = static_cast<SparseMultiVectorfield2DStatistics*>(m_stats);
-    SparseMultiVectorfield2DStatistics* new_stats = new SparseMultiVectorfield2DStatistics(vf);
+    SparseMultiVectorfield2DStatistics new_stats(vf);
 	
     //Check if min-max-statistics have changed:
-    if( old_stats && new_stats &&
-       (   new_stats->combinedLengthStats().min != old_stats->combinedLengthStats().min
-        || new_stats->combinedLengthStats().max != old_stats->combinedLengthStats().max
-        || force_update) )
+    if(    new_stats.combinedLengthStats().min != m_stats.combinedLengthStats().min
+        || new_stats.combinedLengthStats().max != m_stats.combinedLengthStats().max
+        || force_update)
     {
         m_stats = new_stats;
-        delete old_stats;
         
-        m_minLength->setRange(floor(m_stats->combinedLengthStats().min), ceil(m_stats->combinedLengthStats().max));
-        m_maxLength->setRange(floor(m_stats->combinedLengthStats().min), ceil(m_stats->combinedLengthStats().max));
+        m_minLength->setRange(floor(m_stats.combinedLengthStats().min), ceil(m_stats.combinedLengthStats().max));
+        m_maxLength->setRange(floor(m_stats.combinedLengthStats().min), ceil(m_stats.combinedLengthStats().max));
     }
-    else
-    {
-        delete new_stats;
-    }
-    */
 }
 
 /**
@@ -581,13 +918,13 @@ void SparseMultiVectorfield2DViewController::updateParameters(bool force_update)
  */
 void SparseMultiVectorfield2DViewController::updateView()
 {
-	ViewController::updateView();
+	SparseVectorfield2DViewControllerBase::updateView();
     
     m_vector_drawer.setLineWidth(m_lineWidth->value());
     m_vector_drawer.setHeadSize(m_headSize->value());
     m_vector_drawer.setColorTable(m_colorTable->value());
     
-	SparseVectorfield2D * vf = static_cast<SparseVectorfield2D*> (model());
+	SparseMultiVectorfield2D * vf = static_cast<SparseMultiVectorfield2D*> (model());
     
 	//Display arrows length scaled
 	if(m_normalizeLength->value() && m_normalizeLength->value() != 0)
@@ -767,6 +1104,7 @@ void SparseMultiVectorfield2DViewController::mousePressEvent(QGraphicsSceneMouse
  */
 SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2DViewController(QGraphicsScene* scene, SparseWeightedMultiVectorfield2D * vf, int z_value)
  :	SparseVectorfield2DViewControllerBase(scene, vf, z_value),
+    m_stats(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
     m_maxWeight(new FloatParameter("Max. weight:",-1.0e10,1.0e10,1)),
     m_showWeightLegend(new BoolParameter("Show weight legend?", false)),
@@ -776,18 +1114,53 @@ SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2D
     m_useColorForWeight(new BoolParameter("Use colors for weights?",false)),
     m_weight_legend(NULL)
 {
-/* TODO
-    //create statistics
-	//delete m_stats;
-	//SparseWeightedMultiVectorfield2DStatistics* stats = new SparseWeightedMultiVectorfield2DStatistics(vf);
-	//m_stats = stats;
+    //update parameters according to statistics:
+    m_headSize->setValue(m_stats.lengthStats().mean*0.3);
+   
+    m_minLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_minLength->setValue(m_stats.lengthStats().min);
+    m_maxLength->setRange(floor(m_stats.lengthStats().min), ceil(m_stats.lengthStats().max));
+    m_maxLength->setValue(m_stats.lengthStats().max);
+    
+    //create and position Legend:	
+    QPointF legend_xy(0, vf->height());
+    
+    if(vf->scale()!=0)
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min*vf->scale(), m_stats.lengthStats().max*vf->scale(),
+                                        m_velocityLegendTicks->value(),
+                                        true,
+                                        this);
+    }
+    else
+    {
+        m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
+                                        150, 50,
+                                        m_stats.lengthStats().min, m_stats.lengthStats().max,
+                                        m_velocityLegendTicks->value(),
+                                        false,
+                                        this);
+    }
+    
+    m_velocity_legend->setTransform(transform());
+    m_velocity_legend->setVisible(false);
+    m_velocity_legend->setCaption(m_velocityLegendCaption->value());
+    m_velocity_legend->setTicks(m_velocityLegendTicks->value());
+    m_velocity_legend->setDigits(m_velocityLegendDigits->value());
+    m_velocity_legend->setZValue(z_value);
+    
+    m_parameters->addParameter("alt", m_showAlternative);
+    
+	m_showAlternative->setRange(0,m_stats.altDirectionStats().size());
     
     //update according to weight statistics:
-    m_minWeight->setRange(floor(stats->weightStats().min), ceil(stats->weightStats().max));
-    m_minWeight->setValue(stats->weightStats().min);
-    m_maxWeight->setRange(floor(stats->weightStats().min), ceil(stats->weightStats().max));
-    m_maxWeight->setValue(stats->weightStats().max);
-    */
+    m_minWeight->setRange(floor(m_stats.weightStats().min), ceil(m_stats.weightStats().max));
+    m_minWeight->setValue(m_stats.weightStats().min);
+    m_maxWeight->setRange(floor(m_stats.weightStats().min), ceil(m_stats.weightStats().max));
+    m_maxWeight->setValue(m_stats.weightStats().max);
+
     m_parameters->addParameter("minWeight",m_minWeight);
     m_parameters->addParameter("maxWeight",m_maxWeight);
     m_parameters->addParameter("useColorForWeight",m_useColorForWeight);
@@ -799,7 +1172,7 @@ SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2D
 	//create and position Legend:	
 	m_weight_legend = new QLegend(m_velocity_legend->rect().right()+5, m_velocity_legend->rect().top(),
                                   150, 50,
-                                  0, 1000, //TODO stats->weightStats().min,stats->weightStats().max,
+                                  m_stats.weightStats().min, m_stats.weightStats().max,
                                   m_weightLegendTicks->value(),
                                   false,
                                   this);
@@ -901,16 +1274,6 @@ void SparseWeightedMultiVectorfield2DViewController::paint(QPainter *painter, co
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "SparseWeightedMultiVectorfield2DViewController"
- */
-QString SparseWeightedMultiVectorfield2DViewController::typeName() const
-{ 
-	return "SparseWeightedMultiVectorfield2DViewController";
-}
-
-/**
  * Specialization of the update of  the parameters of this ViewController according to the current
  * model's parameters. This is necessary, if something may have changed 
  * the model in meantime.
@@ -921,29 +1284,25 @@ void SparseWeightedMultiVectorfield2DViewController::updateParameters(bool force
 {
     SparseVectorfield2DViewControllerBase::updateParameters(force_update);
     
-    /** TODO
     SparseWeightedMultiVectorfield2D* vf = static_cast<SparseWeightedMultiVectorfield2D*>(model());
     
-    SparseWeightedMultiVectorfield2DStatistics* old_stats = static_cast<SparseWeightedMultiVectorfield2DStatistics*>(m_stats);
-    SparseWeightedMultiVectorfield2DStatistics* new_stats = new SparseWeightedMultiVectorfield2DStatistics(vf);
+    SparseWeightedMultiVectorfield2DStatistics new_stats(vf);
 	
     //Check if min-max-statistics have changed:
-    if( old_stats && new_stats &&
-       (   new_stats->combinedWeightStats().min != old_stats->combinedWeightStats().min
-        || new_stats->combinedWeightStats().max != old_stats->combinedWeightStats().max
-        || force_update) )
+    if(    new_stats.combinedLengthStats().min != m_stats.combinedLengthStats().min
+        || new_stats.combinedLengthStats().max != m_stats.combinedLengthStats().max
+        || new_stats.combinedWeightStats().min != m_stats.combinedWeightStats().min
+        || new_stats.combinedWeightStats().max != m_stats.combinedWeightStats().max
+        || force_update)
     {
         m_stats = new_stats;
-        delete old_stats;
         
-        m_minWeight->setRange(floor(new_stats->combinedWeightStats().min), ceil(new_stats->combinedWeightStats().max));
-        m_maxWeight->setRange(floor(new_stats->combinedWeightStats().min), ceil(new_stats->combinedWeightStats().max));
+        m_minLength->setRange(floor(m_stats.combinedLengthStats().min), ceil(m_stats.combinedLengthStats().max));
+        m_maxLength->setRange(floor(m_stats.combinedLengthStats().min), ceil(m_stats.combinedLengthStats().max));
+        
+        m_minWeight->setRange(floor(m_stats.combinedWeightStats().min), ceil(m_stats.combinedWeightStats().max));
+        m_maxWeight->setRange(floor(m_stats.combinedWeightStats().min), ceil(m_stats.combinedWeightStats().max));
     }
-    else
-    {
-        delete new_stats;
-    }
-    */
 }
 
 /**

@@ -67,7 +67,6 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewControllerBase
          */
 		SparseVectorfield2DViewControllerBase(QGraphicsScene * scene, SparseVectorfield2DBase<T>* vf, int z_value=0)
         :	ViewController(scene, vf, z_value),
-           //TODO m_stats(new SparseVectorfield2DStatistics(vf)),
             m_lineWidth(new FloatParameter("Arrow width:", 0,100000,1)),
             m_headSize(new FloatParameter("Head size:",0,100000,0.3f)),
             m_minLength(new FloatParameter("Min. length (px.):",0,10000,0)),
@@ -95,14 +94,6 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewControllerBase
                 modes.append("Delete");
             m_mode = new EnumParameter("Mode:", modes);
             
-           /*TODO: m_headSize->setValue(m_stats->lengthStats().mean*0.3);
-            
-            //update according to statistics:
-            m_minLength->setRange(floor(m_stats->lengthStats().min), ceil(m_stats->lengthStats().max));
-            m_minLength->setValue(m_stats->lengthStats().min);
-            m_maxLength->setRange(floor(m_stats->lengthStats().min), ceil(m_stats->lengthStats().max));
-            m_maxLength->setValue(m_stats->lengthStats().max);
-            */
             m_parameters->addParameter("arrowWidth", m_lineWidth);
             m_parameters->addParameter("headSize", m_headSize);
             m_parameters->addParameter("minLength", m_minLength);
@@ -116,37 +107,6 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewControllerBase
             m_parameters->addParameter("velocityLegendTicks", m_velocityLegendTicks);
             m_parameters->addParameter("velocityLegendDigits", m_velocityLegendDigits);
             m_parameters->addParameter("mode", m_mode);
-            
-            //create and position Legend:	
-            QPointF legend_xy(0, vf->height());
-            
-            if(vf->scale()!=0)
-            {
-                m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
-                                                150, 50,
-                                                m_stats->lengthStats().min*vf->scale(), m_stats->lengthStats().max*vf->scale(),
-                                                m_velocityLegendTicks->value(),
-                                                true,
-                                                this);
-            }
-            else
-            {
-                m_velocity_legend = new QLegend(legend_xy.x(), legend_xy.y()+5,
-                                                150, 50,
-                                                m_stats->lengthStats().min, m_stats->lengthStats().max,
-                                                m_velocityLegendTicks->value(),
-                                                false,
-                                                this);
-            }
-            
-            m_velocity_legend->setTransform(transform());
-            m_velocity_legend->setVisible(false);
-            m_velocity_legend->setCaption(m_velocityLegendCaption->value());
-            m_velocity_legend->setTicks(m_velocityLegendTicks->value());
-            m_velocity_legend->setDigits(m_velocityLegendDigits->value());
-            m_velocity_legend->setZValue(z_value);
-            
-            updateView();
         }
 
                 
@@ -158,146 +118,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewControllerBase
         {
             //The command "delete m_parameters;" inside the base class
             //will also delete all other (newly introduced) parameters
-            delete m_stats;
             delete m_velocity_legend;
         }
-
-
-        /**
-         * Implementation/specialization of the ViewController's paint procedure. This is called
-         * by the QGraphicsView on every re-draw request.
-         *
-         * \param painter Pointer to the painter, which is used for drawing.
-         * \param option Further style options for this GraphicsItem's drawing.
-         * \param widget The widget, where we will draw onto.
-         */
-		void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-        { 
-            ViewController::paintBefore(painter, option, widget);
-            
-            SparseVectorfield2D * vf = static_cast<SparseVectorfield2D *>(model());
-            
-            if(vf->isViewable())
-            {
-                painter->save();
-                
-                QPointFX origin, direction, target;
-                QColor current_color;
-                
-                for(const Vector2D& v : *vf)
-                {
-                    float current_length = v.direction.length();
-                    
-                    if(current_length!=0 && (current_length>= m_minLength->value()) && (current_length <= m_maxLength->value()))
-                    {
-                        origin = v.origin;
-                        
-                        switch( m_displayMotionMode->value() )
-                        {/*
-                            case GlobalMotion:
-                                direction = vf->globalDirection(i);
-                                break;
-                                
-                            case LocalMotion:
-                                direction = vf->localDirection(i);
-                                break;
-                           TODO*/
-                            case CompleteMotion:
-                            default:
-                                direction = v.direction;
-                                break;
-                        }
-                        
-                        float len = direction.length();
-                        
-                        if(len!=0)
-                        {
-                            if(m_normalizeLength->value() && m_normalizedLength->value()!= 0)
-                            {
-                                direction=direction/len*m_normalizedLength->value();
-                            }
-                            
-                            target = origin + direction;
-                            
-                            float normalized_weight = std::min(1.0f,std::max(0.0f,(current_length - m_minLength->value())/(m_maxLength->value() - m_minLength->value())));
-                            m_vector_drawer.paint(painter, origin, target,normalized_weight);
-                        }
-                    }
-                }
-                
-                painter->restore();
-            }
-            
-            ViewController::paintAfter(painter, option, widget);
-        }
     
-        /**
-         * The bounding rect of the sparse vectorfield.
-         *
-         * \return The bounding rectangle of this view.
-         */
-        QRectF boundingRect() const
-        {
-            qreal maxLength = m_stats->lengthStats().max;
-            if(m_normalizeLength->value() && m_normalizedLength->value() != 0)
-            {
-                maxLength = m_normalizedLength->value();
-            }
-            //Always return rect in local coordinates -> global coords will be computed
-            //by the scene by means of the sceneTransform of the item, which is handled
-            //elsewhere.
-            QRectF rect(QPointF( - maxLength,
-                                 - maxLength),
-                          QPointF(m_model->width()  + maxLength,
-                                  m_model->height() + maxLength));
-
-            return rect.united(ViewController::boundingRect());
-        }
-    
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "SparseVectorfield2DViewController"
-         */
-		virtual QString typeName() const
-        { 
-            return "SparseVectorfield2DViewController";
-        }
-    
-        /**
-         * Specialization of the update of  the parameters of this ViewController according to the current
-         * model's parameters. This is necessary, if something may have changed 
-         * the model in meantime.
-         * 
-         * \param force_update If true, force every single parameter to update.
-         */
-        void updateParameters(bool force_update=false)
-        {
-            ViewController::updateParameters(force_update);
-
-            SparseVectorfield2D* vf = static_cast<SparseVectorfield2D*>(model());
-            
-            SparseVectorfield2DStatistics* old_stats = static_cast<SparseVectorfield2DStatistics*>(m_stats);
-            SparseVectorfield2DStatistics* new_stats = new SparseVectorfield2DStatistics(vf);
-            
-            //Check if min-max-statistics have changed:
-            if( old_stats && new_stats &&
-               (   new_stats->lengthStats().min != old_stats->lengthStats().min
-                || new_stats->lengthStats().max != old_stats->lengthStats().max
-                || force_update) )
-            {
-                m_stats = new_stats;
-                delete old_stats;
-                
-                m_minLength->setRange(floor(m_stats->lengthStats().min), ceil(m_stats->lengthStats().max));
-                m_maxLength->setRange(floor(m_stats->lengthStats().min), ceil(m_stats->lengthStats().max));
-            }
-            else
-            {
-                delete new_stats;
-            }
-        }
-    
+  
         /**
          * Specialization of the update of the view according to the current parameter settings.
          */
@@ -309,7 +133,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewControllerBase
             m_vector_drawer.setHeadSize(m_headSize->value());
             m_vector_drawer.setColorTable(m_colorTable->value());
             
-            SparseVectorfield2D * vf = static_cast<SparseVectorfield2D*> (model());
+            SparseVectorfield2DBase<T>* vf = static_cast<SparseVectorfield2DBase<T>*> (model());
             
             //Display arrows length scaled
             if(m_normalizeLength->value() && m_normalizeLength->value() != 0)
@@ -355,135 +179,6 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewControllerBase
             m_velocity_legend->setVisible(m_showVelocityLegend->value());
         }
     
-    protected:
-        /**
-         * Implementation/specialization of the handling of a mouse-move event
-         *
-         * \param event The mouse event which triggered this function.
-         */
-        void hoverMoveEvent(QGraphicsSceneHoverEvent * event)
-        {	
-            QGraphicsItem::hoverMoveEvent(event);
-            
-            if(acceptHoverEvents())
-            {
-                SparseVectorfield2D * vf = static_cast<SparseVectorfield2D *> (model());
-                
-                if(!vf->isViewable())
-                    return;
-                
-                QPointF p = event->pos();
-                float	x = p.x(),
-                        y = p.y();
-                SparseVectorfield2D::PointType mouse_pos(x,y);
-                
-                unsigned int i=0;
-                
-                if(		x >= 0 && x < vf->width() 
-                   &&	y >= 0 && y < vf->height())
-                {
-                    QString vectors_in_reach;
-                    for(const Vector2D& v: *vf)
-                    {
-                        SparseVectorfield2D::PointType ori = v.origin;
-                        float d2 = QPointFX(ori-mouse_pos).squaredLength();
-                        
-                        if( d2 <= std::max(2.0f, m_lineWidth->value()*m_lineWidth->value()) )
-                        {
-                            vectors_in_reach = vectors_in_reach + QString("<tr> <td>%1</td> <td>%2</td> <td>%3</td> <td>%4</td> <td>%5</td> <td>%6</td> </tr>").arg(i).arg(ori.x()).arg(ori.y()).arg(v.direction.length()).arg(v.direction.angle()).arg(sqrt(d2));
-                        }
-                        ++i;
-                    }
-                    if (vectors_in_reach.isEmpty()) 
-                    {
-                        vectors_in_reach = QString("<b>no vectors in reach</b>");
-                    }
-                    else
-                    {
-                        vectors_in_reach =		QString("<table><tr> <th>Idx</th> <th>x</th> <th>y</th> <th>length</th> <th>angle</th> <th>dist</th> </tr>")
-                        +	vectors_in_reach
-                        +	QString("</table>");
-                    }
-                    
-                    emit updateStatusText(vf->shortName() + QString("[%1,%2]").arg(x).arg(y));
-                    emit updateStatusDescription(	QString("<b>Mouse moved over Object: </b><br/><i>") 
-                                                 +	vf->shortName()
-                                                 +	QString("</i><br/>at position [%1,%2]:<br/>").arg(x).arg(y)
-                                                 +	vectors_in_reach);
-                    
-                    event->accept();
-                }
-            }
-        }
-    
-        /**
-         * Implementation/specialization of the handling of a mouse-pressed event
-         *
-         * \param event The mouse event which triggered this function.
-         */
-        void mousePressEvent (QGraphicsSceneMouseEvent * event)
-        {
-            QGraphicsItem::mousePressEvent(event);
-            
-            if(acceptHoverEvents())
-            {
-                SparseVectorfield2D * vf = static_cast<SparseVectorfield2D *> (model());
-                
-                if(!vf->isViewable())
-                    return;
-                
-                QPointF p = event->pos();
-                float	x = p.x(),
-                        y = p.y();
-                SparseVectorfield2D::PointType mouse_pos(x,y);
-                
-                if(   x >= 0 && x < vf->width()
-                   && y >= 0 && y < vf->height())
-                {                
-                    switch (m_mode->value())
-                    {
-                        case 0:
-                            break;
-                        case 1:
-                        {
-                            bool ok;
-                            double dir_x = QInputDialog::getDouble(NULL, QString("Values for new vector at (%1, %2) -> (?, dir_y)").arg(x).arg(y), QString("x-direction (px) of new vector"), 0.0, -999999.99, 999999.99, 2, &ok);
-                            if(ok)
-                            {
-                                double dir_y = QInputDialog::getDouble(NULL, QString("Values for new vector at (%1, %2) -> (%3, dir_y)").arg(x).arg(y).arg(dir_x), QString("y-direction (px) of new vector"), 0.0, -999999.99, 999999.99, 2, &ok);
-                                if(ok)
-                                {
-                                    Vector2D new_v;
-                                        new_v.origin=mouse_pos;
-                                        new_v.direction=SparseVectorfield2D::PointType(dir_x, dir_y);
-                                    vf->append(new_v);
-                                }
-                            }
-                        }
-                            break;
-                        case 2:
-                            for(unsigned int i=0; i< vf->size(); ++i)
-                            {
-                                SparseVectorfield2D::PointType ori = vf->item(i).origin;
-                                SparseVectorfield2D::PointType dir = vf->item(i).direction;
-                                float d2 = QPointFX(ori-mouse_pos).squaredLength();
-                                
-                                if( d2 <= std::max(2.0f, m_lineWidth->value()*m_lineWidth->value()) )
-                                {
-                                    QString delete_string = QString("Do you want to delete vector: %1 at (%2, %3) -> (%4, %5)?").arg(i).arg(ori.x()).arg(ori.y()).arg(dir.x()).arg(dir.y());
-                                    if ( QMessageBox::question(NULL, QString("Delete vector?"), delete_string, QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes )
-                                    {
-                                        vf->remove(i);
-                                    }
-                                }
-                            }
-                            break;
-                    }
-                    updateParameters();
-                }
-            }
-        }
-    
 		//Statistics
 		SparseVectorfield2DStatistics * m_stats;
     
@@ -514,10 +209,69 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
 :	public SparseVectorfield2DViewControllerBase<Vector2D>
 {
     public:
-        SparseVectorfield2DViewController(QGraphicsScene * scene, SparseVectorfield2D* vf, int z_value=0)
-        :	SparseVectorfield2DViewControllerBase(scene, vf, z_value)
-        {
+        /**
+         * Specialization of the SparseVectorfield2DViewController's
+         * constructor.
+         *
+         * \param scene The scene, where this View shall be carried out.
+         * \param vf The sparse weighted vectorfield, which we want to show.
+         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
+         */
+        SparseVectorfield2DViewController(QGraphicsScene * scene, SparseVectorfield2D* vf, int z_value=0);
+
+        /**
+         * The typename of this ViewController
+         *
+         * \return Always: "SparseVectorfield2DViewController"
+         */
+		QString typeName() const
+        { 
+            return "SparseVectorfield2DViewController";
         }
+    
+        /**
+         * Implementation/specialization of the ViewController's paint procedure. This is called
+         * by the QGraphicsView on every re-draw request.
+         *
+         * \param painter Pointer to the painter, which is used for drawing.
+         * \param option Further style options for this GraphicsItem's drawing.
+         * \param widget The widget, where we will draw onto.
+         */
+		void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    
+        /**
+         * The bounding rect of the sparse vectorfield.
+         *
+         * \return The bounding rectangle of this view.
+         */
+        QRectF boundingRect() const;
+    
+        /**
+         * Specialization of the update of  the parameters of this ViewController according to the current
+         * model's parameters. This is necessary, if something may have changed 
+         * the model in meantime.
+         * 
+         * \param force_update If true, force every single parameter to update.
+         */
+        void updateParameters(bool force_update=false);
+    
+      protected:
+        /**
+         * Implementation/specialization of the handling of a mouse-move event
+         *
+         * \param event The mouse event which triggered this function.
+         */
+        void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
+        /**
+         * Implementation/specialization of the handling of a mouse-pressed event
+         *
+         * \param event The mouse event which triggered this function.
+         */
+        void mousePressEvent (QGraphicsSceneMouseEvent * event);
+    
+        //Statistics of the view-controlled vectorfield
+        SparseVectorfield2DStatistics m_stats;
+    
 };
 
 
@@ -530,7 +284,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
 {
 	public:
         /**
-         * specialization of the SparseVectorfield2DViewController's
+         * Specialization of the SparseWeightedVectorfield2DViewController's
          * constructor.
          *
          * \param scene The scene, where this View shall be carried out.
@@ -560,7 +314,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
          *
          * \return Always: "SparseWeightedVectorfield2DViewController"
          */
-		virtual QString typeName() const;
+		QString typeName() const
+        {
+            return "SparseWeightedVectorfield2DViewController";
+        }
 	
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -590,6 +347,9 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
          * \param event The mouse event which triggered this function.
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
+    
+        //Statistics of the view-controlled vectorfield
+        SparseWeightedVectorfield2DStatistics m_stats;
     
         //Additional parameters:
         FloatParameter  * m_minWeight,
@@ -633,6 +393,16 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
 		~SparseMultiVectorfield2DViewController();
 		
         /**
+         * The typename of this ViewController
+         *
+         * \return Always: "SparseMultiVectorfield2DViewController"
+         */
+		QString typeName() const
+        {
+            return "SparseMultiVectorfield2DViewController";
+        }
+	
+        /**
          * Implementation/specialization of the ViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -641,15 +411,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
          * \param widget The widget, where we will draw onto.
          */
 		void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-            
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "SparseMultiVectorfield2DViewController"
-         */
-		virtual QString typeName() const;
-		
-	
+    
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
          * model's parameters. This is necessary, if something may have changed 
@@ -679,8 +441,8 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
     
-		//Statistics
-		//TODO SparseMultiVectorfield2DStatistics * m_stats;
+        //Statistics of the view-controlled vectorfield
+        SparseMultiVectorfield2DStatistics m_stats;
     
         //Additional parameters
 		IntParameter* m_showAlternative;
@@ -712,7 +474,17 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          * destructor.
          */
 		~SparseWeightedMultiVectorfield2DViewController();
-				
+    
+        /**
+         * The typename of this ViewController
+         *
+         * \return Always: "SparseWeightedMultiVectorfield2DViewController"
+         */
+		QString typeName() const
+        {
+            return "SparseWeightedMultiVectorfield2DViewController";
+        }
+    
         /**
          * Implementation/specialization of the ViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
@@ -722,13 +494,6 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          * \param widget The widget, where we will draw onto.
          */
 		void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-            
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "SparseWeightedMultiVectorfield2DViewController"
-         */
-		virtual QString typeName() const;
 	
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -759,8 +524,8 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
 	
-		//Statistics
-		//TODO SparseWeightedMultiVectorfield2DStatistics * m_stats;
+        //Statistics of the view-controlled vectorfield
+        SparseWeightedMultiVectorfield2DStatistics m_stats;
     
         //Additional parameters
 		IntParameter    * m_showAlternative;

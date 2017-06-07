@@ -81,13 +81,18 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
 	std::vector<std::vector<int> > adjacency(feature_count);
     for (int i=0; i< feature_count; ++i)
 	{
-		result_vectorfield->addVector(vectorfield->origin(i), vectorfield->direction(i), vectorfield->weight(i));
-		work_vectorfield->addVector(vectorfield->origin(i), vectorfield->direction(i), vectorfield->weight(i));
+        WeightedVector2D v;
+            v.origin = vectorfield->item(i).origin;
+            v.direction = vectorfield->item(i).direction;
+            v.weight = vectorfield->item(i).weight;
+        
+		result_vectorfield->append(v);
+		work_vectorfield->append(v);
 		
 		for (int j=0; j<=i; ++j)
 		{
-            if(    (QPointFX(vectorfield->origin(i)-vectorfield->origin(j)).squaredLength()	< max_geo_distance*max_geo_distance)	// distance small enough
-				&& (vectorfield->weight(i)>min_weight))							// corr > thresh
+            if(    (QPointFX(v.origin-vectorfield->item(j).origin).squaredLength()	< max_geo_distance*max_geo_distance)	// distance small enough
+				&& (v.weight > min_weight))							// corr > thresh
 			{									// corr != NaN	
 				adjacency[i].push_back(j); //j is neighboured to i and thus
 				adjacency[j].push_back(i); //i is neighboured to j!
@@ -110,22 +115,23 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
 			unsigned int j = adjacency[i][adj_idx];
 			
             //distance weighted mean needs a weight for each direction
-            double g  = gauss(QPointFX(vectorfield->origin(i) - vectorfield->origin(j)).length());
-            double w = vectorfield->weight(j);
+            double g  = gauss(QPointFX(vectorfield->item(i).origin - vectorfield->item(j).origin).length());
+            double w = vectorfield->item(j).weight;
             
-            mean_direction	+= w*g*(vectorfield->direction(j)); 
+            mean_direction	+= w*g*(vectorfield->item(j).direction);
             sum_wg			+= w*g;
             sum_g           += g;
 			
 			if (useAllCandidates)
             {
-                for(unsigned int alt_idx = 0; alt_idx != vectorfield->alternatives(); ++alt_idx)
+                int alternatives = vectorfield->item(i).altDirections.size();
+                for(unsigned int alt_idx = 0; alt_idx != alternatives; ++alt_idx)
                 {
                     //distance weighted mean needs a weight for each direction
-                    double g  = gauss(QPointFX(vectorfield->origin(i) - vectorfield->origin(j)).length());
-                    double w = vectorfield->altWeight(j,alt_idx);
+                    double g  = gauss(QPointFX(vectorfield->item(i).origin - vectorfield->item(j).origin).length());
+                    double w = vectorfield->item(j).altWeights[alt_idx];
                     
-                    mean_direction	+= w*g*(vectorfield->altDirection(j,alt_idx));
+                    mean_direction	+= w*g*(vectorfield->item(j).altDirections[alt_idx]);
                     sum_wg			+= w*g;
                     sum_g           += g;
                 }
@@ -137,11 +143,21 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
 			mean_direction	/= sum_wg;
 			sum_wg			/= sum_g;
 		
-			result_vectorfield->setDirection(i, mean_direction);
-			result_vectorfield->setWeight(i, sum_wg);
+            WeightedVector2D res;
+            res.origin = vectorfield->item(i).origin;
+            res.direction = mean_direction;
+            res.weight = sum_wg;
+            
+			result_vectorfield->replace(i, res);
 		}
-		else {
-			result_vectorfield->setWeight(i, 0.0);
+		else
+        {
+            WeightedVector2D res;
+            res.origin = vectorfield->item(i).origin;
+            res.direction = mean_direction;
+            res.weight = 0.0;
+            
+			result_vectorfield->replace(i, res);
 		}
 
 	}
@@ -169,10 +185,10 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
 				unsigned int j = adjacency[i][adj_idx];
 				
                 //distance weighted mean needs a weight for each direction
-                double g  = gauss(QPointFX(vectorfield->origin(i) - vectorfield->origin(j)).length());
-				double w = work_vectorfield->weight(j);
+                double g  = gauss(QPointFX(vectorfield->item(i).origin - vectorfield->item(j).origin).length());
+				double w = work_vectorfield->item(j).weight;
 				
-				mean_direction	+= w*g*(work_vectorfield->direction(j)); 
+				mean_direction	+= w*g*(work_vectorfield->item(j).direction);
 				sum_wg			+= w*g;
 				sum_g           += g;
 			}
@@ -183,11 +199,19 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
 				mean_direction	/= sum_wg;
 				sum_wg			/= sum_g;
 				
-				result_vectorfield->setDirection(i, mean_direction);
-				result_vectorfield->setWeight(i, sum_wg);
+                WeightedVector2D res;
+                    res.origin = vectorfield->item(i).origin ;
+                    res.direction = mean_direction;
+                    res.weight = sum_wg;
+				result_vectorfield->replace(i, res);
 			}
-			else {
-				result_vectorfield->setWeight(i, 0.0);
+			else
+            {
+                WeightedVector2D res;
+                    res.origin = vectorfield->item(i).origin ;
+                    res.direction = mean_direction;
+                    res.weight = 0.0;
+				result_vectorfield->replace(i, res);
 			}
 		}
     }
@@ -233,13 +257,18 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 	std::vector<std::vector<int> > adjacency(feature_count);
 	for (int i=0; i< feature_count; ++i)
 	{
-		result_vectorfield->addVector(vectorfield->origin(i), vectorfield->direction(i), vectorfield->weight(i));
-		work_vectorfield->addVector(vectorfield->origin(i), vectorfield->direction(i), vectorfield->weight(i));
+        WeightedVector2D v;
+            v.origin = vectorfield->item(i).origin;
+            v.direction = vectorfield->item(i).direction;
+            v.weight = vectorfield->item(i).weight;
+        
+		result_vectorfield->append(v);
+		work_vectorfield->append(v);
 		
 		for (int j=0; j<=i; ++j)
 		{
-			if(    (QPointFX(vectorfield->origin(i)-vectorfield->origin(j)).squaredLength()	< max_geo_distance*max_geo_distance)	// distance small enough
-			   && (vectorfield->weight(i)>min_weight))							// corr > thresh
+			if(    (QPointFX(vectorfield->item(i).origin-vectorfield->item(j).origin).squaredLength()	< max_geo_distance*max_geo_distance)	// distance small enough
+			   && (vectorfield->item(i).weight>min_weight))							// corr > thresh
 			{									// corr != NaN	
 				adjacency[i].push_back(j); //j is neighboured to i and thus
 				adjacency[j].push_back(i); //i is neighboured to j!
@@ -261,23 +290,24 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 			unsigned int j = adjacency[i][adj_idx];
 					
             //distance weighted mean needs a weight for each direction
-            double g  = gauss(QPointFX(vectorfield->origin(i) - vectorfield->origin(j)).length());
-            double w = vectorfield->weight(j);
+            double g  = gauss(QPointFX(vectorfield->item(i).origin - vectorfield->item(j).origin).length());
+            double w = vectorfield->item(j).weight;
             
-            mean_direction	+= w*g*(vectorfield->direction(j)); 
+            mean_direction	+= w*g*(vectorfield->item(j).direction); 
             //sum_wg			+= w*g;
             sum_g           += g;
             
 			if (useAllCandidates)
 			{
-            	for(unsigned int alt_idx = 0; alt_idx != vectorfield->alternatives(); ++alt_idx)
+                int alternatives = vectorfield->item(i).altDirections.size();
+            	for(unsigned int alt_idx = 0; alt_idx != alternatives; ++alt_idx)
 				{	
 					
                     //distance weighted mean needs a weight for each direction
-                    double g  = gauss(QPointFX(vectorfield->origin(i) - vectorfield->origin(j)).length());
-					double w = vectorfield->altWeight(j,alt_idx);
+                    double g  = gauss(QPointFX(vectorfield->item(i).origin - vectorfield->item(j).origin).length());
+					double w = vectorfield->item(j).altWeights[alt_idx];
 					
-					mean_direction	+= w*g*(vectorfield->altDirection(j,alt_idx));
+					mean_direction	+= w*g*(vectorfield->item(j).altDirections[alt_idx]);
 					sum_wg			+= w*g;
 					sum_g           += g;
 				}
@@ -298,9 +328,9 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 			int best_idx=0;
 			double best_fit=0;
         
-            double fit =   vectorfield->weight(i)
-                         * vectorfield->direction(i).dot(mean_direction)	// This formula calculates the cosine
-                         / QPointFX(vectorfield->direction(i)).length()		// of the angle between the current alternative
+            double fit =   vectorfield->item(i).weight
+                         * vectorfield->item(i).direction.dot(mean_direction)	// This formula calculates the cosine
+                         / QPointFX(vectorfield->item(i).direction).length()		// of the angle between the current alternative
                          / QPointFX(mean_direction).length();				// vector and the representative (value of 1 = 0°)
         
             if(fit > best_fit)
@@ -309,11 +339,12 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
                 best_idx=-1;
             }
             
-			for (unsigned int alt_idx=0; alt_idx<vectorfield->alternatives(); ++alt_idx)
+            int alternatives = vectorfield->item(i).altDirections.size();
+			for (unsigned int alt_idx=0; alt_idx<alternatives; ++alt_idx)
 			{
-				fit =   vectorfield->altWeight(i,alt_idx)
-							 * vectorfield->altDirection(i,alt_idx).dot(mean_direction)	// This formula calculates the cosine
-							 / QPointFX(vectorfield->altDirection(i,alt_idx)).length()	// of the angle between the current alternative
+				fit =   vectorfield->item(i).altWeights[alt_idx]
+							 * vectorfield->item(i).altDirections[alt_idx].dot(mean_direction)	// This formula calculates the cosine
+							 / QPointFX(vectorfield->item(i).altDirections[alt_idx]).length()	// of the angle between the current alternative
 							 / QPointFX(mean_direction).length();						// vector and the representative (value of 1 = 0°)
 			
 				if(fit > best_fit)
@@ -325,8 +356,8 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
             
             if(best_idx == -1)
             {
-                result_vectorfield->setDirection(i,vectorfield->direction(i));
-                result_vectorfield->setWeight(i,vectorfield->weight(i));
+                result_vectorfield->setDirection(i,vectorfield->item(i).direction);
+                result_vectorfield->setWeight(i,vectorfield->item(i).weight);
             }
             else
             {
@@ -363,10 +394,10 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 				unsigned int j = adjacency[i][adj_idx];
 				
 				//distance weighted mean needs a weight for each direction
-				double g  = gauss(QPointFX(work_vectorfield->origin(i) - work_vectorfield->origin(j)).length());
-				double w = work_vectorfield->weight(j);
+				double g  = gauss(QPointFX(work_vectorfield->item(i).origin - work_vectorfield->item(j).origin).length());
+				double w = work_vectorfield->item(j).weight;
 				
-				mean_direction	+= w*g*(work_vectorfield->direction(j)); 
+				mean_direction	+= w*g*(work_vectorfield->item(j).direction); 
 				//sum_wg			+= w*g;
 				sum_g           += g;
 			}
@@ -386,9 +417,9 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 				int best_idx=0;
 				double best_fit=0;
             
-                double fit =   vectorfield->weight(i)
-                             * vectorfield->direction(i).dot(mean_direction)	// This formula calculates the cosine
-                             / QPointFX(vectorfield->direction(i)).length()		// of the angle between the current alternative
+                double fit =   vectorfield->item(i).weight
+                             * vectorfield->item(i).direction.dot(mean_direction)	// This formula calculates the cosine
+                             / QPointFX(vectorfield->item(i).direction).length()		// of the angle between the current alternative
                              / QPointFX(mean_direction).length();				// vector and the representative (value of 1 = 0°)
             
                 if(fit > best_fit)
@@ -399,9 +430,9 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
                 
                 for (unsigned int alt_idx=0; alt_idx<vectorfield->alternatives(); ++alt_idx)
                 {
-                    fit = vectorfield->altWeight(i,alt_idx)
-                                 * vectorfield->altDirection(i,alt_idx).dot(mean_direction)	// This formula calculates the cosine
-                                 / QPointFX(vectorfield->altDirection(i,alt_idx)).length()	// of the angle between the current alternative
+                    fit = vectorfield->item(i).altWeights[alt_idx]
+                                 * vectorfield->item(i).altDirections[alt_idx].dot(mean_direction)	// This formula calculates the cosine
+                                 / QPointFX(vectorfield->item(i).altDirections[alt_idx]).length()	// of the angle between the current alternative
                                  / QPointFX(mean_direction).length();						// vector and the representative (value of 1 = 0°)
                 
                     if(fit > best_fit)
@@ -413,8 +444,8 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
                 
                 if(best_idx == -1)
                 {
-                    result_vectorfield->setDirection(i,vectorfield->direction(i));
-                    result_vectorfield->setWeight(i,vectorfield->weight(i));
+                    result_vectorfield->setDirection(i,vectorfield->item(i).direction);
+                    result_vectorfield->setWeight(i,vectorfield->item(i).weight);
                 }
                 else
                 {
