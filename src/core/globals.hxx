@@ -40,6 +40,8 @@
 #include "core/model.hxx"
 #include "core/viewcontroller.hxx"
 
+#include <QDir>
+
 #include <vector>
 
 /**
@@ -50,6 +52,9 @@
  */
  
 namespace graipe {
+
+GRAIPE_CORE_EXPORT QString loadModules();
+GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir);
 
 //Three global variables for the factories:
 extern ModelFactory modelFactory;

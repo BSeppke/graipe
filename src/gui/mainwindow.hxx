@@ -89,6 +89,12 @@ public:
 
 signals:
     /**
+     * This signal is mapped to call the right new model creation each time the
+     * corresponding (menu-)action is triggered.
+     */
+    void clickedNewModel(int);
+    
+    /**
      * This signal is mapped to call the right algorithm each time the
      * corresponding (menu-)action is triggered.
      */
@@ -148,7 +154,7 @@ protected slots:
     /**
      * This slot is called every tiem a new data item / Model shall be created.
      */
-    void newModel();
+    void newModel(int index);
     
     /**
      * This slot is called by all registered algorithms. The parameter
@@ -337,7 +343,7 @@ protected:
      * \param added_menus Menus added during the module load.
      * \return An html-formatted report of the loading. Empty if no module was found.
      */
-    QString loadFactoriesFromDirectory(const QDir & dir, QList<QMenu*> & added_menus);
+    void connectToFactories();
 
     /**
      * Accessor for the current Model.
@@ -365,14 +371,14 @@ protected:
      *
      * \return Pointer of the Model of the current ViewController. NULL if none.
      */
-    Model*          currentViewControllerModel();
+    Model* currentViewControllerModel();
     
     /**
      * The type of the Model of the current ViewController.
      *
      * \return The type of the Model of the current ViewController. Empty if none.
      */
-    QString         currentViewControllerModelType();
+    QString currentViewControllerModelType();
 
     /**
      * Adds a given Model to the list of models.
@@ -416,8 +422,11 @@ private:
     //a printer (of the view)
     QPrinter* m_printer;
 
+    //signal mapping for dynamically created models
+    QSignalMapper* m_modSignalMapper;
+    
     //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
-    QSignalMapper* m_signalMapper;
+    QSignalMapper* m_algSignalMapper;
 
     //Enum for easy handling of current view type:
     enum DisplayMode

@@ -66,7 +66,8 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     QMainWindow(parent,f),
 	m_scene(NULL),
 	m_view(NULL),
-	m_signalMapper(new QSignalMapper),
+	m_modSignalMapper(new QSignalMapper),
+	m_algSignalMapper(new QSignalMapper),
 	m_status_window(new StatusWindow),
     m_lblMemoryUsage(new QLabel("(Memory: 0 MB, max: 0 MB)")),
     m_recentFileCount(10)
@@ -432,42 +433,33 @@ void MainWindow::about()
 /**
  * This slot is called every tiem a new data item / Model shall be created.
  */
-void MainWindow::newModel()
+void MainWindow::newModel(int index)
 {
-    QAction * act = static_cast<QAction *>(sender());
-    QString newModel_typeName = act->text();
-    
-    for (ModelFactoryItem item : modelFactory)
-    {
-        if(item.model_type == newModel_typeName)
-        {
-            Model * new_model = item.model_fptr();
+    ModelFactoryItem item = modelFactory[index];
+    Model * new_model = item.model_fptr();
             
-            //SHOW EDIT DIALOG
-            ModelParameterSelection parameter_selection(this, new_model);
-            parameter_selection.setWindowTitle(QString("Create new ")+ act->text());
-            parameter_selection.setModal(true);
-	
-            if(parameter_selection.exec())
+    //SHOW EDIT DIALOG
+    ModelParameterSelection parameter_selection(this, new_model);
+    parameter_selection.setWindowTitle(QString("Create new ")+ new_model->typeName());
+    parameter_selection.setModal(true);
+
+    if(parameter_selection.exec())
+    {
+        Model* copyModel = parameter_selection.useOtherModel();
+        
+        if(copyModel != NULL)
+        {
+            if(parameter_selection.cloneOtherModel())
             {
-                Model* copyModel = parameter_selection.useOtherModel();
-                
-                if(copyModel != NULL)
-                {
-                    if(parameter_selection.cloneOtherModel())
-                    {
-                        copyModel->copyData(*new_model);
-                    }
-                    else
-                    {
-                        copyModel->copyMetadata(*new_model);
-                    }
-                }
-                
-                addModelItemToList(new_model);
-                break;
+                copyModel->copyData(*new_model);
+            }
+            else
+            {
+                copyModel->copyMetadata(*new_model);
             }
         }
+        
+        addModelItemToList(new_model);
     }
 }
 
@@ -1458,22 +1450,14 @@ void MainWindow::loadFactories()
 {
 	//search paths for modules:
 	QDir		current_dir		= QCoreApplication::applicationDirPath();
-	QList<QMenu*> added_menus;
-	
+    
     //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
     //     Graipe.app/Contents/MacOS
-    QString report = loadFactoriesFromDirectory(QCoreApplication::applicationDirPath(), added_menus);
-    
-    //Since this only works after deploying the app, we will also search at the level of the .app directory
-    //for loadable modules, iff we found none so far
-    if(report.isEmpty())
-    {
-        report = loadFactoriesFromDirectory(QDir::current(), added_menus);
-    }
+    QString report = graipe::loadModules();
     m_status_window->updateStatus(report);
     
-	connect(m_signalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedAlgorithm(int)));
-	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));	
+    connectToFactories();
+    
 }
 
 /**
@@ -1483,133 +1467,63 @@ void MainWindow::loadFactories()
  * \param dir The directory to search for modules.
  * \param added_menus Menus added during the module load.
  */
-QString MainWindow::loadFactoriesFromDirectory(const QDir & current_dir, QList<QMenu*> & added_menus)
+void MainWindow::connectToFactories()
 {
-    QString ss;
-	
-	QStringList all_files		= current_dir.entryList(QDir::Files);
+    unsigned int i=0;
+    for(const ModelFactoryItem& item : modelFactory)
+    {
+        QAction* newAct = new QAction(item.model_type, this);
+        m_ui.menuCreate->addAction(newAct);
+        //connect everything
+        connect(newAct, SIGNAL(triggered()), m_modSignalMapper, SLOT(map()));
+        m_modSignalMapper->setMapping(newAct, i++);
+    }
     
-    for(const QString& file : all_files)
-	{
-		//ignore symlinks
-		QString symTarget = QFile::symLinkTarget(file);
-		
-		if(symTarget.isEmpty() && QLibrary::isLibrary(file))
-		{
-			typedef  Module* (*Initialize_f) ();
-			Initialize_f module_initialize = (Initialize_f) QLibrary::resolve(current_dir.absoluteFilePath(file), "initialize");
-			
-			if (module_initialize)
-			{
-				Module* module = module_initialize();
-				
-				ss  += "<h3>" + module->name() + "</h3>\n"
-                     + "<ul>\n"
-                     + "  <li>loaded from: " + current_dir.absoluteFilePath(file) + "</li>\n";
-				
-				ModelFactory model_items = module->modelFactory();
-				
-                if(model_items.size() != 0)
+	connect(m_modSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedNewModel(int)));
+	connect(this, SIGNAL(clickedNewModel(int)), this, SLOT(newModel(int)));
+    
+	QList<QMenu*> added_menus;
+    i=0;
+    
+    for(const AlgorithmFactoryItem& item : algorithmFactory)
+    {
+        QAction* newAct = new QAction(item.algorithm_name, this);
+        
+        if (item.topic_name == "Import")
+        {
+            m_ui.menuImport->addAction(newAct);
+        }
+        else if (item.topic_name == "Export")
+        {
+            m_ui.menuExport->addAction(newAct);
+        }
+        else
+        {
+            //add Menu-entry "topic_name"
+            QMenu* algorithm_menu = NULL;
+            for(QMenu* m : added_menus)
+            {
+                if (m->title() == item.topic_name)
                 {
-                    ss += "  <li>Models:</li>\n"
-                          "    <ul>\n";
-                    
-                    for(const ModelFactoryItem& item : model_items)
-                    {
-                        ss += "      <li>" + item.model_type  + "</li>\n";
-                        modelFactory.push_back(item);
-                        
-                        QAction* newAct = new QAction(item.model_type, this);
-                        m_ui.menuCreate->addAction(newAct);
-                        connect(newAct, SIGNAL(triggered()), this, SLOT(newModel()));
-                    }
-                    
-                    ss += "    </ul>\n";
+                    algorithm_menu = m;
+                    break;
                 }
-                else
-                {
-                    ss += "<li>No models.</li>\n";
-                }
-                
-				ViewControllerFactory vc_items = module->viewControllerFactory();
-                
-                if(vc_items.size() != 0)
-                {
-                    ss += "  <li>ViewControllers:</li>\n"
-                          "    <ul>\n";
-                    
-                    for(const ViewControllerFactoryItem& item : vc_items)
-                    {
-                        ss += "      <li>" + item.viewController_name + " <i>(for model: " + item.model_type + ")</i></li>\n";
-                        viewControllerFactory.push_back(item);
-                    }
-                    
-                    ss += "    </ul>\n";
-                }
-                else
-                {
-                    ss += "<li>No ViewControllers.</li>\n";
-                }
-                
-				std::vector<AlgorithmFactoryItem> alg_items = module->algorithmFactory();
-                
-                if(alg_items.size() != 0)
-                {
-                    ss += "  <li>Algorithms:</li>\n"
-                          "    <ul>\n";
-                    
-                    for(const AlgorithmFactoryItem& item : alg_items)
-                    {
-                        ss += "      <li>" + item.algorithm_name + " <i>(for topic: " + item.topic_name  + ")</i></li>\n";
-                        algorithmFactory.push_back(item);
-                        
-                        QAction* newAct = new QAction(item.algorithm_name, this);
-                        
-                        if (item.topic_name == "Import")
-                        {
-                            m_ui.menuImport->addAction(newAct);
-                        }
-                        else if (item.topic_name == "Export")
-                        {
-                            m_ui.menuExport->addAction(newAct);
-                        }
-                        else
-                        {
-                            //add Menu-entry "topic_name"
-                            QMenu* algorithm_menu = NULL;
-                            for(QMenu* m : added_menus)
-                            {
-                                if (m->title() == item.topic_name)
-                                {
-                                    algorithm_menu = m;
-                                    break;
-                                }
-                            }
-                            if (!algorithm_menu){
-                                algorithm_menu = new QMenu(item.topic_name);
-                                m_ui.menuAlgorithms->addMenu(algorithm_menu);
+            }
+            if (!algorithm_menu){
+                algorithm_menu = new QMenu(item.topic_name);
+                m_ui.menuAlgorithms->addMenu(algorithm_menu);
 
-                                added_menus.push_back(algorithm_menu);
-                            }
-                            algorithm_menu->addAction(newAct);
-                        }
-                        //connect everything
-                        connect(newAct, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-                        m_signalMapper->setMapping(newAct, (unsigned int)(algorithmFactory.size()-1));
-                    }
-                    ss += "    </ul>\n";
-                }
-                else
-                {
-                    ss += "<li>No algorithms.</li>\n";
-                }
-                
-                ss  += "</ul>\n\n";
-				
-			}
-		}			
-	}
-    return ss;
+                added_menus.push_back(algorithm_menu);
+            }
+            algorithm_menu->addAction(newAct);
+        }
+        //connect everything
+        connect(newAct, SIGNAL(triggered()), m_algSignalMapper, SLOT(map()));
+        m_algSignalMapper->setMapping(newAct, i++);
+    }
+    
+	connect(m_algSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedAlgorithm(int)));
+	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));
 }
 
 /**
