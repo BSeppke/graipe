@@ -79,16 +79,6 @@ FilenameParameter::~FilenameParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "FilenameParameter".
- */
-QString  FilenameParameter::typeName() const
-{
-    return "FilenameParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type.
  *
  * \return The value of this parameter (For filename: QString).

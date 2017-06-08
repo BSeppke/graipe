@@ -144,11 +144,11 @@ class GRAIPE_CORE_EXPORT Serializable
     
         /**
          * Since we want to identify, we assign the Serializable class an uid.
-         * Should be overwritten in iheriting classes.
+         * Must be overwritten in iheriting classes.
          *
-         * \return "Serializable" as a QString
+         * \return "UNIQUE TYPE/CLASSNAME" as a QString
          */
-        virtual QString typeName() const;
+        virtual QString typeName() const = 0;
     
         /**
          * Deserialization of a parameter's state from an xml file.

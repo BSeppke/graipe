@@ -83,15 +83,6 @@ PointFParameter::~PointFParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "PointFParameter".
- */
-QString  PointFParameter::typeName() const
-{
-    return "PointFParameter";
-}
-/**
  * The lowest possible value of this parameter.
  *
  * \return The minimal value of this parameter.

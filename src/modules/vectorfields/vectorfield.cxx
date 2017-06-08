@@ -63,16 +63,6 @@ Vectorfield2D::Vectorfield2D(const Vectorfield2D & vf)
 }
 
 /**
- * The typename of this vector field.
- *
- * \return Always "Vectorfield2D"
- */
-QString Vectorfield2D::typeName() const
-{ 
-	return	QString("Vectorfield2D");
-}
-
-/**
  * Getter for the scaling function of the vector length
  * from units/pixels to cm/s.
  *

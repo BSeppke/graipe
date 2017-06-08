@@ -119,16 +119,6 @@ QRectF PolygonList2DViewController::boundingRect() const
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "PolygonList2DViewController"
- */
-QString PolygonList2DViewController::typeName() const
-{
-	return "PolygonList2DViewController";
-}
-
-/**
  * Implementation/specialization of the handling of a mouse-pressed event
  *
  * \param event The mouse event which triggered this function.
@@ -326,16 +316,6 @@ QRectF WeightedPolygonList2DViewController::boundingRect() const
 				  m_model->width()+2*m_lineWidth->value(),m_model->height()+2*m_lineWidth->value());
     
     return ViewController::boundingRect().united(rect);
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "WeightedPolygonList2DViewController"
- */
-QString WeightedPolygonList2DViewController::typeName() const
-{
-	return "WeightedPolygonList2DViewController";
 }
 
 /**

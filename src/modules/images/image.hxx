@@ -111,7 +111,7 @@ class GRAIPE_IMAGES_EXPORT Image
          *
          * \return the typeName of the Image.
          */
-        virtual QString typeName() const;
+        QString typeName() const;
     
         /**
          * Check if an Image has  > 0 pixels

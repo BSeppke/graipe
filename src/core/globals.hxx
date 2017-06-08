@@ -56,6 +56,9 @@ namespace graipe {
 GRAIPE_CORE_EXPORT QString loadModules();
 GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir);
 
+//One global algorithm mutex:
+extern QMutex global_algorithm_mutex;
+
 //Three global variables for the factories:
 extern ModelFactory modelFactory;
 extern ViewControllerFactory viewControllerFactory;

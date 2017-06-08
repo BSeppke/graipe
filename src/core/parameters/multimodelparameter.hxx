@@ -89,7 +89,10 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          *
          * \return "MultiModelParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "MultiModelParameter";
+        }
         
         /** 
          * The current value of this parameter in the correct, most special type.

@@ -87,7 +87,11 @@ class GRAIPE_CORE_EXPORT DoubleParameter
          *
          * \return "DoubleParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "DoubleParameter";
+        }
+    
         /**
          * The lowest possible value of this parameter.
          *

@@ -60,16 +60,6 @@ CubicSplineList2D::CubicSplineList2D(const CubicSplineList2D& spline_list)
 }
 
 /**
- * Returns the typeName of a 2d cubic spline list.
- *
- * \return Always "CubicSplineList2D".
- */
-QString CubicSplineList2D::typeName() const
-{
-	return "CubicSplineList2D";
-}
-
-/**
  * Returns the number of 2D cubic splines in this list.
  *
  * \return The number of 2D cubic splines in this list.
@@ -418,16 +408,6 @@ WeightedCubicSplineList2D::WeightedCubicSplineList2D(const WeightedCubicSplineLi
 	{
 		m_weights.push_back(spline_list.weight(i));
 	}
-}
-
-/**
- * Returns the typeName of a weighted 2D cubic spline list.
- *
- * \return Always "WeightedCubicSplineList2D".
- */
-QString WeightedCubicSplineList2D::typeName() const
-{
-	return "WeightedCubicSplineList2D";
 }
 
 /**

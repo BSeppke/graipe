@@ -83,16 +83,6 @@ PointParameter::~PointParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "PointParameter".
- */
-QString  PointParameter::typeName() const
-{
-    return "PointParameter";
-}
-
-/**
  * The lowest possible value of this parameter.
  *
  * \return The minimal value of this parameter.

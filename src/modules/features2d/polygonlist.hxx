@@ -72,7 +72,10 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          *
          * \return Always "PolygonList2D".
          */
-		virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "PolygonList2D";
+        }
     
         /**
          * Returns the number of polygons in this list.
@@ -206,7 +209,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          *
          * \return Always "WeightedPolygonList2D".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "WeightedPolygonList2D";
+        }
     
         /**
          * Getter of the weight of a polygon at a given index. May throw an error,

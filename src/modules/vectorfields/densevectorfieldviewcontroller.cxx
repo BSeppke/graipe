@@ -239,16 +239,6 @@ QRectF DenseVectorfield2DViewController::boundingRect() const
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "DenseVectorfield2DViewController"
- */
-QString DenseVectorfield2DViewController::typeName() const
-{ 
-	return "DenseVectorfield2DViewController"; 
-}
-
-/**
  * Specialization of the update of  the parameters of this ViewController according to the current
  * model's parameters. This is necessary, if something may have changed 
  * the model in meantime.
@@ -558,16 +548,6 @@ QRectF DenseVectorfield2DParticleViewController::boundingRect() const
 				QPointF(m_dense_model->width()  + d,
 						m_dense_model->height() + d));
 	return rect.united(ViewController::boundingRect());
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "DenseVectorfield2DParticleViewController"
- */
-QString DenseVectorfield2DParticleViewController::typeName() const
-{ 
-	return "DenseVectorfield2DParticleView"; 
 }
 
 /**
@@ -921,16 +901,6 @@ void DenseWeightedVectorfield2DViewController::paint(QPainter *painter, const QS
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "DenseWeightedVectorfield2DViewController"
- */
-QString DenseWeightedVectorfield2DViewController::typeName() const
-{ 
-	return "DenseWeightedVectorfield2DViewController"; 
-}
-
-/**
  * Specialization of the update of  the parameters of this ViewController according to the current
  * model's parameters. This is necessary, if something may have changed 
  * the model in meantime.
@@ -1203,16 +1173,6 @@ void DenseWeightedVectorfield2DParticleViewController::paint(QPainter *painter, 
     }
     
 	ViewController::paintAfter(painter, option, widget);
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "DenseWeightedVectorfield2DParticleViewController"
- */
-QString DenseWeightedVectorfield2DParticleViewController::typeName() const
-{ 
-	return "DenseWeightedVectorfield2DParticleView"; 
 }
 
 /**

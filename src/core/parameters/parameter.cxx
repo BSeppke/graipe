@@ -80,17 +80,6 @@ Parameter::~Parameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- * Implemented to fullfil the Serializable interface.
- *
- * \return "Parameter".
- */
-QString Parameter::typeName() const
-{
-	return "Parameter";
-}
-
-/**
  * The name of this parameter. This name is used as a label for the parameter.
  *
  * \return The name of the parameter.

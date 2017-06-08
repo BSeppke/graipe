@@ -88,7 +88,10 @@ class GRAIPE_CORE_EXPORT StringParameter
          *
          * \return "StringParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "StringParameter";
+        }
         
         /** 
          * The current value of this parameter in the correct, most special type.

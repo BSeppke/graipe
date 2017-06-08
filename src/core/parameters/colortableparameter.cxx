@@ -79,16 +79,6 @@ ColorTableParameter::~ColorTableParameter()
 }
     
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "ColorTableParameter".
- */
-QString ColorTableParameter::typeName() const
-{
-    return "ColorTableParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type.
  *
  * \return The value of this parameter.

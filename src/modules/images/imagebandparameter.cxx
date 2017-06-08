@@ -69,16 +69,6 @@ ImageBandParameterBase::~ImageBandParameterBase()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "ImageBandParameterBase".
- */
-QString ImageBandParameterBase::typeName() const
-{
-	return "ImageBandParameterBase";
-}
-
-/**
  * The delegate widget of this parameter. 
  * Each parameter generates such a widget on demand, which refers to the
  * first call of this function. This is needed due to the executability of
@@ -184,18 +174,6 @@ template <class T>
 ImageBandParameter<T>::~ImageBandParameter()
 {
     //Widgets will be destroyed in parent (base) class
-}
-
-/**
- * The (immutable) type name of this parameter class.
- *
- * \return Image<T>::typeName() const + "BandParameter".
- */
-template <class T>
-QString ImageBandParameter<T>::typeName() const
-{
-    Image<T> temp;
-	return temp.typeName() + "BandParameter";
 }
 
 /**

@@ -60,17 +60,6 @@ SparseVectorfield2D::SparseVectorfield2D(const SparseVectorfield2D & vf)
 	}
 }
 
-
-/**
- * The typename of this vector field.
- *
- * \return Always "SparseVectorfield2D"
- */
-QString SparseVectorfield2D::typeName() const
-{ 
-	return QString("SparseVectorfield2D");
-}
-
 /**
  * The size of this vectorfield. 
  * Implemented here, defined as pure virtual in base class.
@@ -407,16 +396,6 @@ SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(const SparseWeightedVec
 }
 
 /**
- * The typename of this vectorfield.
- *
- * \return Always "SparseWeightedVectorfield2D"
- */
-QString SparseWeightedVectorfield2D::typeName() const
-{ 
-	return QString("SparseWeightedVectorfield2D");
-}
-
-/**
  * The removal of all vectors of this vectorfield.
  * Specialized for this class.
  * Does nothing if the model is locked.
@@ -647,16 +626,6 @@ SparseMultiVectorfield2D::SparseMultiVectorfield2D(const SparseMultiVectorfield2
         }
         m_alt_directions[i] = new_vec;
     }
-}
-
-/**
- * The typename of this vectorfield.
- *
- * \return Always "SparseMultiVectorfield2D"
- */
-QString SparseMultiVectorfield2D::typeName() const
-{ 
-	return	QString("SparseMultiVectorfield2D");
 }
 
 /**
@@ -1113,7 +1082,18 @@ void SparseMultiVectorfield2D::updateModel()
 
 
 		
-//A sparse vectorfield with multiple weighted targets for each vector
+/**
+ * Default constructor. Creates an empty sparse weighted multi vectorfield.
+ */
+SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D()
+{
+}
+
+/**
+ * Copy constructor. Creates a sparse multi weighted vectorfield from another one.
+ *
+ * \param vf The other sparse multi weighted vectorfield.
+ */
 SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D(const SparseWeightedMultiVectorfield2D & vf)
 :	SparseMultiVectorfield2D(vf)
 {
@@ -1122,14 +1102,6 @@ SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D(const SparseW
 		m_weights.push_back(vf.weight(i));
         m_alt_weights.push_back(std::vector<float>(vf.alternatives()));
 	}
-}
-SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D()
-{
-}
-
-QString SparseWeightedMultiVectorfield2D::typeName() const
-{
-	return	QString("SparseWeightedMultiVectorfield2D");
 }
 
 /**

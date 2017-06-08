@@ -81,12 +81,16 @@ class GRAIPE_CORE_EXPORT PointFParameter
          * Destructor of the PointParameter class.
          */
         ~PointFParameter();
+        
         /**
          * The (immutable) type name of this parameter class.
          *
          * \return "PointFParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "PointFParameter";
+        }
     
         /**
          * The lowest possible value of this parameter.

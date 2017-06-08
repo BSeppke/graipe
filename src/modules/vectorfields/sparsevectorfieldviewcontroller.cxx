@@ -234,16 +234,6 @@ QRectF SparseVectorfield2DViewController::boundingRect () const
 
 	return rect.united(ViewController::boundingRect());
 }
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "SparseVectorfield2DViewController"
- */
-QString SparseVectorfield2DViewController::typeName() const
-{ 
-	return "SparseVectorfield2DViewController";
-}
 	
 /**
  * Specialization of the update of  the parameters of this ViewController according to the current
@@ -604,16 +594,6 @@ void SparseWeightedVectorfield2DViewController::paint(QPainter *painter, const Q
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "SparseWeightedVectorfield2DViewController"
- */
-QString SparseWeightedVectorfield2DViewController::typeName() const
-{ 
-	return "SparseWeightedVectorfield2DViewController"; 
-}
-
-/**
  * Specialization of the update of  the parameters of this ViewController according to the current
  * model's parameters. This is necessary, if something may have changed 
  * the model in meantime.
@@ -945,16 +925,6 @@ void SparseMultiVectorfield2DViewController::paint(QPainter *painter, const QSty
     }
     
 	ViewController::paintAfter(painter, option, widget);
-}
-            
-/**
- * The typename of this ViewController
- *
- * \return Always: "SparseMultiVectorfield2DViewController"
- */
-QString SparseMultiVectorfield2DViewController::typeName() const
-{ 
-	return "SparseMultiVectorfield2DViewController"; 
 }
 
 /**
@@ -1310,16 +1280,6 @@ void SparseWeightedMultiVectorfield2DViewController::paint(QPainter *painter, co
     }
     
 	ViewController::paintAfter(painter, option, widget);
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "SparseWeightedMultiVectorfield2DViewController"
- */
-QString SparseWeightedMultiVectorfield2DViewController::typeName() const
-{ 
-	return "SparseWeightedMultiVectorfield2DViewController";
 }
 
 /**

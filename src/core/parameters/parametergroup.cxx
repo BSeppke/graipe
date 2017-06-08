@@ -82,16 +82,6 @@ ParameterGroup::~ParameterGroup()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "ParameterGroup".
- */
-QString ParameterGroup::typeName() const
-{
-	return "ParameterGroup";
-}
-
-/**
  * Add an already existing parameter to the ParameterGroup.
  *
  * \param id     The key for this parameter for easy access inside the group

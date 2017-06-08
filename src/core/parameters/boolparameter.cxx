@@ -76,16 +76,6 @@ BoolParameter::~BoolParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "BoolParameter".
- */
-QString BoolParameter::typeName() const
-{
-	return "BoolParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type
  *
  * \return The value of this parameter.

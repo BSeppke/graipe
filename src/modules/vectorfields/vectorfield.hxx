@@ -70,7 +70,10 @@ class GRAIPE_VECTORFIELDS_EXPORT Vectorfield2D
          *
          * \return Always "Vectorfield2D"
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "Vectorfield2D";
+        }
     
         /**
          * Getter for the scaling function of the vector length

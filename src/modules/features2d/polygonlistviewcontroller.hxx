@@ -92,7 +92,10 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2DViewController
          *
          * \return Always: "PolygonList2DViewController"
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "PolygonList2DViewController";
+        }
         
     protected:
         /**
@@ -164,7 +167,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
          *
          * \return Always: "WeightedPolygonList2DViewController"
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "WeightedPolygonList2DViewController";
+        }
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current

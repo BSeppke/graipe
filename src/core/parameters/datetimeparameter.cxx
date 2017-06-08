@@ -74,16 +74,6 @@ DateTimeParameter::~DateTimeParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "DateTimeParameter".
- */
-QString  DateTimeParameter::typeName() const
-{
-    return "DateTimeParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type.
  *
  * \return The value of this parameter.

@@ -249,11 +249,6 @@ class GCP
             return hasId();
         }
 
-        virtual QString typeName() const
-        {
-            return "GCP";
-        }
-
 	private:
 		unsigned int m_id;
 		QString m_description;

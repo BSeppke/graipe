@@ -87,7 +87,10 @@ class GRAIPE_CORE_EXPORT PointParameter
          *
          * \return "PointParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "PointParameter";
+        }
     
         /**
          * The lowest possible value of this parameter.

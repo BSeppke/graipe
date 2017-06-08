@@ -76,16 +76,6 @@ EnumParameter::~EnumParameter()
         delete m_delegate;
 }
 
-/**
- * The (immutable) type name of this parameter class.
- *
- * \return "EnumParameter".
- */
-QString  EnumParameter::typeName() const
-{
-	return "EnumParameter";
-}
-
 /** 
  * The current value of this parameter in the correct, most special type.
  *

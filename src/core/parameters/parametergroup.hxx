@@ -101,7 +101,10 @@ class GRAIPE_CORE_EXPORT ParameterGroup
          *
          * \return "ParameterGroup".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "ParameterGroup";
+        }
     
         /**
          * Add an already existing parameter to the ParameterGroup.

@@ -42,8 +42,6 @@
 
 #include <vector>
 
-#include <QMutex>
-
 /**
  * @file
  * @brief Header file for the Algorithm class
@@ -66,8 +64,7 @@ namespace graipe {
  * http://labs.qt.nokia.com/2010/06/17/youre-doing-it-wrong/
  *
  * If the called algorithm is (somewhere) not thread-safe, it can lock
- * the given global Mutex, which is generated and passed by the GUI
- * to each algorithm before the execution.
+ * the given global Mutex (in the variable global_algorithm_mutex).
  *
  * To further keep consistency among the involved models, which are 
  * needed by the algorithm to run, it has a lockModels() method
@@ -134,26 +131,6 @@ class GRAIPE_CORE_EXPORT Algorithm
      	void unlockModels();
 
         /**
-         * To enusure the running of non-thread-safe partial algorithms, like
-         * the FFTW, it is possible to provide the algorithm a global Mutex.
-         *This Mutex will then be used for locking if necessary.
-         *
-         * This is the setter for the Mutex.
-         * \param mutex The global mutex to be set.
-         */
-        void setGlobalAlgorithmMutex(QMutex * mutex);
-
-        /**
-         * To enusure the running of non-thread-safe partial algorithms, like
-         * the FFTW, it is possible to provide the algorithm a global Mutex.
-         *This Mutex will then be used for locking if necessary.
-         *
-         * This is the getter for the Mutex.
-         * \return The global mutex of this algorithm.
-         */
-        QMutex * globalAlgorithmMutex();
-
-        /**
          * For monitoring purpose, algorithms may send progress signals by means of
          * status messages. This method provids a slot, which creates and sends the
          * appropriate processing signal 0...99.9 (%) as a status message.
@@ -214,10 +191,6 @@ class GRAIPE_CORE_EXPORT Algorithm
 		ParameterGroup * m_parameters;
 		/** The results **/
         std::vector<Model*> m_results;
-    
-    private:
-        /** The global algorithm mutex **/
-        QMutex * m_global_algorithm_mutex;
 };
 
 }//end of namespace graipe

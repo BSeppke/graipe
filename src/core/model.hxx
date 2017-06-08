@@ -109,6 +109,16 @@ class GRAIPE_CORE_EXPORT Model
 		virtual ~Model();
     
         /**
+         * The type of this model (same for every instance).
+         *
+         * \return "Model"
+         */
+        QString typeName() const
+        {
+            return "Model";
+        }
+    
+        /**
          * The (full) model name. This returns the complete name.
          *
          * \return The name of the model.
@@ -319,12 +329,6 @@ class GRAIPE_CORE_EXPORT Model
          */
         virtual void copyData(Model& other) const;
 
-        /**
-         * The type of this model (same for every instance).
-         *
-         * \return "Model"
-         */
-        virtual QString typeName() const;
     
         /**
          * This function serializes a complete Model to a xml stream.
@@ -483,6 +487,16 @@ class GRAIPE_CORE_EXPORT RasteredModel
 		virtual ~RasteredModel();
     
         /**
+         * The type of this RasteredModel (same for every instance).
+         *
+         * \return "RasteredModel"
+         */
+        QString typeName() const
+        {
+            return "RasteredModel";
+        }
+    
+        /**
          * Const accessor to the raster resolution in x-direction of the model.
          *
          * \return The raster width of the model.
@@ -556,13 +570,6 @@ class GRAIPE_CORE_EXPORT RasteredModel
          * \param other The other model.
          */
         void copyData(Model& other) const;
-    
-        /**
-         * The type of this RasteredModel (same for every instance).
-         *
-         * \return "RasteredModel"
-         */
-        virtual QString typeName() const;
     
     protected:
         /** The additional parameters of this model: **/

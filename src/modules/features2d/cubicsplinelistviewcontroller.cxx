@@ -137,17 +137,6 @@ QRectF CubicSplineList2DViewController::boundingRect() const
     
     return ViewController::boundingRect().united(rect);
 }
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "CubicSplineList2DViewController"
- */
-QString CubicSplineList2DViewController::typeName() const
-{
-    return "CubicSplineList2DViewController";
-}
-
 /**
  * Snycronizes between the Model's data and the views reprsentation:
  * Re-creates the polylines and point sets defined by the model.
@@ -388,16 +377,6 @@ QRectF WeightedCubicSplineList2DViewController::boundingRect() const
                 m_model->height() + 2*m_lineWidth->value());
     
     return ViewController::boundingRect().united(rect);
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "WeightedCubicSplineList2DViewController"
- */
-QString WeightedCubicSplineList2DViewController::typeName() const
-{
-	return "WeightedCubicSplineList2DViewController";
 }
 
 /**

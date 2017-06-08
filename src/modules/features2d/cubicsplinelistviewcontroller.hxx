@@ -91,7 +91,10 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2DViewController
          *
          * \return Always: "CubicSplineList2DViewController"
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "CubicSplineList2DViewController";
+        }
         
     protected:
         /**
@@ -175,7 +178,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
          *
          * \return Always: "WeightedCubicSplineList2DViewController"
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "WeightedCubicSplineList2DViewController";
+        }
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current

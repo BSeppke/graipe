@@ -129,19 +129,6 @@ void ImageSingleBandViewController<T>::paint(QPainter *painter, const QStyleOpti
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Unique QString depending on the templated image type. Either:
- *         "ImageSingleBandViewController", "IntImageSingleBandViewController" or
- *         "ByteImageSingleBandViewController".
- */
-template <class T>
-QString ImageSingleBandViewController<T>::typeName() const
-{
-    Image<T> temp;
-    return temp.typeName() + "SingleBandViewController";
-}
-/**
  * Specialization of the update of the view according to the current parameter settings.
  */
 template <class T>
@@ -313,21 +300,6 @@ void ImageRGBViewController<T>::paint(QPainter *painter, const QStyleOptionGraph
     }
     
 	ViewController::paintAfter(painter,option, widget);
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Unique QString depending on the templated image type. Either:
- *         "ImageRGBViewController", "IntImageRGBViewController" or
- *         "ByteImageRGBViewController".
- */
-template <class T>
-QString ImageRGBViewController<T>::typeName() const
-{
-    Image<T> temp;
-
-    return temp.typeName() + "RGBViewController";
 }
 
 /**

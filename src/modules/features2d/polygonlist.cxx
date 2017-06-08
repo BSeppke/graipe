@@ -57,17 +57,7 @@ PolygonList2D::PolygonList2D(const PolygonList2D& poly_list)
 		addPolygon(poly_list.polygon(i));
 	}
 }
-
-/**
- * Returns the typeName of a polygon list.
- *
- * \return Always "PolygonList2D".
- */
-QString PolygonList2D::typeName() const
-{
-	return "PolygonList2D";
-}
-    
+  
 /**
  * Returns the number of polygons in this list.
  *
@@ -351,16 +341,6 @@ WeightedPolygonList2D::WeightedPolygonList2D(const WeightedPolygonList2D& poly_l
 	{
 		m_weights.push_back(poly_list.weight(i));
 	}
-}
-
-/**
- * Returns the typeName of a weighted polygon list.
- *
- * \return Always "WeightedPolygonList2D".
- */
-QString WeightedPolygonList2D::typeName() const
-{
-	return "WeightedPolygonList2D";
 }
 
 /**

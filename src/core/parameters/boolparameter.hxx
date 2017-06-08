@@ -85,7 +85,10 @@ class GRAIPE_CORE_EXPORT BoolParameter
          *
          * \return "BoolParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "BoolParameter";
+        }
     
         /** 
          * The current value of this parameter in the correct, most special type

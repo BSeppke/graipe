@@ -150,10 +150,6 @@ typedef Factory<ViewControllerFactoryItem>      ViewControllerFactory;
 /** A Factory for Algorithms **/
 typedef Factory<AlgorithmFactoryItem> AlgorithmFactory;
 
-extern ModelFactory modelFactory;
-extern ViewControllerFactory viewControllerFactory;
-extern AlgorithmFactory algorithmFactory;
-
 }//end of namespace graipe
 
 /**

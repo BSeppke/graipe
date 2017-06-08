@@ -504,16 +504,6 @@ void Model::copyData(Model& other) const
 }
 
 /**
- * The type of this model (same for every instance).
- *
- * \return "Model"
- */
-QString Model::typeName() const
-{
-	return "Model";
-}
-
-/**
  * This function serializes a complete Model to a xml stream.
  * Writes the following XML code by default:
  *
@@ -911,16 +901,6 @@ void RasteredModel::copyGeometry(Model& other) const
 void RasteredModel::copyData(Model& other) const
 {
     Model::copyData(other);
-}
-
-/**
- * The type of this model (same for every instance).
- *
- * \return "RasteredModel"
- */
-QString RasteredModel::typeName() const
-{
-	return "RasteredModel";
 }
 
 } //end of namespace graipe

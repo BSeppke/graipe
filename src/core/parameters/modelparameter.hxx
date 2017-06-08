@@ -89,7 +89,10 @@ class GRAIPE_CORE_EXPORT ModelParameter
          *
          * \return "ModelParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "ModelParameter";
+        }
         
         /** 
          * The current value of this parameter in the correct, most special type.

@@ -86,7 +86,10 @@ class GRAIPE_CORE_EXPORT EnumParameter
          *
          * \return "EnumParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "EnumParameter";
+        }
     
         /** 
          * The current value of this parameter in the correct, most special type.

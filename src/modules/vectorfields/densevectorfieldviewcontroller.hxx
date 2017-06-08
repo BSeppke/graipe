@@ -91,7 +91,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DViewController
          *
          * \return Always: "DenseVectorfield2DViewController"
          */
-		virtual QString typeName() const;
+		QString typeName() const
+        {
+            return "DenseVectorfield2DViewController";
+        }
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -191,7 +194,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DParticleViewController
          *
          * \return Always: "DenseVectorfield2DParticleViewController"
          */
-		virtual QString typeName() const;
+		QString typeName() const
+        {
+            return "DenseVectorfield2DParticleViewController";
+        }
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -294,7 +300,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DViewController
          *
          * \return Always: "DenseWeightedVectorfield2DViewController"
          */
-		virtual QString typeName() const;
+		QString typeName() const
+        {
+            return "DenseWeightedVectorfield2DViewController";
+        }
 	
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -375,7 +384,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DParticleViewControlle
          *
          * \return Always: "DenseWeightedVectorfield2DParticleViewController"
          */
-		virtual QString typeName() const;
+		QString typeName() const
+        {
+            return "DenseWeightedVectorfield2DParticleViewController";
+        }
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current

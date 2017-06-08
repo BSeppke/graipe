@@ -89,7 +89,10 @@ class GRAIPE_CORE_EXPORT LongStringParameter
          *
          * \return "LongStringParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "LongStringParameter";
+        }
     
         /** 
          * The current value of this parameter in the correct, most special type.

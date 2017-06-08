@@ -79,16 +79,6 @@ LongStringParameter::~LongStringParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "LongStringParameter".
- */
-QString  LongStringParameter::typeName() const
-{
-    return "LongStringParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type.
  *
  * \return The value of this parameter.

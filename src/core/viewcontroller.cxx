@@ -404,16 +404,6 @@ void ViewController::updateParameters(bool /*force_update*/)
 }
 
 /**
- * The type name of this view (same for every instance).
- *
- * \return "ViewController"
- */
-QString ViewController::typeName() const
-{
-    return "ViewController";
-}
-
-/**
  * This function serializes a complete ViewController to an output device.
  * To do so, it serializes the typeName(), then the model denoted by the model's
  * filename and eventually the parameter set.

@@ -149,17 +149,6 @@ void Serializable::setID(const QString& new_id)
     m_id = new_id;
 }
 
-/**
- * Since we want to identify, we assign the Serializable class an uid.
- * Should be overwritten in iheriting classes.
- *
- * \return "Serializable" as a QString
- */
-QString Serializable::typeName() const
-{
-    return "Serializable";
-}
-
 } //end of namespace graipe
 
 /**

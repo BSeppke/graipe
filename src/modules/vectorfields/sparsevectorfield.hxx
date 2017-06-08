@@ -69,7 +69,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          *
          * \return Always "SparseVectorfield2D"
          */
-		virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "SparseVectorfield2D";
+        }
     
         /**
          * The size of this vectorfield. 
@@ -236,7 +239,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
          *
          * \return Always "SparseWeightedVectorfield2D"
          */
-		virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "SparseWeightedVectorfield2D";
+        }
     
         /**
          * The removal of all vectors of this vectorfield.
@@ -365,7 +371,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          *
          * \return Always "SparseMultiVectorfield2D"
          */
-		virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "SparseMultiVectorfield2D";
+        }
     
         /**
          * The removal of all vectors of this vectorfield.
@@ -615,10 +624,27 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
 class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public SparseMultiVectorfield2D
 {
 	public:
-		SparseWeightedMultiVectorfield2D(const SparseWeightedMultiVectorfield2D & vf);	
-		SparseWeightedMultiVectorfield2D();
+        /**
+         * Default constructor. Creates an empty sparse weighted multi vectorfield.
+         */
+        SparseWeightedMultiVectorfield2D();
+    
+        /**
+         * Copy constructor. Creates a sparse weighted multi vectorfield from another one.
+         *
+         * \param vf The other sparse weighted multi vectorfield.
+         */
+		SparseWeightedMultiVectorfield2D(const SparseWeightedMultiVectorfield2D & vf);
 		
-		virtual QString typeName() const;
+        /**
+         * The typename of this vectorfield.
+         *
+         * \return Always "SparseWeightedMultiVectorfield2D"
+         */
+        QString typeName() const
+        {
+            return "SparseWeightedMultiVectorfield2D";
+        }
 		
         /**
          * The removal of all vectors of this vectorfield.

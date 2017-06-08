@@ -40,7 +40,6 @@
 #include "core/globals.hxx"
 
 #include <QDir>
-#include <QMutex>
 #include <QLibrary>
 #include <QThread>
 #include <QMessageBox>
@@ -52,8 +51,6 @@
 #include <QTimer>
 
 namespace graipe {
-
-static QMutex global_algorithm_mutex;
 
 /**
  * Constructor of main window.
@@ -478,7 +475,6 @@ void MainWindow::runAlgorithm(int index)
     AlgorithmFactoryItem alg_item = algorithmFactory[index];
 	
 	Algorithm* alg = alg_item.algorithm_fptr();
-	alg->setGlobalAlgorithmMutex(&global_algorithm_mutex);
     
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);

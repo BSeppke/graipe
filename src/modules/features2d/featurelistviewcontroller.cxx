@@ -159,16 +159,6 @@ QRectF PointFeatureList2DViewController::boundingRect() const
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "PointFeatureList2DViewController"
- */
-QString PointFeatureList2DViewController::typeName() const
-{
-    return "PointFeatureList2DViewController";
-}
-
-/**
  * Implementation/specialization of the handling of a mouse-move event
  *
  * \param event The mouse event which triggered this function.
@@ -441,16 +431,6 @@ QRectF WeightedPointFeatureList2DViewController::boundingRect() const
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "WeightedPointFeatureList2DViewController"
- */
-QString WeightedPointFeatureList2DViewController::typeName() const
-{
-	return "WeightedPointFeatureList2DViewController";
-}
-
-/**
  * Specialization of the update of  the parameters of this ViewController according to the current
  * model's parameters. This is necessary, if something may have changed 
  * the model in meantime.
@@ -710,16 +690,6 @@ void EdgelFeatureList2DViewController::paint(QPainter *painter, const QStyleOpti
 }
 
 /**
- * The typename of this ViewController
- *
- * \return Always: "EdgelList2DViewController"
- */
-QString EdgelFeatureList2DViewController::typeName() const
-{
-	return "EdgelFeatureList2DViewController";
-}
-
-/**
  * Implementation/specialization of the handling of a mouse-move event
  *
  * \param event The mouse event which triggered this function.
@@ -951,16 +921,6 @@ void SIFTFeatureList2DViewController::paint(QPainter *painter, const QStyleOptio
 	
 	
 	ViewController::paintAfter(painter, option, widget);
-}
-
-/**
- * The typename of this ViewController
- *
- * \return Always: "SIFTFeatureList2DViewController"
- */
-QString SIFTFeatureList2DViewController::typeName() const
-{
-	return "SIFTFeatureList2DViewController"; 
 }
 
 /**

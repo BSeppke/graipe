@@ -78,16 +78,6 @@ DoubleParameter::~DoubleParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "DoubleParameter".
- */
-QString  DoubleParameter::typeName() const
-{
-	return "DoubleParameter";
-}
-
-/**
  * The lowest possible value of this parameter.
  *
  * \return The minimal value of this parameter.

@@ -78,16 +78,6 @@ IntParameter::~IntParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "IntParameter".
- */
-QString  IntParameter::typeName() const
-{
-	return "IntParameter";
-}
-
-/**
  * The lowest possible value of this parameter.
  *
  * \return The minimal value of this parameter.

@@ -87,7 +87,10 @@ class GRAIPE_CORE_EXPORT ColorParameter
          *
          * \return "ColorParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "ColorParameter";
+        }
         
         /** 
          * The current value of this parameter in the correct, most special type.

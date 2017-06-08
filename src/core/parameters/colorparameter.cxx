@@ -74,16 +74,6 @@ ColorParameter::~ColorParameter()
     if(m_delegate!=NULL)
         delete m_delegate;
 }
-    
-/**
- * The (immutable) type name of this parameter class.
- *
- * \return "ColorParameter".
- */
-QString ColorParameter::typeName() const
-{
-    return "ColorParameter";
-}
 
 /**
  * The current value of this parameter in the correct, most special type.

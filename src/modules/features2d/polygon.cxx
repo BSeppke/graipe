@@ -43,16 +43,6 @@ namespace graipe {
 Polygon2D::~Polygon2D()
 {
 }
-    
-/**
- * The typename of this Polygon2D class
- *
- * \return Always: "Polygon2D"
- */
-QString Polygon2D::typeName() const
-{
-	return "Polygon2D";
-}
 
 /**
  * Check if the polygon is closed.

@@ -101,16 +101,6 @@ DenseVectorfield2D::DenseVectorfield2D(const ArrayViewType & u, const ArrayViewT
 }
 
 /**
- * The typename of this vector field.
- *
- * \return Always "DenseVectorfield2D"
- */
-QString DenseVectorfield2D::typeName() const
-{ 
-    return	QString("DenseVectorfield2D");
-}
-
-/**
  * The size of this vectorfield. 
  * Implemented here, defined as pure virtual in base class.
  * 
@@ -797,16 +787,6 @@ DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, c
 :	DenseVectorfield2D(u, v),
 	m_w(w)
 {	
-}
-    
-/**
- * The typename of this vector field.
- *
- * \return Always "DenseWeightedVectorfield2D"
- */
-QString DenseWeightedVectorfield2D::typeName() const
-{ 
-	return QString("DenseWeightedVectorfield2D");
 }
 
 /**

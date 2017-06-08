@@ -85,7 +85,10 @@ class GRAIPE_CORE_EXPORT DateTimeParameter
          *
          * \return "DateTimeParameter".
          */
-        virtual QString typeName() const;
+        QString typeName() const
+        {
+            return "DateTimeParameter";
+        }
         
         /** 
          * The current value of this parameter in the correct, most special type.

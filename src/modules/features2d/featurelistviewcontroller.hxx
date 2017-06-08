@@ -70,6 +70,16 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
         ~PointFeatureList2DViewController();
     
         /**
+         * The typename of this ViewController
+         *
+         * \return Always: "PointFeatureList2DViewController"
+         */
+		QString typeName() const
+        {
+            return "PointFeatureList2DViewController";
+        }
+    
+        /**
          * Implementation/specialization of the ViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -85,13 +95,6 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
          * \return The bounding rectangle of this view.
          */
         QRectF boundingRect() const;
-    
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "PointFeatureList2DViewController"
-         */
-        virtual QString typeName() const;
         
     protected:
         /**
@@ -144,6 +147,16 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
         ~WeightedPointFeatureList2DViewController();
 	
         /**
+         * The typename of this ViewController
+         *
+         * \return Always: "WeightedPointFeatureList2DViewController"
+         */
+		QString typeName() const
+        {
+            return "WeightedPointFeatureList2DViewController";
+        }
+    
+        /**
          * Implementation/specialization of the ViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -159,13 +172,6 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
          * \return The bounding rectangle of this view.
          */
         QRectF boundingRect() const;
-    
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "WeightedPointFeatureList2DViewController"
-         */
-		virtual QString typeName() const;
     
         /**
          * Specialization of the update of  the parameters of this ViewController according to the current
@@ -241,6 +247,16 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController
         ~EdgelFeatureList2DViewController();
 		
         /**
+         * The typename of this ViewController
+         *
+         * \return Always: "EdgelFeatureList2DViewController"
+         */
+		QString typeName() const
+        {
+            return "EdgelFeatureList2DViewController";
+        }
+    
+        /**
          * Implementation/specialization of the WeightedPointFeatureList2DViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -249,13 +265,6 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController
          * \param widget The widget, where we will draw onto.
          */
 		void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-		
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "EdgelList2DViewController"
-         */
-		virtual QString typeName() const;
 
 	protected:
         /**
@@ -301,6 +310,16 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
         ~SIFTFeatureList2DViewController();
 		
         /**
+         * The typename of this ViewController
+         *
+         * \return Always: "SIFTFeatureList2DViewController"
+         */
+		QString typeName() const
+        {
+            return "SIFTFeatureList2DViewController";
+        }
+    
+        /**
          * Implementation/specialization of the EdgelFeatureList2DViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -309,13 +328,6 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
          * \param widget The widget, where we will draw onto.
          */
 		void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-		
-        /**
-         * The typename of this ViewController
-         *
-         * \return Always: "SIFTFeatureList2DViewController"
-         */
-		virtual QString typeName() const;
     
 	protected:
         /**

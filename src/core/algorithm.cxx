@@ -173,32 +173,6 @@ void Algorithm::unlockModels()
 }
 
 /**
- * To enusure the running of non-thread-safe partial algorithms, like
- * the FFTW, it is possible to provide the algorithm a global Mutex.
- * This Mutex will then be used for locking if necessary.
- *
- * This is the setter for the Mutex.
- * \param mutex The global mutex to be set.
- */
-void Algorithm::setGlobalAlgorithmMutex(QMutex * mutex)
-{
-    m_global_algorithm_mutex = mutex;
-}
-
-/**
- * To enusure the running of non-thread-safe partial algorithms, like
- * the FFTW, it is possible to provide the algorithm a global Mutex.
- * This Mutex will then be used for locking if necessary.
- *
- * This is the getter for the Mutex.
- * \return The global mutex of this algorithm.
- */
-QMutex * Algorithm::globalAlgorithmMutex()
-{
-    return m_global_algorithm_mutex;
-}
-
-/**
  * For monitoring purpose, algorithms may send progress signals by means of
  * status messages. This method provids a slot, which creates and sends the
  * appropriate processing signal 0...99.9 (%) as a status message.

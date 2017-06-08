@@ -78,16 +78,6 @@ FloatParameter::~FloatParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "FloatParameter".
- */
-QString FloatParameter::typeName() const
-{
-	return "FloatParameter";
-}
-
-/**
  * The lowest possible value of this parameter.
  *
  * \return The minimal value of this parameter.

@@ -173,6 +173,9 @@ GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir)
     return ss;
 }
 
+//One global algorithm mutex:
+QMutex global_algorithm_mutex;
+
 //Three global variables for the factories:
 ModelFactory modelFactory;
 ViewControllerFactory viewControllerFactory;

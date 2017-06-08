@@ -76,16 +76,6 @@ StringParameter::~StringParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "StringParameter".
- */
-QString  StringParameter::typeName() const
-{
-	return "StringParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type.
  *
  * \return The value of this parameter.

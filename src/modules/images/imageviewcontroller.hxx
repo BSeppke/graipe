@@ -69,6 +69,19 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
         ~ImageSingleBandViewController();
     
         /**
+         * The typename of this ViewController
+         *
+         * \return Unique QString depending on the templated image type. Either:
+         *         "ImageSingleBandViewController", "IntImageSingleBandViewController" or
+         *         "ByteImageSingleBandViewController".
+         */
+        QString typeName() const
+        {
+            Image<T> temp;
+            return temp.typeName() + "SingleBandViewController";
+        }
+    
+        /**
          * Implementation/specialization of the ViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -77,15 +90,6 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
          * \param widget The widget, where we will draw onto.
          */
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    
-        /**
-         * The typename of this ViewController
-         *
-         * \return Unique QString depending on the templated image type. Either:
-         *         "ImageSingleBandViewController", "IntImageSingleBandViewController" or
-         *         "ByteImageSingleBandViewController".
-         */
-        virtual QString typeName() const;
     
         /**
          * Specialization of the update of the view according to the current parameter settings.
@@ -129,6 +133,9 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
         QVector<QRgb> m_ct;
 };
 
+
+
+
 /**
  * A class for viewing three bands of an image by means of RGB assignment on a QGraphicsScene/View and
  * controlling the view using different parameters.
@@ -155,6 +162,19 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
         ~ImageRGBViewController();
     
         /**
+         * The typename of this ViewController
+         *
+         * \return Unique QString depending on the templated image type. Either:
+         *         "ImageRGBViewController", "IntImageRGBViewController" or
+         *         "ByteImageRGBViewController".
+         */
+        QString typeName() const
+        {
+            Image<T> temp;
+            return temp.typeName() + "RGBViewController";
+        }
+    
+        /**
          * Implementation/specialization of the ViewController's paint procedure. This is called
          * by the QGraphicsView on every re-draw request.
          *
@@ -163,15 +183,6 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
          * \param widget The widget, where we will draw onto.
          */
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    
-        /**
-         * The typename of this ViewController
-         *
-         * \return Unique QString depending on the templated image type. Either:
-         *         "ImageRGBViewController", "IntImageRGBViewController" or
-         *         "ByteImageRGBViewController".
-         */
-        virtual QString typeName() const;
     
         /**
          * Specialization of the update of the view according to the current parameter settings.

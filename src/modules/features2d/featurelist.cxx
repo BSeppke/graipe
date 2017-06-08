@@ -48,16 +48,6 @@ PointFeatureList2D::PointFeatureList2D()
 }
 
 /**
- * The typename of this feature list
- *
- * \return Always "PointFeatureList2D"
- */
-QString PointFeatureList2D::typeName() const
-{
-	return "PointFeatureList2D";
-}
-
-/**
  * Returns the number of features in this list.
  *
  * \return The number of features in this list.
@@ -324,16 +314,6 @@ WeightedPointFeatureList2D::WeightedPointFeatureList2D()
 }
 
 /**
- * The typename of this feature list
- *
- * \return Always "WeightedPointFeatureList2D"
- */
-QString WeightedPointFeatureList2D::typeName() const
-{
-	return "WeightedPointFeatureList2D";
-}
-
-/**
  * Completely erases this list of weighted features. Does nothing if the list is locked.
  */
 void WeightedPointFeatureList2D::clear()
@@ -525,16 +505,6 @@ bool WeightedPointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
  */
 EdgelFeatureList2D::EdgelFeatureList2D()
 {
-}
-
-/**
- * The typename of this feature list
- *
- * \return Always "EdgelFeatureList2D"
- */
-QString EdgelFeatureList2D::typeName() const
-{
-	return "EdgelFeatureList2D";
 }
 
 /**
@@ -757,16 +727,6 @@ bool EdgelFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
  */
 SIFTFeatureList2D::SIFTFeatureList2D()
 {
-}
-
-/**
- * The typename of this feature list
- *
- * \return Always "SIFTFeatureList2D"
- */
-QString SIFTFeatureList2D::typeName() const
-{
-	return "SIFTFeatureList2D";
 }
 
 /**

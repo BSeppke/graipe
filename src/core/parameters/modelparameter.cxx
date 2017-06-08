@@ -94,16 +94,6 @@ ModelParameter::~ModelParameter()
 }
 
 /**
- * The (immutable) type name of this parameter class.
- *
- * \return "ModelParameter".
- */
-QString  ModelParameter::typeName() const
-{
-	return "ModelParameter";
-}
-
-/**
  * The current value of this parameter in the correct, most special type.
  *
  * \return The value of this parameter.
