@@ -232,7 +232,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          */
         void setWeight(unsigned int index, float new_w);
         
-        /*
+        /**
          * Reset/replace a polygon inside this list at a given index. The weight of the reset
          * polygon will be set to zero. If the index is out of range or the model is locked, 
          * this function will do nothing.
@@ -253,7 +253,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          */
 		virtual void setPolygon(unsigned int index, const PolygonType& new_p, float new_w);
     
-        /*
+        /**
          * Add a polygon at the end of this list.
          * If the model is locked, this function will do nothing.
          *
@@ -261,7 +261,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          */
 		virtual void addPolygon(const PolygonType& poly);
     
-        /*
+        /**
          * Add a weighted polygon at the end of this list.
          * If the model is locked, this function will do nothing.
          *

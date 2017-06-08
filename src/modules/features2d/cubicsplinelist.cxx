@@ -211,12 +211,19 @@ bool CubicSplineList2D::itemFromCSV(const QString & serial)
     return true;
 }
 /**
- * Serialization of one 2D cubic spline at a given list index to a string. This function will
-         * throw an error if the index is out of range.
+ * Serialization of one 2D cubic spline at a given list index to XML. 
+ * This function will throw an error if the index is out of range.
+ * The serialization will be written as:
+ *
+ * <Derivative ID="0"><x>dp0/dx</x><y>dp0/dy</y></Derivative>
+ * <Point ID="0"><x>p0_x</x><y>p0_y</y></Point>
+ * ...
+ * <Point ID="N-1"><x>pN-1_x</x><y>pN-1_y</y></Point>
+ * <Derivative ID="N-1"><x>dpN-1/dx</x><y>dpN-1/dy</y></Derivative>
  *
  * \param index The index of the 2D cubic spline to be serialized.
- * \return A QString containing the searialization of the 2D cubic spline.
- *         The serialization should be given as: dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
+ * \param xmlWriter The XML Stream writer, where the serialization takes place.
+ *
  */
 void CubicSplineList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
@@ -247,9 +254,9 @@ void CubicSplineList2D::serialize_item(unsigned int index, QXmlStreamWriter& xml
 }
 
 /**
- * Deserialization/addition of a 2D cubic spline from a string to this list.
+ * Deserialization/addition of a 2D cubic spline from an XML stream to this list.
  *
- * \param serial A QString containing the searialization of the 2D cubic spline.
+ * \param xmlReader An XML stream reader right at the searialization of the 2D cubic spline.
  * \return True, if the item could be deserialized and the model is not locked.
  */
 bool CubicSplineList2D::deserialize_item(QXmlStreamReader& xmlReader)
