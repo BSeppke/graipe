@@ -80,28 +80,28 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	/*--------- File menu --------*/
 	connect( m_ui.actionLoad_data, SIGNAL(triggered()), this, SLOT(loadModel()));
 	
-	connect( m_ui.actionSave_current_data, SIGNAL(triggered()), this, SLOT(saveCurrentModel()));
-	connect( m_ui.actionShow_current_data, SIGNAL(triggered()), this, SLOT(showCurrentModel()));
-	connect( m_ui.actionUnload_current_data, SIGNAL(triggered()), this, SLOT(removeCurrentModel()));
+	connect( m_ui.actionSave_current_data,      SIGNAL(triggered()), this, SLOT(saveCurrentModel()));
+	connect( m_ui.actionShow_current_data,      SIGNAL(triggered()), this, SLOT(showCurrentModel()));
+	connect( m_ui.actionUnload_current_data,    SIGNAL(triggered()), this, SLOT(removeCurrentModel()));
     
-    connect( m_ui.actionSave_workspace, SIGNAL(triggered()), this, SLOT(saveWorkspace()));
-    connect( m_ui.actionRestore_workspace, SIGNAL(triggered()), this, SLOT(restoreWorkspace()));
+    connect( m_ui.actionSave_workspace,     SIGNAL(triggered()), this, SLOT(saveWorkspace()));
+    connect( m_ui.actionRestore_workspace,  SIGNAL(triggered()), this, SLOT(restoreWorkspace()));
     
-	connect( m_ui.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
-	connect(m_ui.actionExport_View_to_PDF, SIGNAL(triggered()), this, SLOT(saveAsPDF()));
-	connect(m_ui.actionExport_View_to_SVG, SIGNAL(triggered()), this, SLOT(saveAsSVG()));
+	connect( m_ui.actionPrint,              SIGNAL(triggered()), this, SLOT(print()));
+	connect(m_ui.actionExport_View_to_PDF,  SIGNAL(triggered()), this, SLOT(saveAsPDF()));
+	connect(m_ui.actionExport_View_to_SVG,  SIGNAL(triggered()), this, SLOT(saveAsSVG()));
 		
 	connect( m_ui.actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 	
 	/*--------- View menu --------*/
-	connect( m_ui.actionZoom_in, SIGNAL(triggered()), this, SLOT(zoomIn()));
-	connect( m_ui.actionZoom_out, SIGNAL(triggered()), this, SLOT(zoomOut()));
-	connect( m_ui.actionNormal_size, SIGNAL(triggered()), this, SLOT(normalSize()));
+	connect( m_ui.actionZoom_in,        SIGNAL(triggered()), this, SLOT(zoomIn()));
+	connect( m_ui.actionZoom_out,       SIGNAL(triggered()), this, SLOT(zoomOut()));
+	connect( m_ui.actionNormal_size,    SIGNAL(triggered()), this, SLOT(normalSize()));
 
 	
 	/*--------- Help menu --------*/
-	connect( m_ui.actionHelp, SIGNAL(triggered()), this, SLOT(help()));
-	connect( m_ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+	connect( m_ui.actionHelp,   SIGNAL(triggered()), this, SLOT(help()));
+	connect( m_ui.actionAbout,  SIGNAL(triggered()), this, SLOT(about()));
 	
 	
 	//Views view
@@ -111,9 +111,9 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	connect(m_ui.btnSaveItem,	SIGNAL(clicked()), this, SLOT(saveCurrentModel()));
 	connect(m_ui.btnRemoveItem, SIGNAL(clicked()), this, SLOT(removeCurrentModel()));
 	
-	connect(m_ui.btnRemoveItemView, SIGNAL(clicked()), this, SLOT(removeCurrentViewController()));
-    connect(m_ui.btnCenterOnModelView, SIGNAL(clicked()), this, SLOT(centerOnCurrentView()));
-	connect(m_ui.btnWorldView,		SIGNAL(clicked()), this, SLOT(updateView()));
+	connect(m_ui.btnRemoveItemView,     SIGNAL(clicked()), this, SLOT(removeCurrentViewController()));
+    connect(m_ui.btnCenterOnModelView,  SIGNAL(clicked()), this, SLOT(centerOnCurrentView()));
+	connect(m_ui.btnWorldView,          SIGNAL(clicked()), this, SLOT(updateView()));
 	
     //Notbehelf, weil die modelUpdate Nachrichten irgendwie nicht immer ankommen... Update manuell per Klick
 	connect( m_ui.listViews, SIGNAL(itemClicked ( QListWidgetItem *)), this, SLOT(currentViewControllerChanged(QListWidgetItem *)));
@@ -149,7 +149,7 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	
 	m_displayMode = ImageMode;
 	
-	loadFactories();
+	initializeFactories();
     
     //Prepare the recent file menu:
     QAction* recentFileAction = NULL;
@@ -431,7 +431,9 @@ void MainWindow::about()
 }
 
 /**
- * This slot is called every tiem a new data item / Model shall be created.
+ * This slot is called every time a new data item / Model shall be created.
+ *
+ * \param inxed The model's index in the modelFactory.
  */
 void MainWindow::newModel(int index)
 {
@@ -511,8 +513,6 @@ void MainWindow::runAlgorithm(int index)
 		{
 			QMessageBox::critical(this, "Error in Algorithm run",
 								  QString("Not all necessary parameters have been set!"));
-			
-			
 		}
 	}
     else
@@ -771,12 +771,10 @@ void MainWindow::saveCurrentModel()
  */
 void MainWindow::removeCurrentModel()
 {
-	
 	Model* model = currentModel();
 	
 	if(model)
 	{
-		
 		bool found_model_view = false;
 		
 		//look if the model is displayed -> cannot delete in that case
@@ -822,7 +820,6 @@ void MainWindow::centerOnCurrentView()
  */
 void MainWindow::removeCurrentViewController()
 {
-	
 	ViewController* viewController = currentViewController();
 	
 	if(viewController != NULL)
@@ -1099,87 +1096,91 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                     {
                         if(xmlReader.name() =="Header")
                         {
-                            w_settings.deserialize(xmlReader);
-                        }
-                        //Read until </Header> comes....
-                        while(true)
-                        {
-                            if(!xmlReader.readNext())
+                            if(w_settings.deserialize(xmlReader))
                             {
-                                throw "Error: XML at end before Header End-Tag";
-                            }
-                            
-                            if(xmlReader.isEndElement() && xmlReader.name() == "Header")
-                            {
-                                break;
-                            }
-                        }
-                        if(xmlReader.readNextStartElement())
-                        {
-                            if(xmlReader.name() =="Content")
-                            {
+                                //Read until </Header> comes....
+                                while(true)
+                                {
+                                    if(!xmlReader.readNext())
+                                    {
+                                        throw "Error: XML at end before Header End-Tag";
+                                    }
+                                    
+                                    if(xmlReader.isEndElement() && xmlReader.name() == "Header")
+                                    {
+                                        break;
+                                    }
+                                }
+                                
                                 if(xmlReader.readNextStartElement())
                                 {
-                                    //1. Read in all the saved models
-                                    if(xmlReader.name() =="Models")
+                                    if(xmlReader.name() =="Content")
                                     {
-                                        for(int i=0; i!=p_models->value(); i++)
-                                        {
-                                            Model* m = Impex::loadModel(xmlReader);
-                                            if(m != NULL)
-                                            {
-                                                addModelItemToList(m);
-                                                if(m->id() == p_currentModel->value())
-                                                {
-                                                    m_ui.listModels->setCurrentRow(m_ui.listModels->count()-1);
-                                                }
-                                            }
-                                        }
-                                        
-                                        //Read until </Models> comes....
-                                        while(true)
-                                        {
-                                            if(xmlReader.isEndElement() && xmlReader.name() == "Models")
-                                            {
-                                                break;
-                                            }
-                                            if(!xmlReader.readNext())
-                                            {
-                                                throw "Error: XML at end before Models End-Tag";
-                                            }
-                                        }
                                         if(xmlReader.readNextStartElement())
                                         {
-                                            //2. Read in all the saved views
-                                            if(xmlReader.name() =="ViewControllers")
+                                            //1. Read in all the saved models
+                                            if(xmlReader.name() =="Models")
                                             {
-                                                QStringList activeVCs = p_activeVCs->value().split(", ");
-                                            
-                                                for(int i=0; i!=p_viewControllers->value(); i++)
+                                                for(int i=0; i!=p_models->value(); i++)
                                                 {
-                                                    ViewController* vc = Impex::loadViewController(xmlReader, m_scene);
-                                                    if(vc != NULL)
+                                                    Model* m = Impex::loadModel(xmlReader);
+                                                    if(m != NULL)
                                                     {
-                                                        addViewControllerItemToList(vc);
-                                                        
-                                                        if(vc->id() == p_currentVC->value())
+                                                        addModelItemToList(m);
+                                                        if(m->id() == p_currentModel->value())
                                                         {
-                                                            m_ui.listViews->setCurrentRow(m_ui.listViews->count()-1);
+                                                            m_ui.listModels->setCurrentRow(m_ui.listModels->count()-1);
                                                         }
-                                                        Qt::CheckState state = Qt::CheckState::Unchecked;
-                                                        if(activeVCs.contains(vc->id()))
+                                                    }
+                                                }
+                                                
+                                                //Read until </Models> comes....
+                                                while(true)
+                                                {
+                                                    if(xmlReader.isEndElement() && xmlReader.name() == "Models")
+                                                    {
+                                                        break;
+                                                    }
+                                                    if(!xmlReader.readNext())
+                                                    {
+                                                        throw "Error: XML at end before Models End-Tag";
+                                                    }
+                                                }
+                                                
+                                                if(xmlReader.readNextStartElement())
+                                                {
+                                                    //2. Read in all the saved views
+                                                    if(xmlReader.name() =="ViewControllers")
+                                                    {
+                                                        QStringList activeVCs = p_activeVCs->value().split(", ");
+                                                    
+                                                        for(int i=0; i!=p_viewControllers->value(); i++)
                                                         {
-                                                            state = Qt::CheckState::Checked;
+                                                            ViewController* vc = Impex::loadViewController(xmlReader, m_scene);
+                                                            if(vc != NULL)
+                                                            {
+                                                                addViewControllerItemToList(vc);
+                                                                
+                                                                if(vc->id() == p_currentVC->value())
+                                                                {
+                                                                    m_ui.listViews->setCurrentRow(m_ui.listViews->count()-1);
+                                                                }
+                                                                Qt::CheckState state = Qt::CheckState::Unchecked;
+                                                                if(activeVCs.contains(vc->id()))
+                                                                {
+                                                                    state = Qt::CheckState::Checked;
+                                                                }
+                                                                m_ui.listViews->item(m_ui.listViews->count()-1)->setCheckState(state);
+                                                            }
                                                         }
-                                                        m_ui.listViews->item(m_ui.listViews->count()-1)->setCheckState(state);
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
+                                 }
                             }
-                         }
+                        }
                     }
                     //3. Restore the other vierport and window state settings:
                     m_ui.btnWorldView->setChecked(p_geoMode->value());
@@ -1211,50 +1212,6 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
 }
     
 /**
- * This slot is called to load a view and maybe the depending objects from file system.
- *
- * \param filename The filename of the ViewController serialization.
- */
-void MainWindow::loadViewController(const QString& filename)
-{
-    //1. Collect models in vector
-    std::vector<Model*> all_models;
-    for(int i=0;  i!=m_ui.listModels->count(); ++i)
-    {
-        QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(i));
-        
-        if(model_item  &&  model_item->model())
-        {
-            all_models.push_back(model_item->model());
-        }
-    }
-    
-    ViewController * vc = Impex::loadViewController(filename, m_scene);
-    
-    //  If it was not found: Indicate error
-    if(vc != NULL)
-    {
-        if(m_ui.btnWorldView->isChecked())
-        {
-            vc->setTransform(vc->model()->globalTransformation());
-        }
-        else
-        {
-            vc->setTransform(vc->model()->localTransformation());
-            m_scene->setSceneRect(m_scene->itemsBoundingRect());
-        }
-        connect(vc, SIGNAL(updateStatusText(QString)), this, SLOT(updateStatusText(QString)));
-        connect(vc, SIGNAL(updateStatusDescription(QString)), this,	SLOT(updateStatusDescription(QString)));
-        
-        addViewControllerItemToList(vc);
-    }
-    else
-    {
-        throw std::runtime_error("ViewController type could not be loaded.");
-    }
-}
-    
-/**
  * The slot creates a new Algorithm item on the Model list for an algorithm instance.
  * This item will persist until the processing is finished.
  *
@@ -1266,7 +1223,8 @@ QListWidgetAlgorithmItem* MainWindow::getAlgorithmItem(Algorithm* alg)
 	for(int i=0; i<m_ui.listModels->count(); i++)
 	{
 		QListWidgetAlgorithmItem* item = dynamic_cast<QListWidgetAlgorithmItem*>( m_ui.listModels->item(i) );
-		if (item && item->algorithm() == alg)
+		
+        if (item && item->algorithm() == alg)
 		{
         	return item;
         }
@@ -1284,8 +1242,6 @@ QListWidgetAlgorithmItem* MainWindow::getAlgorithmItem(Algorithm* alg)
  */
 void MainWindow::algorithmStateChanged(float p, QString str)
 {
-	//qDebug() << str << " percentage: " << p; 
-	
 	Algorithm* alg = static_cast<Algorithm*> (sender());
 	
 	QListWidgetAlgorithmItem* item = getAlgorithmItem(alg);
@@ -1301,8 +1257,6 @@ void MainWindow::algorithmStateChanged(float p, QString str)
  */
 void MainWindow::algorithmErrorState(QString str)
 {
-	//qDebug() << "Error state reached: " << str; 
-	
 	Algorithm* alg = static_cast<Algorithm*> (sender());
 	
 	QListWidgetAlgorithmItem* item = getAlgorithmItem(alg);
@@ -1441,34 +1395,16 @@ void MainWindow::loadModel(const QString& filename)
 }
 
 /**
- * Find all available modules and fill the corresponding registries with their
- * contributions. Calls loadFactoriesFromDirectory with different paths:
- * Under Mac OS at the place of the executable file (not the app-Bundle) and at
- * the location of the .app-bundle.
+ * Uses the graipe::core function to find and load all modules into the global factories.
+ * Afterwards, it connects to all loaded models and algorithms in the factories.
  */
-void MainWindow::loadFactories()
+void MainWindow::initializeFactories()
 {
-	//search paths for modules:
-	QDir		current_dir		= QCoreApplication::applicationDirPath();
-    
-    //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
-    //     Graipe.app/Contents/MacOS
+    //Use the graipe::core function to find and load all modules into the global factories:
     QString report = graipe::loadModules();
     m_status_window->updateStatus(report);
     
-    connectToFactories();
-    
-}
-
-/**
- * Find all available modules in a directory and fill the corresponding registries with their
- * contributions.
- *
- * \param dir The directory to search for modules.
- * \param added_menus Menus added during the module load.
- */
-void MainWindow::connectToFactories()
-{
+    //Connect the model factory to the GUI
     unsigned int i=0;
     for(const ModelFactoryItem& item : modelFactory)
     {
@@ -1482,9 +1418,9 @@ void MainWindow::connectToFactories()
 	connect(m_modSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedNewModel(int)));
 	connect(this, SIGNAL(clickedNewModel(int)), this, SLOT(newModel(int)));
     
+    //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     i=0;
-    
     for(const AlgorithmFactoryItem& item : algorithmFactory)
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
@@ -1536,9 +1472,13 @@ Model* MainWindow::currentModel()
 	QListWidgetModelItem* item  = dynamic_cast<QListWidgetModelItem*>(m_ui.listModels->currentItem());
 	
 	if(item)
-		return item->model();
-	else
-		return NULL;
+	{
+    	return item->model();
+	}
+    else
+	{
+    	return NULL;
+    }
 }
 
 /**
@@ -1551,9 +1491,13 @@ QString MainWindow::currentModelType()
     Model * model = currentModel();
     
 	if(model)
+    {
 		return model->typeName();
-	else
-		return QString("");
+	}
+    else
+	{
+    	return QString("");
+    }
 }
 
 /**
@@ -1566,9 +1510,13 @@ ViewController* MainWindow::currentViewController()
 	QListWidgetViewControllerItem* vc_item  = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->currentItem());
 	
 	if(vc_item)
-		return vc_item->viewController();
-	else
-		return NULL;
+	{
+    	return vc_item->viewController();
+	}
+    else
+	{
+    	return NULL;
+    }
 }
 
 /**
@@ -1581,9 +1529,13 @@ Model* MainWindow::currentViewControllerModel()
 	QListWidgetViewControllerItem* vc_item  = dynamic_cast<QListWidgetViewControllerItem*>(m_ui.listViews->currentItem());
 	
 	if(vc_item)
-		return vc_item->viewController()->model();
-	else
-		return NULL;
+	{
+    	return vc_item->viewController()->model();
+	}
+    else
+	{
+    	return NULL;
+    }
 }
 
 /**
@@ -1596,9 +1548,13 @@ QString MainWindow::currentViewControllerModelType()
     Model * model = currentViewControllerModel();
 
     if(model)
-		return model->typeName();
-	else
-		return QString("");
+	{
+    	return model->typeName();
+	}
+    else
+	{
+    	return QString("");
+    }
 }
 
 /**
@@ -1608,7 +1564,6 @@ QString MainWindow::currentViewControllerModelType()
  */
 void MainWindow::addModelItemToList(Model* model)
 {
-	
 	if(model)
 	{
 		QListWidgetModelItem * model_item = new QListWidgetModelItem(model->name(), model );
@@ -1616,9 +1571,7 @@ void MainWindow::addModelItemToList(Model* model)
 		m_ui.listModels->addItem(model_item);
 		connect(model, SIGNAL(modelChanged()), this, SLOT(refreshModelNames()));
         
-        //m_ui.listModels->setCurrentItem(model_item);
         updateMemoryUsage();
-        
 	}
 	else
 	{
@@ -1654,7 +1607,7 @@ void MainWindow::addViewControllerItemToList(ViewController* viewController)
 		vc_item->setToolTip(viewController->typeName() + " of " + model->description());
 		m_ui.listViews->addItem(vc_item);
         m_ui.listViews->setCurrentItem(vc_item);
-        //m_view->centerOn(viewController);
+        
         currentViewControllerChanged(vc_item);
         updateMemoryUsage();
 	}

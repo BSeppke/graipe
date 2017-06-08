@@ -55,9 +55,8 @@
 namespace graipe {
 
 /**
- * This is the MainWindow, the overall GUI controller. Here nearly 
- * everything is handled. At startup, it looks for importable
- * modules in the same directory and loads them if possible.
+ * This is the MainWindow, the overall GUI controller. Here, nearly
+ * everything is handled on the larger scale.
  *
  * The GUI design is stored elsewhere, the base class is created using UIC.
  */
@@ -152,7 +151,9 @@ protected slots:
     void about();
     
     /**
-     * This slot is called every tiem a new data item / Model shall be created.
+     * This slot is called every time a new data item / Model shall be created.
+     * 
+     * \param inxed The model's index in the modelFactory.
      */
     void newModel(int index);
     
@@ -229,7 +230,6 @@ protected slots:
      * \param dirname The dirname of the Workspace serialization.
      */
     void saveWorkspace(const QString& dirname);
-
     
     /**
      * This slot is called to restore the last workspace from a folder in the file system.
@@ -242,18 +242,11 @@ protected slots:
     void restoreWorkspace();
     
     /**
-     * This slot is called to restore the complete  from a folder in the file system.
+     * This slot is called to restore the complete from a folder in the file system.
      *
      * \param dirname The dirname of the Workspace serialization.
      */
     void restoreWorkspace(const QString& dirname);
-    
-    /**
-     * This slot is called to load a view and maybe the depending objects from file system.
-     *
-     * \param filename The filename of the ViewController serialization.
-     */
-    void loadViewController(const QString& filename);
     
     /**
      * The slot creates a new Algorithm item on the Model list for an algorithm instance.
@@ -328,22 +321,10 @@ protected:
     void loadModel(const QString& filename);
 
     /**
-     * Find all available modules and fill the corresponding registries with their
-     * contributions. Calls loadFactoriesFromDirectory with different paths:
-     * Under Mac OS at the place of the executable file (not the app-Bundle) and at
-     * the location of the .app-bundle.
+     * Uses the graipe::core function to find and load all modules into the global factories.
+     * Afterwards, it connects to all loaded models and algorithms in the factories.
      */
-    void loadFactories();
-    
-    /**
-     * Find all available modules in a directory and fill the corresponding registries with their
-     * contributions.
-     *
-     * \param dir The directory to search for modules.
-     * \param added_menus Menus added during the module load.
-     * \return An html-formatted report of the loading. Empty if no module was found.
-     */
-    void connectToFactories();
+    void initializeFactories();
 
     /**
      * Accessor for the current Model.

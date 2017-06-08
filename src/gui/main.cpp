@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     
     QApplication app(argc,argv);
 
-    graipe::MainWindow m(0,"GRAIPE 1.0");
+    graipe::MainWindow m(NULL,"GRAIPE 1.0");
 	
     if (	QApplication::desktop()->width() > m.width() + 50
 		 && QApplication::desktop()->height() > m.height() + 50 )
