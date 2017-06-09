@@ -61,6 +61,11 @@ class MonotonyFeatureDetector
             m_parameters->addParameter("hiM",    new IntParameter("Highest Monotony class", 0,8, 8));
         }
 	
+    
+        QString typeName() const
+        {
+            return "MonotonyFeatureDetector";
+        }
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -167,6 +172,11 @@ class HarrisCornerDetector
             m_parameters->addParameter("T",     new FloatParameter("Corner response threshold", 0,999999, 0));
         }
 	
+    
+        QString typeName() const
+        {
+            return "HarrisCornerDetector";
+        }
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -272,6 +282,11 @@ class CannyFeatureDetector
             m_parameters->addParameter("sigmaT", new FloatParameter("Canny (gradient strength) threshold", 0,9999999, 0));
         }
         
+    
+        QString typeName() const
+        {
+            return "CannyFeatureDetector";
+        }
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -374,6 +389,11 @@ class CannyFeatureLengthFilter
             m_parameters->addParameter("radius",     new FloatParameter("Search radius for Edgel-unions", 0,9999999, 1.5));
         }
         
+    
+        QString typeName() const
+        {
+            return "CannyFeatureLengthFilter";
+        }
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -535,6 +555,11 @@ class SIFTFeatureDetector
             m_parameters->addParameter("norm",      new BoolParameter("normalize image to 0..1", true));
         }
 	
+    
+        QString typeName() const
+        {
+            return "SIFTFeatureDetector";
+        }
         /**
          * Specialization of the running phase of this algorithm.
          */

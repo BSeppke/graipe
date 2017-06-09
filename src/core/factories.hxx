@@ -107,6 +107,7 @@ struct AlgorithmFactoryItem
 {
 	QString  topic_name;
 	QString  algorithm_name;
+    QString algorithm_type; //TODO: Fill for all the algs with typeName()
 	Algorithm* (*algorithm_fptr)();
 };
 

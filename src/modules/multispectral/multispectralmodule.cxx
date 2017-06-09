@@ -79,6 +79,11 @@ class MSCannyFeatureDetector
             m_parameters->addParameter("mode", new EnumParameter("MS gradient mode:", ms_gradient_modes(),0));
         }
     
+        QString typeName() const
+        {
+            return "DistanceTransformator";
+        }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -188,6 +193,11 @@ class MSGradientCalculator
             m_parameters->addParameter("sigma", new FloatParameter("Gradient Scale", 0,9999999, 0));
         }
     
+        QString typeName() const
+        {
+            return "MSGradientCalculator";
+        }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -248,6 +258,23 @@ class MSGradientCalculator
         }
 };
 
+
+template<>
+QString MSGradientCalculator<MSMeanGradientFunctor>::typeName() const
+{
+    return "MSGradientCalculator<MSMeanGradientFunctor>";
+}
+template<>
+QString MSGradientCalculator<MSMaxGradientFunctor>::typeName() const
+{
+    return "MSGradientCalculator<MSMaxGradientFunctor>";
+}
+template<>
+QString MSGradientCalculator<MSMVGradientFunctor>::typeName() const
+{
+    return "MSGradientCalculator<MSMVGradientFunctor>";
+}
+
 /** 
  * Creates one instance of the multspectral mean gradient
  * estimation algorithm defined above.
@@ -300,6 +327,11 @@ class NDVIEstimator
             m_parameters->addParameter("image", new ModelParameter("Image","Image"));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
+        }
+    
+        QString typeName() const
+        {
+            return "NDVIEstimator";
         }
     
         /**
@@ -404,6 +436,11 @@ class EVIEstimator
             m_parameters->addParameter("C1", new FloatParameter("C1", 0,9999999, 6.0));
             m_parameters->addParameter("C2", new FloatParameter("C2", 0,9999999, 7.5));
             m_parameters->addParameter("Gain", new FloatParameter("Gain", 0,9999999, 2.5));
+        }
+    
+        QString typeName() const
+        {
+            return "EVIEstimator";
         }
     
         /**
@@ -516,6 +553,11 @@ class EVI2BandsEstimator
             m_parameters->addParameter("L", new FloatParameter("L", 0,9999999, 1));
             m_parameters->addParameter("C", new FloatParameter("C", 0,9999999, 2.4f));
             m_parameters->addParameter("Gain", new FloatParameter("Gain", 0,9999999, 2.5f));
+        }
+    
+        QString typeName() const
+        {
+            return "EVI2BandsEstimator";
         }
     
         /**

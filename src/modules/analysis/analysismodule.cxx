@@ -57,7 +57,12 @@ class MeanVectorfield
         {
             m_parameters->addParameter("vf", new MultiModelParameter("(Dense) Vectorfields",  "DenseVectorfield2D"));
         }
-        
+    
+        QString typeName() const
+        {
+            return "MeanVectorfield";
+        }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -168,7 +173,12 @@ class Vectorfield2DDenseModelComparison
             m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with", "DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("degree", new IntParameter("Use spline interpolation of degree", 0, 5,1));
         }
-	
+    
+        QString typeName() const
+        {
+            return "Vectorfield2DDenseModelComparison";
+        }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -321,6 +331,12 @@ class Vectorfield2DGenericComparison
             m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with",  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("n", new IntParameter("use n nearest neighbors in reference vf", 0, 100));
         }
+    
+        QString typeName() const
+        {
+            return "Vectorfield2DGenericComparison";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -427,6 +443,12 @@ class Vectorfield2DSeparation
         {
             m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D"));
         }
+    
+        QString typeName() const
+        {
+            return "Vectorfield2DSeparation";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -525,6 +547,12 @@ class Vectorfield2DCurl
             m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
+    
+        QString typeName() const
+        {
+            return "Vectorfield2DCurl";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -623,6 +651,12 @@ class Vectorfield2DDiv
             m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D"));
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
+    
+        QString typeName() const
+        {
+            return "Vectorfield2DDiv";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.

@@ -69,6 +69,11 @@ class BlockWiseImageMatcher
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
     
+    
+        QString typeName() const
+        {
+            return "BlockWiseImageMatcher";
+        }
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -239,6 +244,11 @@ class FeatureToFeatureMatcher
             m_parameters->addParameter("best_n",    new IntParameter("Find N best candidates", 1, 50));
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
+    
+        QString typeName() const
+        {
+            return "FeatureToFeatureMatcher";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -405,6 +415,11 @@ class FeatureToImageMatcher
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
     
+        QString typeName() const
+        {
+            return "FeatureToImageMatcher";
+        }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -566,6 +581,11 @@ class ShapeContextMatcher
             m_parameters->addParameter("best_n",    new IntParameter("Find N best candidates", 1, 50));
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
+    
+        QString typeName() const
+        {
+            return "ShapeContextMatcher";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -711,6 +731,11 @@ class SIFTMatcher
             m_parameters->addParameter("max_d", new FloatParameter("Max. geometrical distance of points", 1, 100000,100));
             m_parameters->addParameter("best_n", new IntParameter("Find N best candidates", 1, 50,10));
             m_parameters->addParameter("gme?", new BoolParameter("use global motion estimation"));
+        }
+    
+        QString typeName() const
+        {
+            return "SIFTMatcher";
         }
         
         /**

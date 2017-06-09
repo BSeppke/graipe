@@ -44,48 +44,31 @@
 namespace graipe {
 
 WorkerThread::WorkerThread(int socketDescriptor, const QString &image_dir, QObject *parent)
-    : QThread(parent), socketDescriptor(socketDescriptor)
+:   QThread(parent),
+    socketDescriptor(socketDescriptor)
+    
 {
-    QDir dir(image_dir);
-
-    if (!dir.exists())
-    {
-        qWarning("Cannot find the image directory");
-    }
-    
-    dir.setFilter(QDir::Files);
-    
-    QStringList filters;
-    filters << "*.jpg" << "*.jpeg" << "*.JPG" << "*.JPEG";
-    dir.setNameFilters(filters);
-
-    QStringList image_filenames = dir.entryList();
-    
-    for(QString file : image_filenames)
-    {
-        images << dir.absoluteFilePath(file);
-    }
 }
 
 void WorkerThread::run()
 {
-    QTcpSocket tcpSocket;
- 
     try
-    {        
-        tcpSocket.setSocketOption(QAbstractSocket::LowDelayOption, 1);
+    {
+        tcpSocket = new QTcpSocket;
+    
+        tcpSocket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
         
-        if (!tcpSocket.setSocketDescriptor(socketDescriptor))
+        if (!tcpSocket->setSocketDescriptor(socketDescriptor))
         {
-            emit error(tcpSocket.error());
+            emit error(tcpSocket->error());
             throw "Error";
         }
         
         //Wait for the request
-        tcpSocket.waitForReadyRead();
+        tcpSocket->waitForReadyRead();
         
         //Get the request
-        QString data = QString::fromLatin1(tcpSocket.readLine());
+        QString data = QString::fromLatin1(tcpSocket->readLine());
         qDebug() << "-->" << data << ".";
         
         QStringList data_split = data.split(":");
@@ -101,93 +84,11 @@ void WorkerThread::run()
         
         if(message_type == "Model")
         {
-            QByteArray in_model_data;
-            
-            //Second: Receive all the data for the model
-            tcpSocket.waitForReadyRead();
-            
-            while(tcpSocket.bytesAvailable() && in_model_data.size() < bytesToRead)
-            {
-                in_model_data.append(tcpSocket.readAll());
-                if(in_model_data.size() == bytesToRead)
-                {
-                    break;
-                }
-                else
-                {
-                    tcpSocket.waitForReadyRead();
-                }
-            }
-            
-            if(in_model_data.size()!= bytesToRead)
-            {
-                qWarning() << "Did not receive the full model data, but only "<< in_model_data.size()  <<" of " << bytesToRead << "bytes";
-                throw "Error";
-            }
-            
-            qDebug() << "--> \"Model data\".";
-            QBuffer in_buf(&in_model_data);
-            
-            //Always use compressed transfer
-            QIOCompressor* in_compressor = new QIOCompressor(&in_buf);
-            in_compressor->setStreamFormat(QIOCompressor::GzipFormat);
-
-            if (!in_compressor->open(QIODevice::ReadOnly))
-            {
-                qWarning("Did not open compressor (gz) on tcpSocket");
-                throw "Error";
-            }
-            
-            QXmlStreamReader xmlReader(in_compressor);
-            Model* new_model = Impex::loadModel(xmlReader);
-            
-            if(new_model == NULL)
-            {
-                qWarning("Did not load a model over the tcpSocket");
-                throw "Error";
-                
-            }
-            
-            qDebug("    Model loaded and added sucessfully!");
-            qDebug() << "Now: " << models.size() << " models available!";
-            
-            
-            QByteArray out_model_data;
-            QBuffer out_buf(&out_model_data);
-            
-            //Always use compressed transfer
-            QIOCompressor* out_compressor = new QIOCompressor(&out_buf);
-            out_compressor->setStreamFormat(QIOCompressor::GzipFormat);
-
-            if (!out_compressor->open(QIODevice::WriteOnly))
-            {
-                qWarning("Did not open compressor (gz) on tcpSocket");
-                throw "Error";
-            }
-            
-            QXmlStreamWriter xmlWriter(out_compressor);
-            new_model->setName("Served: " + new_model->name());
-            new_model->serialize(xmlWriter);
-            out_compressor->close();
-            
-            QString request = QString("Model:%1\n").arg(out_model_data.size());
-        
-            qDebug() << "<-- " << request;
-            //First: Write the type (Image) and the number of bytes (of the image) to the socket"
-            tcpSocket.write(request.toLatin1());
-            tcpSocket.waitForBytesWritten();
-            
-            qDebug() << "<-- \"Model data\".";
-            //Then submit the data of the model:
-            tcpSocket.write(out_model_data);
-            tcpSocket.waitForBytesWritten();
-            
-            
+            readModel(bytesToRead);
         }
         else if(message_type == "Algorithm")
         {
-            qDebug() << "Algorithms not supported yet!";
-            throw "Error";
+            readAndRunAlgorithm(bytesToRead);
         }
     }
     catch (...)
@@ -195,17 +96,190 @@ void WorkerThread::run()
         QString errorString = "Error:0";
         
         //First: Write the type (Image) and the number of bytes (of the image) to the socket"
-        tcpSocket.write(errorString.toLatin1());
-        tcpSocket.waitForBytesWritten();
+        tcpSocket->write(errorString.toLatin1());
+        tcpSocket->waitForBytesWritten();
     }
     
-    tcpSocket.close();
+    tcpSocket->close();
     
     //Finish by disconnect
-    tcpSocket.disconnectFromHost();
-    if(tcpSocket.state() != QTcpSocket::UnconnectedState)
+    tcpSocket->disconnectFromHost();
+    if(tcpSocket->state() != QTcpSocket::UnconnectedState)
     {
-        tcpSocket.waitForDisconnected();
+        tcpSocket->waitForDisconnected();
+    }
+    
+}
+
+void WorkerThread::readModel(int bytesToRead)
+{
+    QByteArray in_model_data;
+    
+    //Second: Receive all the data for the model
+    tcpSocket->waitForReadyRead();
+    
+    while(tcpSocket->bytesAvailable() && in_model_data.size() < bytesToRead)
+    {
+        in_model_data.append(tcpSocket->readAll());
+        if(in_model_data.size() == bytesToRead)
+        {
+            break;
+        }
+        else
+        {
+            tcpSocket->waitForReadyRead();
+        }
+    }
+    
+    if(in_model_data.size()!= bytesToRead)
+    {
+        qWarning() << "Did not receive the full model data, but only "<< in_model_data.size()  <<" of " << bytesToRead << "bytes";
+        throw "Error";
+    }
+    
+    qDebug() << "--> \"Model data\".";
+    QBuffer in_buf(&in_model_data);
+    
+    //Always use compressed transfer
+    QIOCompressor* in_compressor = new QIOCompressor(&in_buf);
+    in_compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+    if (!in_compressor->open(QIODevice::ReadOnly))
+    {
+        qWarning("Did not open compressor (gz) on tcpSocket");
+        throw "Error";
+    }
+    
+    QXmlStreamReader xmlReader(in_compressor);
+    Model* new_model = Impex::loadModel(xmlReader);
+    
+    if(new_model == NULL)
+    {
+        qWarning("Did not load a model over the tcpSocket");
+        throw "Error";
+        
+    }
+    
+    qDebug("    Model loaded and added sucessfully!");
+    qDebug() << "Now: " << models.size() << " models available!";
+    
+    
+    QByteArray out_model_data;
+    QBuffer out_buf(&out_model_data);
+    
+    //Always use compressed transfer
+    QIOCompressor* out_compressor = new QIOCompressor(&out_buf);
+    out_compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+    if (!out_compressor->open(QIODevice::WriteOnly))
+    {
+        qWarning("Did not open compressor (gz) on tcpSocket");
+        throw "Error";
+    }
+    
+    QXmlStreamWriter xmlWriter(out_compressor);
+    new_model->setName("Served: " + new_model->name());
+    new_model->serialize(xmlWriter);
+    out_compressor->close();
+    
+    QString request = QString("Model:%1\n").arg(out_model_data.size());
+
+    qDebug() << "<-- " << request;
+    //First: Write the type (Image) and the number of bytes (of the image) to the socket"
+    tcpSocket->write(request.toLatin1());
+    tcpSocket->waitForBytesWritten();
+    
+    qDebug() << "<-- \"Model data\".";
+    //Then submit the data of the model:
+    tcpSocket->write(out_model_data);
+    tcpSocket->waitForBytesWritten();
+
+}
+
+void WorkerThread::readAndRunAlgorithm(int bytesToRead)
+{
+    QByteArray in_alg_data;
+    
+    //Second: Receive all the data for the model
+    tcpSocket->waitForReadyRead();
+    
+    while(tcpSocket->bytesAvailable() && in_alg_data.size() < bytesToRead)
+    {
+        in_alg_data.append(tcpSocket->readAll());
+        if(in_alg_data.size() == bytesToRead)
+        {
+            break;
+        }
+        else
+        {
+            tcpSocket->waitForReadyRead();
+        }
+    }
+    
+    if(in_alg_data.size()!= bytesToRead)
+    {
+        qWarning() << "Did not receive the full algorithm data, but only "<< in_alg_data.size()  <<" of " << bytesToRead << "bytes";
+        throw "Error";
+    }
+    
+    qDebug() << "--> \"Algorithm data\".";
+    QBuffer in_buf(&in_alg_data);
+    
+    //Always use compressed transfer
+    QIOCompressor* in_compressor = new QIOCompressor(&in_buf);
+    in_compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+    if (!in_compressor->open(QIODevice::ReadOnly))
+    {
+        qWarning("Did not open compressor (gz) on tcpSocket");
+        throw "Error";
+    }
+    
+    QXmlStreamReader xmlReader(in_compressor);
+    Algorithm* new_alg = Impex::loadAlgorithm(xmlReader);
+    
+    if(new_alg == NULL)
+    {
+        qWarning("Did not load a algorithm over the tcpSocket");
+        throw "Error";
+        
+    }
+    
+    qDebug("    Algorithm loaded sucessfully!");
+    new_alg->run();
+    qDebug("    Algorithm ran sucessfully!");
+    
+    for(Model* model : new_alg->results())
+    {
+        QByteArray out_model_data;
+        QBuffer out_buf(&out_model_data);
+        
+        //Always use compressed transfer
+        QIOCompressor* out_compressor = new QIOCompressor(&out_buf);
+        out_compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+        if (!out_compressor->open(QIODevice::WriteOnly))
+        {
+            qWarning("Did not open compressor (gz) on tcpSocket");
+            throw "Error";
+        }
+        
+        QXmlStreamWriter xmlWriter(out_compressor);
+        model->serialize(xmlWriter);
+        out_compressor->close();
+        
+        QString request = QString("Model:%1\n").arg(out_model_data.size());
+
+        qDebug() << "<-- " << request;
+        //First: Write the type (Image) and the number of bytes (of the image) to the socket"
+        tcpSocket->write(request.toLatin1());
+        tcpSocket->waitForBytesWritten();
+        
+        qDebug() << "<-- \"Model data\".";
+        //Then submit the data of the model:
+        tcpSocket->write(out_model_data);
+        tcpSocket->waitForBytesWritten();
+
     }
 }
 

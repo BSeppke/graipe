@@ -101,6 +101,10 @@ class WindDetector
             m_parameters->addParameter("mask_w", new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h", new IntParameter("Mask height", 3, 999));
         }
+        QString typeName() const
+        {
+            return "WindDetector";
+        }
 
     protected:
         /**
@@ -324,6 +328,10 @@ class StructureTensorWindDetector
             m_parameters->addParameter("dir",    new EnumParameter("(known) wind direction", direction_names()));
             m_parameters->addParameter("sigma1", new FloatParameter("innner scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("sigma2", new FloatParameter("outer scale", 0.0, 10.0, 1.0));
+        }
+        QString typeName() const
+        {
+            return "StructureTensorWindDetector";
         }
     
         /**

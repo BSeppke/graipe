@@ -121,6 +121,12 @@ class RacerInterpreter
             m_parameters->addParameter("abox-filename", m_param_abox_filename);
         }
     
+        QString typeName() const
+        {
+            return "RacerInterpreter";
+        }
+    
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -748,6 +754,12 @@ class RacerClusteredInterpreter
             m_parameters->addParameter("save_abox?",    m_param_save_abox);
             m_parameters->addParameter("abox-filename", m_param_abox_filename);
         }
+    
+        QString typeName() const
+        {
+            return "RacerClusteredInterpreter";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -1373,6 +1385,12 @@ class ClusteredABox
             
             m_parameters->addParameter("abox-filename", m_param_abox_filename);
         }
+    
+        QString typeName() const
+        {
+            return "ClusteredABox";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.

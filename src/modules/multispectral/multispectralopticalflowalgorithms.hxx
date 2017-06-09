@@ -60,6 +60,11 @@ class OpticalFlowAlgorithm2Bands
         {
         }
 
+    
+        QString typeName() const
+        {
+            return "OpticalFlowAlgorithm2Bands";
+        }
     protected:
         /**
          * This function adds the image and mask parameters to an algorithm's instance.

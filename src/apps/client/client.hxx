@@ -36,10 +36,11 @@
 #ifndef GRAIPE_CLIENT_CLIENT_HXX
 #define GRAIPE_CLIENT_CLIENT_HXX
 
-#include <QDialog>
+#include <QMainWindow>
 #include <QTcpSocket>
-#include <QDataStream>
-#include <QImage>
+#include <QSignalMapper>
+
+#include "core/core.h"
 
 class QComboBox;
 class QLabel;
@@ -50,19 +51,33 @@ class QNetworkSession;
 
 namespace graipe {
 
-class Client : public QDialog
+class Client : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit Client(QWidget *parent = Q_NULLPTR);
 
+signals:
+    void clickedAlgorithm(int);
+
 private slots:
-    void sendModel();
+    void loadAndSendModel();
+    void sendModel(Model* m);
+    void sendAlgorithm(Algorithm* alg);
+    
     void readHandler();
     void displayError(QAbstractSocket::SocketError socketError);
     void enableSendRequestButton();
     void sessionOpened();
+    
+    /**
+     * This slot is called by all registered algorithms. The parameter
+     * (int id) corresponds to the index at the algorithm_factory.
+     *
+     * \param index The index of the algorithm at the algorithm_factory.
+     */
+    void runAlgorithm(int index);
 
 private:
     inline void readModel(int bytesToRead);
@@ -75,6 +90,9 @@ private:
     QTcpSocket *m_tcpSocket;
 
     QNetworkSession *m_networkSession;
+    
+    //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
+    QSignalMapper* m_algSignalMapper;
 };
 
 } //namespace graipe

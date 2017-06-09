@@ -65,6 +65,11 @@ class GlobalMotionCorrector
             m_parameters->addParameter("image1", m_param_imageBand1 );
             m_parameters->addParameter("image2", m_param_imageBand2 );
         }
+    
+        QString typeName() const
+        {
+            return "GlobalMotionCorrector";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -194,6 +199,11 @@ class GenericRegistration
 			m_parameters->addParameter("image2", new ModelParameter("Reference Image",  "Image"));
 			m_parameters->addParameter("vf", new ModelParameter("Correspondence Map",  "SparseVectorfield2D"));
 		}
+    
+        QString typeName() const
+        {
+            return "GenericRegistration";
+        }
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -275,7 +285,57 @@ class GenericRegistration
         }
 };
 
-/** 
+template<>
+QString GenericRegistration<WarpAffineFunctor>::typeName() const
+{
+    return "GenericRegistration<WarpAffineFunctor>";
+}
+template<>
+QString GenericRegistration<WarpProjectiveFunctor>::typeName() const
+{
+    return "GenericRegistration<WarpProjectiveFunctor>";
+}
+template<>
+QString GenericRegistration<WarpBilinearFunctor>::typeName() const
+{
+    return "GenericRegistration<WarpBilinearFunctor>";
+}
+template<>
+QString GenericRegistration<WarpBiquadraticFunctor>::typeName() const
+{
+    return "GenericRegistration<WarpBiquadraticFunctor>";
+}
+template<>
+QString GenericRegistration<WarpBicubicFunctor>::typeName() const
+{
+    return "GenericRegistration<WarpBicubicFunctor>";
+}
+template<>
+QString GenericRegistration<WarpPiecewiseAffineFunctor>::typeName() const
+{
+    return "GenericRegistration<WarpPiecewiseAffineFunctor>";
+}
+template<>
+QString GenericRegistration<WarpRBF1Functor>::typeName() const
+{
+    return "GenericRegistration<WarpRBF1Functor>";
+}
+template<>
+QString GenericRegistration<WarpRBF2Functor>::typeName() const
+{
+    return "GenericRegistration<WarpRBF2Functor>";
+}
+template<>
+QString GenericRegistration<WarpRBF3Functor>::typeName() const
+{
+    return "GenericRegistration<WarpRBF3Functor>";
+}
+template<>
+QString GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >::typeName() const
+{
+    return "GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >";
+}
+/**
  * Creates one instance of the point->point affine registration
  * algorithm using the framework defined above.
  *

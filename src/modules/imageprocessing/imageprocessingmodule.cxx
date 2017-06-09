@@ -64,6 +64,12 @@ class AddImages
             m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image"));
         }
     
+        QString typeName() const
+        {
+            return "AddImages";
+        }
+    
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -170,6 +176,12 @@ class GaussianGradientCalculator
             m_parameters->addParameter("sigma", new FloatParameter("Gaussian gradient Scale", 0,9999999, 1.0));
         }
     
+        QString typeName() const
+        {
+            return "GaussianGradientCalculator";
+        }
+    
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -260,6 +272,11 @@ class RecursiveSmoothingFilter : public Algorithm
             //m_parameters.push_back( new EnumParameter("Border treatment", border_treatment_modes(), 2));
             
         }
+        QString typeName() const
+        {
+            return "RecursiveSmoothingFilter";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -353,6 +370,11 @@ class GaussianSmoothingFilter : public Algorithm
             m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
         }
+        QString typeName() const
+        {
+            return "GaussianSmoothingFilter";
+        }
+    
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -451,6 +473,11 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
             m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band"));
         }
+        QString typeName() const
+        {
+            return "NormalizedGaussianSmoothingFilter";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -557,6 +584,11 @@ class ApplyMaskToImage
             m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band"));
             
         }
+        QString typeName() const
+        {
+            return "ApplyMaskToImage";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -656,6 +688,11 @@ class MaskErosion
             m_parameters->addParameter("radius", new IntParameter("Erosion radius", 1, 50, 1) );
             
         }
+        QString typeName() const
+        {
+            return "MaskErosion";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -749,6 +786,11 @@ class MaskDilation
             m_parameters->addParameter("radius", new IntParameter("Dilation radius", 1, 50, 1) );
             
         }
+        QString typeName() const
+        {
+            return "MaskDilation";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -842,6 +884,11 @@ class MaskUnion
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL));
             
         }
+        QString typeName() const
+        {
+            return "MaskUnion";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -934,6 +981,11 @@ class MaskIntersection: public Algorithm
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL));
             
         }
+        QString typeName() const
+        {
+            return "MaskIntersection";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1028,6 +1080,11 @@ class MaskDifference: public Algorithm
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL));
             
         }
+        QString typeName() const
+        {
+            return "MaskDifference";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1127,6 +1184,11 @@ class ImageCropper
             m_parameters->addParameter("lr_y", new IntParameter("Lower Right y", 0,999999, 1000));
             
         }
+        QString typeName() const
+        {
+            return "ImageCropper";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1247,6 +1309,11 @@ class ImageResizer : public Algorithm
             m_parameters->addParameter("degree", new IntParameter("Spline-Interpolation degree ", 0,5, 1));
             
         }
+        QString typeName() const
+        {
+            return "ImageResizer";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1371,6 +1438,11 @@ class ImageInverter
             m_parameters->addParameter("invert_offset", new IntParameter("Global inverting offset", 0,999999, 255, (*m_parameters)["invert"]));
             
         }
+        QString typeName() const
+        {
+            return "ImageInverter";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1481,6 +1553,11 @@ class ImageThresholder
             m_parameters->addParameter("yes",   new FloatParameter("Value Mark", 0,999999, 1));
             
         }
+        QString typeName() const
+        {
+            return "ImageThresholder";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1587,6 +1664,11 @@ class FloatingImageThresholder
             m_parameters->addParameter("horizontal", new BoolParameter("Float horizontally", true));
             
         }
+        QString typeName() const
+        {
+            return "FloatingImageThresholder";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1726,6 +1808,11 @@ class ThinLineExtractor
             m_parameters->addParameter("save",        new BoolParameter("Save region statistics image", true));
             
         }
+        QString typeName() const
+        {
+            return "ThinLineExtractor";
+        }
+    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1895,6 +1982,11 @@ class DistanceTransformator
         {
             m_parameters->addParameter("mask", new ImageBandParameter<float>("Mask image band",	NULL));
             
+        }
+    
+        QString typeName() const
+        {
+            return "DistanceTransformator";
         }
     
         /**

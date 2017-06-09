@@ -59,6 +59,10 @@ class VectorfieldSmoother
             m_parameters->addParameter("iterations",       new IntParameter("iterations", 1, 9999, 10));
             m_parameters->addParameter("use_all_weights?", new BoolParameter("use all alternative weights for smoothness comparison", true));
         }
+        QString typeName() const
+        {
+            return "VectorfieldSmoother";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -151,6 +155,10 @@ class VectorfieldRelaxer : public Algorithm
             m_parameters->addParameter("iterations",       new IntParameter("iterations", 1, 9999, 10));
             m_parameters->addParameter("use_all_weights?", new BoolParameter("use all alternative weights for smoothness comparison", true));
         }
+        QString typeName() const
+        {
+            return "VectorfieldRelaxer";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -242,6 +250,10 @@ class VectorfieldClustererGreedy : public Algorithm
             m_parameters->addParameter("radius", new FloatParameter("radius for clustering sizes", 0.0, 9999, 10));
             m_parameters->addParameter("weightT", new FloatParameter("weight threshold", 0.0, 9999, 0.0));
             m_parameters->addParameter("use_local_vectors?", new BoolParameter("use local vectors", false));
+        }
+        QString typeName() const
+        {
+            return "VectorfieldClustererGreedy";
         }
         
         /**
@@ -348,6 +360,10 @@ class VectorfieldClustererKMeans
             m_parameters->addParameter("k", new IntParameter("k (count of clusters)", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",  new FloatParameter("weight threshold", 0.0, 9999, 0.0));
             m_parameters->addParameter("use_local_vectors?", new BoolParameter("use local vectors", false));
+        }
+        QString typeName() const
+        {
+            return "VectorfieldClustererKMeans";
         }
         
         /**

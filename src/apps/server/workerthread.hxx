@@ -41,21 +41,26 @@
 
 namespace graipe {
 
-class WorkerThread : public QThread
+class WorkerThread
+:   public QThread
 {
     Q_OBJECT
 
-public:
-    WorkerThread(int socketDescriptor, const QString &image_dir, QObject *parent);
+    public:
+        WorkerThread(int socketDescriptor, const QString &image_dir, QObject *parent);
 
-    void run() override;
+        void run() override;
 
-signals:
-    void error(QTcpSocket::SocketError socketError);
+    protected:
+        void readModel(int bytesToRead);
+        void readAndRunAlgorithm(int bytesToRead);
 
-private:
-    int socketDescriptor;
-    QStringList images;
+    signals:
+        void error(QTcpSocket::SocketError socketError);
+
+    private:
+        int socketDescriptor;
+        QTcpSocket* tcpSocket;
 };
 
 } //namespace graipe

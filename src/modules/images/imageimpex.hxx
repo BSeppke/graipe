@@ -90,6 +90,11 @@ class ImageImporter
          * Default constructor for the image importer class.
          */
         ImageImporter();
+        
+        QString typeName() const
+        {
+            return "ImageImporter";
+        }
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -122,6 +127,11 @@ class ImageExporter
          * Default constructor for the image exporter class.
          */
         ImageExporter();
+        
+        QString typeName() const
+        {
+            return "ImageExporter";
+        }
     
         /**
          * Specialization of the running phase of this algorithm.

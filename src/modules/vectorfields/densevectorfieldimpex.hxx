@@ -82,10 +82,16 @@ class DenseVectorfieldImporter
          */
         DenseVectorfieldImporter();
     
+        QString typeName() const
+        {
+            return "DenseVectorfieldImporter";
+        }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
         void run();
+    
 };
 
     
@@ -101,6 +107,11 @@ class DenseVectorfieldExporter
          * Default constructor for the dense vectorfield exporter class.
          */
         DenseVectorfieldExporter();
+    
+        QString typeName() const
+        {
+            return "DenseVectorfieldExporter";
+        }
     
         /**
          * Specialization of the running phase of this algorithm.

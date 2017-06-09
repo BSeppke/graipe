@@ -102,6 +102,11 @@ class OpticalFlowAlgorithm
         OpticalFlowAlgorithm()
         {
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowAlgorithm";
+        }
         
     protected:
         /**
@@ -403,6 +408,12 @@ class OpticalFlowHSEstimator
 		
 			addFrameworkProcessingParameters();
 		}
+    
+        QString typeName() const
+        {
+            return "OpticalFlowHSEstimator";
+        }
+    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -485,6 +496,12 @@ class OpticalFlowBruhnEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowBruhnEstimator";
+        }
+    
  
         /**
          * Specialization of the running phase of this algorithm.
@@ -566,6 +583,12 @@ class OpticalFlowLKEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowLKEstimator";
+        }
+    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -646,6 +669,12 @@ class OpticalFlowFBEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowFBEstimator";
+        }
+    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -730,6 +759,12 @@ class OpticalFlowTensorEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowTensorEstimator";
+        }
+    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -809,6 +844,12 @@ class OpticalFlowCCEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowCCEstimator";
+        }
+    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -887,6 +928,12 @@ class OpticalFlowExperimentalEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        QString typeName() const
+        {
+            return "OpticalFlowExperimentalEstimator";
+        }
+ 
 
          **
          * Specialization of the running phase of this algorithm.

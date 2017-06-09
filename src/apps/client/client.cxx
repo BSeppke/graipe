@@ -43,15 +43,77 @@
 namespace graipe {
 
 Client::Client(QWidget *parent)
-    : QDialog(parent)
-    , m_cmbHost(new QComboBox)
-    , m_lnePort(new QLineEdit)
-    , m_lneRequest(new QLineEdit("/Users/seppke/Desktop/Lenna_face.xgz"))
-    , m_btnSend(new QPushButton(tr("Send Request")))
-    , m_tcpSocket(new QTcpSocket(this))
-    , m_networkSession(Q_NULLPTR)
+:   QMainWindow(parent),
+    m_cmbHost(new QComboBox),
+    m_lnePort(new QLineEdit),
+    m_lneRequest(new QLineEdit("/Users/seppke/Desktop/Lenna_face.xgz")),
+    m_btnSend(new QPushButton(tr("Send Request"))),
+    m_tcpSocket(new QTcpSocket(this)),
+    m_networkSession(Q_NULLPTR),
+    m_algSignalMapper(new QSignalMapper)
 {
+    //init graipe
     loadModules();
+    Impex::loadModel(m_lneRequest->text());
+    
+    menuBar();
+    
+    QMenu* mnuFile = menuBar()->addMenu("File");
+
+    QMenu* mnuImport = mnuFile->addMenu("Import");
+    QMenu* mnuExport = mnuFile->addMenu("Export");
+    
+    QMenu* mnuAlgs = menuBar()->addMenu("Algorithms");
+    
+    //Connect the algorithm factory to the GUI
+	QList<QMenu*> added_menus;
+    unsigned int i=0;
+    for(const AlgorithmFactoryItem& item : algorithmFactory)
+    {
+        QAction* newAct = new QAction(item.algorithm_name, this);
+        
+        if (item.topic_name == "Import")
+        {
+            mnuImport->addAction(newAct);
+        }
+        else if (item.topic_name == "Export")
+        {
+            mnuExport->addAction(newAct);
+        }
+        else
+        {
+            //add Menu-entry "topic_name"
+            QMenu* algorithm_menu = NULL;
+            for(QMenu* m : added_menus)
+            {
+                if (m->title() == item.topic_name)
+                {
+                    algorithm_menu = m;
+                    break;
+                }
+            }
+            if (!algorithm_menu){
+                algorithm_menu = new QMenu(item.topic_name);
+                mnuAlgs->addMenu(algorithm_menu);
+
+                added_menus.push_back(algorithm_menu);
+            }
+            algorithm_menu->addAction(newAct);
+        }
+        //connect everything
+        connect(newAct, SIGNAL(triggered()), m_algSignalMapper, SLOT(map()));
+        m_algSignalMapper->setMapping(newAct, i++);
+    }
+    
+	connect(m_algSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedAlgorithm(int)));
+	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));
+
+
+
+
+
+
+
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     m_cmbHost->setEditable(true);
@@ -106,28 +168,17 @@ Client::Client(QWidget *parent)
     connect(m_lneRequest, &QLineEdit::textChanged,
             this, &Client::enableSendRequestButton);
     connect(m_btnSend, &QAbstractButton::clicked,
-            this, &Client::sendModel);
+            this, &Client::loadAndSendModel);
     connect(quitButton, &QAbstractButton::clicked, this, &QWidget::close);
     connect(m_tcpSocket, &QIODevice::readyRead, this, &Client::readHandler);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(m_tcpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
             this, &Client::displayError);
+    
+    this->setCentralWidget(new QWidget);
 
-    QGridLayout *mainLayout = Q_NULLPTR;
-    if (QGuiApplication::styleHints()->showIsFullScreen() || QGuiApplication::styleHints()->showIsMaximized()) {
-        QVBoxLayout *outerVerticalLayout = new QVBoxLayout(this);
-        outerVerticalLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::MinimumExpanding));
-        QHBoxLayout *outerHorizontalLayout = new QHBoxLayout;
-        outerHorizontalLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Ignored));
-        QGroupBox *groupBox = new QGroupBox(QGuiApplication::applicationDisplayName());
-        mainLayout = new QGridLayout(groupBox);
-        outerHorizontalLayout->addWidget(groupBox);
-        outerHorizontalLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding, QSizePolicy::Ignored));
-        outerVerticalLayout->addLayout(outerHorizontalLayout);
-        outerVerticalLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Ignored, QSizePolicy::MinimumExpanding));
-    } else {
-        mainLayout = new QGridLayout(this);
-    }
+    QGridLayout *mainLayout = new QGridLayout(this->centralWidget());
+
     mainLayout->addWidget(hostLabel, 0, 0);
     mainLayout->addWidget(m_cmbHost, 0, 1);
     mainLayout->addWidget(portLabel, 1, 0);
@@ -136,7 +187,7 @@ Client::Client(QWidget *parent)
     mainLayout->addWidget(m_lneRequest, 2, 1);
     mainLayout->addWidget(m_lblStatus, 3, 0, 1, 2);
     mainLayout->addWidget(buttonBox, 4, 0, 1, 2);
-
+    
     setWindowTitle(QGuiApplication::applicationDisplayName());
     m_lnePort->setFocus();
 
@@ -164,25 +215,42 @@ Client::Client(QWidget *parent)
     }
 }
 
-void Client::sendModel()
+void Client::loadAndSendModel()
+{
+    Model* model = Impex::loadModel(m_lneRequest->text());
+    
+    if (model != NULL)
+    {
+        sendModel(model);
+    }
+}
+
+void Client::sendModel(Model* model)
 {
     m_btnSend->setEnabled(false);
     m_tcpSocket->abort();
-    m_tcpSocket->connectToHost(m_cmbHost->currentText(),
-                             m_lnePort->text().toInt());
+    m_tcpSocket->connectToHost( m_cmbHost->currentText(),
+                                m_lnePort->text().toInt());
     
     m_tcpSocket->waitForConnected();
+
+    QByteArray model_data;
+    QBuffer out_buf(&model_data);
     
-    //Open (model) file:
-    QFile file(m_lneRequest->text());
-    
-    if(!file.open(QFile::ReadOnly))
+    //Always use compressed transfer
+    QIOCompressor* compressor = new QIOCompressor(&out_buf);
+    compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+    if (!compressor->open(QIODevice::WriteOnly))
     {
-        qWarning() << "Could not open file" << file.fileName();
-        return;
+        qWarning("Did not open compressor (gz) on tcpSocket");
+        throw "Error";
     }
     
-    QByteArray model_data = file.readAll();
+    QXmlStreamWriter xmlWriter(compressor);
+    model->serialize(xmlWriter);
+    compressor->close();
+    delete model;
     
     QString request1 = QString("Model:%1\n").arg(model_data.size());
     
@@ -196,7 +264,51 @@ void Client::sendModel()
     m_tcpSocket->write(model_data);
     m_tcpSocket->waitForBytesWritten();
     m_tcpSocket->flush();
+    
+    m_btnSend->setEnabled(true);
 }
+void Client::sendAlgorithm(Algorithm* alg)
+{
+    m_btnSend->setEnabled(false);
+    m_tcpSocket->abort();
+    m_tcpSocket->connectToHost( m_cmbHost->currentText(),
+                                m_lnePort->text().toInt());
+    
+    m_tcpSocket->waitForConnected();
+
+    QByteArray alg_data;
+    QBuffer out_buf(&alg_data);
+    
+    //Always use compressed transfer
+    QIOCompressor* compressor = new QIOCompressor(&out_buf);
+    compressor->setStreamFormat(QIOCompressor::GzipFormat);
+
+    if (!compressor->open(QIODevice::WriteOnly))
+    {
+        qWarning("Did not open compressor (gz) on tcpSocket");
+        throw "Error";
+    }
+    
+    QXmlStreamWriter xmlWriter(compressor);
+    alg->serialize(xmlWriter);
+    compressor->close();
+    
+    QString request1 = QString("Algorithm:%1\n").arg(alg_data.size());
+    
+    qDebug() << "--> " << request1;
+    m_tcpSocket->write(request1.toLatin1());
+    m_tcpSocket->waitForBytesWritten();
+    m_tcpSocket->flush();
+    
+    
+    qDebug() << "--> \"Compressed Algorithm Data\"";
+    m_tcpSocket->write(alg_data);
+    m_tcpSocket->waitForBytesWritten();
+    m_tcpSocket->flush();
+    
+    m_btnSend->setEnabled(true);
+}
+
 void Client::readModel(int bytesToRead)
 {
     try
@@ -348,4 +460,53 @@ void Client::sessionOpened()
     enableSendRequestButton();
 }
 
+/**
+ * This slot is called by all registered algorithms. The parameter
+ * (int id) corresponds to the index at the algorithm_factory.
+ *
+ * \param index The index of the algorithm at the algorithm_factory.
+ */
+void Client::runAlgorithm(int index)
+{
+    using namespace ::std;
+    
+    AlgorithmFactoryItem alg_item = algorithmFactory[index];
+	
+	Algorithm* alg = alg_item.algorithm_fptr();
+    
+	AlgorithmParameterSelection parameter_selection(this, alg);
+	parameter_selection.setWindowTitle(alg_item.algorithm_name);
+	parameter_selection.setModal(true);
+	
+	if(parameter_selection.exec())
+	{
+		//The result is true if and only if all parameters have been finalised
+		//AND are available!
+		if( parameter_selection.result()!=0 )
+		{
+			//Collect all models and transmit them:
+            std::vector<Model*> neededModels = alg->parameters()->needsModels();
+            
+            for(Model* m : neededModels)
+            {
+                sendModel(m);
+            }
+            sendAlgorithm(alg);
+		}
+		else 
+		{
+			QMessageBox::critical(this, "Error in Algorithm run",
+								  QString("Not all necessary parameters have been set!"));
+		}
+	}
+    else
+    {
+        for(Model* m : alg->results())
+        {
+            delete m;
+            m=NULL;
+        }
+        alg->results().clear();
+    }
+}
 } //namespace graipe

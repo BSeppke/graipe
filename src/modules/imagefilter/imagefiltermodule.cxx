@@ -118,6 +118,10 @@ class FrostFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
         }
+        QString typeName() const
+        {
+            return "FrostFilter";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -222,6 +226,10 @@ class EnhancedFrostFilter
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
+        }
+        QString typeName() const
+        {
+            return "EnhancedFrostFilter";
         }
     
         /**
@@ -330,6 +338,10 @@ class GammaMAPFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
         }
+        QString typeName() const
+        {
+            return "GammaMAPFilter";
+        }
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -434,6 +446,10 @@ class KuanFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
         }
+        QString typeName() const
+        {
+            return "KuanFilter";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -537,6 +553,10 @@ class LeeFilter
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
+        }
+        QString typeName() const
+        {
+            return "LeeFilter";
         }
     
         /**
@@ -646,6 +666,10 @@ class EnhancedLeeFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
         }
+        QString typeName() const
+        {
+            return "EnhancedLeeFilter";
+        }
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -750,6 +774,10 @@ class MedianFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>);
         }
+        QString typeName() const
+        {
+            return "MedianFilter";
+        }
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -852,6 +880,11 @@ class ShockFilter
             m_parameters->addParameter("upwind", new FloatParameter("upwinding factor", 0.0, 10.0, 0.3f));
             m_parameters->addParameter("iterations", new IntParameter("Iterations", 1, 9999, 10));
             m_results.push_back(new Image<float>);
+        }
+        
+        QString typeName() const
+        {
+            return "ShockFilter";
         }
         
         /**
