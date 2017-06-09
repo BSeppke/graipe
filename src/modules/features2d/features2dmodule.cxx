@@ -43,14 +43,14 @@ namespace graipe {
  * way that it can be used within graipe. To achieve this, it extends
  * graipe's Module class by introducing new Models and new ViewControllers.
  */
-class FeaturesModule
+class Features2DModule
 :   public Module
 {
 	public:
         /**
          * Default constructor of the FeatureModule.
          */
-		FeaturesModule()
+		Features2DModule()
 		{}
 	
         /**
@@ -411,7 +411,7 @@ class FeaturesModule
 extern "C"{
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
-        return new graipe::FeaturesModule;
+        return new graipe::Features2DModule;
 	}
 }
 
