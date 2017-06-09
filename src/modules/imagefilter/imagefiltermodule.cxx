@@ -1025,40 +1025,48 @@ class ImageFilterModule
 			alg_item.topic_name = "Image filters";
 			
 			//1. Frost Filter
-			alg_item.algorithm_name = "Frost filter";	
+			alg_item.algorithm_name = "Frost filter";
+            alg_item.algorithm_type = "FrostFilter";
 			alg_item.algorithm_fptr = &createFrostFilter;
 			alg_factory.push_back(alg_item);
 			
-			alg_item.algorithm_name = "Enhanced Frost filter";	
+			alg_item.algorithm_name = "Enhanced Frost filter";
+            alg_item.algorithm_type = "EnhancedFrostFilter";
 			alg_item.algorithm_fptr = &createEnhancedFrostFilter;
 			alg_factory.push_back(alg_item);
 			
 			//2. Gamma Filter
-			alg_item.algorithm_name = "Gamma MAP filter";		
+			alg_item.algorithm_name = "Gamma MAP filter";	
+            alg_item.algorithm_type = "GammaMAPFilter";
 			alg_item.algorithm_fptr = &createGammaMAPFilter;
 			alg_factory.push_back(alg_item);
 			
 			//3. Kuan Filter
-			alg_item.algorithm_name = "Kuan filter";			
+			alg_item.algorithm_name = "Kuan filter";	
+            alg_item.algorithm_type = "KuanFilter";
 			alg_item.algorithm_fptr = &createKuanFilter;
 			alg_factory.push_back(alg_item);
 			
 			//4. Lee Filter
-			alg_item.algorithm_name = "Lee filter";				
+			alg_item.algorithm_name = "Lee filter";	
+            alg_item.algorithm_type = "LeeFilter";
 			alg_item.algorithm_fptr = &createLeeFilter;
 			alg_factory.push_back(alg_item);
 			
-			alg_item.algorithm_name = "Enhanced Lee filter";				
+			alg_item.algorithm_name = "Enhanced Lee filter";
+            alg_item.algorithm_type = "EnhancedLeeFilter";
 			alg_item.algorithm_fptr = &createEnhancedLeeFilter;
 			alg_factory.push_back(alg_item);
 			
 			//5. Median Filter
-			alg_item.algorithm_name = "Median filter";				
+			alg_item.algorithm_name = "Median filter";		
+            alg_item.algorithm_type = "MedianFilter";
 			alg_item.algorithm_fptr = &createMedianFilter;
 			alg_factory.push_back(alg_item);
 			
 			//6. Shock Filter
-			alg_item.algorithm_name = "Coherence enhancing shock filter";				
+			alg_item.algorithm_name = "Coherence enhancing shock filter";	
+            alg_item.algorithm_type = "ShockFilter";
 			alg_item.algorithm_fptr = &createShockFilter;
 			alg_factory.push_back(alg_item);
 			

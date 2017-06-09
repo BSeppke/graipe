@@ -193,6 +193,12 @@ class BlockWiseImageMatcher
             }
         }
 };
+    
+template<>
+QString BlockWiseImageMatcher<FastCCFunctor>::typeName() const
+{
+    return "BWMatcherFastCC";
+}
 
 /**
  * Creates a new block-wise image to image matcher, which uses
@@ -203,6 +209,12 @@ class BlockWiseImageMatcher
 Algorithm* createBWMatcherFastCC()
 {
 	return new BlockWiseImageMatcher<FastCCFunctor>;
+}
+
+template<>
+QString BlockWiseImageMatcher<FastNCCFunctor>::typeName() const
+{
+    return "BWMatcherFastNCC";
 }
 
 /**
@@ -364,6 +376,12 @@ class FeatureToFeatureMatcher
         }
 };
 
+template<>
+QString FeatureToFeatureMatcher<CorrelationFunctor>::typeName() const
+{
+    return "FFMatcherC";
+}
+
 /** 
  * Creates one instance of the feature to feature matching
  * using the un-normalized correlation coefficient for feature/subimage comparison.
@@ -373,6 +391,12 @@ class FeatureToFeatureMatcher
 Algorithm* createFFMatcherC()
 {
 	return new FeatureToFeatureMatcher<CorrelationFunctor>;
+}
+
+template<>
+QString FeatureToFeatureMatcher<NormalizedCorrelationFunctor>::typeName() const
+{
+    return "FFMatcherNC";
 }
 
 /** 
@@ -531,6 +555,12 @@ class FeatureToImageMatcher
         }
 };
 
+template<>
+QString FeatureToImageMatcher<FastCCFunctor>::typeName() const
+{
+    return "FIMatcherFastCC";
+}
+
 /** 
  * Creates one instance of the feature to image matching
  * using the fast unnormalized cross-correlation.
@@ -542,6 +572,13 @@ Algorithm* createFIMatcherFastCC()
 	return new FeatureToImageMatcher<FastCCFunctor>;
 }
 
+
+
+template<>
+QString FeatureToImageMatcher<FastNCCFunctor>::typeName() const
+{
+    return "FIMatcherFastNCC";
+}
 
 /** 
  * Creates one instance of the feature to image matching
@@ -924,21 +961,25 @@ class FeatureMatchingModule
 
 			//1. Using (unnormalized) cross-correlation	
 			alg_item.algorithm_name = "Cross-correlation (F->F)";
+            alg_item.algorithm_type = "FFMatcherC";
 			alg_item.algorithm_fptr = &createFFMatcherC;
 			alg_factory.push_back(alg_item);
 			
 			//2. Using (fast) normalized cross-correlation
 			alg_item.algorithm_name = "Normalized cross-correlation (F->F)";	
+            alg_item.algorithm_type = "FFMatcherNC";
 			alg_item.algorithm_fptr = &createFFMatcherNC;
 			alg_factory.push_back(alg_item);
 			
 			//3. Using Shape Contexts and matching
 			alg_item.algorithm_name = "Shape Context matching (F->F)";	
+            alg_item.algorithm_type = "ShapeContextMatcher";
 			alg_item.algorithm_fptr = &createShapeContextMatcher;
 			alg_factory.push_back(alg_item);
 			
 			//4. Using SIFT features
 			alg_item.algorithm_name = "SIFT matching (F->F)";	
+            alg_item.algorithm_type = "SIFTMatcher";
 			alg_item.algorithm_fptr = &createSIFTMatcher;
 			alg_factory.push_back(alg_item);
 			
@@ -946,12 +987,14 @@ class FeatureMatchingModule
 			//Match features to image (no second featureset needed for this class of algorithms)
 			
 			//1. Fast Cross-Correlation of features->image
-			alg_item.algorithm_name = "Fast cross-correlation (F->I)";		
+			alg_item.algorithm_name = "Fast cross-correlation (F->I)";	
+            alg_item.algorithm_type = "FIMatcherFastCC";
 			alg_item.algorithm_fptr = &createFIMatcherFastCC;
 			alg_factory.push_back(alg_item);
 			
 			//2. Fast Normalized Cross-Correlation of features->image
 			alg_item.algorithm_name = "Fast normalized cross-correlation (F->I)";
+            alg_item.algorithm_type = "FIMatcherFastNCC";
 			alg_item.algorithm_fptr = &createFIMatcherFastNCC;
 			alg_factory.push_back(alg_item);
 			
@@ -961,11 +1004,13 @@ class FeatureMatchingModule
 			
 			//1. blockwise using Fast cross-correlation
 			alg_item.algorithm_name = "Fast cross-correlation block-matching (I->I)";	
+            alg_item.algorithm_type = "BWMatcherFastCC";
 			alg_item.algorithm_fptr = &createBWMatcherFastCC;
 			alg_factory.push_back(alg_item);
 			
 			//2. blockwise using fast Normalized Cross-Correlation
 			alg_item.algorithm_name = "Fast normalized cross-correlation block-matching (I->I)";
+            alg_item.algorithm_type = "BWMatcherFastNCC";
 			alg_item.algorithm_fptr = &createBWMatcherFastNCC;
 			alg_factory.push_back(alg_item);
 			

@@ -795,31 +795,37 @@ class AnalysisModule
 			alg_item.topic_name = "Analysis";
 			
 			//1. specialized vectorfield -> dense model vf comparison method
-			alg_item.algorithm_name = "Vectorfield Comparison w.r.t. dense model data";	
+			alg_item.algorithm_name = "Vectorfield Comparison w.r.t. dense model data";
+            alg_item.algorithm_type = "Vectorfield2DDenseModelComparison";
 			alg_item.algorithm_fptr = &createVectorfield2DDenseModelComparison;
 			alg_factory.push_back(alg_item);
 			
 			//2. generic vectorfield -> vectorfield comparison method
-			alg_item.algorithm_name = "Generic Vectorfield Comparison";	
+			alg_item.algorithm_name = "Generic Vectorfield Comparison";
+            alg_item.algorithm_type = "Vectorfield2DGenericComparison";
 			alg_item.algorithm_fptr = &createVectorfield2DGenericComparison;
 			alg_factory.push_back(alg_item);
 			
 			
 			//3. vectorfield separation -> estimation of affine motion from vf
-			alg_item.algorithm_name = "Generic Vectorfield Separation";	
+			alg_item.algorithm_name = "Generic Vectorfield Separation";
+            alg_item.algorithm_type = "Vectorfield2DSeparation";
 			alg_item.algorithm_fptr = &createVectorfield2DSeparation;
 			alg_factory.push_back(alg_item);
 			
-			alg_item.algorithm_name = "Create mean vectorfield";	
+			alg_item.algorithm_name = "Create mean vectorfield";
+            alg_item.algorithm_type = "MeanVectorfield";
 			alg_item.algorithm_fptr = &createMeanVectorfield;
 			alg_factory.push_back(alg_item);
             
 			alg_item.algorithm_name = "Compute curl of vectorfield";
+            alg_item.algorithm_type = "Vectorfield2DDiv";
 			alg_item.algorithm_fptr = &computeVectorfield2DCurl;
 			alg_factory.push_back(alg_item);
 			
             
 			alg_item.algorithm_name = "Compute divergence of vectorfield";
+            alg_item.algorithm_type = "Vectorfield2DDiv";
 			alg_item.algorithm_fptr = &computeVectorfield2DDiv;
 			alg_factory.push_back(alg_item);
 			

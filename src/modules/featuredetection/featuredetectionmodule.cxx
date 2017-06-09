@@ -694,26 +694,31 @@ class FeatureDetectionModule
 			
 			//find features monotony
 			alg_item.algorithm_name = "Monotony operator";	
+			alg_item.algorithm_type = "MonotonyFeatureDetector";
 			alg_item.algorithm_fptr =  &createMonotonyFeatureDetector;
 			alg_factory.push_back(alg_item);
 			
 			//find features canny
-			alg_item.algorithm_name = "Harris corner detector";		
+			alg_item.algorithm_name = "Harris corner detector";	
+			alg_item.algorithm_type = "HarrisCornerDetector";
 			alg_item.algorithm_fptr = &createHarrisCornerDetector;
 			alg_factory.push_back(alg_item);
 			
 			//find features canny
 			alg_item.algorithm_name = "Canny operator";		
+			alg_item.algorithm_type = "CannyFeatureDetector";
 			alg_item.algorithm_fptr = &createCannyFeatureDetector;
 			alg_factory.push_back(alg_item);
 			
 			//find features canny
-			alg_item.algorithm_name = "SIFT technique";		
+			alg_item.algorithm_name = "SIFT technique";	
+			alg_item.algorithm_type = "SIFTFeatureDetector";
 			alg_item.algorithm_fptr = &createSIFTFeatureDetector;
 			alg_factory.push_back(alg_item);
 			
 			//filter canny features by length
-			alg_item.algorithm_name = "Filter Canny edgels by length";		
+			alg_item.algorithm_name = "Filter Canny edgels by length";
+			alg_item.algorithm_type = "CannyFeatureLengthFilter";
 			alg_item.algorithm_fptr = &createCannyFeatureLengthFilter;
 			alg_factory.push_back(alg_item);
 			

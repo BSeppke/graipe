@@ -2112,42 +2112,50 @@ class ImageProcessingModule
 			alg_item.topic_name = "Basic image processing";
 			
 			//compute gaussian gradient
-			alg_item.algorithm_name = "Compute gaussian gradient";	
+			alg_item.algorithm_name = "Compute gaussian gradient";
+            alg_item.algorithm_type = "GaussianGradientCalculator";
 			alg_item.algorithm_fptr =  &createGaussianGradientCalculator;
 			alg_factory.push_back(alg_item);
 			
 			//1. Recursive smoothing filter
 			alg_item.algorithm_name = "Recursive smoothing";	
+            alg_item.algorithm_type = "RecursiveSmoothingFilter";
 			alg_item.algorithm_fptr = &createRecursiveSmoothingFilter;
 			alg_factory.push_back(alg_item);
 			
 			//2. Gaussian smoothing filter
 			alg_item.algorithm_name = "Gaussian smoothing";	
+            alg_item.algorithm_type = "GaussianSmoothingFilter";
 			alg_item.algorithm_fptr = &createGaussianSmoothingFilter;
 			alg_factory.push_back(alg_item);
 			
 			//3. Normalized Gaussian smoothing filter
-			alg_item.algorithm_name = "Normalized Gaussian smoothing";	
+			alg_item.algorithm_name = "Normalized Gaussian smoothing";
+            alg_item.algorithm_type = "NormalizedGaussianSmoothingFilter";
 			alg_item.algorithm_fptr = &createNormalizedGaussianSmoothingFilter;
 			alg_factory.push_back(alg_item);
 						
 			//4. Image Cropper
 			alg_item.algorithm_name = "Crop image";
+            alg_item.algorithm_type = "ImageCropper";
 			alg_item.algorithm_fptr = &createImageCropper;
 			alg_factory.push_back(alg_item);
 			
 			//5. Image Resizer
 			alg_item.algorithm_name = "Resize image";
+            alg_item.algorithm_type = "ImageResizer";
 			alg_item.algorithm_fptr = &createImageResizer;
 			alg_factory.push_back(alg_item);
 			
 			//6. Image Inverter
 			alg_item.algorithm_name = "Invert image";
+            alg_item.algorithm_type = "ImageInverter";
 			alg_item.algorithm_fptr = &createImageInverter;
 			alg_factory.push_back(alg_item);
 			
 			//7. Add imagesImage Inverter
 			alg_item.algorithm_name = "Add/Sum images";
+            alg_item.algorithm_type = "AddImages";
 			alg_item.algorithm_fptr = &createAddImages;
 			alg_factory.push_back(alg_item);
 			
@@ -2156,51 +2164,61 @@ class ImageProcessingModule
 			
 			//1. Image Thresholder
 			alg_item.algorithm_name = "Create mask from image band by thresholding";
+            alg_item.algorithm_type = "ImageThresholder";
 			alg_item.algorithm_fptr = &createImageThresholder;
 			alg_factory.push_back(alg_item);
 			
 			//2. Floating Image Thresholder
 			alg_item.algorithm_name = "Create mask from image Band by floating thresholding";
+            alg_item.algorithm_type = "FloatingImageThresholder";
 			alg_item.algorithm_fptr = &createFloatingImageThresholder;
 			alg_factory.push_back(alg_item);
 			
 			//3. Apply mask to Image
 			alg_item.algorithm_name = "Apply mask to image";	
+            alg_item.algorithm_type = "ApplyMaskToImage";
 			alg_item.algorithm_fptr = &createApplyMaskToImage;
 			alg_factory.push_back(alg_item);
 			
 			//4. Mask erosion
 			alg_item.algorithm_name = "Mask erosion";	
+            alg_item.algorithm_type = "eMaskErosion";
 			alg_item.algorithm_fptr = &createMaskErosion;
 			alg_factory.push_back(alg_item);
 			
 			//5. Mask dilation
 			alg_item.algorithm_name = "Mask dilation";	
+            alg_item.algorithm_type = "MaskDilation";
 			alg_item.algorithm_fptr = &createMaskDilation;
 			alg_factory.push_back(alg_item);
 			
 			//6. Mask Union
 			alg_item.algorithm_name = "Union of two masks";	
+            alg_item.algorithm_type = "MaskUnion";
 			alg_item.algorithm_fptr = &createMaskUnion;
 			alg_factory.push_back(alg_item);
 			
 			//7. Mask Intersection
-			alg_item.algorithm_name = "Intersection of two masks";	
+			alg_item.algorithm_name = "Intersection of two masks";
+            alg_item.algorithm_type = "MaskIntersection";
 			alg_item.algorithm_fptr = &createMaskIntersection;
 			alg_factory.push_back(alg_item);
 			
 			//8. Mask Difference
 			alg_item.algorithm_name = "Difference of two masks";	
+            alg_item.algorithm_type = "MaskDifference";
 			alg_item.algorithm_fptr = &createMaskDifference;
 			alg_factory.push_back(alg_item);
 			
 			//9. Thin Line Extractor
 			alg_item.algorithm_name = "Distance transform from mask image band";
+            alg_item.algorithm_type = "DistanceTransformator";
 			alg_item.algorithm_fptr = &createDistanceTransformator;
 			alg_factory.push_back(alg_item);
 			
 			//10. Thin Line Extractor
 			alg_item.algorithm_name = "Extract thin line mask from mask image band";
+            alg_item.algorithm_type = "ThinLineExtractor";
 			alg_item.algorithm_fptr = &createThinLineExtractor;
 			alg_factory.push_back(alg_item);
 			

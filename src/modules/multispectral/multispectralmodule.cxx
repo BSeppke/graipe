@@ -262,17 +262,7 @@ class MSGradientCalculator
 template<>
 QString MSGradientCalculator<MSMeanGradientFunctor>::typeName() const
 {
-    return "MSGradientCalculator<MSMeanGradientFunctor>";
-}
-template<>
-QString MSGradientCalculator<MSMaxGradientFunctor>::typeName() const
-{
-    return "MSGradientCalculator<MSMaxGradientFunctor>";
-}
-template<>
-QString MSGradientCalculator<MSMVGradientFunctor>::typeName() const
-{
-    return "MSGradientCalculator<MSMVGradientFunctor>";
+    return "MSMeanGradientCalculator";
 }
 
 /** 
@@ -286,6 +276,12 @@ Algorithm* createMSMeanGradientCalculator()
 	return new MSGradientCalculator<MSMeanGradientFunctor>;
 }
 
+template<>
+QString MSGradientCalculator<MSMaxGradientFunctor>::typeName() const
+{
+    return "MSMaxGradientCalculator";
+}
+
 /** 
  * Creates one instance of the multspectral maximal gradient
  * estimation algorithm defined above.
@@ -295,6 +291,12 @@ Algorithm* createMSMeanGradientCalculator()
 Algorithm* createMSMaxGradientCalculator()
 {
 	return new MSGradientCalculator<MSMaxGradientFunctor>;
+}
+
+template<>
+QString MSGradientCalculator<MSMVGradientFunctor>::typeName() const
+{
+    return "MSMVGradientCalculator";
 }
 
 /** 
@@ -877,47 +879,56 @@ class MultispectralModule
 			alg_item.topic_name = "Multispectral approaches";
 			
 			//estimate ndvi
-			alg_item.algorithm_name = "compute NDVI (from 2 bands)";		
+			alg_item.algorithm_name = "compute NDVI (from 2 bands)";
+            alg_item.algorithm_type = "NDVIEstimator";
 			alg_item.algorithm_fptr = &createNDVIEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//estimate evi
-			alg_item.algorithm_name = "compute EVI (from 2 bands)";		
+			alg_item.algorithm_name = "compute EVI (from 2 bands)";	
+            alg_item.algorithm_type = "EVI2BandsEstimator";
 			alg_item.algorithm_fptr = &createEVI2BandsEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//estimate evi
-			alg_item.algorithm_name = "compute EVI (from 3 bands)";		
+			alg_item.algorithm_name = "compute EVI (from 3 bands)";	
+            alg_item.algorithm_type = "EVIEstimator";
 			alg_item.algorithm_fptr = &createEVIEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//estimate gradient using mean approach 
-			alg_item.algorithm_name = "MS mean gradient computation";		
+			alg_item.algorithm_name = "MS mean gradient computation";	
+            alg_item.algorithm_type = "MSMeanGradientCalculator";
 			alg_item.algorithm_fptr = &createMSMeanGradientCalculator;
 			alg_factory.push_back(alg_item);
 			
 			//estimate gradient using max approach 
-			alg_item.algorithm_name = "MS max gradient computation";		
+			alg_item.algorithm_name = "MS max gradient computation";	
+            alg_item.algorithm_type = "MSMaxGradientCalculator";
 			alg_item.algorithm_fptr = &createMSMaxGradientCalculator;
 			alg_factory.push_back(alg_item);
 			
 			//estimate gradient using mv approach 
 			alg_item.algorithm_name = "MS MV gradient computation";		
+            alg_item.algorithm_type = "MSMVGradientCalculator";
 			alg_item.algorithm_fptr = &createMSMVGradientCalculator;
 			alg_factory.push_back(alg_item);
 			
 			//find ms features canny
 			alg_item.algorithm_name = "MS Canny feature detection";		
+            alg_item.algorithm_type = "MSCannyFeatureDetector";
 			alg_item.algorithm_fptr = &createMSCannyFeatureDetector;
 			alg_factory.push_back(alg_item);
 			
 			//estimate ms optical flow using two bands
-			alg_item.algorithm_name = "MS 2-band Optical Flow estimation";		
+			alg_item.algorithm_name = "MS 2-band Optical Flow estimation";	
+            alg_item.algorithm_type = "OpticalFlow2BandsEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlow2BandsEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//estimate horn&schunck ms optical flow using two bands
-			alg_item.algorithm_name = "Horn and Schunk MS 2-band Optical Flow estimation";		
+			alg_item.algorithm_name = "Horn and Schunk MS 2-band Optical Flow estimation";	
+            alg_item.algorithm_type = "OpticalFlowHS2BandsEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowHS2BandsEstimator;
 			alg_factory.push_back(alg_item);
 			

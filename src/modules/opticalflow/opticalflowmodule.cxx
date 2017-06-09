@@ -212,49 +212,58 @@ class OpticalFlowModule
             alg_item.topic_name = "Optical flow estimation";
 			
 			//1. original hs method
-			alg_item.algorithm_name = "Horn-Schunk method (original)";	
+			alg_item.algorithm_name = "Horn-Schunk method (original)";
+            alg_item.algorithm_type = "OpticalFlowHSOriginalEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowHSOriginalEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//2. extended hs method
 			alg_item.algorithm_name = "Horn-Schunk method (gaussian kernels)";
+            alg_item.algorithm_type = "OpticalFlowHSEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowHSEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//3. nagel's method
 			alg_item.algorithm_name = "Nagel-Enkelmann method";	
+            alg_item.algorithm_type = "OpticalFlowNEEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowNEEstimator;
 			alg_factory.push_back(alg_item);
 			
 			
 			//4. lukas kanade method
 			alg_item.algorithm_name = "Lucas kanade method";	
+            alg_item.algorithm_type = "OpticalFlowLKEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowLKEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//5. structure tensor method
 			alg_item.algorithm_name = "Structure tensor method";	
+            alg_item.algorithm_type = "OpticalFlowSTEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowSTEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//6. Verri's constant contrast method
 			alg_item.algorithm_name = "Verri's constant contrast method";
+            alg_item.algorithm_type = "OpticalFlowCCEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowCCEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//7. Farnebaeck's method
 			alg_item.algorithm_name = "Farnebaeck method";
+            alg_item.algorithm_type = "OpticalFlowFBEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowFBEstimator;
 			alg_factory.push_back(alg_item);
 			
             
 			//8. Combined Local Global method (linear)
 			alg_item.algorithm_name = "Combined Local Global method (linear)";	
+            alg_item.algorithm_type = "OpticalFlowCLGEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowCLGEstimator;
 			alg_factory.push_back(alg_item);
 			
 			//9. Combined Local Global method (nonlinear)
 			alg_item.algorithm_name = "Combined Local Global method (nonlinear)";	
+            alg_item.algorithm_type = "OpticalFlowCLGNonlinearEstimator";
 			alg_item.algorithm_fptr = &createOpticalFlowCLGNonlinearEstimator;
 			alg_factory.push_back(alg_item);
 			

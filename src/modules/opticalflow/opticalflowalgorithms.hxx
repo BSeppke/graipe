@@ -461,6 +461,23 @@ class OpticalFlowHSEstimator
         IntParameter* m_param_iterations;
 };
 
+template<>
+QString OpticalFlowHSEstimator<OpticalFlowHSOriginalFunctor>::typeName() const
+{
+    return "OpticalFlowHSOriginalEstimator";
+}
+
+template<>
+QString OpticalFlowHSEstimator<OpticalFlowHSFunctor>::typeName() const
+{
+    return "OpticalFlowHSEstimator";
+}
+
+template<>
+QString OpticalFlowHSEstimator<OpticalFlowNEFunctor>::typeName() const
+{
+    return "OpticalFlowNEEstimator";
+}
 
 
 
@@ -553,7 +570,17 @@ class OpticalFlowBruhnEstimator
         IntParameter* m_param_iterations;
 };
 
+template<>
+QString OpticalFlowBruhnEstimator<OpticalFlowCLGFunctor>::typeName() const
+{
+    return "createOpticalFlowCLGEstimator";
+}
 
+template<>
+QString OpticalFlowBruhnEstimator<OpticalFlowCLGNonlinearFunctor>::typeName() const
+{
+    return "OpticalFlowCLGNonlinearFunctor";
+}
 
 
 /**
@@ -816,7 +843,24 @@ class OpticalFlowTensorEstimator
         IntParameter* m_param_iterations;
 };
 
+template<>
+QString OpticalFlowTensorEstimator<OpticalFlowSTFunctor>::typeName() const
+{
+    return "OpticalFlowSTEstimator";
+}
+/*
+template<>
+QString OpticalFlowTensorEstimator<OpticalFlowGETTFunctor>::typeName() const
+{
+    return "OpticalFlowGETEstimator";
+}
 
+template<>
+QString OpticalFlowTensorEstimator<OpticalFlowHGFunctor>::typeName() const
+{
+    return "OpticalFlowHGEstimator";
+}
+*/
 
 
 /**

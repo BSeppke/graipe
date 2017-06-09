@@ -509,21 +509,25 @@ class VectorfieldProcessingModule
 		
 			//1. Smoothing
 			alg_item.algorithm_name = "Vectorfield smoothing";	
+            alg_item.algorithm_type = "VectorfieldSmoother";
 			alg_item.algorithm_fptr = &createVectorfieldSmoother;
 			alg_factory.push_back(alg_item);
 			
 			//2. Relaxation
-			alg_item.algorithm_name = "Vectorfield relaxation (variance minimization)";		
+			alg_item.algorithm_name = "Vectorfield relaxation (variance minimization)";	
+            alg_item.algorithm_type = "VectorfieldRelaxer";
 			alg_item.algorithm_fptr = &createVectorfieldRelaxer;
 			alg_factory.push_back(alg_item);
 			
 			//3. Simple Clustering
 			alg_item.algorithm_name = "Basic Vectorfield clustering";	
+            alg_item.algorithm_type = "VectorfieldClustererSimple";
 			alg_item.algorithm_fptr = &createVectorfieldClustererSimple;
 			alg_factory.push_back(alg_item);
 			
 			//4. KMeans Clustering
-			alg_item.algorithm_name = "k-means Vectorfield clustering";	
+			alg_item.algorithm_name = "k-means Vectorfield clustering";
+            alg_item.algorithm_type = "VectorfieldClustererKMeans";
 			alg_item.algorithm_fptr = &createVectorfieldClustererKMeans;
 			alg_factory.push_back(alg_item);
 			

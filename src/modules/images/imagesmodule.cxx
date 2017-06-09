@@ -142,7 +142,8 @@ class ImagesModule
 			alg_item.topic_name = "Import";
 			
 			//Import images
-			alg_item.algorithm_name = "Import image";	
+			alg_item.algorithm_name = "Import image";
+            alg_item.algorithm_type = "ImageImporter";
 			alg_item.algorithm_fptr =  &createImageImporter;
 			alg_factory.push_back(alg_item);
 			
@@ -150,6 +151,7 @@ class ImagesModule
 			
 			//Import images
 			alg_item.algorithm_name = "Export image";
+            alg_item.algorithm_type = "ImageExporter";
 			alg_item.algorithm_fptr =  &createImageExporter;
 			alg_factory.push_back(alg_item);
 			

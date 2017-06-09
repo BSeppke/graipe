@@ -459,16 +459,19 @@ class WindDetectionModule: public Module
 			
 			//1. Wind detection using FFT analysis
 			alg_item.algorithm_name = "Fourier spectra method";		
+            alg_item.algorithm_type = "FourierSpectrumWindDetector";
 			alg_item.algorithm_fptr = &createFourierSpectrumWindDetector;
 			alg_factory.push_back(alg_item);
 			
 			//2. Wind detection using Gradient Histogram analysis
 			alg_item.algorithm_name = "Gradient histogram analysis method";	
+            alg_item.algorithm_type = "GradientHistogramWindDetector";
 			alg_item.algorithm_fptr = &createGradientHistogramWindDetector;
 			alg_factory.push_back(alg_item);
 			
 			//3. Wind detection using Structure Tensor analysis
 			alg_item.algorithm_name = "Structure tensor analysis method";
+            alg_item.algorithm_type = "StructureTensorWindDetector";
 			alg_item.algorithm_fptr = &createStructureTensorWindDetector;
 			alg_factory.push_back(alg_item);
 			

@@ -288,53 +288,9 @@ class GenericRegistration
 template<>
 QString GenericRegistration<WarpAffineFunctor>::typeName() const
 {
-    return "GenericRegistration<WarpAffineFunctor>";
+    return "AffineRegistration";
 }
-template<>
-QString GenericRegistration<WarpProjectiveFunctor>::typeName() const
-{
-    return "GenericRegistration<WarpProjectiveFunctor>";
-}
-template<>
-QString GenericRegistration<WarpBilinearFunctor>::typeName() const
-{
-    return "GenericRegistration<WarpBilinearFunctor>";
-}
-template<>
-QString GenericRegistration<WarpBiquadraticFunctor>::typeName() const
-{
-    return "GenericRegistration<WarpBiquadraticFunctor>";
-}
-template<>
-QString GenericRegistration<WarpBicubicFunctor>::typeName() const
-{
-    return "GenericRegistration<WarpBicubicFunctor>";
-}
-template<>
-QString GenericRegistration<WarpPiecewiseAffineFunctor>::typeName() const
-{
-    return "GenericRegistration<WarpPiecewiseAffineFunctor>";
-}
-template<>
-QString GenericRegistration<WarpRBF1Functor>::typeName() const
-{
-    return "GenericRegistration<WarpRBF1Functor>";
-}
-template<>
-QString GenericRegistration<WarpRBF2Functor>::typeName() const
-{
-    return "GenericRegistration<WarpRBF2Functor>";
-}
-template<>
-QString GenericRegistration<WarpRBF3Functor>::typeName() const
-{
-    return "GenericRegistration<WarpRBF3Functor>";
-}
-template<>
-QString GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >::typeName() const
-{
-    return "GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >";
-}
+
 /**
  * Creates one instance of the point->point affine registration
  * algorithm using the framework defined above.
@@ -344,6 +300,12 @@ QString GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor
 Algorithm* createAffineRegistration()
 {
 	return new GenericRegistration<WarpAffineFunctor>;
+}
+
+template<>
+QString GenericRegistration<WarpProjectiveFunctor>::typeName() const
+{
+    return "ProjectiveRegistration";
 }
 
 /** 
@@ -357,6 +319,12 @@ Algorithm* createProjectiveRegistration()
 	return new GenericRegistration<WarpProjectiveFunctor>;
 }
 
+template<>
+QString GenericRegistration<WarpBilinearFunctor>::typeName() const
+{
+    return "BilinearRegistration";
+}
+
 /** 
  * Creates one instance of the point->point bilinear registration
  * algorithm using the framework defined above.
@@ -366,6 +334,12 @@ Algorithm* createProjectiveRegistration()
 Algorithm* createBilinearRegistration()
 {
 	return new GenericRegistration<WarpBilinearFunctor>;
+}
+
+template<>
+QString GenericRegistration<WarpBiquadraticFunctor>::typeName() const
+{
+    return "BiquadraticRegistration";
 }
 
 /** 
@@ -379,6 +353,12 @@ Algorithm* createBiquadraticRegistration()
 	return new GenericRegistration<WarpBiquadraticFunctor>;
 }
 
+template<>
+QString GenericRegistration<WarpBicubicFunctor>::typeName() const
+{
+    return "GBicubicRegistration";
+}
+
 /** 
  * Creates one instance of the point->point bicubic registration
  * algorithm using the framework defined above.
@@ -390,6 +370,11 @@ Algorithm* createBicubicRegistration()
 	return new GenericRegistration<WarpBicubicFunctor>;
 }
 
+template<>
+QString GenericRegistration<WarpPiecewiseAffineFunctor>::typeName() const
+{
+    return "PiecewiseAffineRegistration";
+}
 /** 
  * Creates one instance of the point->point piecewise affine registration
  * algorithm using the framework defined above.
@@ -399,6 +384,12 @@ Algorithm* createBicubicRegistration()
 Algorithm* createPiecewiseAffineRegistration()
 {
 	return new GenericRegistration<WarpPiecewiseAffineFunctor>;
+}
+
+template<>
+QString GenericRegistration<WarpRBF1Functor>::typeName() const
+{
+    return "RBF1Registration";
 }
 
 /** 
@@ -412,6 +403,12 @@ Algorithm* createRBF1Registration()
 	return new GenericRegistration<WarpRBF1Functor>;
 }
 
+template<>
+QString GenericRegistration<WarpRBF2Functor>::typeName() const
+{
+    return "RBF2Registration";
+}
+
 /** 
  * Creates one instance of the point->point radial basis registration
  * algorithm using a quadratic distance power functor and the framework defined above.
@@ -422,7 +419,11 @@ Algorithm* createRBF2Registration()
 {
 	return new GenericRegistration<WarpRBF2Functor>;
 }
-
+template<>
+QString GenericRegistration<WarpRBF3Functor>::typeName() const
+{
+    return "RBF3Registration";
+}
 /** 
  * Creates one instance of the point->point radial basis registration
  * algorithm using a cubic distance power functor and the framework defined above.
@@ -434,6 +435,11 @@ Algorithm* createRBF3Registration()
 	return new GenericRegistration<WarpRBF3Functor>;
 }
 
+template<>
+QString GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >::typeName() const
+{
+    return "TPSRegistration";
+}
 /** 
  * Creates one instance of the point->point radial basis registration
  * algorithm using a thin plate spline functor and the framework defined above.
@@ -503,6 +509,7 @@ class RegistrationModule
             
             //1. Global Motion Correction
             alg_item.algorithm_name = "Global motion correction (rot. + transl.)";
+            alg_item.algorithm_type = "GlobalMotionCorrector";
             alg_item.algorithm_fptr = &createGlobalMotionCorrector;
             alg_factory.push_back(alg_item);
             
@@ -513,51 +520,61 @@ class RegistrationModule
 			
 			//1. Affine Registration
 			alg_item.algorithm_name = "Affine registration";
+            alg_item.algorithm_type = "AffineRegistration";
 			alg_item.algorithm_fptr = &createAffineRegistration;
 			alg_factory.push_back(alg_item);	
 			
 			//2. Projective Registration
 			alg_item.algorithm_name = "Projective registration";
+            alg_item.algorithm_type = "ProjectiveRegistration";
 			alg_item.algorithm_fptr = &createProjectiveRegistration;
 			alg_factory.push_back(alg_item);
 			
 			//3. Bilinear Registration
 			alg_item.algorithm_name = "Bilinear registration";
+            alg_item.algorithm_type = "BilinearRegistration";
 			alg_item.algorithm_fptr = &createBilinearRegistration;
 			alg_factory.push_back(alg_item);	
 			
 			//4. Biquadratic Registration
 			alg_item.algorithm_name = "Biquadratic registration";
+            alg_item.algorithm_type = "BiquadraticRegistration";
 			alg_item.algorithm_fptr = &createBiquadraticRegistration;
 			alg_factory.push_back(alg_item);	
 			
 			//5. Bicubic Registration
 			alg_item.algorithm_name = "Bicubic registration";
+            alg_item.algorithm_type = "BicubicRegistration";
 			alg_item.algorithm_fptr = &createBicubicRegistration;
 			alg_factory.push_back(alg_item);	
 			
 			//6. Piecewise affine Registration
 			alg_item.algorithm_name = "Piecewise affine registration";
+            alg_item.algorithm_type = "PiecewiseAffineRegistration";
 			alg_item.algorithm_fptr = &createPiecewiseAffineRegistration;
 			alg_factory.push_back(alg_item);	
 			
 			//7. RBF linear Registration
 			alg_item.algorithm_name = "RBF linear registration";
+            alg_item.algorithm_type = "RBF1Registration";
 			alg_item.algorithm_fptr = &createRBF1Registration;
 			alg_factory.push_back(alg_item);
 						
 			//8. RBF quadratic Registration
 			alg_item.algorithm_name = "RBF quadratic registration";
+            alg_item.algorithm_type = "RBF2Registration";
 			alg_item.algorithm_fptr = &createRBF2Registration;
 			alg_factory.push_back(alg_item);
 			
 			//9. RBF cubic Registration
 			alg_item.algorithm_name = "RBF cubic registration";
+            alg_item.algorithm_type = "RBF3Registration";
 			alg_item.algorithm_fptr = &createRBF3Registration;
 			alg_factory.push_back(alg_item);
 			
 			//10. RBF TPS Registration
-			alg_item.algorithm_name = "Thin plate spline registration";		
+			alg_item.algorithm_name = "Thin plate spline registration";	
+            alg_item.algorithm_type = "TPSRegistration";
 			alg_item.algorithm_fptr = &createTPSRegistration;
 			alg_factory.push_back(alg_item);	
 			

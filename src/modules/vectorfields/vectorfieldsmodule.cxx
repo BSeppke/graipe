@@ -165,6 +165,7 @@ class VectorfieldsModule
 			
 			//Import dense vectorfields
 			alg_item.algorithm_name = "Import dense vectorfield (.flo)";
+			alg_item.algorithm_type = "DenseVectorfieldImporter";
 			alg_item.algorithm_fptr =  &createDenseVectorfieldImporter;
 			alg_factory.push_back(alg_item);
 			
@@ -172,6 +173,7 @@ class VectorfieldsModule
 			
 			//Import dense vectorfields
 			alg_item.algorithm_name = "Export dense vectorfield (.flo)";
+			alg_item.algorithm_type = "DenseVectorfieldExporter";
 			alg_item.algorithm_fptr =  &createDenseVectorfieldExporter;
 			alg_factory.push_back(alg_item);
 			

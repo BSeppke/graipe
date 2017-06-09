@@ -1872,17 +1872,20 @@ class RacerClientModule
 			
 			
 			//1. Interpret VF using Racer
-			alg_item.algorithm_name = "measurements and vectorfields vs. A-Box (Racer)";	
+			alg_item.algorithm_name = "measurements and vectorfields vs. A-Box (Racer)";
+            alg_item.algorithm_type = "RacerInterpreter";
 			alg_item.algorithm_fptr = &createRacerInterpreter;
 			alg_factory.push_back(alg_item);
 			
 			//1. Interpret Clustered VF using Racer
 			alg_item.algorithm_name = "Clustered measurements and vectorfields vs. A-Box (Racer)";	
+            alg_item.algorithm_type = "RacerClusteredInterpreter";
 			alg_item.algorithm_fptr = &createRacerClusteredInterpreter;
 			alg_factory.push_back(alg_item);
 			
 			//1. Create Clustered VF ABox
 			alg_item.algorithm_name = "Create Clustered measurements and vectorfields A-Box";	
+            alg_item.algorithm_type = "ClusteredABox";
 			alg_item.algorithm_fptr = &createClusteredABox;
 			alg_factory.push_back(alg_item);
 			
