@@ -256,6 +256,16 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          * \return True, if the parameter's value is valid.
          */
         virtual bool isValid() const;
+    
+        /**
+         * This function indicates whether the value of a parameter is a Model* or 
+         * many of them or needs one at least. These parameters need to access the
+         * global 'models' variable, too!
+         *
+         * \return A filled vector, if the parameter's value is related to a Model*.
+         *         An empty vector by default.
+         */
+        std::vector<Model*> needsModels() const;
         
     protected:
         /**

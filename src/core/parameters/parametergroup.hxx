@@ -107,6 +107,16 @@ class GRAIPE_CORE_EXPORT ParameterGroup
         }
     
         /**
+         * This function indicates whether the value of a parameter is a Model* or 
+         * many of them or needs one at least. These parameters need to access the
+         * global 'models' variable, too!
+         *
+         * \return A filled vector, if the parameter's value is related to a Model*.
+         *         An empty vector by default.
+         */
+        std::vector<Model*> needsModels() const;
+    
+        /**
          * Add an already existing parameter to the ParameterGroup.
          *
          * \param id     The key for this parameter for easy access inside the group

@@ -81,6 +81,38 @@ ParameterGroup::~ParameterGroup()
     }
 }
 
+    
+/**
+ * This function indicates whether the value of a parameter is a Model* or 
+ * many of them or needs one at least. These parameters need to access the
+ * global 'models' variable, too!
+ *
+ * \return A filled vector, if the parameter's value is related to a Model*.
+ *         An empty vector by default.
+ */
+std::vector<Model*> ParameterGroup::needsModels() const
+{
+    std::vector<Model*> modelList;
+    
+    //For each parameter
+    for(item_type item : m_parameters)
+    {
+        //For each of the linked models
+        for(Model* m : item.second->needsModels())
+        {
+            //Is it already in the modelList?
+            auto iter = std::find(modelList.begin(), modelList.end(), m);
+            
+            //If not: Add it!
+            if(iter == modelList.end())
+            {
+                modelList.push_back(m);
+            }
+        }
+    }
+    return modelList;
+}
+
 /**
  * Add an already existing parameter to the ParameterGroup.
  *

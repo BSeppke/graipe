@@ -408,6 +408,27 @@ bool ImageBandParameter<T>::isValid() const
 	return	(m_image != NULL) && (m_bandId < m_image->numBands());
 }
 
+    
+/**
+ * This function indicates whether the value of a parameter is a Model* or 
+ * many of them or needs one at least. These parameters need to access the
+ * global 'models' variable, too!
+ *
+ * \return A filled vector, if the parameter's value is related to a Model*.
+ *         An empty vector by default.
+ */
+template <class T>
+std::vector<Model*> ImageBandParameter<T>::needsModels() const
+{
+    std::vector<Model*> modelList;
+    
+    if(isValid())
+    {
+        modelList.push_back(image());
+    }
+    return modelList;
+}
+    
 /**
  * Initializes the connections (signal<->slot) between the parameter class and
  * the delegate widget. This will be done after the first call of the delegate()

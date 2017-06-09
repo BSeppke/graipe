@@ -175,6 +175,16 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
         virtual bool isValid() const;
         
         /**
+         * This function indicates whether the value of a parameter is a Model* or 
+         * many of them or needs one at least. These parameters need to access the
+         * global 'models' variable, too!
+         *
+         * \return A filled vector, if the parameter's value is related to a Model*.
+         *         An empty vector by default.
+         */
+        std::vector<Model*> needsModels() const;
+        
+        /**
          * The delegate widget of this parameter. 
          * Each parameter generates such a widget on demand, which refers to the
          * first call of this function. This is needed due to the executability of
