@@ -40,6 +40,7 @@
 
 #include "core/model.hxx"
 #include "core/viewcontroller.hxx"
+#include "core/algorithm.hxx"
 
 #include <map>
 
@@ -127,6 +128,26 @@ class GRAIPE_CORE_EXPORT Impex
          * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
          */
         static ViewController* loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene);
+    
+        /**
+         * Basic import procedure for all algorithms, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        static Algorithm* loadAlgorithm(const QString & filename);
+    
+        /**
+         * Basic import procedure for all algorithms, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        static Algorithm* loadAlgorithm(QXmlStreamReader & xmlReader);
             
         /**
          * Standard exporter for everything, which implements the Serializable interface.

@@ -75,7 +75,8 @@ namespace graipe {
  * current progress, errors and finshed state.
  */
 class GRAIPE_CORE_EXPORT Algorithm
-:	public QObject
+:   public QObject,
+	public Serializable
 {
 	Q_OBJECT
 	
@@ -98,6 +99,33 @@ class GRAIPE_CORE_EXPORT Algorithm
          * the stack, we need to clean them up here
          */
 		virtual ~Algorithm();
+    
+        /**
+         * Returns the typename of this algorithm. needs to be overwritten in 
+         * inheriting class
+         *
+         * \return "Algorithm" as a QString
+         */
+        QString typeName() const
+        {
+            return "Algorithm";
+        }
+    
+        /**
+         * Deserialization of the parameters' state from an xml file.
+         *
+         * \param xmlReader The QXmlStreamReader, where we read from.
+         * \return True, if the deserialization was successful, else false.
+         */
+        bool deserialize(QXmlStreamReader& xmlReader);
+    
+        /**
+         * Serialization on to an output device. Simply serialized the parameters
+         * onto the given device.
+         *
+         * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
+         */
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Potentially non-const accessor of the algorithms parameters.

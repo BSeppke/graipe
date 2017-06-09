@@ -69,6 +69,55 @@ Algorithm::~Algorithm()
 {
     delete m_parameters;
 }
+    
+/**
+ * Deserialization of the parameters' state from an xml file.
+ *
+ * \param xmlReader The QXmlStreamReader, where we read from.
+ * \return True, if the deserialization was successful, else false.
+ */
+bool Algorithm::deserialize(QXmlStreamReader& xmlReader)
+{
+    if(     xmlReader.name() == typeName()
+        &&  xmlReader.attributes().hasAttribute("ID"))
+    {
+        setID(xmlReader.attributes().value("ID").toString());
+                
+        if(xmlReader.readNextStartElement())
+        {
+            return m_parameters->deserialize(xmlReader);
+        }
+    }
+    return false;
+}
+
+/**
+ * Serialization on to an output device. Simply serialized the parameters
+ * onto the given device.
+ *
+ * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
+ */
+void Algorithm::serialize(QXmlStreamWriter& xmlWriter) const
+{
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.setAutoFormattingIndent(4);
+    
+    bool fullFile = (xmlWriter.device()->pos() == 0);
+    
+    if (fullFile)
+    {
+        xmlWriter.writeStartDocument();
+    }
+        xmlWriter.writeStartElement(typeName());
+        xmlWriter.writeAttribute("ID", id());
+            m_parameters->serialize(xmlWriter);
+        xmlWriter.writeEndElement();
+        
+    if (fullFile)
+    {
+        xmlWriter.writeEndDocument();
+    }
+}
 
 /**
  * Potentially non-const accessor of the algorithms parameters.

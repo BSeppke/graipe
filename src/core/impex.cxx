@@ -264,6 +264,84 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
     }
     return NULL;
 }
+/**
+ * Basic import procedure for all types, which implements the serializable interface.
+ *
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
+ * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
+ */
+Algorithm* Impex::loadAlgorithm(const QString & filename)
+{
+    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+    Algorithm * alg = NULL;
+    
+    if(device != NULL)
+    {
+        QXmlStreamReader xmlReader(device);
+        alg = loadAlgorithm(xmlReader);
+        device->close();
+    }
+    
+    return alg;
+}
+
+
+/**
+ * Basic import procedure of a settings dictionary from a given QString
+ * A dictionary is defined by means of a mapping from QString keys
+ * to QString values.
+ *
+ * \param contents The input QString.
+ * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
+ */
+Algorithm* Impex::loadAlgorithm(QXmlStreamReader & xmlReader)
+{
+    Algorithm * alg = NULL;
+
+    //1. Read the root attributes of the xml node as well as the name of the root
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.attributes().hasAttribute("ID"))
+    {
+        //First start element: ViewController's name
+        QString alg_type = xmlReader.name().toString();
+
+        //Create an algorithm using the alg_type:
+        for(unsigned int i=0; i<algorithmFactory.size(); ++i)
+        {
+            if(algorithmFactory[i].algorithm_name==alg_type)
+            {
+                alg = algorithmFactory[i].algorithm_fptr();
+                break;
+            }
+        }
+        //If it was not found: Indicate error
+        if(alg == NULL)
+        {
+            qWarning("Impex::loadAlgorithm: Algorithm was not found among available ones.");
+            return NULL;
+        }
+        
+        //4. Restore the parameters
+        if(alg->deserialize(xmlReader))
+        {
+            return alg;
+        }
+        else
+        {
+            qWarning("Impex::loadAlgorithm: Deserialization of Algorithm failed");
+            delete alg;
+            return NULL;
+        }
+    }
+    else
+    {
+        qWarning("Impex::loadAlgorithm: Could not find a single XML start element!");
+        return NULL;
+    }
+    return NULL;
+}
 
 /**
  * Standard exporter for everything, which implements the Serializable interface.
