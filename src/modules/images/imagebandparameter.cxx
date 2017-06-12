@@ -162,7 +162,7 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
             
         if(m_allowed_images.size())
         {
-            m_image = m_allowed_images[0];
+            m_image = m_allowed_images.front();
         }
     }
 }
@@ -304,51 +304,48 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
     
     try
     {
-        if (xmlReader.readNextStartElement())
-        {            
-            if(xmlReader.name() == typeName())
+        if(xmlReader.name() == typeName())
+        {
+            for(int i=0; i!=3; ++i)
             {
-                for(int i=0; i!=3; ++i)
+                xmlReader.readNextStartElement();
+            
+                if(xmlReader.name() == "Name")
                 {
-                    xmlReader.readNextStartElement();
-                
-                    if(xmlReader.name() == "Name")
+                    setName(xmlReader.readElementText());
+                }
+                if(xmlReader.name() == "ImageID")
+                {
+                    QString valueText =  xmlReader.readElementText();
+                    
+                    for(Image<T>* allowed: m_allowed_images)
                     {
-                        setName(xmlReader.readElementText());
-                    }
-                    if(xmlReader.name() == "ImageID")
-                    {
-                        QString valueText =  xmlReader.readElementText();
-                        
-                        for(Image<T>* allowed: m_allowed_images)
+                        if (allowed->id() == valueText)
                         {
-                            if (allowed->id() == valueText)
-                            {
-                                setImage(allowed);
-                                success = true;
-                            }
+                            setImage(allowed);
+                            success = true;
                         }
                     }
-                    if(xmlReader.name() == "BandID")
-                    {
-                        QString valueText =  xmlReader.readElementText();
-                        setBandId(valueText.toInt());
-                    }
                 }
-                while(true)
+                if(xmlReader.name() == "BandID")
                 {
-                    if(!xmlReader.readNext())
-                    {
-                        return false;
-                    }
-                    
-                    if(xmlReader.isEndElement() && xmlReader.name() == typeName())
-                    {
-                        break;
-                    }
+                    QString valueText =  xmlReader.readElementText();
+                    setBandId(valueText.toInt());
                 }
-                return success;
             }
+            while(true)
+            {
+                if(!xmlReader.readNext())
+                {
+                    return false;
+                }
+                
+                if(xmlReader.isEndElement() && xmlReader.name() == typeName())
+                {
+                    break;
+                }
+            }
+            return success;
         }
         else
         {

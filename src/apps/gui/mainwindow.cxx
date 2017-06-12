@@ -912,7 +912,7 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
                 if(model_item && model_item->model())
                 {
                     Model* model = model_item->model();
-                    model->setID(xmlFilename + QString("/model%1").arg(i));
+                    model->setID(QString::number((long int) model));
                     
                     if(model == currentModel())
                     {
@@ -930,7 +930,7 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
                 {
                     ViewController* vc = vc_item->viewController();
                 
-                    vc->setID(xmlFilename + QString("/viewController%1").arg(i));
+                    vc->setID(QString::number((long int) vc));
                 
                     if(vc == currentViewController())
                     {

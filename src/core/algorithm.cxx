@@ -82,11 +82,7 @@ bool Algorithm::deserialize(QXmlStreamReader& xmlReader)
         &&  xmlReader.attributes().hasAttribute("ID"))
     {
         setID(xmlReader.attributes().value("ID").toString());
-                
-        if(xmlReader.readNextStartElement())
-        {
-            return m_parameters->deserialize(xmlReader);
-        }
+        return m_parameters->deserialize(xmlReader);
     }
     return false;
 }

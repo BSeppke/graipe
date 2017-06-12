@@ -437,7 +437,7 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 				global_bottom = global_top  + (global_bottom - global_top)*rescale.second;
 				
 				//Set filename in each case!
-				image.setID(filename);
+				image.setID(QString::number((long int)&image));
 				
                 QFileInfo fi(filename);
                 

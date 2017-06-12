@@ -248,22 +248,31 @@ void Client::sendModel(Model* model)
     }
     
     QXmlStreamWriter xmlWriter(compressor);
+    model->setID(QString::number((long int)model));
     model->serialize(xmlWriter);
     compressor->close();
-    delete model;
     
     QString request1 = QString("Model:%1\n").arg(model_data.size());
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
-    m_tcpSocket->waitForBytesWritten();
     m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
     
+    while( m_tcpSocket->bytesToWrite() != 0)
+    {
+        QCoreApplication::processEvents();
+    }
     
     qDebug() << "--> \"Compressed Model Data\"";
     m_tcpSocket->write(model_data);
-    m_tcpSocket->waitForBytesWritten();
     m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
+    
+    while( m_tcpSocket->bytesToWrite() != 0)
+    {
+        QCoreApplication::processEvents();
+    }
     
     m_btnSend->setEnabled(true);
 }

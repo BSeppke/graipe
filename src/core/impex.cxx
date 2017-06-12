@@ -310,7 +310,7 @@ Algorithm* Impex::loadAlgorithm(QXmlStreamReader & xmlReader)
         //Create an algorithm using the alg_type:
         for(unsigned int i=0; i<algorithmFactory.size(); ++i)
         {
-            if(algorithmFactory[i].algorithm_name==alg_type)
+            if(algorithmFactory[i].algorithm_type==alg_type)
             {
                 alg = algorithmFactory[i].algorithm_fptr();
                 break;

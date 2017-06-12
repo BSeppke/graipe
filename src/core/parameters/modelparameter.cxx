@@ -72,16 +72,20 @@ ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* 
 		
 		for(Model * model: models)
 		{
-            
 			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
 			{
 				m_allowed_values.push_back(model);
 			}
 		}
 	}
-    
-    setValue(value);
-    
+    if(value != NULL)
+    {
+        setValue(value);
+    }
+    else if(m_allowed_values.size() != 0)
+    {
+        setValue(m_allowed_values.front());
+    }
 }
 
 /**
@@ -137,7 +141,7 @@ void ModelParameter::setValue(Model* value)
     
     if (!found)
     {
-        qDebug("ModelParameter::setValue() failed due to unknown/not allowed model value");
+        qDebug() << "ModelParameter::setValue() failed due to unknown/not allowed model value: " << (long int) value;
     }
 }
 
