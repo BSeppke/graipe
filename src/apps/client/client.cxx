@@ -49,7 +49,6 @@ Client::Client(QWidget *parent)
     m_lneRequest(new QLineEdit("/Users/seppke/Desktop/Lenna_face.xgz")),
     m_btnSend(new QPushButton(tr("Send Request"))),
     m_tcpSocket(new QTcpSocket(this)),
-    m_networkSession(Q_NULLPTR),
     m_algSignalMapper(new QSignalMapper)
 {
     //init graipe
@@ -191,28 +190,10 @@ Client::Client(QWidget *parent)
     setWindowTitle(QGuiApplication::applicationDisplayName());
     m_lnePort->setFocus();
 
-    QNetworkConfigurationManager manager;
-    if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
-        // Get saved network configuration
-        QSettings settings(QSettings::UserScope, QLatin1String("QtProject"));
-        settings.beginGroup(QLatin1String("QtNetwork"));
-        const QString id = settings.value(QLatin1String("DefaultNetworkConfiguration")).toString();
-        settings.endGroup();
+    m_lblStatus->setText(tr("This examples requires that you run the "
+                            "Image Server example as well."));
 
-        // If the saved network configuration is not currently discovered use the system default
-        QNetworkConfiguration config = manager.configurationFromIdentifier(id);
-        if ((config.state() & QNetworkConfiguration::Discovered) !=
-            QNetworkConfiguration::Discovered) {
-            config = manager.defaultConfiguration();
-        }
-
-        m_networkSession = new QNetworkSession(config, this);
-        connect(m_networkSession, &QNetworkSession::opened, this, &Client::sessionOpened);
-
-        m_btnSend->setEnabled(false);
-        m_lblStatus->setText(tr("Opening network session."));
-        m_networkSession->open();
-    }
+    enableSendRequestButton();
 }
 
 void Client::loadAndSendModel()
@@ -274,6 +255,8 @@ void Client::sendModel(Model* model)
         QCoreApplication::processEvents();
     }
     
+    m_tcpSocket->waitForReadyRead();
+    
     m_btnSend->setEnabled(true);
 }
 void Client::sendAlgorithm(Algorithm* alg)
@@ -306,14 +289,14 @@ void Client::sendAlgorithm(Algorithm* alg)
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
-    m_tcpSocket->waitForBytesWritten();
     m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
     
     
     qDebug() << "--> \"Compressed Algorithm Data\"";
     m_tcpSocket->write(alg_data);
-    m_tcpSocket->waitForBytesWritten();
     m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
     
     m_btnSend->setEnabled(true);
 }
@@ -410,6 +393,10 @@ void Client::readHandler()
         {
             m_lblStatus->setText(QString("Error number: %1 occured!").arg(bytesToRead));
         }
+        if(message_type == "Sucess")
+        {
+            m_lblStatus->setText(QString("Success!").arg(bytesToRead));
+        }
     }
     m_btnSend->setEnabled(true);
 }
@@ -442,31 +429,9 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
 
 void Client::enableSendRequestButton()
 {
-    m_btnSend->setEnabled((!m_networkSession || m_networkSession->isOpen()) &&
-                                 !m_cmbHost->currentText().isEmpty() &&
-                                 !m_lnePort->text().isEmpty());
+    m_btnSend->setEnabled( !m_cmbHost->currentText().isEmpty() &&
+                           !m_lnePort->text().isEmpty());
 
-}
-
-void Client::sessionOpened()
-{
-    // Save the used configuration
-    QNetworkConfiguration config = m_networkSession->configuration();
-    QString id;
-    if (config.type() == QNetworkConfiguration::UserChoice)
-        id = m_networkSession->sessionProperty(QLatin1String("UserChoiceConfiguration")).toString();
-    else
-        id = config.identifier();
-
-    QSettings settings(QSettings::UserScope, QLatin1String("QtProject"));
-    settings.beginGroup(QLatin1String("QtNetwork"));
-    settings.setValue(QLatin1String("DefaultNetworkConfiguration"), id);
-    settings.endGroup();
-
-    m_lblStatus->setText(tr("This examples requires that you run the "
-                            "Image Server example as well."));
-
-    enableSendRequestButton();
 }
 
 /**

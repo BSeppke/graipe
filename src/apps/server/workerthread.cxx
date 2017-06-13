@@ -52,11 +52,10 @@ WorkerThread::WorkerThread(int socketDescriptor, const QString &image_dir, QObje
 
 void WorkerThread::run()
 {
+    QString statusString("Success:0");
     try
     {
         tcpSocket = new QTcpSocket;
-    
-        tcpSocket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
         
         if (!tcpSocket->setSocketDescriptor(socketDescriptor))
         {
@@ -85,21 +84,21 @@ void WorkerThread::run()
         if(message_type == "Model")
         {
             readModel(bytesToRead);
+            //Returns "Success:0"
         }
         else if(message_type == "Algorithm")
         {
             readAndRunAlgorithm(bytesToRead);
+            //Returns resulting Model(s)...
         }
     }
     catch (...)
     {
-        QString errorString = "Error:0";
-        
-        //First: Write the type (Image) and the number of bytes (of the image) to the socket"
-        tcpSocket->write(errorString.toLatin1());
+        //return error
+        tcpSocket->write(QString("Error:0").toLatin1());
+        tcpSocket->flush();
         tcpSocket->waitForBytesWritten();
     }
-    
     tcpSocket->close();
     
     //Finish by disconnect
@@ -131,7 +130,7 @@ void WorkerThread::readModel(int bytesToRead)
         }
     }
     
-    if(in_model_data.size()!= bytesToRead)
+    if(in_model_data.size() < bytesToRead)
     {
         qWarning() << "Did not receive the full model data, but only "<< in_model_data.size()  <<" of " << bytesToRead << "bytes";
         throw "Error";
@@ -163,6 +162,10 @@ void WorkerThread::readModel(int bytesToRead)
     qDebug("    Model loaded and added sucessfully!");
     qDebug() << "Now: " << models.size() << " models available!";
     
+    tcpSocket->write(QString("Success:0").toLatin1());
+    tcpSocket->flush();
+    tcpSocket->waitForBytesWritten();
+    /*
     
     QByteArray out_model_data;
     QBuffer out_buf(&out_model_data);
@@ -193,6 +196,7 @@ void WorkerThread::readModel(int bytesToRead)
     //Then submit the data of the model:
     tcpSocket->write(out_model_data);
     tcpSocket->waitForBytesWritten();
+    */
 
 }
 
@@ -216,7 +220,7 @@ void WorkerThread::readAndRunAlgorithm(int bytesToRead)
         }
     }
     
-    if(in_alg_data.size()!= bytesToRead)
+    if(in_alg_data.size() < bytesToRead)
     {
         qWarning() << "Did not receive the full algorithm data, but only "<< in_alg_data.size()  <<" of " << bytesToRead << "bytes";
         throw "Error";
@@ -273,11 +277,13 @@ void WorkerThread::readAndRunAlgorithm(int bytesToRead)
         qDebug() << "<-- " << request;
         //First: Write the type (Image) and the number of bytes (of the image) to the socket"
         tcpSocket->write(request.toLatin1());
+        tcpSocket->flush();
         tcpSocket->waitForBytesWritten();
         
         qDebug() << "<-- \"Model data\".";
         //Then submit the data of the model:
         tcpSocket->write(out_model_data);
+        tcpSocket->flush();
         tcpSocket->waitForBytesWritten();
 
     }

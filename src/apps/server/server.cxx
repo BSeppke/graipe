@@ -51,6 +51,7 @@ Server::Server(QObject *parent)
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
+    qDebug("New incoming connection");
     WorkerThread *thread = new WorkerThread(socketDescriptor, image_dir, this);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();

@@ -69,7 +69,6 @@ private slots:
     void readHandler();
     void displayError(QAbstractSocket::SocketError socketError);
     void enableSendRequestButton();
-    void sessionOpened();
     
     /**
      * This slot is called by all registered algorithms. The parameter
@@ -88,8 +87,6 @@ private:
     QPushButton *m_btnSend;
 
     QTcpSocket *m_tcpSocket;
-
-    QNetworkSession *m_networkSession;
     
     //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
     QSignalMapper* m_algSignalMapper;
