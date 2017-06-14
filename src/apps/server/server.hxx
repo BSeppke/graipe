@@ -50,7 +50,7 @@ public:
     Server(QObject *parent = 0);
 
 public slots:
-    void registerSocket(long int socketDescriptor, QString username, QString password);
+    void registerSocket(qintptr socketDescriptor, QString username, QString password);
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
@@ -59,7 +59,7 @@ protected:
 private:
     QVector<QString> m_registered_users;
     
-    QVector<long int> m_connected_sockets;
+    QVector<qintptr> m_connected_sockets;
     QVector<QString> m_connected_usernames;
 };
 

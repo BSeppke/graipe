@@ -61,23 +61,24 @@ void Server::incomingConnection(qintptr socketDescriptor)
     for(unsigned int i=0; i!=m_connected_sockets.size(); ++i)
     {
         //This socket has already registered itself as a valid user
-        if(m_connected_sockets[i] == (long int)socketDescriptor)
+        if(m_connected_sockets[i] == socketDescriptor)
         {
             user = m_connected_usernames[i];
-            qDebug() << "User:" << user;
+            qDebug() << "User:" << user << "Socket:"<< socketDescriptor;
         }
     }
     WorkerThread *thread = new WorkerThread(socketDescriptor, user, this);
-    connect(thread, SIGNAL(userRegistered(long int, QString, QString)), this, SLOT(registerSocket(long int, QString, QString)));
+    connect(thread, SIGNAL(userRegistered(qintptr, QString, QString)), this, SLOT(registerSocket(qintptr, QString, QString)));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
 }
 
-void Server::registerSocket(long int socketDescriptor, QString username, QString password)
+void Server::registerSocket(qintptr socketDescriptor, QString username, QString password)
 {
     QString user = username + ":" + password;
     if(m_registered_users.contains(user))
     {
+        qDebug() << "Login for user " << username << " complete";
         m_connected_sockets.push_back(socketDescriptor);
         m_connected_usernames.push_back(username);
     }

@@ -77,7 +77,14 @@ void WorkerThread::run()
                 qWarning() << "Did not get data in the right format. Expected login:username:password, but got: " << data << ".";
                 throw "Error";
             }
-            emit userRegistered((long int)socketDescriptor, data_split[1], data_split[2]);
+            
+            //return Success
+            tcpSocket->write(QString("login:ok\n").toLatin1());
+            tcpSocket->flush();
+            tcpSocket->waitForBytesWritten();
+            
+            //Tell the server to add the user
+            emit userRegistered(socketDescriptor, data_split[1], data_split[2].trimmed());
         }
         else
         {

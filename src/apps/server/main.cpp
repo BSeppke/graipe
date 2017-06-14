@@ -46,7 +46,9 @@
 
 
 int main(int argc, char *argv[])
-{    
+{
+    qRegisterMetaType<qintptr>("qintptr");
+    
     QApplication app(argc, argv);
     graipe::MainDialog dialog;
     dialog.show();

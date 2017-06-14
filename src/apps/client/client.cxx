@@ -47,6 +47,7 @@ Client::Client(QWidget *parent)
     m_cmbHost(new QComboBox),
     m_lnePort(new QLineEdit),
     m_lneRequest(new QLineEdit("/Users/seppke/Desktop/Lenna_face.xgz")),
+    m_btnLogin(new QPushButton(tr("Login"))),
     m_btnSend(new QPushButton(tr("Send Request"))),
     m_tcpSocket(new QTcpSocket(this)),
     m_algSignalMapper(new QSignalMapper)
@@ -157,6 +158,7 @@ Client::Client(QWidget *parent)
     QPushButton *quitButton = new QPushButton(tr("Quit"));
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(m_btnLogin, QDialogButtonBox::ActionRole);
     buttonBox->addButton(m_btnSend, QDialogButtonBox::ActionRole);
     buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
 
@@ -166,6 +168,8 @@ Client::Client(QWidget *parent)
             this, &Client::enableSendRequestButton);
     connect(m_lneRequest, &QLineEdit::textChanged,
             this, &Client::enableSendRequestButton);
+    connect(m_btnLogin, &QAbstractButton::clicked,
+            this, &Client::registerAtServer);
     connect(m_btnSend, &QAbstractButton::clicked,
             this, &Client::loadAndSendModel);
     connect(quitButton, &QAbstractButton::clicked, this, &QWidget::close);
@@ -197,9 +201,7 @@ Client::Client(QWidget *parent)
 }
 
 void Client::loadAndSendModel()
-{
-    registerAtServer();
-    
+{    
     Model* model = Impex::loadModel(m_lneRequest->text());
     
     if (model != NULL)
@@ -269,13 +271,12 @@ void Client::registerAtServer()
                                 m_lnePort->text().toInt());
     
     m_tcpSocket->waitForConnected();
-    QString request1("login:test:test");
+    QString request1("login:test:test\n");
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
     m_tcpSocket->flush();
     m_tcpSocket->waitForBytesWritten();
-    m_tcpSocket->close();
     
     m_btnSend->setEnabled(true);
 }
@@ -472,8 +473,6 @@ void Client::runAlgorithm(int index)
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);
 	parameter_selection.setModal(true);
-	
-    registerAtServer();
     
 	if(parameter_selection.exec())
 	{

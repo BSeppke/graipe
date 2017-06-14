@@ -85,6 +85,7 @@ private:
     QLineEdit *m_lnePort;
     QLineEdit *m_lneRequest;
     QLabel *m_lblStatus;
+    QPushButton *m_btnLogin;
     QPushButton *m_btnSend;
 
     QTcpSocket *m_tcpSocket;

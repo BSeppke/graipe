@@ -56,7 +56,7 @@ class WorkerThread
 
     signals:
         void error(QTcpSocket::SocketError socketError);
-        void userRegistered(long int socketDescriptor, QString username, QString password);
+        void userRegistered(qintptr socketDescriptor, QString username, QString password);
 
     private:
         QString m_username;
