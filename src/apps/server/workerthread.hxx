@@ -47,8 +47,7 @@ class WorkerThread
     Q_OBJECT
 
     public:
-        WorkerThread(int socketDescriptor, const QString &image_dir, QObject *parent);
-
+        WorkerThread(long int socketDescriptor, QString username, QObject *parent);
         void run() override;
 
     protected:
@@ -57,8 +56,10 @@ class WorkerThread
 
     signals:
         void error(QTcpSocket::SocketError socketError);
+        void userRegistered(long int socketDescriptor, QString username, QString password);
 
     private:
+        QString m_username;
         int socketDescriptor;
         QTcpSocket* tcpSocket;
 };

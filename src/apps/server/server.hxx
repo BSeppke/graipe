@@ -41,20 +41,26 @@
 
 namespace graipe {
 
-static QString image_dir = "/Users/seppke/development/experiments/c++/threadedfortuneserver/images";
-
-class Server : public QTcpServer
+class Server
+:   public QTcpServer
 {
     Q_OBJECT
 
 public:
     Server(QObject *parent = 0);
 
+public slots:
+    void registerSocket(long int socketDescriptor, QString username, QString password);
+
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
 
+
 private:
-    QStringList fortunes;
+    QVector<QString> m_registered_users;
+    
+    QVector<long int> m_connected_sockets;
+    QVector<QString> m_connected_usernames;
 };
 
 } //namespace graipe

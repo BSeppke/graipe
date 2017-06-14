@@ -198,6 +198,8 @@ Client::Client(QWidget *parent)
 
 void Client::loadAndSendModel()
 {
+    registerAtServer();
+    
     Model* model = Impex::loadModel(m_lneRequest->text());
     
     if (model != NULL)
@@ -259,6 +261,25 @@ void Client::sendModel(Model* model)
     
     m_btnSend->setEnabled(true);
 }
+void Client::registerAtServer()
+{
+    m_btnSend->setEnabled(false);
+    m_tcpSocket->abort();
+    m_tcpSocket->connectToHost( m_cmbHost->currentText(),
+                                m_lnePort->text().toInt());
+    
+    m_tcpSocket->waitForConnected();
+    QString request1("login:test:test");
+    
+    qDebug() << "--> " << request1;
+    m_tcpSocket->write(request1.toLatin1());
+    m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
+    m_tcpSocket->close();
+    
+    m_btnSend->setEnabled(true);
+}
+
 void Client::sendAlgorithm(Algorithm* alg)
 {
     m_btnSend->setEnabled(false);
@@ -452,6 +473,8 @@ void Client::runAlgorithm(int index)
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);
 	parameter_selection.setModal(true);
 	
+    registerAtServer();
+    
 	if(parameter_selection.exec())
 	{
 		//The result is true if and only if all parameters have been finalised

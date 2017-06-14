@@ -69,6 +69,7 @@ private slots:
     void readHandler();
     void displayError(QAbstractSocket::SocketError socketError);
     void enableSendRequestButton();
+    void registerAtServer();
     
     /**
      * This slot is called by all registered algorithms. The parameter

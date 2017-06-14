@@ -43,10 +43,10 @@
 
 namespace graipe {
 
-WorkerThread::WorkerThread(int socketDescriptor, const QString &image_dir, QObject *parent)
+WorkerThread::WorkerThread(long int socketDescriptor, QString username, QObject *parent)
 :   QThread(parent),
+    m_username(username),
     socketDescriptor(socketDescriptor)
-    
 {
 }
 
@@ -63,33 +63,52 @@ void WorkerThread::run()
             throw "Error";
         }
         
-        //Wait for the request
-        tcpSocket->waitForReadyRead();
-        
-        //Get the request
-        QString data = QString::fromLatin1(tcpSocket->readLine());
-        qDebug() << "-->" << data << ".";
-        
-        QStringList data_split = data.split(":");
-        
-        if(data_split.size() != 2)
+        //User ist not yet registered
+        if(m_username.isEmpty())
         {
-            qWarning() << "Did not get data in the right format. Expected TypeName:Size, but got: " << data << ".";
-            throw "Error";
+            //Wait for the data
+            tcpSocket->waitForReadyRead();
+            
+            QString data = QString::fromLatin1(tcpSocket->readLine());
+            QStringList data_split = data.split(":");
+            
+            if(data_split.size() != 3 || data_split[0] != "login")
+            {
+                qWarning() << "Did not get data in the right format. Expected login:username:password, but got: " << data << ".";
+                throw "Error";
+            }
+            emit userRegistered((long int)socketDescriptor, data_split[1], data_split[2]);
         }
-        
-        QString message_type = data_split[0];
-        int bytesToRead = data_split[1].toInt();
-        
-        if(message_type == "Model")
+        else
         {
-            readModel(bytesToRead);
-            //Returns "Success:0"
-        }
-        else if(message_type == "Algorithm")
-        {
-            readAndRunAlgorithm(bytesToRead);
-            //Returns resulting Model(s)...
+            //Wait for the request
+            tcpSocket->waitForReadyRead();
+            
+            //Get the request
+            QString data = QString::fromLatin1(tcpSocket->readLine());
+            qDebug() <<  m_username << "-->" << data << ".";
+            
+            QStringList data_split = data.split(":");
+            
+            if(data_split.size() != 2)
+            {
+                qWarning() << "Did not get data in the right format. Expected TypeName:Size, but got: " << data << ".";
+                throw "Error";
+            }
+            
+            QString message_type = data_split[0];
+            int bytesToRead = data_split[1].toInt();
+            
+            if(message_type == "Model")
+            {
+                readModel(bytesToRead);
+                //Returns "Success:0"
+            }
+            else if(message_type == "Algorithm")
+            {
+                readAndRunAlgorithm(bytesToRead);
+                //Returns resulting Model(s)...
+            }
         }
     }
     catch (...)
