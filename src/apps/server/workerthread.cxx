@@ -108,27 +108,19 @@ void WorkerThread::readyRead()
             {
                 m_state = 1;
                 m_expected_bytes = split_data[1].toInt();
+                readModel(m_expected_bytes);
+                m_expected_bytes = 0;
+                m_state = 0;
             }
             else if(split_data[0] == "Algorithm")
             {
-                m_state = 2;
+                m_state = 1;
                 m_expected_bytes = split_data[1].toInt();
+                readAndRunAlgorithm(m_expected_bytes);
+                m_expected_bytes = 0;
+                m_state = 0;
             }
         }
-    }
-    else if(m_state == 1)
-    {
-        m_state = 3;
-        readModel(m_expected_bytes);
-        m_state = 0;
-        m_expected_bytes = 0;
-    }
-    else if(m_state == 2)
-    {
-        m_state = 3;
-        readAndRunAlgorithm(m_expected_bytes);
-        m_state = 0;
-        m_expected_bytes = 0;
     }
 }
 

@@ -64,9 +64,13 @@ class WorkerThread
     private:
         int m_socketDescriptor;
         QTcpSocket* m_tcpSocket;
+    
         QVector<QString> m_registered_users;
-        int m_state;
-        int m_expected_bytes;
+    
+        int m_state; // -1 : no logged in,
+                     //  0 : logged in,
+                     //  1 : busy (waiting for data to be received)
+        int m_expected_bytes; //in case state==1 - how many bytes do we want to receive
     
     
 };

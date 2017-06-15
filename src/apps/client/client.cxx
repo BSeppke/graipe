@@ -248,13 +248,6 @@ void Client::sendModel(Model* model)
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
-    m_tcpSocket->flush();
-    m_tcpSocket->waitForBytesWritten();
-    
-    while( m_tcpSocket->bytesToWrite() != 0)
-    {
-        QCoreApplication::processEvents();
-    }
     
     qDebug() << "--> \"Compressed Model Data\"";
     m_tcpSocket->write(model_data);
@@ -311,13 +304,10 @@ void Client::sendAlgorithm(Algorithm* alg)
     alg->serialize(xmlWriter);
     compressor->close();
     
-    QString request1 = QString("Algorithm:%1\n").arg(alg_data.size());
+    QString request1 = QString("Algorithm:%1\r\n").arg(alg_data.size());
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
-    m_tcpSocket->flush();
-    m_tcpSocket->waitForBytesWritten();
-    
     
     qDebug() << "--> \"Compressed Algorithm Data\"";
     m_tcpSocket->write(alg_data);
