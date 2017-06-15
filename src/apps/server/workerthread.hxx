@@ -47,21 +47,28 @@ class WorkerThread
     Q_OBJECT
 
     public:
-        WorkerThread(long int socketDescriptor, QString username, QObject *parent);
+        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QObject *parent);
         void run() override;
 
+    protected slots:
+        void readyRead();
+        void disconnected();
+   
     protected:
         void readModel(int bytesToRead);
         void readAndRunAlgorithm(int bytesToRead);
 
     signals:
         void error(QTcpSocket::SocketError socketError);
-        void userRegistered(qintptr socketDescriptor, QString username, QString password);
 
     private:
-        QString m_username;
-        int socketDescriptor;
-        QTcpSocket* tcpSocket;
+        int m_socketDescriptor;
+        QTcpSocket* m_tcpSocket;
+        QVector<QString> m_registered_users;
+        int m_state;
+        int m_expected_bytes;
+    
+    
 };
 
 } //namespace graipe

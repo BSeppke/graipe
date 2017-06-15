@@ -83,6 +83,10 @@ private:
     inline void readModel(int bytesToRead);
     QComboBox *m_cmbHost;
     QLineEdit *m_lnePort;
+    
+    QLineEdit *m_lneUser;
+    QLineEdit *m_lnePassword;
+    
     QLineEdit *m_lneRequest;
     QLabel *m_lblStatus;
     QPushButton *m_btnLogin;

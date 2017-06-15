@@ -49,18 +49,11 @@ class Server
 public:
     Server(QObject *parent = 0);
 
-public slots:
-    void registerSocket(qintptr socketDescriptor, QString username, QString password);
-
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
 
-
 private:
     QVector<QString> m_registered_users;
-    
-    QVector<qintptr> m_connected_sockets;
-    QVector<QString> m_connected_usernames;
 };
 
 } //namespace graipe

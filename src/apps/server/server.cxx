@@ -38,6 +38,7 @@
 #include "core/core.h"
 
 #include <QDir>
+#include <QCryptographicHash>
 
 #include <stdlib.h>
 
@@ -48,44 +49,24 @@ Server::Server(QObject *parent)
 {
     qDebug() << "Server knows factories: models " << modelFactory.size() << ", ViewControllers: " << viewControllerFactory.size() << ", algorithms: " << algorithmFactory.size();
     
-    m_registered_users.push_back("test:test");
-    m_registered_users.push_back("user:password");
+    QString user1 = "test";
+    QString pass1 = "test";
+    
+    QString user2 = "user";
+    QString pass2 = "password";
+    
+    m_registered_users.push_back(user1 + ":" + QCryptographicHash::hash(pass1.toLatin1(), QCryptographicHash::Algorithm::Md5).toHex());
+    m_registered_users.push_back(user2 + ":" + QCryptographicHash::hash(pass2.toLatin1(), QCryptographicHash::Algorithm::Md5).toHex());
 }
 
 void Server::incomingConnection(qintptr socketDescriptor)
 {
     qDebug("New incoming connection");
     
-    QString user;
-    
-    for(unsigned int i=0; i!=m_connected_sockets.size(); ++i)
-    {
-        //This socket has already registered itself as a valid user
-        if(m_connected_sockets[i] == socketDescriptor)
-        {
-            user = m_connected_usernames[i];
-            qDebug() << "User:" << user << "Socket:"<< socketDescriptor;
-        }
-    }
-    WorkerThread *thread = new WorkerThread(socketDescriptor, user, this);
-    connect(thread, SIGNAL(userRegistered(qintptr, QString, QString)), this, SLOT(registerSocket(qintptr, QString, QString)));
+    WorkerThread *thread = new WorkerThread(socketDescriptor, m_registered_users, this);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
 }
 
-void Server::registerSocket(qintptr socketDescriptor, QString username, QString password)
-{
-    QString user = username + ":" + password;
-    if(m_registered_users.contains(user))
-    {
-        qDebug() << "Login for user " << username << " complete";
-        m_connected_sockets.push_back(socketDescriptor);
-        m_connected_usernames.push_back(username);
-    }
-    else
-    {
-        qWarning() << "Attempt of illegal user login! User: " << username << ", Password: " << password;
-    }
-}
 
 } //namespace graipe

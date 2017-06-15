@@ -35,6 +35,7 @@
 
 #include <QtWidgets>
 #include <QtNetwork>
+#include <QCryptographicHash>
 
 #include "client.hxx"
 
@@ -46,6 +47,8 @@ Client::Client(QWidget *parent)
 :   QMainWindow(parent),
     m_cmbHost(new QComboBox),
     m_lnePort(new QLineEdit),
+    m_lneUser(new QLineEdit),
+    m_lnePassword(new QLineEdit),
     m_lneRequest(new QLineEdit("/Users/seppke/Desktop/Lenna_face.xgz")),
     m_btnLogin(new QPushButton(tr("Login"))),
     m_btnSend(new QPushButton(tr("Send Request"))),
@@ -146,6 +149,12 @@ Client::Client(QWidget *parent)
     hostLabel->setBuddy(m_cmbHost);
     QLabel *portLabel = new QLabel(tr("S&erver port:"));
     portLabel->setBuddy(m_lnePort);
+    
+    QLabel *userLabel = new QLabel(tr("&User:"));
+    userLabel->setBuddy(m_lneUser);
+    QLabel *passwordLabel = new QLabel(tr("&Password:"));
+    passwordLabel->setBuddy(m_lnePassword);
+    
     QLabel *requestLabel = new QLabel(tr("&Request:"));
     requestLabel->setBuddy(m_lneRequest);
 
@@ -186,10 +195,14 @@ Client::Client(QWidget *parent)
     mainLayout->addWidget(m_cmbHost, 0, 1);
     mainLayout->addWidget(portLabel, 1, 0);
     mainLayout->addWidget(m_lnePort, 1, 1);
-    mainLayout->addWidget(requestLabel, 2, 0);
-    mainLayout->addWidget(m_lneRequest, 2, 1);
-    mainLayout->addWidget(m_lblStatus, 3, 0, 1, 2);
-    mainLayout->addWidget(buttonBox, 4, 0, 1, 2);
+    mainLayout->addWidget(userLabel, 2, 0);
+    mainLayout->addWidget(m_lneUser, 2, 1);
+    mainLayout->addWidget(passwordLabel, 3, 0);
+    mainLayout->addWidget(m_lnePassword, 3, 1);
+    mainLayout->addWidget(requestLabel, 4, 0);
+    mainLayout->addWidget(m_lneRequest, 4, 1);
+    mainLayout->addWidget(m_lblStatus, 5, 0, 1, 2);
+    mainLayout->addWidget(buttonBox, 6, 0, 1, 2);
     
     setWindowTitle(QGuiApplication::applicationDisplayName());
     m_lnePort->setFocus();
@@ -213,12 +226,6 @@ void Client::loadAndSendModel()
 void Client::sendModel(Model* model)
 {
     m_btnSend->setEnabled(false);
-    m_tcpSocket->abort();
-    m_tcpSocket->connectToHost( m_cmbHost->currentText(),
-                                m_lnePort->text().toInt());
-    
-    m_tcpSocket->waitForConnected();
-
     QByteArray model_data;
     QBuffer out_buf(&model_data);
     
@@ -271,7 +278,9 @@ void Client::registerAtServer()
                                 m_lnePort->text().toInt());
     
     m_tcpSocket->waitForConnected();
-    QString request1("login:test:test\n");
+    
+    QString account = m_lneUser->text() + ":" + QCryptographicHash::hash(m_lnePassword->text().toLatin1(), QCryptographicHash::Algorithm::Md5).toHex();
+    QString request1("login:" + account + "\r\n");
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
@@ -284,11 +293,6 @@ void Client::registerAtServer()
 void Client::sendAlgorithm(Algorithm* alg)
 {
     m_btnSend->setEnabled(false);
-    m_tcpSocket->abort();
-    m_tcpSocket->connectToHost( m_cmbHost->currentText(),
-                                m_lnePort->text().toInt());
-    
-    m_tcpSocket->waitForConnected();
 
     QByteArray alg_data;
     QBuffer out_buf(&alg_data);
@@ -405,22 +409,28 @@ void Client::readHandler()
     else
     {
         QString message_type = data_split[0];
-        int bytesToRead = data_split[1].toInt();
 
         if(message_type == "Model")
         {
+            int bytesToRead = data_split[1].toInt();
             readModel(bytesToRead);
         }
         if(message_type == "Error")
         {
+            int bytesToRead = data_split[1].toInt();
             m_lblStatus->setText(QString("Error number: %1 occured!").arg(bytesToRead));
         }
         if(message_type == "Sucess")
         {
-            m_lblStatus->setText(QString("Success!").arg(bytesToRead));
+            
+            m_lblStatus->setText("Success!" + data_split[1]);
+        }
+        if(message_type == "login" && data_split[1] =="ok")
+        {
+            m_lblStatus->setText(QString("Successfully logged in!"));
+            m_btnSend->setEnabled(true);
         }
     }
-    m_btnSend->setEnabled(true);
 }
 
 void Client::displayError(QAbstractSocket::SocketError socketError)
@@ -451,9 +461,7 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
 
 void Client::enableSendRequestButton()
 {
-    m_btnSend->setEnabled( !m_cmbHost->currentText().isEmpty() &&
-                           !m_lnePort->text().isEmpty());
-
+    m_btnSend->setEnabled(m_tcpSocket->state() == QTcpSocket::ConnectedState);
 }
 
 /**
