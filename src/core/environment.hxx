@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_CORE_GLOBALS_HXX
-#define GRAIPE_CORE_GLOBALS_HXX
+#ifndef GRAIPE_CORE_ENVIRONMENT_HXX
+#define GRAIPE_CORE_ENVIRONMENT_HXX
 
 #include "core/factories.hxx"
 #include "core/model.hxx"

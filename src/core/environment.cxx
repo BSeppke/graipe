@@ -33,7 +33,7 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 #include "core/module.hxx"
 
 #include <QCoreApplication>
@@ -177,9 +177,6 @@ GRAIPE_CORE_EXPORT Environment* loadModules(const QDir & current_dir, QString& r
     
     return env;
 }
-
-
-//Environment * environment = new Environment;
 
 } //end of namespace graipe
 

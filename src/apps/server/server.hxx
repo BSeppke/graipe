@@ -38,7 +38,7 @@
 
 #include <QStringList>
 #include <QTcpServer>
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 
 namespace graipe {
 

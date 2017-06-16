@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "images/imagebandparameter.hxx"
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 
 namespace graipe {
 

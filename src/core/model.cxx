@@ -36,7 +36,7 @@
 #include "core/model.hxx"
 #include "core/impex.hxx"
 #include "core/parameters.hxx"
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 
 #include <cmath>
 #include <algorithm>

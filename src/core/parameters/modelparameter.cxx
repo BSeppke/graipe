@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "core/parameters/modelparameter.hxx"
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 
 #include <QtDebug>
 #include <QXmlStreamWriter>

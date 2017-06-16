@@ -37,7 +37,7 @@
 #include "gui/memorystatus.hxx"
 
 #include "core/updatechecker.hxx"
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 
 #include <QDir>
 #include <QLibrary>
@@ -134,14 +134,6 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     m_view->setRenderHint(QPainter::Antialiasing, true);
     m_view->setRenderHint(QPainter::SmoothPixmapTransform, false);
     
-    
-	statusBar();
-    this->statusBar()->addPermanentWidget(m_lblMemoryUsage);
-    updateMemoryUsage();
-    
-	setWindowTitle(tr(name));
-    setCentralWidget(m_view);
-	
     m_printer = NULL;
 	
 	m_displayMode = ImageMode;
@@ -196,6 +188,14 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     connect(checkerThread, SIGNAL(started()), checker, SLOT(checkForUpdates()));
     connect(checker, SIGNAL(finished()), checkerThread, SLOT(quit()));
     checkerThread->start();
+    
+	statusBar();
+    this->statusBar()->addPermanentWidget(m_lblMemoryUsage);
+    updateMemoryUsage();
+    
+	setWindowTitle(tr(name));
+    setCentralWidget(m_view);
+	
 }
 
 

@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "core/viewcontroller.hxx"
-#include "core/globals.hxx"
+#include "core/environment.hxx"
 
 #include <algorithm>
 
