@@ -43,13 +43,15 @@
 
 namespace graipe {
 
-WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QObject *parent)
+WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QMutex* mutex, Environment* env, QObject *parent)
 :   QThread(parent),
     m_socketDescriptor(socketDescriptor),
     m_tcpSocket(NULL),
     m_registered_users(registered_users),
     m_state(-1),
-    m_expected_bytes(0)
+    m_expected_bytes(0),
+    m_mutex(mutex),
+    m_environment(env)
 {
 }
 
@@ -66,19 +68,19 @@ void WorkerThread::run()
     connect(m_tcpSocket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
     connect(m_tcpSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
-    qDebug() << "Client " << m_socketDescriptor << " connected";
+    qDebug() << m_socketDescriptor << "--- connected";
     
     exec();
 }
 
 void WorkerThread::readyRead()
 {
-    qDebug() << "Thread's state: " << m_state;
+    qDebug()  << m_socketDescriptor << "--- state: " << m_state;
     
     if(m_state < 0)
     {
         QByteArray data = m_tcpSocket->readLine();
-        qDebug() << "Client " << m_socketDescriptor <<  "-->" << QString::fromLatin1(data);
+        qDebug() <<  m_socketDescriptor <<  "-->" << QString::fromLatin1(data);
 
         //Still waiting for login:
         QStringList split_data = QString::fromLatin1(data).trimmed().split(":");
@@ -90,75 +92,98 @@ void WorkerThread::readyRead()
             if(m_registered_users.contains(account))
             {
                 m_state = 0;
-                qDebug() << "Client " << m_socketDescriptor <<  " logged in unsing:" << account;
+                qDebug() << m_socketDescriptor <<  "--- logged in unsing:" << account;
             }
         }
     }
     else if(m_state == 0)
     {
         QByteArray data = m_tcpSocket->readLine();
-        qDebug() << "Client " << m_socketDescriptor <<  "-->" << QString::fromLatin1(data);
+        qDebug() << m_socketDescriptor <<  "-->" << QString::fromLatin1(data);
 
         //Waiting for model or algorithm call
         QStringList split_data = QString::fromLatin1(data).trimmed().split(":");
         
-        if( split_data.size() == 2)
+        if(split_data.size() == 2)
         {
             if(split_data[0] == "Model")
             {
                 m_state = 1;
                 m_expected_bytes = split_data[1].toInt();
-                readModel(m_expected_bytes);
-                m_expected_bytes = 0;
-                m_state = 0;
+                m_buffer.clear();
+                //Maybe some bytes already arrived?
+                if(m_tcpSocket->bytesAvailable())
+                {
+                    readyRead();
+                }
             }
             else if(split_data[0] == "Algorithm")
             {
-                m_state = 1;
+                m_state = 2;
                 m_expected_bytes = split_data[1].toInt();
-                readAndRunAlgorithm(m_expected_bytes);
-                m_expected_bytes = 0;
-                m_state = 0;
+                m_buffer.clear();
+                //Maybe some bytes already arrived?
+                if(m_tcpSocket->bytesAvailable())
+                {
+                    readyRead();
+                }
             }
+        }
+    }
+    else if(m_state == 1)
+    {
+        if(m_buffer.size() < m_expected_bytes)
+        {
+            m_buffer.append(m_tcpSocket->readAll());
+        }
+        
+        if(m_buffer.size() == m_expected_bytes)
+        {
+            readModel();
+            m_state = 0;
+            m_expected_bytes = 0;
+            m_buffer.clear();
+        }
+        else
+        {
+            qDebug()  << m_socketDescriptor << "--- Still waiting for more Model bytes";
+        }
+    }
+    else if(m_state == 2)
+    {
+        if(m_buffer.size() < m_expected_bytes)
+        {
+            m_buffer.append(m_tcpSocket->readAll());
+        }
+        
+        if(m_buffer.size() == m_expected_bytes)
+        {
+            readAndRunAlgorithm();
+            m_state = 0;
+            m_expected_bytes = 0;
+            m_buffer.clear();
+        }
+        else
+        {
+            qDebug()  << m_socketDescriptor << "--- Still waiting for more Algorithm bytes";
         }
     }
 }
 
 void WorkerThread::disconnected()
 {
-    qDebug() << "Client "<< m_socketDescriptor << " disconnected";
+    qDebug() << m_socketDescriptor << "--- disconnected";
 
     m_tcpSocket->deleteLater();
     exit(0);
 }
 
-void WorkerThread::readModel(int bytesToRead)
+void WorkerThread::readModel()
 {
     try
     {
-        QByteArray in_model_data;
+        QByteArray in_model_data = m_buffer;
         
-        while(m_tcpSocket->bytesAvailable() && in_model_data.size() < bytesToRead)
-        {
-            in_model_data.append(m_tcpSocket->readAll());
-            if(in_model_data.size() == bytesToRead)
-            {
-                break;
-            }
-            else
-            {
-                qDebug() << "    still waiting for some model data...";
-                m_tcpSocket->waitForReadyRead();
-            }
-        }
-        
-        if(in_model_data.size() < bytesToRead)
-        {
-            qWarning() << "Did not receive the full model data, but only "<< in_model_data.size()  <<" of " << bytesToRead << "bytes";
-            throw "Error";
-        }
-        
-        qDebug() << "--> \"Model data\".";
         QBuffer in_buf(&in_model_data);
         
         //Always use compressed transfer
@@ -167,22 +192,25 @@ void WorkerThread::readModel(int bytesToRead)
 
         if (!in_compressor->open(QIODevice::ReadOnly))
         {
-            qWarning("Did not open compressor (gz) on tcpSocket");
+            qWarning()  << m_socketDescriptor << "--- Did not open compressor (gz) on tcpSocket";
             throw "Error";
         }
         
         QXmlStreamReader xmlReader(in_compressor);
-        Model* new_model = Impex::loadModel(xmlReader);
+        
+        m_mutex->lock();
+        Model* new_model = Impex::loadModel(xmlReader, m_environment);
+        m_mutex->unlock();
         
         if(new_model == NULL)
         {
-            qWarning("Did not load a model over the tcpSocket");
+            qWarning() << m_socketDescriptor << "--- Did not load a model over the tcpSocket";
             throw "Error";
             
         }
         
-        qDebug("    Model loaded and added sucessfully!");
-        qDebug() << "Now: " << models.size() << " models available!";
+        qDebug() << m_socketDescriptor << "--- Model loaded and added sucessfully!";
+        qDebug() << m_socketDescriptor << "--- Now: " << m_environment->models.size() << " models available!";
         
         m_tcpSocket->write(QString("Success:0").toLatin1());
         m_tcpSocket->flush();
@@ -199,33 +227,13 @@ void WorkerThread::readModel(int bytesToRead)
     }
 }
 
-void WorkerThread::readAndRunAlgorithm(int bytesToRead)
+void WorkerThread::readAndRunAlgorithm()
 {
     try
     {
-        QByteArray in_alg_data;
+        QByteArray in_alg_data = m_buffer;
         
-        while(m_tcpSocket->bytesAvailable() && in_alg_data.size() < bytesToRead)
-        {
-            in_alg_data.append(m_tcpSocket->readAll());
-            if(in_alg_data.size() == bytesToRead)
-            {
-                break;
-            }
-            else
-            {
-                qDebug() << "    still waiting for some algorithm data...";
-                m_tcpSocket->waitForReadyRead();
-            }
-        }
-        
-        if(in_alg_data.size() < bytesToRead)
-        {
-            qWarning() << "Did not receive the full algorithm data, but only "<< in_alg_data.size()  <<" of " << bytesToRead << "bytes";
-            throw "Error";
-        }
-        
-        qDebug() << "--> \"Algorithm data\".";
+        qDebug()  << m_socketDescriptor << "--> \"Algorithm data\".";
         QBuffer in_buf(&in_alg_data);
         
         //Always use compressed transfer
@@ -234,23 +242,23 @@ void WorkerThread::readAndRunAlgorithm(int bytesToRead)
 
         if (!in_compressor->open(QIODevice::ReadOnly))
         {
-            qWarning("Did not open compressor (gz) on tcpSocket");
+            qWarning() << m_socketDescriptor << "--- Did not open compressor (gz) on tcpSocket";
             throw "Error";
         }
         
         QXmlStreamReader xmlReader(in_compressor);
-        Algorithm* new_alg = Impex::loadAlgorithm(xmlReader);
+        Algorithm* new_alg = Impex::loadAlgorithm(xmlReader, m_environment);
         
         if(new_alg == NULL)
         {
-            qWarning("Did not load a algorithm over the tcpSocket");
+            qWarning() << m_socketDescriptor << "--- Did not load a algorithm over the tcpSocket";
             throw "Error";
             
         }
         
-        qDebug("    Algorithm loaded sucessfully!");
+        qDebug() << m_socketDescriptor << "--- Algorithm loaded sucessfully!";
         new_alg->run();
-        qDebug("    Algorithm ran sucessfully!");
+        qDebug() << m_socketDescriptor << "--- Algorithm ran sucessfully!";
         
         for(Model* model : new_alg->results())
         {
@@ -263,7 +271,7 @@ void WorkerThread::readAndRunAlgorithm(int bytesToRead)
 
             if (!out_compressor->open(QIODevice::WriteOnly))
             {
-                qWarning("Did not open compressor (gz) on tcpSocket");
+                qWarning()  << m_socketDescriptor << "--- Did not open compressor (gz) on tcpSocket";
                 throw "Error";
             }
             
@@ -273,13 +281,13 @@ void WorkerThread::readAndRunAlgorithm(int bytesToRead)
             
             QString request = QString("Model:%1\n").arg(out_model_data.size());
 
-            qDebug() << "<-- " << request;
+            qDebug()  << m_socketDescriptor << "<-- " << request;
             //First: Write the type (Image) and the number of bytes (of the image) to the socket"
             m_tcpSocket->write(request.toLatin1());
             m_tcpSocket->flush();
             m_tcpSocket->waitForBytesWritten();
             
-            qDebug() << "<-- \"Model data\".";
+            qDebug()  << m_socketDescriptor << "<-- \"Model data\".";
             //Then submit the data of the model:
             m_tcpSocket->write(out_model_data);
             m_tcpSocket->flush();

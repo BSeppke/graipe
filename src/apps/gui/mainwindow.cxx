@@ -434,8 +434,8 @@ void MainWindow::about()
  */
 void MainWindow::newModel(int index)
 {
-    ModelFactoryItem item = modelFactory[index];
-    Model * new_model = item.model_fptr();
+    ModelFactoryItem item = m_environment->modelFactory[index];
+    Model * new_model = item.model_fptr(m_environment);
             
     //SHOW EDIT DIALOG
     ModelParameterSelection parameter_selection(this, new_model);
@@ -472,9 +472,9 @@ void MainWindow::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = algorithmFactory[index];
+    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory[index];
 	
-	Algorithm* alg = alg_item.algorithm_fptr();
+	Algorithm* alg = alg_item.algorithm_fptr(m_environment);
     
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);
@@ -685,7 +685,7 @@ void MainWindow::showCurrentModel()
 			
         if(model_item && model_item->model()->isViewable())
         {
-            ViewControllerFactory vc_possibilities =  viewControllerFactory.filterByModelType(model_item->model());
+            ViewControllerFactory vc_possibilities =  m_environment->viewControllerFactory.filterByModelType(model_item->model());
             int vc_index = -1;
             
             //Select the view/controller
@@ -743,7 +743,7 @@ void MainWindow::saveCurrentModel()
 		
 		if(!filename.isEmpty())
 		{	
-			ModelFactory model_possibilities =  modelFactory.filterByModelType(model);
+			ModelFactory model_possibilities =  m_environment->modelFactory.filterByModelType(model);
 			
 			if(model_possibilities.size()==1)
 			{
@@ -975,13 +975,13 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
             
                 xmlWriter.writeStartElement("Content");
                     xmlWriter.writeStartElement("Models");
-                        for(Model* m : models)
+                        for(Model* m : m_environment->models)
                         {
                             m->serialize(xmlWriter);
                         }
                     xmlWriter.writeEndElement();
                     xmlWriter.writeStartElement("ViewControllers");
-                        for(ViewController* vc : viewControllers)
+                        for(ViewController* vc : m_environment->viewControllers)
                         {
                             vc->serialize(xmlWriter);
                         }
@@ -1119,7 +1119,7 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                             {
                                                 for(int i=0; i!=p_models->value(); i++)
                                                 {
-                                                    Model* m = Impex::loadModel(xmlReader);
+                                                    Model* m = Impex::loadModel(xmlReader, m_environment);
                                                     if(m != NULL)
                                                     {
                                                         addModelItemToList(m);
@@ -1152,7 +1152,7 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                                     
                                                         for(int i=0; i!=p_viewControllers->value(); i++)
                                                         {
-                                                            ViewController* vc = Impex::loadViewController(xmlReader, m_scene);
+                                                            ViewController* vc = Impex::loadViewController(xmlReader, m_scene, m_environment);
                                                             if(vc != NULL)
                                                             {
                                                                 addViewControllerItemToList(vc);
@@ -1307,7 +1307,7 @@ void MainWindow::updateStatusDescription(QString str)
  */
 void MainWindow::updateMemoryUsage()
 {
-    m_lblMemoryUsage->setText(QString("%1 Models, %2 Views (Memory: %3 MB, max: %4 MB)").arg(models.size()).arg(viewControllers.size()).arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
+    m_lblMemoryUsage->setText(QString("%1 Models, %2 Views (Memory: %3 MB, max: %4 MB)").arg(m_environment->models.size()).arg(m_environment->viewControllers.size()).arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
 }
 
 /**
@@ -1377,7 +1377,7 @@ void MainWindow::loadModel(const QString& filename)
         throw std::runtime_error("Loading model from " + filename.toStdString() + " failed. File does not exists");
     }
     
-	Model* model = Impex::loadModel(filename);
+	Model* model = Impex::loadModel(filename, m_environment);
     
     if(model != NULL)
     {
@@ -1397,12 +1397,13 @@ void MainWindow::loadModel(const QString& filename)
 void MainWindow::initializeFactories()
 {
     //Use the graipe::core function to find and load all modules into the global factories:
-    QString report = graipe::loadModules();
+    QString report;
+    m_environment = graipe::loadModules(report);
     m_status_window->updateStatus(report);
     
     //Connect the model factory to the GUI
     unsigned int i=0;
-    for(const ModelFactoryItem& item : modelFactory)
+    for(const ModelFactoryItem& item : m_environment->modelFactory)
     {
         QAction* newAct = new QAction(item.model_type, this);
         m_ui.menuCreate->addAction(newAct);
@@ -1417,7 +1418,7 @@ void MainWindow::initializeFactories()
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     i=0;
-    for(const AlgorithmFactoryItem& item : algorithmFactory)
+    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory)
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
         

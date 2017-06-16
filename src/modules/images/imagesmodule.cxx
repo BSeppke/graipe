@@ -176,9 +176,9 @@ class ImagesModule
          *
          * \return A new Image<float>.
          */
-        static Model* createImage()
+        static Model* createImage(Environment* env)
         {
-            return new Image<float>;
+            return new Image<float>(env);
         }
             
         /**
@@ -222,9 +222,9 @@ class ImagesModule
          *
          * \return A new Image<int>.
          */
-        static Model* createIntImage()
+        static Model* createIntImage(Environment* env)
         {
-            return new Image<int>;
+            return new Image<int>(env);
         }
     
         /**
@@ -267,9 +267,9 @@ class ImagesModule
          *
          * \return A new Image<unsigned char>.
          */
-        static Model* createByteImage()
+        static Model* createByteImage(Environment* env)
         {
-            return new Image<unsigned char>;
+            return new Image<unsigned char>(env);
         }
     
         /**
@@ -308,9 +308,9 @@ class ImagesModule
          *
          * \return A new ImageImporter.
          */
-        static Algorithm* createImageImporter()
+        static Algorithm* createImageImporter(Environment* env)
         {
-            return new ImageImporter;
+            return new ImageImporter(env);
         }
 
         /**
@@ -318,9 +318,9 @@ class ImagesModule
          *
          * \return A new ImageExporter.
          */
-        static Algorithm* createImageExporter()
+        static Algorithm* createImageExporter(Environment* env)
         {
-            return new ImageExporter;
+            return new ImageExporter(env);
         }
 };
 

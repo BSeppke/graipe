@@ -56,23 +56,24 @@ namespace graipe {
  * Under Mac OS at the place of the executable file (not the app-Bundle) and at
  * the location of the .app-bundle.
  */
-GRAIPE_CORE_EXPORT QString loadModules()
+GRAIPE_CORE_EXPORT Environment* loadModules(QString & report)
 {
 	//search paths for modules:
 	QDir		current_dir		= QCoreApplication::applicationDirPath();
 	
     //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
     //     Graipe.app/Contents/MacOS
-    QString report = loadModules(QCoreApplication::applicationDirPath());
+    Environment* env = loadModules(QCoreApplication::applicationDirPath(), report);
     
     //Since this only works after deploying the app, we will also search at the level of the .app directory
     //for loadable modules, iff we found none so far
     if(report.isEmpty())
     {
-        report = loadModules(QDir::current());
+        delete env;
+        env = loadModules(QDir::current(), report);
     }
     
-    return report;
+    return env;
 }
 
 /**
@@ -82,8 +83,10 @@ GRAIPE_CORE_EXPORT QString loadModules()
  * \param dir The directory to search for modules.
  * \param added_menus Menus added during the module load.
  */
-GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir)
+GRAIPE_CORE_EXPORT Environment* loadModules(const QDir & current_dir, QString& report)
 {
+    Environment* env = new Environment;
+    
     QString ss;
 	
 	QStringList all_files = current_dir.entryList(QDir::Files);
@@ -116,7 +119,7 @@ GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir)
                     for(const ModelFactoryItem& item : model_items)
                     {
                         ss += "      <li>" + item.model_type  + "</li>\n";
-                        modelFactory.push_back(item);
+                        env->modelFactory.push_back(item);
                     }
                     
                     ss += "    </ul>\n";
@@ -136,7 +139,7 @@ GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir)
                     for(const ViewControllerFactoryItem& item : vc_items)
                     {
                         ss += "      <li>" + item.viewController_name + " <i>(for model: " + item.model_type + ")</i></li>\n";
-                        viewControllerFactory.push_back(item);
+                        env->viewControllerFactory.push_back(item);
                     }
                     
                     ss += "    </ul>\n";
@@ -156,7 +159,7 @@ GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir)
                     for(const AlgorithmFactoryItem& item : alg_items)
                     {
                         ss += "      <li>" + item.algorithm_name + " <i>(for topic: " + item.topic_name  + ")</i></li>\n";
-                        algorithmFactory.push_back(item);
+                        env->algorithmFactory.push_back(item);
                     }
                     ss += "    </ul>\n";
                 }
@@ -170,20 +173,13 @@ GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir)
 			}
 		}			
 	}
-    return ss;
+    report = ss;
+    
+    return env;
 }
 
-//One global algorithm mutex:
-QMutex global_algorithm_mutex;
 
-//Three global variables for the factories:
-ModelFactory modelFactory;
-ViewControllerFactory viewControllerFactory;
-AlgorithmFactory algorithmFactory;
-
-//And two more holding all currently available Models and ViewControllers:
-std::vector<Model*> models;
-std::vector<ViewController*> viewControllers;
+//Environment * environment = new Environment;
 
 } //end of namespace graipe
 

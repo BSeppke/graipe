@@ -53,20 +53,26 @@
  
 namespace graipe {
 
-GRAIPE_CORE_EXPORT QString loadModules();
-GRAIPE_CORE_EXPORT QString loadModules(const QDir & current_dir);
+GRAIPE_CORE_EXPORT Environment* loadModules(QString& report);
+GRAIPE_CORE_EXPORT Environment* loadModules(const QDir & current_dir, QString& report);
 
-//One global algorithm mutex:
-extern QMutex global_algorithm_mutex;
+class Environment
+{
+    public:
+        //One global algorithm mutex:
+        QMutex global_algorithm_mutex;
 
-//Three global variables for the factories:
-extern ModelFactory modelFactory;
-extern ViewControllerFactory viewControllerFactory;
-extern AlgorithmFactory algorithmFactory;
+        //Three global variables for the factories:
+        ModelFactory modelFactory;
+        ViewControllerFactory viewControllerFactory;
+        AlgorithmFactory algorithmFactory;
 
-//And two more holding all currently available Models and ViewControllers:
-extern std::vector<Model*> models;
-extern std::vector<ViewController*> viewControllers;
+        //And two more holding all currently available Models and ViewControllers:
+        std::vector<Model*> models;
+        std::vector<ViewController*> viewControllers;
+};
+
+//extern Environment * environment;
 
 }//end of namespace graipe
 

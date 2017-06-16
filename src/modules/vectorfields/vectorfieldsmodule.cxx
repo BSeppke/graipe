@@ -198,9 +198,9 @@ class VectorfieldsModule
          *
          * \return A new SparseVectorfield2D.
          */
-        static Model* createSparseVectorfield2D()
+        static Model* createSparseVectorfield2D(Environment* env)
         {
-            return new SparseVectorfield2D;
+            return new SparseVectorfield2D(env);
         }
     
         /**
@@ -226,9 +226,9 @@ class VectorfieldsModule
          *
          * \return A new SparseWeightedVectorfield2D.
          */
-        static Model* createSparseWeightedVectorfield2D()
+        static Model* createSparseWeightedVectorfield2D(Environment* env)
         {
-            return new SparseWeightedVectorfield2D;
+            return new SparseWeightedVectorfield2D(env);
         }
     
         /**
@@ -253,9 +253,9 @@ class VectorfieldsModule
          *
          * \return A new SparseMultiVectorfield2D.
          */
-        static Model* createSparseMultiVectorfield2D()
+        static Model* createSparseMultiVectorfield2D(Environment* env)
         {
-            return new SparseMultiVectorfield2D;
+            return new SparseMultiVectorfield2D(env);
         }
         
         /**
@@ -280,9 +280,9 @@ class VectorfieldsModule
          *
          * \return A new SparseWeightedMultiVectorfield2D.
          */
-        static Model* createSparseWeightedMultiVectorfield2D()
+        static Model* createSparseWeightedMultiVectorfield2D(Environment* env)
         {
-            return new SparseWeightedMultiVectorfield2D;
+            return new SparseWeightedMultiVectorfield2D(env);
         }
         
         /**
@@ -307,9 +307,9 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfield2D.
          */
-        static Model* createDenseVectorfield2D()
+        static Model* createDenseVectorfield2D(Environment* env)
         {
-            return new DenseVectorfield2D;
+            return new DenseVectorfield2D(env);
         }
     
         /**
@@ -350,9 +350,9 @@ class VectorfieldsModule
          *
          * \return A new DenseWeightedVectorfield2D.
          */
-        static Model* createDenseWeightedVectorfield2D()
+        static Model* createDenseWeightedVectorfield2D(Environment* env)
         {
-            return new DenseWeightedVectorfield2D;
+            return new DenseWeightedVectorfield2D(env);
         }    
     
         /**
@@ -389,9 +389,9 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfieldImporter.
          */
-        static Algorithm* createDenseVectorfieldImporter()
+        static Algorithm* createDenseVectorfieldImporter(Environment* env)
         {
-            return new DenseVectorfieldImporter;
+            return new DenseVectorfieldImporter(env);
         }
 
         /**
@@ -399,9 +399,9 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfieldExporter.
          */
-        static Algorithm* createDenseVectorfieldExporter()
+        static Algorithm* createDenseVectorfieldExporter(Environment* env)
         {
-            return new DenseVectorfieldExporter;
+            return new DenseVectorfieldExporter(env);
         }
 };
 

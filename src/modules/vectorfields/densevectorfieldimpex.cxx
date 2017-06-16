@@ -219,10 +219,11 @@ bool DenseVectorfieldImpex::exportVectorfield(const DenseVectorfield2D & vf, con
 /**
  * Default constructor for the dense vectorfield importer class.
  */
-DenseVectorfieldImporter::DenseVectorfieldImporter()
+DenseVectorfieldImporter::DenseVectorfieldImporter(Environment* env)
+: Algorithm(env)
 {
     m_parameters->addParameter("filename", new FilenameParameter(".flo filename", "", NULL));
-    m_results.push_back(new DenseVectorfield2D);
+    m_results.push_back(new DenseVectorfield2D(env));
 }
 
 /**
@@ -261,9 +262,10 @@ void DenseVectorfieldImporter::run()
 /**
  * Default constructor for the dense vectorfield exporter class.
  */
-DenseVectorfieldExporter::DenseVectorfieldExporter()
+DenseVectorfieldExporter::DenseVectorfieldExporter(Environment* env)
+: Algorithm(env)
 {
-    m_parameters->addParameter("vectorfield", new ModelParameter("Vectorfield",	"DenseVectorfield2D, DenseWeightedVectorfield2D"));
+    m_parameters->addParameter("vectorfield", new ModelParameter("Vectorfield",	"DenseVectorfield2D, DenseWeightedVectorfield2D", NULL, false, env));
     m_parameters->addParameter("filename", new FilenameParameter(".flo filename", "", NULL));
 }
 

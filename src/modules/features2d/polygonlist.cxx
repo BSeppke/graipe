@@ -40,7 +40,8 @@ namespace graipe {
 /**
  * Default constructor. Constructs an empty list of polygons.
  */
-PolygonList2D::PolygonList2D()
+PolygonList2D::PolygonList2D(Environment* env)
+: Model(env)
 {
 }
 
@@ -324,7 +325,8 @@ bool PolygonList2D::deserialize_content(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Constructs an empty list of weighted polygons.
  */
-WeightedPolygonList2D::WeightedPolygonList2D()
+WeightedPolygonList2D::WeightedPolygonList2D(Environment* env)
+:   graipe::PolygonList2D(env)
 {
 
 }

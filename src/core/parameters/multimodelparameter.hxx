@@ -72,12 +72,11 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          * \param name           The name (label) of this parameter.
          * \param allowed_models A vector containing all currently available models.
          * \param type_filter    A QString to restrict the model list to certain model types.
-         * \param value          The initial value of this parameter.
          * \param parent         If given (!= NULL), this parameter has a parent and will
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        MultiModelParameter(const QString& name, QString type_filter="", std::vector<Model*>* value=NULL, Parameter* parent=NULL, bool invert_parent=false);
+        MultiModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Environment* env);
     
         /**
          * Destructor of the MultiModel class

@@ -56,7 +56,7 @@ class GRAIPE_VECTORFIELDS_EXPORT Vectorfield2D
         /**
          * Default constructor. Creates an empty vectorfield.
          */
-        Vectorfield2D();
+        Vectorfield2D(Environment* env);
     
         /**
          * Copy constructor. Creates a vectorfield from another one.

@@ -71,9 +71,10 @@ class MSCannyFeatureDetector
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MSCannyFeatureDetector()
+        MSCannyFeatureDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image", NULL, false, env));
             m_parameters->addParameter("sigma", new FloatParameter("Canny Scale", 0,9999999, 0));
             m_parameters->addParameter("T", new FloatParameter("Canny (gradient strength) threshold", 0,9999999, 0));
             m_parameters->addParameter("mode", new EnumParameter("MS gradient mode:", ms_gradient_modes(),0));
@@ -166,9 +167,9 @@ class MSCannyFeatureDetector
  *
  * \return A new instance of the MSCannyFeatureDetector.
  */
-Algorithm* createMSCannyFeatureDetector()
+Algorithm* createMSCannyFeatureDetector(Environment* env)
 {
-	return new MSCannyFeatureDetector;
+	return new MSCannyFeatureDetector(env);
 }
 
 
@@ -187,9 +188,10 @@ class MSGradientCalculator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MSGradientCalculator()
+        MSGradientCalculator(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image", NULL, false, env));
             m_parameters->addParameter("sigma", new FloatParameter("Gradient Scale", 0,9999999, 0));
         }
     
@@ -231,7 +233,7 @@ class MSGradientCalculator
                     MS_GRADIENT_FUNCTOR func;
                     func(jacobian, gradient);
                     
-                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(gradient.bindElementChannel(0) , gradient.bindElementChannel(1));
+                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(gradient.bindElementChannel(0) , gradient.bindElementChannel(1), m_environment);
                     
                     new_gradient_vf->setName(func.shortName() + QString(" gradient ") + image->name());
                     QString descr = QString("The following parameters were used to determine the %1 gradient\n").arg(func.name());
@@ -271,9 +273,9 @@ QString MSGradientCalculator<MSMeanGradientFunctor>::typeName() const
  *
  * \return A new instance of the MSGradientCalculator<MSMeanGradientFunctor>.
  */
-Algorithm* createMSMeanGradientCalculator()
+Algorithm* createMSMeanGradientCalculator(Environment* env)
 {
-	return new MSGradientCalculator<MSMeanGradientFunctor>;
+	return new MSGradientCalculator<MSMeanGradientFunctor>(env);
 }
 
 template<>
@@ -288,9 +290,9 @@ QString MSGradientCalculator<MSMaxGradientFunctor>::typeName() const
  *
  * \return A new instance of the MSGradientCalculator<MSMaxGradientFunctor>.
  */
-Algorithm* createMSMaxGradientCalculator()
+Algorithm* createMSMaxGradientCalculator(Environment* env)
 {
-	return new MSGradientCalculator<MSMaxGradientFunctor>;
+	return new MSGradientCalculator<MSMaxGradientFunctor>(env);
 }
 
 template<>
@@ -305,9 +307,9 @@ QString MSGradientCalculator<MSMVGradientFunctor>::typeName() const
  *
  * \return A new instance of the MSGradientCalculator<MSMVGradientFunctor>.
  */
-Algorithm* createMSMVGradientCalculator()
+Algorithm* createMSMVGradientCalculator(Environment* env)
 {
-	return new MSGradientCalculator<MSMVGradientFunctor>;
+	return new MSGradientCalculator<MSMVGradientFunctor>(env);
 }
 
 
@@ -324,9 +326,10 @@ class NDVIEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        NDVIEstimator()
+        NDVIEstimator(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image", NULL, false, env));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
         }
@@ -367,7 +370,7 @@ class NDVIEstimator
                     
                     emit statusMessage(1.0, QString("starting computation"));
                     
-                    Image<float>* new_image = new Image<float>(image->size(), 1);
+                    Image<float>* new_image = new Image<float>(image->size(), 1, m_environment);
                     
                     using namespace vigra::functor;
                     
@@ -408,9 +411,9 @@ class NDVIEstimator
  *
  * \return A new instance of the NDVIEstimator.
  */
-Algorithm* createNDVIEstimator()
+Algorithm* createNDVIEstimator(Environment* env)
 {
-	return new NDVIEstimator;
+	return new NDVIEstimator(env);
 }
 
 
@@ -427,9 +430,10 @@ class EVIEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        EVIEstimator()
+        EVIEstimator(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image", NULL, false, env));
             m_parameters->addParameter("blue-id", new IntParameter("Blue band-id", 0,9999999, 0));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
@@ -483,7 +487,7 @@ class EVIEstimator
                     
                     emit statusMessage(1.0, QString("starting computation"));
                     
-                    Image<float>* new_image = new Image<float>(image->size(), 1);
+                    Image<float>* new_image = new Image<float>(image->size(), 1, m_environment);
                     
                     computeEVI(image->band(nir_band_param->value()),
                                image->band(red_band_param->value()),
@@ -524,9 +528,9 @@ class EVIEstimator
  *
  * \return A new instance of the EVIEstimator.
  */
-Algorithm* createEVIEstimator()
+Algorithm* createEVIEstimator(Environment* env)
 {
-	return new EVIEstimator;
+	return new EVIEstimator(env);
 }
 
 
@@ -546,9 +550,10 @@ class EVI2BandsEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        EVI2BandsEstimator()
+        EVI2BandsEstimator(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image","Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image","Image", NULL, false, env));
             m_parameters->addParameter("red-id", new IntParameter("Red band-id", 0,9999999, 2));
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
             
@@ -597,7 +602,7 @@ class EVI2BandsEstimator
                     
                     emit statusMessage(1.0, QString("starting computation"));
                     
-                    Image<float>* new_image = new Image<float>(image->size(), 1);
+                    Image<float>* new_image = new Image<float>(image->size(), 1, m_environment);
                     
                     computeEVI2(image->band(nir_band_param->value()),
                                 image->band(red_band_param->value()),
@@ -637,9 +642,9 @@ class EVI2BandsEstimator
  *
  * \return A new instance of the EVI2BandsEstimator.
  */
-Algorithm* createEVI2BandsEstimator()
+Algorithm* createEVI2BandsEstimator(Environment* env)
 {
-	return new EVI2BandsEstimator;
+	return new EVI2BandsEstimator(env);
 }
 
 
@@ -658,7 +663,8 @@ class OpticalFlow2BandsEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlow2BandsEstimator()
+        OpticalFlow2BandsEstimator(Environment* env)
+        : OpticalFlowAlgorithm2Bands(env)
         {
             addImageAndMaskParameters();
             
@@ -726,9 +732,9 @@ class OpticalFlow2BandsEstimator
  *
  * \return A new instance of the OpticalFlow2BandsEstimator.
  */
-Algorithm* createOpticalFlow2BandsEstimator()
+Algorithm* createOpticalFlow2BandsEstimator(Environment* env)
 {
-	return new OpticalFlow2BandsEstimator;
+	return new OpticalFlow2BandsEstimator(env);
 }
 
 
@@ -748,7 +754,8 @@ class OpticalFlowHS2BandsEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlowHS2BandsEstimator()
+        OpticalFlowHS2BandsEstimator(Environment* env)
+        : OpticalFlowAlgorithm2Bands(env)
         {
             addImageAndMaskParameters();
             
@@ -816,9 +823,9 @@ class OpticalFlowHS2BandsEstimator
  *
  * \return A new instance of the OpticalFlowHS2BandsEstimator.
  */
-Algorithm* createOpticalFlowHS2BandsEstimator()
+Algorithm* createOpticalFlowHS2BandsEstimator(Environment* env)
 {
-	return new OpticalFlowHS2BandsEstimator;
+	return new OpticalFlowHS2BandsEstimator(env);
 }
 
     

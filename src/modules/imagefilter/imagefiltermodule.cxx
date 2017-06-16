@@ -55,7 +55,8 @@ class ImageFilter
          * Default_constructor. Introduces the list of vigra's 
          * BorderTreatmentModes.
          */
-        ImageFilter()
+        ImageFilter(Environment * env)
+        : Algorithm(env)
         {
             //According to VIGRA's <vigra/bordertreatment.hxx>:
             /*
@@ -110,13 +111,14 @@ class FrostFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        FrostFilter()
+        FrostFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -150,7 +152,7 @@ class FrostFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -199,9 +201,9 @@ class FrostFilter
  *
  * \return A new instance of the FrostFilter.
  */
-Algorithm* createFrostFilter()
+Algorithm* createFrostFilter(Environment * env)
 {
-	return new FrostFilter;
+	return new FrostFilter(env);
 }
 
 
@@ -218,14 +220,15 @@ class EnhancedFrostFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        EnhancedFrostFilter()
+        EnhancedFrostFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -260,7 +263,7 @@ class EnhancedFrostFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -309,9 +312,9 @@ class EnhancedFrostFilter
  *
  * \return A new instance of the EnhancedFrostFilter.
  */
-Algorithm* createEnhancedFrostFilter()
+Algorithm* createEnhancedFrostFilter(Environment * env)
 {
-	return new EnhancedFrostFilter;
+	return new EnhancedFrostFilter(env);
 }
 
 
@@ -330,13 +333,14 @@ class GammaMAPFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GammaMAPFilter()
+        GammaMAPFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -370,7 +374,7 @@ class GammaMAPFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -419,9 +423,9 @@ class GammaMAPFilter
  *
  * \return A new instance of the GammaMAPFilter.
  */
-Algorithm* createGammaMAPFilter()
+Algorithm* createGammaMAPFilter(Environment * env)
 {
-	return new GammaMAPFilter;
+	return new GammaMAPFilter(env);
 }
 
 
@@ -438,13 +442,14 @@ class KuanFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        KuanFilter()
+        KuanFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -478,7 +483,7 @@ class KuanFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -527,9 +532,9 @@ class KuanFilter
  *
  * \return A new instance of the KuanFilter.
  */
-Algorithm* createKuanFilter()
+Algorithm* createKuanFilter(Environment * env)
 {
-	return new KuanFilter;
+	return new KuanFilter(env);
 }
 
 
@@ -546,13 +551,14 @@ class LeeFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        LeeFilter()
+        LeeFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -586,7 +592,7 @@ class LeeFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -635,9 +641,9 @@ class LeeFilter
  *
  * \return A new instance of the LeeFilter.
  */
-Algorithm* createLeeFilter()
+Algorithm* createLeeFilter(Environment * env)
 {
-	return new LeeFilter;
+	return new LeeFilter(env);
 }
 
 
@@ -657,14 +663,15 @@ class EnhancedLeeFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        EnhancedLeeFilter()
+        EnhancedLeeFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -699,7 +706,7 @@ class EnhancedLeeFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -748,9 +755,9 @@ class EnhancedLeeFilter
  *
  * \return A new instance of the EnhancedLeeFilter.
  */
-Algorithm* createEnhancedLeeFilter()
+Algorithm* createEnhancedLeeFilter(Environment * env)
 {
-	return new EnhancedLeeFilter;
+	return new EnhancedLeeFilter(env);
 }
 
 
@@ -767,12 +774,13 @@ class MedianFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MedianFilter()
+        MedianFilter(Environment * env)
+        : ImageFilter(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         QString typeName() const
         {
@@ -805,7 +813,7 @@ class MedianFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -853,9 +861,9 @@ class MedianFilter
  *
  * \return A new instance of the MedianFilter.
  */
-Algorithm* createMedianFilter()
+Algorithm* createMedianFilter(Environment * env)
 {
-	return new MedianFilter;
+	return new MedianFilter(env);
 }
 
 
@@ -872,14 +880,15 @@ class ShockFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */    
-        ShockFilter()
+        ShockFilter(Environment * env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("sigma1", new FloatParameter("inner Sigma", 0.0, 100, 0.7f));
             m_parameters->addParameter("sigma2", new FloatParameter("outer Sigma", 0.0, 100, 3));
             m_parameters->addParameter("upwind", new FloatParameter("upwinding factor", 0.0, 10.0, 0.3f));
             m_parameters->addParameter("iterations", new IntParameter("Iterations", 1, 9999, 10));
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(env));
         }
         
         QString typeName() const
@@ -915,7 +924,7 @@ class ShockFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -963,9 +972,9 @@ class ShockFilter
  *
  * \return A new instance of the ShockFilter.
  */
-Algorithm* createShockFilter()
+Algorithm* createShockFilter(Environment * env)
 {
-	return new ShockFilter;
+	return new ShockFilter(env);
 }
 
 

@@ -58,7 +58,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
         /**
          * Default constructor. Constructs an empty list of polygons.
          */
-		PolygonList2D();
+		PolygonList2D(Environment* env);
     
         /**
          * Copy constructor. Creates a copy from another list of polygons.
@@ -195,7 +195,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
         /**
          * Default constructor. Constructs an empty list of weighted polygons.
          */
-        WeightedPolygonList2D();
+        WeightedPolygonList2D(Environment* env);
     
         /**
          * Copy constructor. Creates a copy from another list of weighted polygons.

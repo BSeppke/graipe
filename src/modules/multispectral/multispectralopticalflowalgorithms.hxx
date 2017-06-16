@@ -56,7 +56,8 @@ class OpticalFlowAlgorithm2Bands
          * we want to have control over ther orderung of them. See the following two member 
          * functions for further details.
          */
-        OpticalFlowAlgorithm2Bands()
+        OpticalFlowAlgorithm2Bands(Environment* env)
+        : Algorithm(env)
         {
         }
 
@@ -71,15 +72,15 @@ class OpticalFlowAlgorithm2Bands
          */
         void addImageAndMaskParameters()
         {
-            m_param_image1		= new ModelParameter("Reference Image",  "Image");
+            m_param_image1		= new ModelParameter("Reference Image",  "Image", NULL, false, m_environment);
             m_param_image1Band1	= new IntParameter("Reference Image band 1", 0, 200,0);
             m_param_image1Band2	= new IntParameter("Reference Image band 2", 0, 200,0);
-            m_param_image2		= new ModelParameter("Second Image", "Image");
+            m_param_image2		= new ModelParameter("Second Image", "Image", NULL, false, m_environment);
             m_param_image2Band1	= new IntParameter("Second Image band 1", 0, 200,0);
             m_param_image2Band2	= new IntParameter("Second Image band 2", 0, 200,0);
             
             m_param_useMask			= new BoolParameter("use image band for masking flow");
-            m_param_mask			= new ImageBandParameter<float>("Mask Image band", m_param_useMask);
+            m_param_mask			= new ImageBandParameter<float>("Mask Image band", m_param_useMask, false, m_environment);
             
             m_parameters->addParameter("image1", m_param_image1 );
             m_parameters->addParameter("i1-band1", m_param_image1Band1 );
@@ -276,12 +277,12 @@ class OpticalFlowAlgorithm2Bands
                     
                     if(FlowValueType().size() == 2)
                     {
-                       new_vectorfield =  new DenseVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1));
+                       new_vectorfield =  new DenseVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1), m_environment);
                     }
                     //Has to be larger
                     else
                     {
-                        new_vectorfield =  new DenseWeightedVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1),flow_list[i].bindElementChannel(2));
+                        new_vectorfield =  new DenseWeightedVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1),flow_list[i].bindElementChannel(2), m_environment);
                     }
                     
                     QString functor_name =  OpticalFlowFunctor::name();
@@ -324,7 +325,7 @@ class OpticalFlowAlgorithm2Bands
                 //Also save warped images on demand
                 if(m_param_pmode->value() !=0 && i!=0 && m_param_saveIntermediateImages->value()) 
                 {
-                    Image<float>* new_image = new Image<float>(img11_list[i].shape(), 2);
+                    Image<float>* new_image = new Image<float>(img11_list[i].shape(), 2, m_environment);
                     new_image->setBand(0, img11_list[i]);
                     new_image->setBand(1, img12_list[i]);
                     

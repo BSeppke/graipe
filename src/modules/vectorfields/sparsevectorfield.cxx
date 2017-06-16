@@ -41,8 +41,8 @@ namespace graipe {
 /**
  * Default constructor. Creates an empty sparse vectorfield.
  */
-SparseVectorfield2D::SparseVectorfield2D()
-:	Vectorfield2D()
+SparseVectorfield2D::SparseVectorfield2D(Environment* env)
+:	Vectorfield2D(env)
 {
 }
 
@@ -377,7 +377,8 @@ bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Creates an empty weighted sparse vectorfield.
  */
-SparseWeightedVectorfield2D::SparseWeightedVectorfield2D()
+SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(Environment* env)
+: SparseVectorfield2D(env)
 {
 }
 
@@ -596,8 +597,8 @@ bool SparseWeightedVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Creates an empty sparse multi vectorfield.
  */
-SparseMultiVectorfield2D::SparseMultiVectorfield2D()
-:	SparseVectorfield2D(),
+SparseMultiVectorfield2D::SparseMultiVectorfield2D(Environment* env)
+:	SparseVectorfield2D(env),
     m_alternatives(new IntParameter("number of alternative directions",0,1000,10))
 {
     m_parameters->addParameter("alternatives", m_alternatives);
@@ -1085,7 +1086,8 @@ void SparseMultiVectorfield2D::updateModel()
 /**
  * Default constructor. Creates an empty sparse weighted multi vectorfield.
  */
-SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D()
+SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D(Environment* env)
+: SparseMultiVectorfield2D(env)
 {
 }
 

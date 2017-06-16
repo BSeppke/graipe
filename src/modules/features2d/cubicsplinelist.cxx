@@ -41,7 +41,8 @@ namespace graipe {
 /**
  * Default constructor. Constructs an empty list of 2D cubic splines.
  */
-CubicSplineList2D::CubicSplineList2D()
+CubicSplineList2D::CubicSplineList2D(Environment* env)
+: Model(env)
 {
 }
 
@@ -398,7 +399,8 @@ bool CubicSplineList2D::deserialize_content(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Constructs an empty list of weighted 2D cubic splines.
  */
-WeightedCubicSplineList2D::WeightedCubicSplineList2D()
+WeightedCubicSplineList2D::WeightedCubicSplineList2D(Environment* env)
+: CubicSplineList2D(env)
 {
 
 }

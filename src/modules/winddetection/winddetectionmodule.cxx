@@ -92,9 +92,10 @@ class WindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        WindDetector()
+        WindDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("band", new ImageBandParameter<float>("Image band",	NULL));
+            m_parameters->addParameter("band", new ImageBandParameter<float>("Image band",	NULL, false, env));
             m_parameters->addParameter("dir", new EnumParameter("(known) wind direction", direction_names()));
             m_parameters->addParameter("x-samples", new IntParameter("x-samples", 1, 9999, 10));
             m_parameters->addParameter("y-samples", new IntParameter("y-samples", 1, 9999, 10));
@@ -135,7 +136,8 @@ class WindDetector
                                                     func, 
                                                     param_xSamples->value(), param_ySamples->value(), 
                                                     param_maskWidth->value(), param_maskHeight->value(),
-                                                    direction_vectors()[param_wind_knowledge->value()]);
+                                                    direction_vectors()[param_wind_knowledge->value()],
+                                                    m_environment);
             
             ((Model*)param_imageBand->image())->copyGeometry(*new_wind_vectorfield);
             
@@ -157,7 +159,8 @@ class FourierSpectrumWindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        FourierSpectrumWindDetector()
+        FourierSpectrumWindDetector(Environment* env)
+        : WindDetector(env)
         {	
             m_parameters->addParameter("sigma", new FloatParameter("energy smoothing", 0.0, 10.0, 1));
             m_parameters->addParameter("T", new FloatParameter("energy threshold [%]", 0.0, 1, 0.8f));
@@ -221,9 +224,9 @@ class FourierSpectrumWindDetector
  *
  * \return A new instance of the FourierSpectrumWindDetector.
  */
-Algorithm* createFourierSpectrumWindDetector()
+Algorithm* createFourierSpectrumWindDetector(Environment* env)
 {
-	return new FourierSpectrumWindDetector;
+	return new FourierSpectrumWindDetector(env);
 }
 
 
@@ -240,7 +243,8 @@ class GradientHistogramWindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        GradientHistogramWindDetector()
+        GradientHistogramWindDetector(Environment* env)
+        : WindDetector(env)
         {	
             m_parameters->addParameter("sigma", new FloatParameter("gadient scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("T",     new FloatParameter("gradient-threshold", 0.0, 10.0, 1.0));
@@ -303,9 +307,9 @@ class GradientHistogramWindDetector
  *
  * \return A new instance of the GradientHistogramWindDetector.
  */
-Algorithm* createGradientHistogramWindDetector()
+Algorithm* createGradientHistogramWindDetector(Environment* env)
 {
-	return new GradientHistogramWindDetector;
+	return new GradientHistogramWindDetector(env);
 }
 
 
@@ -322,9 +326,10 @@ class StructureTensorWindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        StructureTensorWindDetector()
+        StructureTensorWindDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("band",   new ImageBandParameter<float>("Image band",	NULL));
+            m_parameters->addParameter("band",   new ImageBandParameter<float>("Image band",	NULL, false, env));
             m_parameters->addParameter("dir",    new EnumParameter("(known) wind direction", direction_names()));
             m_parameters->addParameter("sigma1", new FloatParameter("innner scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("sigma2", new FloatParameter("outer scale", 0.0, 10.0, 1.0));
@@ -363,7 +368,8 @@ class StructureTensorWindDetector
                     DenseVectorfield2D* new_wind_vectorfield
                         = estimateWindDirectionFromSARImageUsingStructureTensor(imageband,
                                                                                 param_innerScale->value(), param_outerScale->value(), 
-                                                                                direction_vectors()[param_wind_knowledge->value()]);
+                                                                                direction_vectors()[param_wind_knowledge->value()],
+                                                                                m_environment);
                 
                     new_wind_vectorfield->setName(QString("ST Wind estimation using ") + param_imageBand->toString());
                     
@@ -397,9 +403,9 @@ class StructureTensorWindDetector
  *
  * \return A new instance of the StructureTensorWindDetector.
  */
-Algorithm* createStructureTensorWindDetector()
+Algorithm* createStructureTensorWindDetector(Environment* env)
 {
-	return new StructureTensorWindDetector;
+	return new StructureTensorWindDetector(env);
 }
 
 

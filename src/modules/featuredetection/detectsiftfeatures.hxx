@@ -75,10 +75,11 @@ namespace graipe {
 
 template <class T>
 SIFTFeatureList2D* detectFeaturesUsingSIFT(const vigra::MultiArrayView<2,T>& src,
-                                          float sigma=1.0, unsigned int octaves=0, unsigned int levels=3,
-									      float contrast_threshold = 0.03, float curvature_threshold = 10.0, bool double_image_size=true, bool normalize_image=true)
+                                          float sigma, unsigned int octaves, unsigned int levels,
+									      float contrast_threshold, float curvature_threshold, bool double_image_size, bool normalize_image,
+                                          Environment * env)
 {
-	SIFTFeatureList2D * result = new SIFTFeatureList2D;
+	SIFTFeatureList2D * result = new SIFTFeatureList2D(env);
     
     std::vector<SIFTFeature> std_result = computeSIFTDescriptors(src, sigma, octaves, levels, contrast_threshold, curvature_threshold, double_image_size, normalize_image);
         

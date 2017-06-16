@@ -96,6 +96,9 @@ private:
     
     //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
     QSignalMapper* m_algSignalMapper;
+    
+    //Env
+    Environment* m_environment;
 };
 
 } //namespace graipe

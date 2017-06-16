@@ -90,7 +90,7 @@ class GRAIPE_CORE_EXPORT Algorithm
          * allow the further classes to derive the result types before the
          * algorithm's run.
          */
-		Algorithm();
+		Algorithm(Environment* env);
     
         /**
          * Destructor of the Algorithm class
@@ -219,6 +219,8 @@ class GRAIPE_CORE_EXPORT Algorithm
 		ParameterGroup * m_parameters;
 		/** The results **/
         std::vector<Model*> m_results;
+        /** The Environment **/
+        Environment* m_environment;
 };
 
 }//end of namespace graipe

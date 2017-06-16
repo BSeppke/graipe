@@ -51,7 +51,11 @@ namespace graipe {
 /**
  * Default constructor of the Parameter class
  */
-Parameter::Parameter()
+Parameter::Parameter( Environment* env)
+:	m_name(""),
+    m_parent(NULL),
+    m_invert_parent(false),
+    m_environment(env)
 {
 }
 
@@ -64,10 +68,11 @@ Parameter::Parameter()
  *                      be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
  */
-Parameter::Parameter(const QString&  name, Parameter* parent, bool invert_parent)
+Parameter::Parameter(const QString&  name, Parameter* parent, bool invert_parent, Environment* env)
 :	m_name(name), 
     m_parent(parent),
-    m_invert_parent(invert_parent)
+    m_invert_parent(invert_parent),
+    m_environment(env)
 {
 }
 

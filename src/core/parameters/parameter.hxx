@@ -57,6 +57,7 @@ namespace graipe {
 
 //Forward declaration of Model class to resolve circular dependency
 class Model;
+class Environment;
 
 /**
  * This is the base class of all Parameters.
@@ -75,7 +76,7 @@ class GRAIPE_CORE_EXPORT Parameter
         /**
          * Default constructor of the Parameter class
          */
-        Parameter();
+        Parameter(Environment * env = NULL);
     
         /**
          * More usable constructor of the Parameter class with a setting of the 
@@ -86,7 +87,7 @@ class GRAIPE_CORE_EXPORT Parameter
          *                      be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
          */
-        Parameter(const QString& name, Parameter* parent=NULL, bool invert_parent=false);
+        Parameter(const QString& name, Parameter* parent, bool invert_parent, Environment* env = NULL);
     
         /**
          * (Of course virtual) Destructor of the Parameter class.
@@ -255,6 +256,9 @@ class GRAIPE_CORE_EXPORT Parameter
     
         /** Should the enabled/disabled by parent rule be inverted? **/
         bool m_invert_parent;
+    
+        //Environment
+        Environment* m_environment;
 };
 
 } //end of namespace graipe

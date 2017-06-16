@@ -59,7 +59,7 @@ namespace graipe {
  * \param useAllCandidates Use all candidate vectors for smoothing.
  * \return The new, smoothed vectorfield.
  */
-SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfield2D * vectorfield,
+SparseWeightedVectorfield2D* smoothVectorfield(SparseWeightedMultiVectorfield2D * vectorfield,
 												 int max_iterations=10,
 												 float max_geo_distance=10.0,
 												 float min_weight=0.0,
@@ -68,8 +68,8 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
 	
     int feature_count = vectorfield->size();					//count of features
 	
-	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D;
-	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D;
+	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
+	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
 		
     result_vectorfield->setGlobalMotion(vectorfield->globalMotion());
     work_vectorfield->setGlobalMotion(vectorfield->globalMotion());
@@ -213,7 +213,7 @@ SparseWeightedVectorfield2D* smoothVectorfield(const SparseWeightedMultiVectorfi
  * \param useAllCandidates Use all candidate vectors for smoothing.
  * \return The new, relaxed vectorfield.
  */
-SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfield2D * vectorfield,
+SparseWeightedVectorfield2D * relaxVectorfield(SparseWeightedMultiVectorfield2D * vectorfield,
 													  int max_iterations=10,
 													  float max_geo_distance=10.0,
 													  float min_weight=0.0,
@@ -221,8 +221,8 @@ SparseWeightedVectorfield2D * relaxVectorfield(const SparseWeightedMultiVectorfi
 {
 	int feature_count = vectorfield->size();					//count of features
 
-	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D;
-	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D;
+	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
+	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
 
 	result_vectorfield->setGlobalMotion(vectorfield->globalMotion());
 	work_vectorfield->setGlobalMotion(vectorfield->globalMotion());

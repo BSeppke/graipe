@@ -186,9 +186,9 @@ class Features2DModule
          *
          * \return A new PointFeatureList2D.
          */
-        static Model* createPointFeatureList2D()
+        static Model* createPointFeatureList2D(Environment* env)
         {
-            return new PointFeatureList2D;
+            return new PointFeatureList2D(env);
         }
         
         /**
@@ -212,9 +212,9 @@ class Features2DModule
          *
          * \return A new WeightedPointFeatureList2D.
          */
-        static Model* createWeightedPointFeatureList2D()
+        static Model* createWeightedPointFeatureList2D(Environment* env)
         {
-            return new WeightedPointFeatureList2D;
+            return new WeightedPointFeatureList2D(env);
         }
                 
         /**
@@ -238,9 +238,9 @@ class Features2DModule
          *
          * \return A new EdgelFeatureList2D.
          */
-        static Model* createEdgelFeatureList2D()
+        static Model* createEdgelFeatureList2D(Environment* env)
         {
-            return new EdgelFeatureList2D;
+            return new EdgelFeatureList2D(env);
         }
             
         /**
@@ -264,9 +264,9 @@ class Features2DModule
          *
          * \return A new SIFTFeatureList2D.
          */
-        static Model* createSIFTFeatureList2D()
+        static Model* createSIFTFeatureList2D(Environment* env)
         {
-            return new SIFTFeatureList2D;
+            return new SIFTFeatureList2D(env);
         }
         
         /**
@@ -293,9 +293,9 @@ class Features2DModule
          *
          * \return A new PolygonList2D.
          */
-        static Model* createPolygonList2D()
+        static Model* createPolygonList2D(Environment* env)
         {
-            return new PolygonList2D;
+            return new PolygonList2D(env);
         }
         
         /**
@@ -319,9 +319,9 @@ class Features2DModule
          *
          * \return A new WeightedPolygonList2D.
          */
-        static Model* createWeightedPolygonList2D()
+        static Model* createWeightedPolygonList2D(Environment* env)
         {
-            return new WeightedPolygonList2D;
+            return new WeightedPolygonList2D(env);
         }
         
         /**
@@ -348,9 +348,9 @@ class Features2DModule
          *
          * \return A new CubicSplineList2D.
          */
-        static Model* createCubicSplineList2D()
+        static Model* createCubicSplineList2D(Environment* env)
         {
-            return new CubicSplineList2D;
+            return new CubicSplineList2D(env);
         }
         
         /**
@@ -374,9 +374,9 @@ class Features2DModule
          *
          * \return A new WeightedCubicSplineList2D.
          */
-        static Model* createWeightedCubicSplineList2D()
+        static Model* createWeightedCubicSplineList2D(Environment* env)
         {
-            return new WeightedCubicSplineList2D;
+            return new WeightedCubicSplineList2D(env);
         }
         
         /**

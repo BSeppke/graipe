@@ -97,7 +97,7 @@ QIODevice* Impex::openFile(const QString & filename, QIODevice::OpenModeFlag ope
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-Model* Impex::loadModel(const QString & filename)
+Model* Impex::loadModel(const QString & filename, Environment* env)
 {
    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
    Model* model = NULL;
@@ -105,7 +105,7 @@ Model* Impex::loadModel(const QString & filename)
     if(device != NULL)
     {
         QXmlStreamReader xmlReader(device);
-        model = loadModel(xmlReader);
+        model = loadModel(xmlReader, env);
         device->close();
     }
     
@@ -119,7 +119,7 @@ Model* Impex::loadModel(const QString & filename)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-Model* Impex::loadModel(QXmlStreamReader& xmlReader)
+Model* Impex::loadModel(QXmlStreamReader& xmlReader, Environment* env)
 {
     //1. Read the name of the xml root
     if(xmlReader.readNextStartElement())
@@ -130,11 +130,11 @@ Model* Impex::loadModel(QXmlStreamReader& xmlReader)
         //3. Create a model using the mod_type and the modelFactory:
         Model* model = NULL;
         
-        for(unsigned int i=0; i<modelFactory.size(); ++i)
+        for(unsigned int i=0; i<env->modelFactory.size(); ++i)
         {
-            if(modelFactory[i].model_type==mod_type)
+            if(env->modelFactory[i].model_type==mod_type)
             {
-                model = modelFactory[i].model_fptr();
+                model = env->modelFactory[i].model_fptr(env);
                 break;
             }
         }
@@ -173,7 +173,7 @@ Model* Impex::loadModel(QXmlStreamReader& xmlReader)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-ViewController* Impex::loadViewController(const QString & filename, QGraphicsScene* scene)
+ViewController* Impex::loadViewController(const QString & filename, QGraphicsScene* scene, Environment* env)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
     ViewController * vc = NULL;
@@ -181,7 +181,7 @@ ViewController* Impex::loadViewController(const QString & filename, QGraphicsSce
     if(device != NULL)
     {
         QXmlStreamReader xmlReader(device);
-        vc = loadViewController(xmlReader, scene);
+        vc = loadViewController(xmlReader, scene, env);
         device->close();
     }
     
@@ -197,7 +197,7 @@ ViewController* Impex::loadViewController(const QString & filename, QGraphicsSce
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene)
+ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene, Environment* env)
 {
     ViewController * vc = NULL;
 
@@ -213,7 +213,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
 
         //2. Find the associated model at the model_list (if it was already loaded)
         Model* vc_model = NULL;
-        for(Model* mod : models)
+        for(Model* mod : env->models)
         {
             if(     mod
                 &&  mod->id() == vc_modelID)
@@ -230,11 +230,11 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         }
         
          //3. Create a controller using the vc_type and the model found above:
-        for(unsigned int i=0; i<viewControllerFactory.size(); ++i)
+        for(unsigned int i=0; i<env->viewControllerFactory.size(); ++i)
         {
-            if(viewControllerFactory[i].viewController_name==vc_type)
+            if(env->viewControllerFactory[i].viewController_name==vc_type)
             {
-                vc = viewControllerFactory[i].viewController_fptr(scene, vc_model, vc_zorder);
+                vc = env->viewControllerFactory[i].viewController_fptr(scene, vc_model, vc_zorder);
                 break;
             }
         }
@@ -272,7 +272,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-Algorithm* Impex::loadAlgorithm(const QString & filename)
+Algorithm* Impex::loadAlgorithm(const QString & filename, Environment* env)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
     Algorithm * alg = NULL;
@@ -280,7 +280,7 @@ Algorithm* Impex::loadAlgorithm(const QString & filename)
     if(device != NULL)
     {
         QXmlStreamReader xmlReader(device);
-        alg = loadAlgorithm(xmlReader);
+        alg = loadAlgorithm(xmlReader, env);
         device->close();
     }
     
@@ -296,7 +296,7 @@ Algorithm* Impex::loadAlgorithm(const QString & filename)
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-Algorithm* Impex::loadAlgorithm(QXmlStreamReader & xmlReader)
+Algorithm* Impex::loadAlgorithm(QXmlStreamReader & xmlReader, Environment* env)
 {
     Algorithm * alg = NULL;
 
@@ -308,11 +308,11 @@ Algorithm* Impex::loadAlgorithm(QXmlStreamReader & xmlReader)
         QString alg_type = xmlReader.name().toString();
 
         //Create an algorithm using the alg_type:
-        for(unsigned int i=0; i<algorithmFactory.size(); ++i)
+        for(unsigned int i=0; i<env->algorithmFactory.size(); ++i)
         {
-            if(algorithmFactory[i].algorithm_type==alg_type)
+            if(env->algorithmFactory[i].algorithm_type==alg_type)
             {
-                alg = algorithmFactory[i].algorithm_fptr();
+                alg = env->algorithmFactory[i].algorithm_fptr(env);
                 break;
             }
         }

@@ -71,7 +71,7 @@ class GRAIPE_IMAGES_EXPORT Image
          * Default constructor. Constructs an empty Image
          * with zero size and no bands at all.
          */
-		Image();
+		Image(Environment* env);
 		
 		/**
          * Copy constructor. Constructs a new Image from another Image.
@@ -86,15 +86,10 @@ class GRAIPE_IMAGES_EXPORT Image
          * parameter's values, too.
          *
          * \param size The image's shape.
-         * \param numBand The image's band count.
-         * \param timestamp The image's timestamp.
-         * \param filename The image's filename (where it was loaded from).
-         * \param comment The image's filename (where it was loaded from).
-         * \param units The image's units (where it can be scaled to using the scale).
-         * \param scale The image's scale (use it to get from pixels to units).
+         * \param numBands The image's band count.
+         
          */
-		Image(Size_Type size, unsigned int numBands = 0, DateTime_Type timestamp = DateTime_Type(), String_Type filename = String_Type(),
-              Comment_Type comment = Comment_Type(), Units_Type units = Units_Type(), Scale_Type scale = Scale_Type());
+		Image(Size_Type size, unsigned int numBands, Environment* env);
     
         /**
          * Specialization of the virtual destructor of RasteredModel

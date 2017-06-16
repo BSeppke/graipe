@@ -56,8 +56,9 @@ Client::Client(QWidget *parent)
     m_algSignalMapper(new QSignalMapper)
 {
     //init graipe
-    loadModules();
-    Impex::loadModel(m_lneRequest->text());
+    QString report;
+    m_environment = loadModules(report);
+    Impex::loadModel(m_lneRequest->text(), m_environment);
     
     menuBar();
     
@@ -71,7 +72,7 @@ Client::Client(QWidget *parent)
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     unsigned int i=0;
-    for(const AlgorithmFactoryItem& item : algorithmFactory)
+    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory)
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
         
@@ -215,7 +216,7 @@ Client::Client(QWidget *parent)
 
 void Client::loadAndSendModel()
 {    
-    Model* model = Impex::loadModel(m_lneRequest->text());
+    Model* model = Impex::loadModel(m_lneRequest->text(), m_environment);
     
     if (model != NULL)
     {
@@ -248,6 +249,13 @@ void Client::sendModel(Model* model)
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
+    m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
+    
+    while( m_tcpSocket->bytesToWrite() != 0)
+    {
+        QCoreApplication::processEvents();
+    }
     
     qDebug() << "--> \"Compressed Model Data\"";
     m_tcpSocket->write(model_data);
@@ -308,12 +316,23 @@ void Client::sendAlgorithm(Algorithm* alg)
     
     qDebug() << "--> " << request1;
     m_tcpSocket->write(request1.toLatin1());
+    m_tcpSocket->flush();
+    m_tcpSocket->waitForBytesWritten();
+    
+    while( m_tcpSocket->bytesToWrite() != 0)
+    {
+        QCoreApplication::processEvents();
+    }
     
     qDebug() << "--> \"Compressed Algorithm Data\"";
     m_tcpSocket->write(alg_data);
     m_tcpSocket->flush();
     m_tcpSocket->waitForBytesWritten();
     
+    while( m_tcpSocket->bytesToWrite() != 0)
+    {
+        QCoreApplication::processEvents();
+    }
     m_btnSend->setEnabled(true);
 }
 
@@ -359,7 +378,7 @@ void Client::readModel(int bytesToRead)
         }
         
         QXmlStreamReader xmlReader(compressor);
-        Model* new_model = Impex::loadModel(xmlReader);
+        Model* new_model = Impex::loadModel(xmlReader, m_environment);
         
         if(new_model == NULL)
         {
@@ -369,9 +388,9 @@ void Client::readModel(int bytesToRead)
         }
         
         qDebug("    Model loaded and added sucessfully!");
-        qDebug() << "Now: " << models.size() << " models available!";
+        qDebug() << "Now: " << m_environment->models.size() << " models available!";
         
-        m_lblStatus->setText(QString("Models: %1, latest model: %2, type:%3, ID:%4, descripton:%5").arg(models.size()).arg(new_model->name()).arg(new_model->typeName()).arg(new_model->id()).arg(new_model->description()));
+        m_lblStatus->setText(QString("Models: %1, latest model: %2, type:%3, ID:%4, descripton:%5").arg(m_environment->models.size()).arg(new_model->name()).arg(new_model->typeName()).arg(new_model->id()).arg(new_model->description()));
     }
     catch(...)
     {
@@ -464,9 +483,9 @@ void Client::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = algorithmFactory[index];
+    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory[index];
 	
-	Algorithm* alg = alg_item.algorithm_fptr();
+	Algorithm* alg = alg_item.algorithm_fptr(m_environment);
     
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);

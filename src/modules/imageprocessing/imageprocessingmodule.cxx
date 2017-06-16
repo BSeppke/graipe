@@ -59,9 +59,10 @@ class AddImages
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        AddImages()
+        AddImages(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image"));
+            m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image", NULL, false, env));
         }
     
         QString typeName() const
@@ -107,7 +108,7 @@ class AddImages
                         Image<float>* image = static_cast<Image<float>*>( selected_images[0] );
                         
                         //create new image to do the addition
-                        Image<float>* new_image = new Image<float>(image->size(), image->numBands());
+                        Image<float>* new_image = new Image<float>(image->size(), image->numBands(), m_environment);
                         
                         //Copy all metadata from current image (will be overwritten later)
                         image->copyMetadata(*new_image);
@@ -151,9 +152,9 @@ class AddImages
         }
 };
 
-Algorithm* createAddImages()
+Algorithm* createAddImages(Environment* env)
 {
-	return new AddImages;
+	return new AddImages(env);
 }
 
 
@@ -170,9 +171,10 @@ class GaussianGradientCalculator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GaussianGradientCalculator()
+        GaussianGradientCalculator(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL));
+            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL, false, env));
             m_parameters->addParameter("sigma", new FloatParameter("Gaussian gradient Scale", 0,9999999, 1.0));
         }
     
@@ -214,7 +216,7 @@ class GaussianGradientCalculator
                     
                     vigra::gaussianGradientMultiArray(imageband, grad, sigma);
                     
-                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(grad.bindElementChannel(0), grad.bindElementChannel(1));
+                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(grad.bindElementChannel(0), grad.bindElementChannel(1), m_environment);
                     
                     //Copy only geometry metadata from current image
                     ((Model*)param_imageband->image())->copyGeometry(*new_gradient_vf);
@@ -248,9 +250,9 @@ class GaussianGradientCalculator
  *
  * \return A new instance of the GaussianGradientCalculator.
  */
-Algorithm* createGaussianGradientCalculator()
+Algorithm* createGaussianGradientCalculator(Environment* env)
 {
-	return new GaussianGradientCalculator;
+	return new GaussianGradientCalculator(env);
 }
 
 
@@ -265,9 +267,10 @@ class RecursiveSmoothingFilter : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        RecursiveSmoothingFilter()
+        RecursiveSmoothingFilter(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
             //m_parameters.push_back( new EnumParameter("Border treatment", border_treatment_modes(), 2));
             
@@ -305,7 +308,7 @@ class RecursiveSmoothingFilter : public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -348,9 +351,9 @@ class RecursiveSmoothingFilter : public Algorithm
  *
  * \return A new instance of the RecursiveSmoothingFilter.
  */
-Algorithm* createRecursiveSmoothingFilter()
+Algorithm* createRecursiveSmoothingFilter(Environment* env)
 {
-	return new RecursiveSmoothingFilter;
+	return new RecursiveSmoothingFilter(env);
 }
 
 
@@ -365,9 +368,10 @@ class GaussianSmoothingFilter : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GaussianSmoothingFilter()
+        GaussianSmoothingFilter(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
         }
         QString typeName() const
@@ -401,7 +405,7 @@ class GaussianSmoothingFilter : public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -447,9 +451,9 @@ class GaussianSmoothingFilter : public Algorithm
  *
  * \return A new instance of the GaussianSmoothingFilter.
  */
-Algorithm* createGaussianSmoothingFilter()
+Algorithm* createGaussianSmoothingFilter(Environment* env)
 {
-	return new GaussianSmoothingFilter;
+	return new GaussianSmoothingFilter(env);
 }
 
 
@@ -467,11 +471,12 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        NormalizedGaussianSmoothingFilter()
+        NormalizedGaussianSmoothingFilter(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band"));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, env));
         }
         QString typeName() const
         {
@@ -509,7 +514,7 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -559,9 +564,9 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
  *
  * \return A new instance of the NormalizedGaussianSmoothingFilter.
  */
-Algorithm* createNormalizedGaussianSmoothingFilter()
+Algorithm* createNormalizedGaussianSmoothingFilter(Environment* env)
 {
-	return new NormalizedGaussianSmoothingFilter;
+	return new NormalizedGaussianSmoothingFilter(env);
 }
 
 
@@ -578,10 +583,11 @@ class ApplyMaskToImage
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ApplyMaskToImage()
+        ApplyMaskToImage(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image"));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band"));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, env));
             
         }
         QString typeName() const
@@ -619,7 +625,7 @@ class ApplyMaskToImage
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(image->size(), image->numBands());
+                    Image<float>* new_image = new Image<float>(image->size(), image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     image->copyMetadata(*new_image);
@@ -663,9 +669,9 @@ class ApplyMaskToImage
  *
  * \return A new instance of the ApplyMaskToImage.
  */
-Algorithm* createApplyMaskToImage()
+Algorithm* createApplyMaskToImage(Environment* env)
 {
-	return new ApplyMaskToImage;
+	return new ApplyMaskToImage(env);
 }
 
 
@@ -682,9 +688,10 @@ class MaskErosion
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskErosion()
+        MaskErosion(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL) );
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL, false, env) );
             m_parameters->addParameter("radius", new IntParameter("Erosion radius", 1, 50, 1) );
             
         }
@@ -722,7 +729,7 @@ class MaskErosion
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask.shape(), 1);
+                    Image<float>* new_image = new Image<float>(mask.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask->image()->copyMetadata(*new_image);
@@ -761,9 +768,9 @@ class MaskErosion
  *
  * \return A new instance of the MaskErosion.
  */
-Algorithm* createMaskErosion()
+Algorithm* createMaskErosion(Environment* env)
 {
-	return new MaskErosion;
+	return new MaskErosion(env);
 }
 
 
@@ -780,9 +787,10 @@ class MaskDilation
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskDilation()
+        MaskDilation(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL) );
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL, false, env) );
             m_parameters->addParameter("radius", new IntParameter("Dilation radius", 1, 50, 1) );
             
         }
@@ -820,7 +828,7 @@ class MaskDilation
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask.shape(), 1);
+                    Image<float>* new_image = new Image<float>(mask.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask->image()->copyMetadata(*new_image);
@@ -859,9 +867,9 @@ class MaskDilation
  *
  * \return A new instance of the MaskDilation.
  */
-Algorithm* createMaskDilation()
+Algorithm* createMaskDilation(Environment* env)
 {
-	return new MaskDilation;
+	return new MaskDilation(env);
 }
 
 
@@ -878,10 +886,11 @@ class MaskUnion
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskUnion()
+        MaskUnion(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL));
-            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL));
+            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, env));
+            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, env));
             
         }
         QString typeName() const
@@ -918,7 +927,7 @@ class MaskUnion
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask1.shape(), 1);
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
@@ -960,9 +969,9 @@ class MaskUnion
  *
  * \return A new instance of the MaskUnion.
  */
-Algorithm* createMaskUnion()
+Algorithm* createMaskUnion(Environment* env)
 {
-	return new MaskUnion;
+	return new MaskUnion(env);
 }
 
 
@@ -975,10 +984,11 @@ class MaskIntersection: public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskIntersection()
+        MaskIntersection(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL));
-            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL));
+            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_environment));
+            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_environment));
             
         }
         QString typeName() const
@@ -1015,7 +1025,7 @@ class MaskIntersection: public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask1.shape(), 1);
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
@@ -1057,9 +1067,9 @@ class MaskIntersection: public Algorithm
  *
  * \return A new instance of the MaskIntersection.
  */
-Algorithm* createMaskIntersection()
+Algorithm* createMaskIntersection(Environment* env)
 {
-	return new MaskIntersection;
+	return new MaskIntersection(env);
 }
 
 
@@ -1074,10 +1084,11 @@ class MaskDifference: public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskDifference()
+        MaskDifference(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL));
-            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL));
+            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_environment));
+            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_environment));
             
         }
         QString typeName() const
@@ -1114,7 +1125,7 @@ class MaskDifference: public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask1.shape(), 1);
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
@@ -1156,9 +1167,9 @@ class MaskDifference: public Algorithm
  *
  * \return A new instance of the MaskDifference.
  */
-Algorithm* createMaskDifference()
+Algorithm* createMaskDifference(Environment* env)
 {
-	return new MaskDifference;
+	return new MaskDifference(env);
 }
 
 
@@ -1175,9 +1186,10 @@ class ImageCropper
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageCropper()
+        ImageCropper(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image", "Image", NULL, false, env));
             m_parameters->addParameter("ul_x", new IntParameter("Upper Left x", 0,999999, 0));
             m_parameters->addParameter("ul_y", new IntParameter("Upper Left y", 0,999999, 0));
             m_parameters->addParameter("lr_x", new IntParameter("Lower Right x", 0,999999, 1000));
@@ -1230,7 +1242,7 @@ class ImageCropper
                     
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(vigra::Shape2(lr_x - ul_x, lr_y - ul_y), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(vigra::Shape2(lr_x - ul_x, lr_y - ul_y), current_image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -1283,9 +1295,9 @@ class ImageCropper
  *
  * \return A new instance of the ImageCropper.
  */
-Algorithm* createImageCropper()
+Algorithm* createImageCropper(Environment* env)
 {
-	return new ImageCropper;
+	return new ImageCropper(env);
 }
 
 
@@ -1301,9 +1313,10 @@ class ImageResizer : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageResizer()
+        ImageResizer(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image",  new ModelParameter("Image", "Image"));
+            m_parameters->addParameter("image",  new ModelParameter("Image", "Image", NULL, false, env));
             m_parameters->addParameter("width",  new IntParameter("New width", 1,999999, 100));
             m_parameters->addParameter("height", new IntParameter("New height ", 1,999999, 100));
             m_parameters->addParameter("degree", new IntParameter("Spline-Interpolation degree ", 0,5, 1));
@@ -1345,7 +1358,7 @@ class ImageResizer : public Algorithm
                         height = param_height->value();
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(vigra::Shape2(width,height), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(vigra::Shape2(width,height), current_image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -1418,9 +1431,9 @@ class ImageResizer : public Algorithm
  *
  * \return A new instance of the ImageResizer.
  */
-Algorithm* createImageResizer()
+Algorithm* createImageResizer(Environment* env)
 {
-	return new ImageResizer;
+	return new ImageResizer(env);
 }
 
 
@@ -1431,9 +1444,10 @@ class ImageInverter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageInverter()
+        ImageInverter(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", "Image"));
+            m_parameters->addParameter("image", new ModelParameter("Image", "Image", NULL, false, env));
             m_parameters->addParameter("invert", new BoolParameter("Use maximum band value as inverting offset",true));
             m_parameters->addParameter("invert_offset", new IntParameter("Global inverting offset", 0,999999, 255, (*m_parameters)["invert"]));
             
@@ -1470,7 +1484,7 @@ class ImageInverter
                     Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands());
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -1524,9 +1538,9 @@ class ImageInverter
  *
  * \return A new instance of the ImageInverter.
  */
-Algorithm* createImageInverter()
+Algorithm* createImageInverter(Environment* env)
 {
-	return new ImageInverter;
+	return new ImageInverter(env);
 }
 
 
@@ -1544,9 +1558,10 @@ class ImageThresholder
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageThresholder()
+        ImageThresholder(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ImageBandParameter<float>("Image band for thresh.",	NULL));
+            m_parameters->addParameter("image", new ImageBandParameter<float>("Image band for thresh.",	NULL, false, env));
             m_parameters->addParameter("low",  new FloatParameter("Lower threshold", -999999,999999, 0));
             m_parameters->addParameter("hi",   new FloatParameter("Upper threshold", -999999,999999, 255));
             m_parameters->addParameter("no",    new FloatParameter("No Value Mark", 0,999999, 0));
@@ -1590,7 +1605,7 @@ class ImageThresholder
                     
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);
@@ -1632,9 +1647,9 @@ class ImageThresholder
  *
  * \return A new instance of the ImageThresholder.
  */
-Algorithm* createImageThresholder()
+Algorithm* createImageThresholder(Environment* env)
 {
-	return new ImageThresholder;
+	return new ImageThresholder(env);
 }
 
 
@@ -1652,9 +1667,10 @@ class FloatingImageThresholder
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        FloatingImageThresholder()
+        FloatingImageThresholder(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image",      new ImageBandParameter<float>("Image band for thresh.",	NULL));
+            m_parameters->addParameter("image",      new ImageBandParameter<float>("Image band for thresh.",	NULL, false, env));
             m_parameters->addParameter("lowS",       new FloatParameter("Lower threshold (at start)", -999999,999999, 0));
             m_parameters->addParameter("hiS",        new FloatParameter("Upper threshold (at start)", -999999,999999, 255));
             m_parameters->addParameter("lowE",       new FloatParameter("Lower threshold (at end)", -999999,999999, 0));
@@ -1736,7 +1752,7 @@ class FloatingImageThresholder
                     }
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
                     new_image->setBand(0, res);
                     
                     //Copy all metadata from current image (will be overwritten later)
@@ -1772,9 +1788,9 @@ class FloatingImageThresholder
  *
  * \return A new instance of the FloatingImageThresholder.
  */
-Algorithm* createFloatingImageThresholder()
+Algorithm* createFloatingImageThresholder(Environment* env)
 {
-	return new FloatingImageThresholder;
+	return new FloatingImageThresholder(env);
 }
 
 
@@ -1792,7 +1808,8 @@ class ThinLineExtractor
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ThinLineExtractor()
+        ThinLineExtractor(Environment* env)
+        : Algorithm(env)
         {
             
             QStringList statistical_modes;
@@ -1800,7 +1817,7 @@ class ThinLineExtractor
                 statistical_modes.append("minimal");
                 statistical_modes.append("maximal");
 
-            m_parameters->addParameter("mask",        new ImageBandParameter<float>("Mask Image",	NULL));
+            m_parameters->addParameter("mask",        new ImageBandParameter<float>("Mask Image",	NULL, false, env));
             m_parameters->addParameter("linewidth",   new FloatParameter("maximal width of lines", 0,999999, 0));
             m_parameters->addParameter("regions",     new EnumParameter("use region statistic for comparison", statistical_modes,0));
             m_parameters->addParameter("no",          new FloatParameter("No Value Mark", 0,999999, 0));
@@ -1904,10 +1921,10 @@ class ThinLineExtractor
                     }
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
                     new_image->setBand(0, res);
                     
-                    Image<float>* new_stat_image = new Image<float>(imageband.shape(), 2);
+                    Image<float>* new_stat_image = new Image<float>(imageband.shape(), 2, m_environment);
                     new_stat_image->setBand(0, res_stats_val);
                     new_stat_image->setBand(1, res_stats_val);
                     
@@ -1959,9 +1976,9 @@ class ThinLineExtractor
  *
  * \return A new instance of the ThinLineExtractor.
  */
-Algorithm* createThinLineExtractor()
+Algorithm* createThinLineExtractor(Environment* env)
 {
-	return new ThinLineExtractor;
+	return new ThinLineExtractor(env);
 }
 
 
@@ -1978,9 +1995,10 @@ class DistanceTransformator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        DistanceTransformator()
+        DistanceTransformator(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("mask", new ImageBandParameter<float>("Mask image band",	NULL));
+            m_parameters->addParameter("mask", new ImageBandParameter<float>("Mask image band",	NULL, false, env));
             
         }
     
@@ -2012,7 +2030,7 @@ class DistanceTransformator
                     vigra::MultiArrayView<2,float> imageband =  param_imageBand->value();
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);
@@ -2048,9 +2066,9 @@ class DistanceTransformator
  *
  * \return A new instance of the DistanceTransformator.
  */
-Algorithm* createDistanceTransformator()
+Algorithm* createDistanceTransformator(Environment* env)
 {
-	return new DistanceTransformator;
+	return new DistanceTransformator(env);
 }
 
 

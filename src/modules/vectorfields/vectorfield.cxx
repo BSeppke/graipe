@@ -40,9 +40,10 @@ namespace graipe {
 /**
  * Default constructor. Creates an empty vectorfield.
  */
-Vectorfield2D::Vectorfield2D()
-:  m_global_motion(new TransformParameter("Global motion matrix:")),
-   m_scale(new DoubleParameter("scale (px->cm/s)",0,99999,10))
+Vectorfield2D::Vectorfield2D(Environment* env)
+:   Model(env),
+    m_global_motion(new TransformParameter("Global motion matrix:")),
+    m_scale(new DoubleParameter("scale (px->cm/s)",0,99999,10))
 {
     m_parameters->addParameter("globalMotion", m_global_motion);
     m_parameters->addParameter("scale", m_scale);

@@ -305,7 +305,7 @@ class MSMVGradientFunctor
  * \return The Canny Edgel list.
  */
 template <class MS_GRADIENT_FUNCTOR>
-EdgelFeatureList2D* msCannyFeatures(const Image<float>* img, float scale, float threshold)
+EdgelFeatureList2D* msCannyFeatures(Image<float>* img, float scale, float threshold)
 {
 	std::vector<vigra::MultiArray<2,vigra::TinyVector<float, 2> > > jacobian;
 	vigra::MultiArray<2,vigra::TinyVector<float, 2> >  gradient;
@@ -320,7 +320,7 @@ EdgelFeatureList2D* msCannyFeatures(const Image<float>* img, float scale, float 
 	// find edgels at scale
     vigra::cannyEdgelListThreshold(gradient, v_edgels, threshold);
 	
-    EdgelFeatureList2D* edgels = new EdgelFeatureList2D;
+    EdgelFeatureList2D* edgels = new EdgelFeatureList2D(img->environment());
 	
 	for(unsigned int i=0; i< v_edgels.size(); ++i)
 	{

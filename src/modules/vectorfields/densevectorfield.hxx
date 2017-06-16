@@ -61,7 +61,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
         /**
          * Default constructor. Creates an empty dense vectorfield.
          */
-        DenseVectorfield2D();
+        DenseVectorfield2D(Environment* env);
     
         /**
          * Copy constructor. Creates a dense vectorfield from another one.
@@ -75,7 +75,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          *
          * \param shape The 2D shape, which, contains (width, height).
          */
-		DenseVectorfield2D(const DiffType& shape);
+		DenseVectorfield2D(const DiffType& shape, Environment* env);
     
         /**
          * Create an empty dense vectorfield of a given 2D shape.
@@ -83,7 +83,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * \param width The width of the new dense vectorfield.
          * \param height The height of the new dense vectorfield.
          */
-		DenseVectorfield2D(int width, int height);
+		DenseVectorfield2D(int width, int height, Environment* env);
     
         /**
          * Create a dense vectorfield from two arrays, which need to contain.
@@ -93,7 +93,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * \param u The x-directions of the vectors.
          * \param v The y-directions of the vectors.
          */
-		DenseVectorfield2D(const ArrayViewType& u, const ArrayViewType& v);
+		DenseVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, Environment* env);
 		
         /**
          * The typename of this vector field.
@@ -474,7 +474,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
         /**
          * Default constructor. Creates an empty dense weighted vectorfield.
          */
-        DenseWeightedVectorfield2D();
+        DenseWeightedVectorfield2D(Environment* env);
     
         /**
          * Copy constructor. Creates a dense weighted vectorfield from a non weighted one.
@@ -496,7 +496,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          *
          * \param shape The 2D shape, which, contains (width, height).
          */
-		DenseWeightedVectorfield2D(const DiffType& shape);
+		DenseWeightedVectorfield2D(const DiffType& shape, Environment* env);
     
         /**
          * Create an empty dense weighted vectorfield of a given 2D shape.
@@ -504,7 +504,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * \param width The width of the new dense weighted vectorfield.
          * \param height The height of the new dense weighted vectorfield.
          */
-		DenseWeightedVectorfield2D(int width, int height);
+		DenseWeightedVectorfield2D(int width, int height, Environment* env);
     
         /**
          * Create a dense weighed vectorfield from two arrays, which need to contain.
@@ -514,7 +514,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * \param u The x-directions of the vectors.
          * \param v The y-directions of the vectors.
          */
-		DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v);
+		DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, Environment* env);
     
         /**
          * Create a dense weighted vectorfield from two arrays, which need to contain.
@@ -525,7 +525,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * \param v The y-directions of the vectors.
          * \param w The weights of the vectors.
          */
-		DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, const ArrayViewType& w);
+		DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, const ArrayViewType& w, Environment* env);
     
         /**
          * The typename of this vector field.

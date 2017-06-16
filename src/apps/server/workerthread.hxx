@@ -36,9 +36,12 @@
 #ifndef GRAIPE_SERVER_WORKERTHREAD_HXX
 #define GRAIPE_SERVER_WORKERTHREAD_HXX
 
+#include "core/model.hxx"
+
 #include <QThread>
 #include <QTcpSocket>
-
+#include <QByteArray>
+#include <QVector>
 namespace graipe {
 
 class WorkerThread
@@ -47,7 +50,7 @@ class WorkerThread
     Q_OBJECT
 
     public:
-        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QObject *parent);
+        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QMutex* mutex, Environment* env, QObject *parent);
         void run() override;
 
     protected slots:
@@ -55,8 +58,8 @@ class WorkerThread
         void disconnected();
    
     protected:
-        void readModel(int bytesToRead);
-        void readAndRunAlgorithm(int bytesToRead);
+        void readModel();
+        void readAndRunAlgorithm();
 
     signals:
         void error(QTcpSocket::SocketError socketError);
@@ -71,8 +74,11 @@ class WorkerThread
                      //  0 : logged in,
                      //  1 : busy (waiting for data to be received)
         int m_expected_bytes; //in case state==1 - how many bytes do we want to receive
+        QByteArray m_buffer;
     
+        QMutex* m_mutex;
     
+        Environment * m_environment;
 };
 
 } //namespace graipe

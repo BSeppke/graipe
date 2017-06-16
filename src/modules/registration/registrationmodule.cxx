@@ -57,10 +57,11 @@ class GlobalMotionCorrector
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GlobalMotionCorrector()
+        GlobalMotionCorrector(Environment* env)
+        : Algorithm(env)
         {
-            m_param_imageBand1 = new ImageBandParameter<float>("Reference Image", NULL);
-            m_param_imageBand2 = new ImageBandParameter<float>("Second Image",	NULL);
+            m_param_imageBand1 = new ImageBandParameter<float>("Reference Image", NULL, false, env);
+            m_param_imageBand2 = new ImageBandParameter<float>("Second Image",	NULL, false, env);
             
             m_parameters->addParameter("image1", m_param_imageBand1 );
             m_parameters->addParameter("image2", m_param_imageBand2 );
@@ -109,7 +110,7 @@ class GlobalMotionCorrector
                                                       rotation_correlation,
                                                       translation_correlation);
                     
-                    Image<float>* displaced_image = new Image<float>(imageband2.shape(), m_param_imageBand1->image()->numBands());
+                    Image<float>* displaced_image = new Image<float>(imageband2.shape(), m_param_imageBand1->image()->numBands(), m_environment);
                     
                     for( unsigned int c=0; c < m_param_imageBand1->image()->numBands(); c++)
                     {
@@ -172,9 +173,9 @@ class GlobalMotionCorrector
  *
  * \return A new instance of the GlobalMotionCorrector.
  */
-Algorithm* createGlobalMotionCorrector()
+Algorithm* createGlobalMotionCorrector(Environment* env)
 {
-    return new GlobalMotionCorrector;	
+    return new GlobalMotionCorrector(env);
 }
 
 
@@ -193,11 +194,12 @@ class GenericRegistration
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-		GenericRegistration()
+		GenericRegistration(Environment* env)
+        : Algorithm(env)
 		{
-			m_parameters->addParameter("image1", new ModelParameter("Image to be warped",  "Image"));
-			m_parameters->addParameter("image2", new ModelParameter("Reference Image",  "Image"));
-			m_parameters->addParameter("vf", new ModelParameter("Correspondence Map",  "SparseVectorfield2D"));
+			m_parameters->addParameter("image1", new ModelParameter("Image to be warped",  "Image", NULL, false, env));
+			m_parameters->addParameter("image2", new ModelParameter("Reference Image",  "Image", NULL, false, env));
+			m_parameters->addParameter("vf", new ModelParameter("Correspondence Map",  "SparseVectorfield2D", NULL, false, env));
 		}
     
         QString typeName() const
@@ -235,7 +237,7 @@ class GenericRegistration
                     
                     WARPING_FUNCTOR func_a;
                     
-                    Image<float>* new_image = new Image<float>(image2->size(), image1->numBands());
+                    Image<float>* new_image = new Image<float>(image2->size(), image1->numBands(), m_environment);
                     
                     vigra::MultiArray<2,float> res_img_band(image2->size());
                     std::vector<vigra::TinyVector<double,2> > src_points(vf->size()), dest_points(vf->size());
@@ -297,9 +299,9 @@ QString GenericRegistration<WarpAffineFunctor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpAffineFunctor>.
  */
-Algorithm* createAffineRegistration()
+Algorithm* createAffineRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpAffineFunctor>;
+	return new GenericRegistration<WarpAffineFunctor>(env);
 }
 
 template<>
@@ -314,9 +316,9 @@ QString GenericRegistration<WarpProjectiveFunctor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpProjectiveFunctor>.
  */
-Algorithm* createProjectiveRegistration()
+Algorithm* createProjectiveRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpProjectiveFunctor>;
+	return new GenericRegistration<WarpProjectiveFunctor>(env);
 }
 
 template<>
@@ -331,9 +333,9 @@ QString GenericRegistration<WarpBilinearFunctor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpBilinearFunctor>.
  */
-Algorithm* createBilinearRegistration()
+Algorithm* createBilinearRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpBilinearFunctor>;
+	return new GenericRegistration<WarpBilinearFunctor>(env);
 }
 
 template<>
@@ -348,9 +350,9 @@ QString GenericRegistration<WarpBiquadraticFunctor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpBiquadraticFunctor>.
  */
-Algorithm* createBiquadraticRegistration()
+Algorithm* createBiquadraticRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpBiquadraticFunctor>;
+	return new GenericRegistration<WarpBiquadraticFunctor>(env);
 }
 
 template<>
@@ -365,9 +367,9 @@ QString GenericRegistration<WarpBicubicFunctor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpBicubicFunctor>.
  */
-Algorithm* createBicubicRegistration()
+Algorithm* createBicubicRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpBicubicFunctor>;
+	return new GenericRegistration<WarpBicubicFunctor>(env);
 }
 
 template<>
@@ -381,9 +383,9 @@ QString GenericRegistration<WarpPiecewiseAffineFunctor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpPiecewiseAffineFunctor>.
  */
-Algorithm* createPiecewiseAffineRegistration()
+Algorithm* createPiecewiseAffineRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpPiecewiseAffineFunctor>;
+	return new GenericRegistration<WarpPiecewiseAffineFunctor>(env);
 }
 
 template<>
@@ -398,9 +400,9 @@ QString GenericRegistration<WarpRBF1Functor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpRadialBasisFunctor<vigra::DistancePowerFunctor<1> > >.
  */
-Algorithm* createRBF1Registration()
+Algorithm* createRBF1Registration(Environment* env)
 {
-	return new GenericRegistration<WarpRBF1Functor>;
+	return new GenericRegistration<WarpRBF1Functor>(env);
 }
 
 template<>
@@ -415,9 +417,9 @@ QString GenericRegistration<WarpRBF2Functor>::typeName() const
  *
  * \return A new instance of theGenericRegistration<WarpRadialBasisFunctor<vigra::DistancePowerFunctor<2> > >.
  */
-Algorithm* createRBF2Registration()
+Algorithm* createRBF2Registration(Environment* env)
 {
-	return new GenericRegistration<WarpRBF2Functor>;
+	return new GenericRegistration<WarpRBF2Functor>(env);
 }
 template<>
 QString GenericRegistration<WarpRBF3Functor>::typeName() const
@@ -430,9 +432,9 @@ QString GenericRegistration<WarpRBF3Functor>::typeName() const
  *
  * \return A new instance of the GenericRegistration<WarpRadialBasisFunctor<vigra::DistancePowerFunctor<3> > >.
  */
-Algorithm* createRBF3Registration()
+Algorithm* createRBF3Registration(Environment* env)
 {
-	return new GenericRegistration<WarpRBF3Functor>;
+	return new GenericRegistration<WarpRBF3Functor>(env);
 }
 
 template<>
@@ -446,9 +448,9 @@ QString GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor
  *
  * \return A new instance of the GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >.
  */
-Algorithm* createTPSRegistration()
+Algorithm* createTPSRegistration(Environment* env)
 {
-	return new GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >;
+	return new GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >(env);
 }
 
 

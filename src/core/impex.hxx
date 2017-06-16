@@ -41,6 +41,7 @@
 #include "core/model.hxx"
 #include "core/viewcontroller.hxx"
 #include "core/algorithm.hxx"
+#include "core/globals.hxx"
 
 #include <map>
 
@@ -97,7 +98,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static Model* loadModel(const QString & filename);
+        static Model* loadModel(const QString & filename, Environment* env);
     
         /**
          * Basic import procedure for all types, which implement the serializable interface
@@ -107,7 +108,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static Model* loadModel(QXmlStreamReader & xmlReader);
+        static Model* loadModel(QXmlStreamReader & xmlReader, Environment* env);
     
         /**
          * Basic import procedure for all types, which implement the serializable interface
@@ -117,7 +118,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static ViewController* loadViewController(const QString & filename, QGraphicsScene* scene);
+        static ViewController* loadViewController(const QString & filename, QGraphicsScene* scene, Environment* env);
 
         /**
          * Basic import procedure of a settings dictionary from a given QString
@@ -127,7 +128,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param contents The input QString.
          * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
          */
-        static ViewController* loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene);
+        static ViewController* loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene, Environment* env);
     
         /**
          * Basic import procedure for all algorithms, which implement the serializable interface
@@ -137,7 +138,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static Algorithm* loadAlgorithm(const QString & filename);
+        static Algorithm* loadAlgorithm(const QString & filename, Environment* env);
     
         /**
          * Basic import procedure for all algorithms, which implement the serializable interface
@@ -147,7 +148,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static Algorithm* loadAlgorithm(QXmlStreamReader & xmlReader);
+        static Algorithm* loadAlgorithm(QXmlStreamReader & xmlReader, Environment* env);
             
         /**
          * Standard exporter for everything, which implements the Serializable interface.

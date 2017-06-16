@@ -56,10 +56,11 @@ class BlockWiseImageMatcher
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        BlockWiseImageMatcher()
+        BlockWiseImageMatcher(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference Image",	NULL));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference Image",NULL, false, env));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image",	NULL, false, env));
             m_parameters->addParameter("x-samples", new IntParameter("x-Samples", 1, 999999));
             m_parameters->addParameter("y-samples", new IntParameter("y-Samples", 1, 999999));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
@@ -108,7 +109,7 @@ class BlockWiseImageMatcher
                     vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
                     vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
                         
-                    PointFeatureList2D features_of_image1;
+                    PointFeatureList2D features_of_image1(m_environment);
                         
                     unsigned int y_step = param_imageBand1->image()->height()/param_ySamples->value();
                     unsigned int x_step = param_imageBand1->image()->width()/param_xSamples->value();
@@ -206,9 +207,9 @@ QString BlockWiseImageMatcher<FastCCFunctor>::typeName() const
  *
  * \return A new instance of the BlockWiseImageMatcher<FastCCFunctor>.
  */
-Algorithm* createBWMatcherFastCC()
+Algorithm* createBWMatcherFastCC(Environment* env)
 {
-	return new BlockWiseImageMatcher<FastCCFunctor>;
+	return new BlockWiseImageMatcher<FastCCFunctor>(env);
 }
 
 template<>
@@ -223,9 +224,9 @@ QString BlockWiseImageMatcher<FastNCCFunctor>::typeName() const
  *
  * \return  A new instance of the BlockWiseImageMatcher<FastNCCFunctor>.
  */
-Algorithm* createBWMatcherFastNCC()
+Algorithm* createBWMatcherFastNCC(Environment* env)
 {
-	return new BlockWiseImageMatcher<FastNCCFunctor>;
+	return new BlockWiseImageMatcher<FastNCCFunctor>(env);
 }
 
 
@@ -244,12 +245,13 @@ class FeatureToFeatureMatcher
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        FeatureToFeatureMatcher()
+        FeatureToFeatureMatcher(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
-            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image", NULL, false, env));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D", NULL, false, env));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image", NULL, false, env));
+            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)",  "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D", NULL, false, env));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -388,9 +390,9 @@ QString FeatureToFeatureMatcher<CorrelationFunctor>::typeName() const
  *
  * \return A new instance of the FeatureToFeatureMatcher<CorrelationFunctor>.
  */
-Algorithm* createFFMatcherC()
+Algorithm* createFFMatcherC(Environment* env)
 {
-	return new FeatureToFeatureMatcher<CorrelationFunctor>;
+	return new FeatureToFeatureMatcher<CorrelationFunctor>(env);
 }
 
 template<>
@@ -405,9 +407,9 @@ QString FeatureToFeatureMatcher<NormalizedCorrelationFunctor>::typeName() const
  *
  * \return A new instance of the FeatureToFeatureMatcher<NormalizedCorrelationFunctor>.
  */
-Algorithm* createFFMatcherNC()
+Algorithm* createFFMatcherNC(Environment* env)
 {
-	return new FeatureToFeatureMatcher<NormalizedCorrelationFunctor>;
+	return new FeatureToFeatureMatcher<NormalizedCorrelationFunctor>(env);
 }
 
 
@@ -427,11 +429,12 @@ class FeatureToImageMatcher
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        FeatureToImageMatcher()
+        FeatureToImageMatcher(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image", NULL, false, env));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D", NULL, false, env));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image", NULL, false, env));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -567,9 +570,9 @@ QString FeatureToImageMatcher<FastCCFunctor>::typeName() const
  *
  * \return A new instance of the FeatureToImageMatcher<FastCCFunctor>.
  */
-Algorithm* createFIMatcherFastCC()
+Algorithm* createFIMatcherFastCC(Environment* env)
 {
-	return new FeatureToImageMatcher<FastCCFunctor>;
+	return new FeatureToImageMatcher<FastCCFunctor>(env);
 }
 
 
@@ -586,9 +589,9 @@ QString FeatureToImageMatcher<FastNCCFunctor>::typeName() const
  *
  * \return A new instance of the FeatureToImageMatcher<FastNCCFunctor>.
  */
-Algorithm* createFIMatcherFastNCC()
+Algorithm* createFIMatcherFastNCC(Environment* env)
 {
-	return new FeatureToImageMatcher<FastNCCFunctor>;
+	return new FeatureToImageMatcher<FastNCCFunctor>(env);
 }
 
 
@@ -606,12 +609,13 @@ class ShapeContextMatcher
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ShapeContextMatcher()
+        ShapeContextMatcher(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image"));
-            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
-            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image"));
-            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D"));
+            m_parameters->addParameter("image1",    new ImageBandParameter<float>("Reference image", NULL, false, env));
+            m_parameters->addParameter("features1", new ModelParameter("Features (of reference image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D", NULL, false, env));
+            m_parameters->addParameter("image2",    new ImageBandParameter<float>("Second Image", NULL, false, env));
+            m_parameters->addParameter("features2", new ModelParameter("Features (of second image)", "PointFeatureList2D | WeightedPointFeatureList2D | EdgelFeatureList2D", NULL, false, env));
             m_parameters->addParameter("mask_w",    new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h",    new IntParameter("Mask height", 3, 999));
             m_parameters->addParameter("max_d",     new IntParameter("Max Distance", 1, 999));
@@ -738,9 +742,9 @@ class ShapeContextMatcher
  *
  * \return A new instance of the ShapeContextMatcher.
  */
-Algorithm* createShapeContextMatcher()
+Algorithm* createShapeContextMatcher(Environment* env)
 {
-	return new ShapeContextMatcher;
+	return new ShapeContextMatcher(env);
 }
 
 
@@ -758,12 +762,13 @@ class SIFTMatcher
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        SIFTMatcher()
+        SIFTMatcher(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image1", new ImageBandParameter<float>("Reference image"));
-            m_parameters->addParameter("sift1", new ModelParameter("SIFT Features (of reference image)", "SIFTFeatureList2D"));
-            m_parameters->addParameter("image2", new ImageBandParameter<float>("Second Image"));
-            m_parameters->addParameter("sift2", new ModelParameter("SIFT Features (of second image)", "SIFTFeatureList2D"));
+            m_parameters->addParameter("image1", new ImageBandParameter<float>("Reference image", NULL, false, env));
+            m_parameters->addParameter("sift1", new ModelParameter("SIFT Features (of reference image)", "SIFTFeatureList2D", NULL, false, env));
+            m_parameters->addParameter("image2", new ImageBandParameter<float>("Second Image", NULL, false, env));
+            m_parameters->addParameter("sift2", new ModelParameter("SIFT Features (of second image)", "SIFTFeatureList2D", NULL, false, env));
             m_parameters->addParameter("max_sift_d", new FloatParameter("Max. distance of point descriptors", 1, 1000000,1000));
             m_parameters->addParameter("max_d", new FloatParameter("Max. geometrical distance of points", 1, 100000,100));
             m_parameters->addParameter("best_n", new IntParameter("Find N best candidates", 1, 50,10));
@@ -897,9 +902,9 @@ class SIFTMatcher
  *
  * \return A new instance of the SIFTMatcher.
  */
-Algorithm* createSIFTMatcher()
+Algorithm* createSIFTMatcher(Environment* env)
 {
-	return new SIFTMatcher;
+	return new SIFTMatcher(env);
 }
 
 

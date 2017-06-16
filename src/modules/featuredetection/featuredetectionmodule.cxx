@@ -52,11 +52,12 @@ class MonotonyFeatureDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        MonotonyFeatureDetector()
+        MonotonyFeatureDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL));
+            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL, false, env));
             m_parameters->addParameter("mask?",  new BoolParameter("Use image band as mask", true));
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"]));
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, env));
             m_parameters->addParameter("lowM",   new IntParameter("Lowest Monotony class", 0,8, 7));
             m_parameters->addParameter("hiM",    new IntParameter("Highest Monotony class", 0,8, 8));
         }
@@ -104,12 +105,16 @@ class MonotonyFeatureDetector
                         
                         new_feature_list = detectFeaturesUsingMonotonyOperatorWithMask(imageband,
                                                                                        mask,
-                                                                                       param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
+                                                                                       param_lowestMonotonyClass->value(), param_highestMonotonyClass->value(),
+                                                                                       1,
+                                                                                       m_environment);
                     }
                     else
                     {
                         new_feature_list = detectFeaturesUsingMonotonyOperator(imageband,
-                                                                               param_lowestMonotonyClass->value(), param_highestMonotonyClass->value());
+                                                                               param_lowestMonotonyClass->value(), param_highestMonotonyClass->value(),
+                                                                               1,
+                                                                               m_environment);
                     }
                     new_feature_list->setName(QString("Monotony Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the Monotony Features:\n");
@@ -144,9 +149,9 @@ class MonotonyFeatureDetector
  *
  * \return A new instance of the MonotonyFeatureDetector.
  */
-Algorithm* createMonotonyFeatureDetector()
+Algorithm* createMonotonyFeatureDetector(Environment * env)
 {
-	return new MonotonyFeatureDetector;
+	return new MonotonyFeatureDetector(env);
 }
 
 
@@ -163,11 +168,12 @@ class HarrisCornerDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        HarrisCornerDetector()
+        HarrisCornerDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL));
+            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL, false, env));
             m_parameters->addParameter("mask?", new BoolParameter("Use image band as mask", true));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"]));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, env));
             m_parameters->addParameter("sigma", new FloatParameter("sigma for calculation of gauss. gradient", 0,99, 0.6f));
             m_parameters->addParameter("T",     new FloatParameter("Corner response threshold", 0,999999, 0));
         }
@@ -214,13 +220,15 @@ class HarrisCornerDetector
                         
                         new_feature_list = detectFeaturesUsingHarrisWithMask(imageband,
                                                                              mask,
-                                                                             param_gradientSigma->value(), param_responseThreshold->value());
+                                                                             param_gradientSigma->value(), param_responseThreshold->value(),
+                                                                             m_environment);
                         
                     }
                     else
                     {
                         new_feature_list = detectFeaturesUsingHarris(imageband,
-                                                                     param_gradientSigma->value(), param_responseThreshold->value());
+                                                                     param_gradientSigma->value(), param_responseThreshold->value(),
+                                                                     m_environment);
                     }
                         
                     new_feature_list->setName(QString("Harris Features of ") + param_imageBand->toString());
@@ -254,9 +262,9 @@ class HarrisCornerDetector
  *
  * \return A new instance of the HarrisCornerDetector.
  */
-Algorithm* createHarrisCornerDetector()
+Algorithm* createHarrisCornerDetector(Environment * env)
 {
-	return new HarrisCornerDetector;
+	return new HarrisCornerDetector(env);
 }
 
 
@@ -273,11 +281,12 @@ class CannyFeatureDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        CannyFeatureDetector()
+        CannyFeatureDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL));
+            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL, false, env));
             m_parameters->addParameter("mask?",  new BoolParameter("Use image band as mask", true));
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"]));
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, env));
             m_parameters->addParameter("sigma",  new FloatParameter("Canny Scale", 0,9999999, 0));
             m_parameters->addParameter("sigmaT", new FloatParameter("Canny (gradient strength) threshold", 0,9999999, 0));
         }
@@ -324,12 +333,14 @@ class CannyFeatureDetector
                         
                         new_edgel_feature_list = detectFeaturesUsingCannyWithMask(imageband,
                                                                                   mask,
-                                                                                  param_cannyScale->value(), param_cannyThreshold->value());
+                                                                                  param_cannyScale->value(), param_cannyThreshold->value(),
+                                                                                  m_environment);
                     }
                     else
                     {
                         new_edgel_feature_list = detectFeaturesUsingCanny(imageband,
-                                                                          param_cannyScale->value(), param_cannyThreshold->value());
+                                                                          param_cannyScale->value(), param_cannyThreshold->value(),
+                                                                          m_environment);
                     }
                     
                     new_edgel_feature_list->setName(QString("Canny-Edgel Features of ") + param_imageBand->toString());
@@ -364,9 +375,9 @@ class CannyFeatureDetector
  *
  * \return A new instance of the CannyFeatureDetector.
  */
-Algorithm* createCannyFeatureDetector()
+Algorithm* createCannyFeatureDetector(Environment * env)
 {
-	return new CannyFeatureDetector;
+	return new CannyFeatureDetector(env);
 }
 
 
@@ -382,9 +393,10 @@ class CannyFeatureLengthFilter
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        CannyFeatureLengthFilter()
+        CannyFeatureLengthFilter(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("edgels",     new ModelParameter("Edgel Featurelist (2D)", "EdgelFeatureList2D"));
+            m_parameters->addParameter("edgels",     new ModelParameter("Edgel Featurelist (2D)", "EdgelFeatureList2D", NULL, false, env));
             m_parameters->addParameter("min-length", new FloatParameter("Minimal Edgel length", 0,9999999, 0));
             m_parameters->addParameter("radius",     new FloatParameter("Search radius for Edgel-unions", 0,9999999, 1.5));
         }
@@ -457,7 +469,7 @@ class CannyFeatureLengthFilter
          */
         EdgelFeatureList2D* removeShortEdgesFromEdgelList(EdgelFeatureList2D* features, double min_length, float search_radius)
         {
-            EdgelFeatureList2D* new_featurelist = new EdgelFeatureList2D;
+            EdgelFeatureList2D* new_featurelist = new EdgelFeatureList2D(features->environment());
             
             std::vector<bool> marked(features->size(), false);
             std::vector<unsigned int> trace, boundary;
@@ -524,9 +536,9 @@ class CannyFeatureLengthFilter
  *
  * \return A new instance of the CannyFeatureLengthFilter.
  */
-Algorithm* createCannyFeatureLengthFilter()
+Algorithm* createCannyFeatureLengthFilter(Environment * env)
 {
-	return new CannyFeatureLengthFilter;
+	return new CannyFeatureLengthFilter(env);
 }
 
 
@@ -543,9 +555,10 @@ class SIFTFeatureDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        SIFTFeatureDetector()
+        SIFTFeatureDetector(Environment* env)
+        : Algorithm(env)
         {
-            m_parameters->addParameter("image",     new ImageBandParameter<float>("Image", NULL));
+            m_parameters->addParameter("image",     new ImageBandParameter<float>("Image", NULL, false, env));
             m_parameters->addParameter("sigma",     new FloatParameter("sigma of first octave", 0, 100,  1));
             m_parameters->addParameter("octaves",   new IntParameter("octaves", 0,100, 4));
             m_parameters->addParameter("levels",    new IntParameter("intra-octave levels", 0, 100, 3));
@@ -597,7 +610,9 @@ class SIFTFeatureDetector
                     
                     SIFTFeatureList2D* new_feature_list =  detectFeaturesUsingSIFT(imageband,
                                                                                    param_sigma->value(), param_octaves->value(), param_levels->value(),
-                                                                                   param_contrast_threshold->value(), param_curvature_threshold->value(), param_double_size->value(), param_normalize->value());
+                                                                                   param_contrast_threshold->value(), param_curvature_threshold->value(),
+                                                                                   param_double_size->value(), param_normalize->value(),
+                                                                                   m_environment);
                     
                     new_feature_list->setName(QString("SIFT Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the SIFT Features:\n");
@@ -631,9 +646,9 @@ class SIFTFeatureDetector
  *
  * \return A new instance of the SIFTFeatureDetector.
  */
-Algorithm* createSIFTFeatureDetector()
+Algorithm* createSIFTFeatureDetector(Environment * env)
 {
-	return new SIFTFeatureDetector;
+	return new SIFTFeatureDetector(env);
 }
 
 

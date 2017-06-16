@@ -57,7 +57,7 @@ namespace graipe {
 /**
  * Default/empty contructor of the Model class
  */
-Model::Model()
+Model::Model(Environment* env)
 :  QObject(),
     Serializable(),
     m_name(new StringParameter("Name:", "", 20, NULL)),
@@ -66,7 +66,8 @@ Model::Model()
     m_lr(new PointParameter("Local lower-right (px.):", QPoint(0,0),QPoint(100000,100000), QPoint(0,0), NULL)),
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(0,0), NULL)),
     m_global_lr(new PointFParameter("Global lower-right (deg.):", QPointF(-180,-90),QPointF(180,90), QPointF(0,0), NULL)),
-    m_parameters(new ParameterGroup("Model Properties", ParameterGroup::storage_type(), QFormLayout::WrapAllRows))
+    m_parameters(new ParameterGroup("Model Properties", ParameterGroup::storage_type(), QFormLayout::WrapAllRows)),
+    m_environment(env)
 {
     m_name->setValue(QString("New ") + typeName());
     m_description->setValue(QString("This new ") + typeName() + " has been created on " + QDateTime::currentDateTime().toString());
@@ -83,7 +84,7 @@ Model::Model()
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
     
     //Add to global Models list
-    models.push_back(this);
+    environment()->models.push_back(this);
 }
 
 /**
@@ -114,7 +115,7 @@ Model::Model(const Model& model)
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
     
     //Add to global Models list
-    models.push_back(this);
+    environment()->models.push_back(this);
 }
 
 /**
@@ -126,7 +127,7 @@ Model::~Model()
     delete m_parameters;
     
     //Remove from global models list
-    models.erase(std::remove(models.begin(), models.end(), this), models.end());
+    environment()->models.erase(std::remove(environment()->models.begin(), environment()->models.end(), this), environment()->models.end());
 }
 
 /**
@@ -757,8 +758,8 @@ void Model::updateModel()
 /**
  * Default/empty contructor of the RasteredModel class.
  */
-RasteredModel::RasteredModel()
-: Model(),
+RasteredModel::RasteredModel(Environment* env)
+: Model(env),
   m_size(new PointParameter("Raster size:", QPoint(0,0),QPoint(100000,100000), QPoint(0,0), NULL))
 {
     m_parameters->addParameter("size", m_size);

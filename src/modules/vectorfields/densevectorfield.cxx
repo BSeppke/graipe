@@ -41,7 +41,8 @@ namespace graipe {
 /**
  * Default constructor. Creates an empty dense vectorfield.
  */
-DenseVectorfield2D::DenseVectorfield2D()
+DenseVectorfield2D::DenseVectorfield2D(Environment* env)
+: Vectorfield2D(env)
 {
 }
 
@@ -62,8 +63,9 @@ DenseVectorfield2D::DenseVectorfield2D(const DenseVectorfield2D& vf)
  *
  * \param shape The 2D shape, which, contains (width, height).
  */
-DenseVectorfield2D::DenseVectorfield2D(const DiffType& shape)
-:	m_u(ArrayType(shape)),
+DenseVectorfield2D::DenseVectorfield2D(const DiffType& shape, Environment* env)
+:   Vectorfield2D(env),
+	m_u(ArrayType(shape)),
 	m_v(ArrayType(shape))
 {
 	setLeft(0); setRight(shape[0]);
@@ -76,8 +78,9 @@ DenseVectorfield2D::DenseVectorfield2D(const DiffType& shape)
  * \param width The width of the new dense vectorfield.
  * \param height The height of the new dense vectorfield.
  */
-DenseVectorfield2D::DenseVectorfield2D(int width, int height)
-:	m_u(ArrayType(width,height)),
+DenseVectorfield2D::DenseVectorfield2D(int width, int height, Environment* env)
+:   Vectorfield2D(env),
+	m_u(ArrayType(width,height)),
     m_v(ArrayType(width,height))
 {
 	setLeft(0); setRight(width);
@@ -92,8 +95,9 @@ DenseVectorfield2D::DenseVectorfield2D(int width, int height)
  * \param u The x-directions of the vectors.
  * \param v The y-directions of the vectors.
  */
-DenseVectorfield2D::DenseVectorfield2D(const ArrayViewType & u, const ArrayViewType & v)
-:	m_u(u),
+DenseVectorfield2D::DenseVectorfield2D(const ArrayViewType & u, const ArrayViewType & v, Environment* env)
+:   Vectorfield2D(env),
+	m_u(u),
 	m_v(v)
 {
 	setLeft(0); setRight(u.width());
@@ -707,8 +711,8 @@ unsigned int DenseVectorfield2D::indexToY(unsigned int index) const
 /**
  * Default constructor. Creates an empty dense weighted vectorfield.
  */
-DenseWeightedVectorfield2D::DenseWeightedVectorfield2D()
-: DenseVectorfield2D()
+DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(Environment* env)
+: DenseVectorfield2D(env)
 {
 }
 
@@ -741,8 +745,8 @@ DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const DenseVectorfield2D 
  *
  * \param shape The 2D shape, which, contains (width, height).
  */
-DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const DiffType& shape)
-:	DenseVectorfield2D(shape),
+DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const DiffType& shape, Environment* env)
+:	DenseVectorfield2D(shape, env),
 	m_w(ArrayType(shape))
 {
 }
@@ -753,8 +757,8 @@ DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const DiffType& shape)
  * \param width The width of the new dense weighted vectorfield.
  * \param height The height of the new dense weighted vectorfield.
  */
-DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(int width, int height)
-:	DenseVectorfield2D(width, height),
+DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(int width, int height, Environment* env)
+:	DenseVectorfield2D(width, height, env),
 	m_w(ArrayType(width, height))
 {
 }
@@ -767,8 +771,8 @@ DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(int width, int height)
  * \param u The x-directions of the vectors.
  * \param v The y-directions of the vectors.
  */
-DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v)
-:	DenseVectorfield2D(u, v),
+DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, Environment* env)
+:	DenseVectorfield2D(u, v, env),
 	m_w(ArrayType(u.width(), u.height()))
 {	
 }
@@ -783,8 +787,8 @@ DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, c
  * \param v The y-directions of the vectors.
  * \param w The weights of the vectors.
  */
-DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, const ArrayViewType& w)
-:	DenseVectorfield2D(u, v),
+DenseWeightedVectorfield2D::DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, const ArrayViewType& w, Environment* env)
+:	DenseVectorfield2D(u, v, env),
 	m_w(w)
 {	
 }

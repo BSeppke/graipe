@@ -50,7 +50,8 @@ MainDialog::MainDialog(QWidget *parent)
     m_server(NULL)
 {
 
-    QString report = graipe::loadModules();
+    QString report;
+    Environment* env = graipe::loadModules(report);
     
     QLabel* lblStatus = new QLabel;
     lblStatus->setWordWrap(true);
@@ -58,7 +59,7 @@ MainDialog::MainDialog(QWidget *parent)
     m_btnQuit = new QPushButton(tr("Quit"));
     m_btnQuit->setAutoDefault(false);
 
-    m_server = new Server;
+    m_server = new Server(env);
 
     if (!m_server->listen()) {
         QMessageBox::critical(this, tr("Threaded Graipe Server"),

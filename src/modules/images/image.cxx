@@ -43,8 +43,8 @@ namespace graipe {
  * with zero size and no bands at all.
  */
 template<class T>
-Image<T>::Image()
- :  RasteredModel(),
+Image<T>::Image(Environment* env)
+ :  RasteredModel(env),
     m_numBands(new IntParameter("Number of bands:",0,1000, 0)),
     m_timestamp(new DateTimeParameter("Timestamp:", QDateTime::currentDateTime())),
     m_scale(new DoubleParameter("Scale (1 px = X m):", 0, 1000000000, 1)),
@@ -100,21 +100,16 @@ Image<T>::Image(const Image<T> & img)
 template<class T>
 Image<T>::Image(Size_Type size, 
                 unsigned int numBands,
-                DateTime_Type timestamp,
-                String_Type id,
-                Comment_Type comment,
-                Units_Type units,
-                Scale_Type scale)
+                Environment* env)
 
- :  RasteredModel(),
+ :  RasteredModel(env),
     m_numBands(new IntParameter("Number of bands:",0,1000, numBands)),
-    m_timestamp(new DateTimeParameter("Timestamp:", timestamp)),
-    m_scale(new DoubleParameter("Scale (1 px = X m):", 0, 1000000000, scale)),
-    m_comment(new LongStringParameter("Comment:", comment)),
-    m_units(new StringParameter("Units:", units))
+    m_timestamp(new DateTimeParameter("Timestamp:", QDateTime::currentDateTime())),
+    m_scale(new DoubleParameter("Scale (1 px = X m):", 0, 1000000000, 1)),
+    m_comment(new LongStringParameter("Comment:", "")),
+    m_units(new StringParameter("Units:", "m"))
 {
     appendParameters();
-    setID(id);
     setWidth((unsigned int)size[0]);
     setHeight((unsigned int)size[1]);
     setNumBands(numBands);

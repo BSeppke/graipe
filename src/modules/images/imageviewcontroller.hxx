@@ -77,8 +77,7 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
          */
         QString typeName() const
         {
-            Image<T> temp;
-            return temp.typeName() + "SingleBandViewController";
+            return m_img->typeName() + "SingleBandViewController";
         }
     
         /**
@@ -170,8 +169,7 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
          */
         QString typeName() const
         {
-            Image<T> temp;
-            return temp.typeName() + "RGBViewController";
+            return m_img->typeName() + "RGBViewController";
         }
     
         /**

@@ -63,6 +63,7 @@ class StringParameter;
 class LongStringParameter;
 class PointParameter;
 class PointFParameter;
+class Environment;
 
 /**
  * This is the base class of all objects we are working
@@ -94,7 +95,7 @@ class GRAIPE_CORE_EXPORT Model
         /**
          * Default/empty contructor of the Model class
          */
-        Model();
+        Model(Environment* env);
     
         /**
          * Copy contructor of the Model class
@@ -141,6 +142,17 @@ class GRAIPE_CORE_EXPORT Model
          */
         virtual void setName(const QString & new_name);
 	
+    
+        /**
+         * Accessor for the Environment of a serializable
+         *
+         * \return The pointer to the environment.
+         */
+        virtual Environment* environment()
+        {
+            return m_environment;
+        }
+    
         /**
          * Const accessor for the model description QString. 
          *
@@ -454,6 +466,9 @@ class GRAIPE_CORE_EXPORT Model
     
         //A group for collecting all
         ParameterGroup      * m_parameters;
+    
+        //The models environment
+        Environment * m_environment;
 
     private:
         //keeping track of the locks
@@ -472,7 +487,7 @@ class GRAIPE_CORE_EXPORT RasteredModel
         /**
          * Default/empty contructor of the RasteredModel class.
          */
-        RasteredModel();
+        RasteredModel(Environment* env);
     
         /**
          * Copy contructor of the RasteredModel class.

@@ -107,7 +107,7 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
 	connect(m_model,      SIGNAL(modelChanged()), this, SLOT(updateView()));
     
     //Add to global viewControllers list
-    viewControllers.push_back(this);
+    model->environment()->viewControllers.push_back(this);
 }
 
 /**
@@ -119,7 +119,11 @@ ViewController::~ViewController()
     delete m_parameters;
     
     //Remove from global viewControllers list
-    viewControllers.erase(std::remove(viewControllers.begin(), viewControllers.end(), this), viewControllers.end());
+    model()->environment()->viewControllers.erase(
+        std::remove(model()->environment()->viewControllers.begin(),
+                    model()->environment()->viewControllers.end(),
+                    this),
+        model()->environment()->viewControllers.end());
 }
 
 /**

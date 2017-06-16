@@ -54,8 +54,9 @@ namespace graipe {
  * allow the further classes to derive the result types before the
  * algorithm's run.
  */
-Algorithm::Algorithm()
-    : m_parameters(new ParameterGroup)
+Algorithm::Algorithm(Environment* env)
+:   m_parameters(new ParameterGroup),
+    m_environment(env)
 {
 }
 

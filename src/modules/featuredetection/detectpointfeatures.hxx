@@ -64,10 +64,12 @@ namespace graipe {
  *         The pixels value.
  */
 template <class T>
-WeightedPointFeatureList2D* detectFeaturesUsingThreshold(const vigra::MultiArrayView<2,T>& src, T lower, T upper)
+WeightedPointFeatureList2D* detectFeaturesUsingThreshold(const vigra::MultiArrayView<2,T>& src,
+                                                            T lower, T upper,
+                                                            Environment * env)
 {
 	
-	WeightedPointFeatureList2D* featureList = new WeightedPointFeatureList2D;
+	WeightedPointFeatureList2D* featureList = new WeightedPointFeatureList2D(env);
 	
 	for(int y=0; y<src.height(); ++y)
 	{
@@ -100,11 +102,12 @@ WeightedPointFeatureList2D* detectFeaturesUsingThreshold(const vigra::MultiArray
 template <	class T, class M>
 WeightedPointFeatureList2D* detectFeaturesUsingThresholdWithMask(const vigra::MultiArrayView<2,T> & src,
                                                                  const vigra::MultiArrayView<2,M> & mask,
-                                                                 T lower, T upper)
+                                                                 T lower, T upper,
+                                                                 Environment * env)
 {
     vigra_precondition( src.shape() == mask.shape(), "mask and source shapes differ!");
     
-	WeightedPointFeatureList2D* featureList = new WeightedPointFeatureList2D;
+	WeightedPointFeatureList2D* featureList = new WeightedPointFeatureList2D(env);
 	
 	for(int y=0; y<src.height(); ++y)
 	{
@@ -167,12 +170,15 @@ void monotony_operator(const vigra::MultiArrayView<2,T> & src, vigra::MultiArray
  *         above thresholds. The weight is defined as the monotony class.
  */
 template <class T>
-WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperator(const vigra::MultiArrayView<2,T>& src, unsigned char lowest_level, unsigned char highest_level, unsigned int monotony_offset=1)
+WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperator(const vigra::MultiArrayView<2,T>& src,
+                                                                unsigned char lowest_level, unsigned char highest_level,
+                                                                unsigned int monotony_offset,
+                                                                Environment * env)
 {
 	vigra::MultiArray<2,unsigned char> monotony_img(src.shape());
 	monotony_operator(src, monotony_img, monotony_offset);
 
-	return detectFeaturesUsingThreshold(monotony_img, lowest_level, highest_level);
+	return detectFeaturesUsingThreshold(monotony_img, lowest_level, highest_level, env);
 }
 
 /** 
@@ -192,14 +198,17 @@ WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperator(const vigra::Mul
 template <	class T, class M>
 WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperatorWithMask(const vigra::MultiArrayView<2,T>& src, const vigra::MultiArrayView<2,M>& mask,
                                                                         unsigned char lowest_level, unsigned char highest_level,
-																		unsigned int monotony_offset=1)
+																		unsigned int monotony_offset,
+                                                                        Environment * env)
 {
     vigra_precondition( src.shape() == mask.shape(), "mask and source shapes differ!");
     
 	vigra::MultiArray<2,unsigned char> monotony_img(src.shape());
 	monotony_operator(src, monotony_img, monotony_offset);
 	
-	return detectFeaturesUsingThresholdWithMask(monotony_img, mask,	lowest_level, highest_level);
+	return detectFeaturesUsingThresholdWithMask(monotony_img, mask,
+                                                lowest_level, highest_level,
+                                                env);
 }
 
 
@@ -217,7 +226,10 @@ WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperatorWithMask(const vi
  *         with reponses above the given threshold.
  */
 template <class T>
-WeightedPointFeatureList2D* detectFeaturesUsingHarris(const vigra::MultiArrayView<2,T>& src, double scale, double threshold = 0)
+WeightedPointFeatureList2D* detectFeaturesUsingHarris(const vigra::MultiArrayView<2,T>& src,
+                                                        double scale,
+                                                        double threshold,
+                                                        Environment * env)
 {
     vigra::MultiArray<2,float>cornerResponse(src.shape());
 	vigra::MultiArray<2,unsigned char> filteredResponse(src.shape());
@@ -228,7 +240,7 @@ WeightedPointFeatureList2D* detectFeaturesUsingHarris(const vigra::MultiArrayVie
     // find local maxima of corner response
     vigra::localMaxima(cornerResponse, filteredResponse);
 	
-	WeightedPointFeatureList2D* new_featurelist = new WeightedPointFeatureList2D;
+	WeightedPointFeatureList2D* new_featurelist = new WeightedPointFeatureList2D(env);
 	
     // sample grid on img1 and try to add ctrl points
     for (int y=0; y < src.height(); y++ )
@@ -262,7 +274,10 @@ WeightedPointFeatureList2D* detectFeaturesUsingHarris(const vigra::MultiArrayVie
  *         with reponses above the given threshold and under the mask.
  */
 template <class T, class M>
-WeightedPointFeatureList2D* detectFeaturesUsingHarrisWithMask(const vigra::MultiArrayView<2,T>& src, const vigra::MultiArrayView<2,M>& mask, double scale, double threshold = 0)
+WeightedPointFeatureList2D* detectFeaturesUsingHarrisWithMask(const vigra::MultiArrayView<2,T>& src,
+                                                              const vigra::MultiArrayView<2,M>& mask,
+                                                              double scale, double threshold,
+                                                              Environment * env)
 {
     vigra_precondition( src.shape() == mask.shape(), "mask and source shapes differ!");
     
@@ -275,7 +290,7 @@ WeightedPointFeatureList2D* detectFeaturesUsingHarrisWithMask(const vigra::Multi
     // find local maxima of corner response
     vigra::localMaxima(cornerResponse, filteredResponse);
 	
-	WeightedPointFeatureList2D* new_featurelist = new WeightedPointFeatureList2D;
+	WeightedPointFeatureList2D* new_featurelist = new WeightedPointFeatureList2D(env);
 	
     // sample grid on img1 and try to add ctrl points
     for (int y=0; y < src.height(); y++ )
@@ -311,7 +326,9 @@ WeightedPointFeatureList2D* detectFeaturesUsingHarrisWithMask(const vigra::Multi
  * \return Edgel point featurelist. The list of all found canny edgels at given scale over the threshold.
  */
 template <class T>
-EdgelFeatureList2D* detectFeaturesUsingCanny(const vigra::MultiArrayView<2,T>& src, double scale, double threshold=0.0)
+EdgelFeatureList2D* detectFeaturesUsingCanny(const vigra::MultiArrayView<2,T>& src,
+                                             double scale, double threshold,
+                                             Environment * env)
 {
 	// empty edgel list
     std::vector<vigra::Edgel> v_edgels;
@@ -319,7 +336,7 @@ EdgelFeatureList2D* detectFeaturesUsingCanny(const vigra::MultiArrayView<2,T>& s
 	// find edgels at scale
     vigra::cannyEdgelListThreshold(src, v_edgels, scale, threshold);
 	
-    EdgelFeatureList2D* edgels = new EdgelFeatureList2D;
+    EdgelFeatureList2D* edgels = new EdgelFeatureList2D(env);
 	
 	for(auto e : v_edgels)
 	{
@@ -342,7 +359,10 @@ EdgelFeatureList2D* detectFeaturesUsingCanny(const vigra::MultiArrayView<2,T>& s
  * \return Edgel point featurelist. The list of all found canny edgels at given scale over the threshold.
  */
 template <class T, class M>
-EdgelFeatureList2D* detectFeaturesUsingCannyWithMask(const vigra::MultiArrayView<2,T>& src,const vigra::MultiArrayView<2,M>& mask, double scale, double threshold=0.0)
+EdgelFeatureList2D* detectFeaturesUsingCannyWithMask(const vigra::MultiArrayView<2,T>& src,
+                                                     const vigra::MultiArrayView<2,M>& mask,
+                                                     double scale, double threshold,
+                                                     Environment * env)
 {
 	// empty edgel list
     std::vector<vigra::Edgel> v_edgels;
@@ -350,7 +370,7 @@ EdgelFeatureList2D* detectFeaturesUsingCannyWithMask(const vigra::MultiArrayView
 	// find edgels at scale
     vigra::cannyEdgelListThreshold(src, v_edgels, scale, threshold);
 	
-    EdgelFeatureList2D* edgels = new EdgelFeatureList2D;
+    EdgelFeatureList2D* edgels = new EdgelFeatureList2D(env);
 	
 	for(auto e : v_edgels)
 	{

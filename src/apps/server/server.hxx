@@ -38,6 +38,7 @@
 
 #include <QStringList>
 #include <QTcpServer>
+#include "core/globals.hxx"
 
 namespace graipe {
 
@@ -47,13 +48,15 @@ class Server
     Q_OBJECT
 
 public:
-    Server(QObject *parent = 0);
+    Server(Environment* env, QObject *parent = NULL);
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
 
 private:
     QVector<QString> m_registered_users;
+    QMutex m_global_mutex;
+    Environment* m_environment;
 };
 
 } //namespace graipe

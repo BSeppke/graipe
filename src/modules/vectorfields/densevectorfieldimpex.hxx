@@ -80,7 +80,7 @@ class DenseVectorfieldImporter
         /**
          * Default constructor for the dense vectorfield importer class.
          */
-        DenseVectorfieldImporter();
+        DenseVectorfieldImporter(Environment* env);
     
         QString typeName() const
         {
@@ -106,7 +106,7 @@ class DenseVectorfieldExporter
         /**
          * Default constructor for the dense vectorfield exporter class.
          */
-        DenseVectorfieldExporter();
+        DenseVectorfieldExporter(Environment* env);
     
         QString typeName() const
         {

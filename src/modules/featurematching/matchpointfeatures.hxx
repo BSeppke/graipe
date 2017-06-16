@@ -109,7 +109,7 @@ public:
 template <class T1, class T2, class MatchingFunctor>
 SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayView<2,T1>& src1,
                                                        const vigra::MultiArrayView<2,T2>& src2,
-                                                       PointFeatureList2D const & features,
+                                                       PointFeatureList2D features,
                                                        MatchingFunctor &  func,
                                                        unsigned int mask_width, unsigned int mask_height,
                                                        unsigned int max_distance,
@@ -153,7 +153,7 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
 	MultiArray<2,float>	result(result_w, result_h);
 	
 	//Create resulting vectorfield
-	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D;
+	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(features.environment());
 	
 	
 	for(unsigned int i=0 ; i < features.size(); ++i)
@@ -399,8 +399,8 @@ class CorrelationFunctor
 template <class T1, class T2, class MatchingFunctor>
 SparseWeightedMultiVectorfield2D* matchFeaturesToFeatures(const vigra::MultiArrayView<2,T1> & src1,
                                                           const vigra::MultiArrayView<2,T2> & src2,
-                                                          PointFeatureList2D const & s1_features,
-                                                          PointFeatureList2D const & s2_features,
+                                                          PointFeatureList2D & s1_features,
+                                                          PointFeatureList2D & s2_features,
                                                           MatchingFunctor & func,
                                                           unsigned int mask_width, unsigned int mask_height,
                                                           unsigned int max_distance,
@@ -438,7 +438,7 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeatures(const vigra::MultiArra
 	used_max_distance = max(1,int(0.5 + max_distance - sqrt(mat(0,2)*mat(0,2) + mat(1,2)*mat(1,2))));
 	
 	//Create resulting vectorfield
-	SparseWeightedMultiVectorfield2D*  result_vf = new SparseWeightedMultiVectorfield2D;
+	SparseWeightedMultiVectorfield2D*  result_vf = new SparseWeightedMultiVectorfield2D(s1_features.environment());
 		
 	for(unsigned int i=0 ; i < s1_features.size(); ++i)
 	{ 
@@ -630,8 +630,8 @@ double shapecontext_cc(const vigra::MultiArray<2, T1> & src1, const vigra::Multi
 template <class T1, class T2>
 SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const vigra::MultiArrayView<2,T1>& src1,
                                                                            const vigra::MultiArrayView<2,T2>& src2,
-                                                                           PointFeatureList2D const & s1_features,
-                                                                           PointFeatureList2D const & s2_features,
+                                                                           PointFeatureList2D & s1_features,
+                                                                           PointFeatureList2D & s2_features,
                                                                            unsigned int mask_width, unsigned int mask_height,
                                                                            unsigned int max_distance,
                                                                            unsigned int n_candidates,
@@ -660,7 +660,7 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const
 	
 	
 	//Create resulting vectorfield
-	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D;
+	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(s1_features.environment());
 	
 	unsigned int max_radius = max(mask_width,mask_height)/2.0,
 			     angle_bins = 8;

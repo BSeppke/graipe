@@ -56,21 +56,20 @@ namespace graipe {
  * \param name           The name (label) of this parameter.
  * \param allowed_models A vector containing all currently available models.
  * \param type_filter    A QString to restrict the model list to certain model types.
- * \param value          The initial value of this parameter.
  * \param parent         If given (!= NULL), this parameter has a parent and will
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* value, Parameter* parent, bool invert_parent)
-:   Parameter(name, parent, invert_parent),
+ModelParameter::ModelParameter(const QString &name, QString type_filter, Parameter* parent, bool invert_parent, Environment* env)
+:   Parameter(name, parent, invert_parent, env),
     m_delegate(NULL),
     m_type_filter(type_filter)
 {
-    if(models.size())
+    if(env!= NULL && env->models.size())
 	{
 		m_allowed_values.clear();
 		
-		for(Model * model: models)
+		for(Model * model: env->models)
 		{
 			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
 			{
@@ -78,11 +77,7 @@ ModelParameter::ModelParameter(const QString &name, QString type_filter, Model* 
 			}
 		}
 	}
-    if(value != NULL)
-    {
-        setValue(value);
-    }
-    else if(m_allowed_values.size() != 0)
+    if(m_allowed_values.size() != 0)
     {
         setValue(m_allowed_values.front());
     }

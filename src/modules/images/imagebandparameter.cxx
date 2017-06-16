@@ -46,8 +46,8 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent)
-:	Parameter(name, parent, invert_parent),
+ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Environment* env)
+:	Parameter(name, parent, invert_parent, env),
     m_delegate(NULL),
 	m_cmbImage(NULL),
 	m_spbBand(NULL)
@@ -138,21 +138,21 @@ void ImageBandParameterBase::initConnections()
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
 template <class T>
-ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool invert_parent)
-:	ImageBandParameterBase(name, parent, invert_parent),
+ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Environment* env)
+:	ImageBandParameterBase(name, parent, invert_parent,env),
     m_image(NULL),
     m_bandId(0)
 {
-    if(models.size())
+    if(env->models.size())
     {
         m_allowed_images.clear();
         
-        Image<T> * img = new Image<T>;
+        Image<T> * img = new Image<T>(env);
         QString typeName = img->typeName();
         delete img;
         img=NULL;
         
-        for(Model* model : models)
+        for(Model* model :env->models )
         {
             if(model->typeName() ==typeName)
             {

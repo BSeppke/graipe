@@ -72,8 +72,8 @@ namespace graipe {
 template <class T1, class T2>
 SparseWeightedMultiVectorfield2D* matchSIFTFeaturesUsingDistance(const vigra::MultiArrayView<2,T1> & src1,
                                                                  const vigra::MultiArrayView<2,T2> & src2,
-                                                                 const SIFTFeatureList2D& points1,
-                                                                 const SIFTFeatureList2D& points2,
+                                                                 SIFTFeatureList2D& points1,
+                                                                 SIFTFeatureList2D& points2,
                                                                  float max_descr_dist,
                                                                  float max_geo_dist,
                                                                  unsigned int n_candidates,
@@ -101,7 +101,7 @@ SparseWeightedMultiVectorfield2D* matchSIFTFeaturesUsingDistance(const vigra::Mu
     used_max_distance = max(1, int(0.5 + max_geo_dist - sqrt(mat(0,2)*mat(0,2) + mat(1,2)*mat(1,2))));
     
     //Create resulting vectorfield
-    SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D;
+    SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(points1.environment());
     
     for(unsigned int i=0; i<points1.size(); i++)
     {

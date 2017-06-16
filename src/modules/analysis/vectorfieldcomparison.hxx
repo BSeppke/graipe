@@ -233,9 +233,12 @@ class AverageVelocityErrorFunctor
  * \return A weighted point list containing the comparision results for each vector of vf.
  */
 template <int SPLINE_ORDER>
-WeightedPointFeatureList2D* compareVectorfieldToDenseModel(const Vectorfield2D* vf, const DenseVectorfield2D* reference_vf, VectorDirectionErrorFunctor& error_measure, QString & report)
+WeightedPointFeatureList2D* compareVectorfieldToDenseModel(Vectorfield2D* vf,
+                                                           DenseVectorfield2D* reference_vf,
+                                                           VectorDirectionErrorFunctor& error_measure,
+                                                           QString & report)
 {
-	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D; 
+	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D(vf->environment());
 	
 	double error=0, error2=0;
 	double single_error;
@@ -315,9 +318,13 @@ WeightedPointFeatureList2D* compareVectorfieldToDenseModel(const Vectorfield2D* 
  * \param report The reference to a QString, in which the report will be stored.
  * \return A weighted point list containing the comparision results for each vector of vf.
  */
-WeightedPointFeatureList2D* compareVectorfieldsGeneric( const Vectorfield2D* vf, const Vectorfield2D* reference_vf, unsigned int n_nearest_neighbors, VectorDirectionErrorFunctor& error_measure, QString & report)
+WeightedPointFeatureList2D* compareVectorfieldsGeneric( Vectorfield2D* vf,
+                                                        const Vectorfield2D* reference_vf,
+                                                        unsigned int n_nearest_neighbors,
+                                                        VectorDirectionErrorFunctor& error_measure,
+                                                        QString & report)
 {
-	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D;
+	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D(vf->environment());
 	
 	double error=0, error2=0;
 	double single_error;

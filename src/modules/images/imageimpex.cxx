@@ -563,9 +563,10 @@ template bool ImageImpex::exportImage<unsigned char>(const Image<unsigned char>&
 /**
  * Default constructor for the image importer class.
  */
-ImageImporter::ImageImporter()
-:  m_filename(new FilenameParameter("Image filename", "", NULL)),
-   m_pixeltype(NULL)
+ImageImporter::ImageImporter(Environment* env)
+:   Algorithm(env),
+    m_filename(new FilenameParameter("Image filename", "", NULL)),
+    m_pixeltype(NULL)
 {
     m_parameters->addParameter("filename", m_filename);
     
@@ -575,7 +576,7 @@ ImageImporter::ImageImporter()
 		types.append("unsigned char");
     m_pixeltype = new EnumParameter("Image pixel type:",types,0);
     m_parameters->addParameter("pixeltype",m_pixeltype);
-    m_results.push_back(new Image<float>);
+    m_results.push_back(new Image<float>(env));
     
     connect(m_pixeltype, SIGNAL(valueChanged()), this, SLOT(pixelTypeChanged()));
 }
@@ -636,13 +637,13 @@ void ImageImporter::pixelTypeChanged()
     switch(m_pixeltype->value())
     {
         case 0:
-            m_results.push_back(new Image<float>);
+            m_results.push_back(new Image<float>(m_environment));
             break;
         case 1:
-            m_results.push_back(new Image<int>);
+            m_results.push_back(new Image<int>(m_environment));
             break;
         case 2:
-            m_results.push_back(new Image<unsigned char>);
+            m_results.push_back(new Image<unsigned char>(m_environment));
             break;
     }
 }
@@ -650,14 +651,15 @@ void ImageImporter::pixelTypeChanged()
 /**
  * Default constructor for the image exporter class.
  */
-ImageExporter::ImageExporter()
+ImageExporter::ImageExporter(Environment * env)
+: Algorithm(env)
 {
 	QStringList format_names;
 		format_names.append("GIF"); format_names.append("GTiff");
 		format_names.append("JPEG"); format_names.append("netCDF");
 		format_names.append("PNG"); format_names.append("XYZ");
 
-    m_parameters->addParameter("image", new ModelParameter("Image",	"Image, IntImage, ByteImage"));
+    m_parameters->addParameter("image", new ModelParameter("Image",	"Image, IntImage, ByteImage", NULL, false, env));
     m_parameters->addParameter("filename", new FilenameParameter("Image filename", "", NULL));
     m_parameters->addParameter("format", new EnumParameter("File format", format_names));
 }
