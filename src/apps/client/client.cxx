@@ -53,11 +53,9 @@ Client::Client(QWidget *parent)
     m_btnLogin(new QPushButton(tr("Login"))),
     m_btnSend(new QPushButton(tr("Send Request"))),
     m_tcpSocket(new QTcpSocket(this)),
-    m_algSignalMapper(new QSignalMapper)
+    m_algSignalMapper(new QSignalMapper),
+    m_environment(new Environment(true))
 {
-    //init graipe
-    QString report;
-    m_environment = loadModules(report);
     Impex::loadModel(m_lneRequest->text(), m_environment);
     
     menuBar();

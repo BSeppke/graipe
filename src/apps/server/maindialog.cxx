@@ -49,9 +49,7 @@ MainDialog::MainDialog(QWidget *parent)
 :   QWidget(parent),
     m_server(NULL)
 {
-
-    QString report;
-    Environment* env = graipe::loadModules(report);
+    Environment* env = new Environment(true);
     
     QLabel* lblStatus = new QLabel;
     lblStatus->setWordWrap(true);
@@ -102,7 +100,7 @@ MainDialog::MainDialog(QWidget *parent)
     
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(lblStatus);
-    mainLayout->addWidget(new QTextEdit(report));
+    mainLayout->addWidget(new QTextEdit(env->status));
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
     setWindowTitle(tr("Threaded Graipe Server"));

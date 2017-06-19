@@ -38,9 +38,12 @@
 
 #include "core/factories.hxx"
 #include "core/model.hxx"
+#include "core/module.hxx"
 #include "core/viewcontroller.hxx"
 
 #include <QDir>
+#include <QCoreApplication>
+#include <QLibrary>
 
 #include <vector>
 
@@ -53,12 +56,39 @@
  
 namespace graipe {
 
-GRAIPE_CORE_EXPORT Environment* loadModules(QString& report);
-GRAIPE_CORE_EXPORT Environment* loadModules(const QDir & current_dir, QString& report);
-
-class Environment
+class GRAIPE_CORE_EXPORT Environment
 {
     public:
+        /**
+         * Constructor: Creates an empty environment
+         * or auto-loads all modules, that are in same dir as the core-module.
+         * Calls loadModules with different paths:
+         * Under Mac OS at the place of the executable file (not the app-Bundle) and at
+         * the location of the .app-bundle.
+         *
+         * \param auto_load If true, it will auto-load all modules. False by default
+         */
+        Environment(bool auto_load=false);
+        /**
+         * Find all available modules in a directory and fill the corresponding registries with their
+         * contributions. SymLinks are not loaded to avoid double loading. Updates the report
+         * property of this class.
+         *
+         * \param dir The directory to search for modules.
+         */
+        void loadModules(QDir dir);
+
+        /**
+         * Load one module and fill the corresponding registries with its contributions.
+         * Also (incrementally updates the report property of this class.
+         *
+         * \param file The filename of the module.
+         */
+        void loadModule(QString file);
+    
+        //One status/report string
+        QString status;
+    
         //One global algorithm mutex:
         QMutex global_algorithm_mutex;
 
@@ -71,8 +101,6 @@ class Environment
         std::vector<Model*> models;
         std::vector<ViewController*> viewControllers;
 };
-
-//extern Environment * environment;
 
 }//end of namespace graipe
 

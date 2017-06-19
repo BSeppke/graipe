@@ -67,7 +67,8 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	m_algSignalMapper(new QSignalMapper),
 	m_status_window(new StatusWindow),
     m_lblMemoryUsage(new QLabel("(Memory: 0 MB, max: 0 MB)")),
-    m_recentFileCount(10)
+    m_recentFileCount(10),
+    m_environment(new Environment(true))
 {	
     m_ui.setupUi(this);
 	
@@ -1396,10 +1397,7 @@ void MainWindow::loadModel(const QString& filename)
  */
 void MainWindow::initializeFactories()
 {
-    //Use the graipe::core function to find and load all modules into the global factories:
-    QString report;
-    m_environment = graipe::loadModules(report);
-    m_status_window->updateStatus(report);
+    m_status_window->updateStatus(m_environment->status);
     
     //Connect the model factory to the GUI
     unsigned int i=0;
