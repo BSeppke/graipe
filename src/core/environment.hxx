@@ -69,6 +69,20 @@ class GRAIPE_CORE_EXPORT Environment
          * \param auto_load If true, it will auto-load all modules. False by default
          */
         Environment(bool auto_load=false);
+        
+        /**
+         * Copy Constructor: Creates an environment from another one.
+         * This contructor copies all the data from the environment, but uses the same
+         * (identical factories). If you want to have new Factories, you need to set the 
+         * reload_factories flag to true, or call loadModules() after the copy.
+         * This will return a clean-copy version, without other's models and viewControllers.
+         *
+         * \param reload_factories If true, it reload all modules and thus use new factories.
+         *                         Else, it will use the other environment's factories.
+         *                         False by default
+         */
+        Environment(const Environment& env, bool reload_factories=false);
+
         /**
          * Find all available modules in a directory and fill the corresponding registries with their
          * contributions. SymLinks are not loaded to avoid double loading. Updates the report

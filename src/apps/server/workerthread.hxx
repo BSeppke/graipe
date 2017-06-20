@@ -50,7 +50,7 @@ class WorkerThread
     Q_OBJECT
 
     public:
-        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QMutex* mutex, Environment* env, QObject *parent);
+        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, Environment* env, QObject *parent);
         void run() override;
 
     protected slots:
@@ -75,8 +75,6 @@ class WorkerThread
                      //  1 : busy (waiting for data to be received)
         int m_expected_bytes; //in case state==1 - how many bytes do we want to receive
         QByteArray m_buffer;
-    
-        QMutex* m_mutex;
     
         Environment * m_environment;
 };

@@ -43,16 +43,18 @@
 
 namespace graipe {
 
-WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, QMutex* mutex, Environment* env, QObject *parent)
+WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, Environment* env, QObject *parent)
 :   QThread(parent),
     m_socketDescriptor(socketDescriptor),
     m_tcpSocket(NULL),
     m_registered_users(registered_users),
     m_state(-1),
     m_expected_bytes(0),
-    m_mutex(mutex),
-    m_environment(env)
+    m_environment(new Environment(*env))
 {
+    qDebug()    << "Server knows factories: models " << m_environment->modelFactory.size()
+                << ", ViewControllers: " << m_environment->viewControllerFactory.size()
+                << ", algorithms: " << m_environment->algorithmFactory.size();
 }
 
 void WorkerThread::run()
@@ -173,7 +175,8 @@ void WorkerThread::readyRead()
 void WorkerThread::disconnected()
 {
     qDebug() << m_socketDescriptor << "--- disconnected";
-
+    
+    delete m_environment;
     m_tcpSocket->deleteLater();
     exit(0);
 }
@@ -198,9 +201,9 @@ void WorkerThread::readModel()
         
         QXmlStreamReader xmlReader(in_compressor);
         
-        m_mutex->lock();
+        m_environment->global_algorithm_mutex.lock();
         Model* new_model = Impex::loadModel(xmlReader, m_environment);
-        m_mutex->unlock();
+        m_environment->global_algorithm_mutex.unlock();
         
         if(new_model == NULL)
         {

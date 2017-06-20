@@ -66,7 +66,7 @@ void Server::incomingConnection(qintptr socketDescriptor)
 {
     qDebug("New incoming connection");
     
-    WorkerThread *thread = new WorkerThread(socketDescriptor, m_registered_users, &m_global_mutex, m_environment, this);
+    WorkerThread *thread = new WorkerThread(socketDescriptor, m_registered_users, m_environment, this);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
 }

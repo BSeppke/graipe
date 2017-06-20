@@ -79,6 +79,41 @@ Environment::Environment(bool auto_load)
 }
 
 /**
+ * Copy Constructor: Creates an environment from another one.
+ * This contructor copies all the data from the environment, but uses the same
+ * (identical factories). If you want to have new Factories, you need to set the 
+ * reload_factories flag to true, or call loadModules() after the copy.
+ * This will return a clean-copy version, without other's models and viewControllers.
+ *
+ * \param reload_factories If true, it reload all modules and thus use new factories.
+ *                         Else, it will use the other environment's factories.
+ *                         False by default
+ */
+Environment::Environment(const Environment& env, bool reload_factories)
+: status(env.status),
+  modelFactory(env.modelFactory),
+  viewControllerFactory(env.viewControllerFactory),
+  algorithmFactory(env.algorithmFactory)
+{
+    if(reload_factories)
+    {
+        //search paths for modules:
+        QDir current_dir = QCoreApplication::applicationDirPath();
+
+        //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
+        //     Graipe.app/Contents/MacOS
+        loadModules(QCoreApplication::applicationDirPath());
+
+        //Since this only works after deploying the app, we will also search at the level of the .app directory
+        //for loadable modules, iff we found none so far
+        if(status.isEmpty())
+        {
+            loadModules(QDir::current());
+        }
+    }
+}
+
+/**
  * Find all available modules in a directory and fill the corresponding registries with their
  * contributions. SymLinks are not loaded to avoid double loading. Updates the report
  * property of this class.
