@@ -28,6 +28,12 @@ IF(APPLE)
 ENDIF(APPLE)
 
 #--------------------------------------------------------------------------------
+# For Apple set the icns file containing icons
+IF(WIN32)    
+  set(SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/icon/graipe.rc ${SOURCES})
+ENDIF(WIN32)
+
+#--------------------------------------------------------------------------------
 #  CMake's way of creating an executable
 add_executable(Graipe MACOSX_BUNDLE WIN32 ${SOURCES} ${UI_FILES} ${HEADERS})
 
