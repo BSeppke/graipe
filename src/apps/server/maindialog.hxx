@@ -53,9 +53,12 @@ public:
 
 public slots:
     void updateClientStatus();
+    void updateLog();
 
 private:
     QLabel* m_lblClientStatus;
+    QTextEdit* m_txtLog;
+    
     QPushButton *m_btnQuit;
     
     Server* m_server;

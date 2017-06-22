@@ -66,6 +66,24 @@ Logging* Logging::logger()
     }
     return m_this;
 }
+
+/**
+ * Replaces the constructor by means of the Singleton design pattern (static)
+ *
+ * \return a new logger, if non existed before, else, the old one
+ */
+Logging* Logging::logger(QString filename)
+{
+    if (m_this == NULL)
+    {
+        m_this = new Logging(filename);
+    }
+    if (m_this->m_file != NULL && m_this->m_file->fileName() != filename)
+    {
+        m_this = new Logging(filename);
+    }
+    return m_this;
+}
  
 /**
  * Returns the currently used filename (static)
@@ -128,7 +146,24 @@ Logging::Logging()
     {
         m_textStream = new QTextStream(m_file);
     }
-    qInfo() << "Starting log session";
+}
+/**
+ * Default constructor for the Logging class (protected)
+ */
+Logging::Logging(QString filename)
+: m_file(NULL),
+  m_textStream(NULL)
+{
+    //Initialize static this pointer
+    m_this = this;
+    
+    //2. Assign class memebers
+    m_file = new QFile(filename);
+    
+    if(m_file->open(QIODevice::WriteOnly | QIODevice::Append))
+    {
+        m_textStream = new QTextStream(m_file);
+    }
 }
 
 /**

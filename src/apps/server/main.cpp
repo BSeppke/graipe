@@ -47,6 +47,15 @@
 
 int main(int argc, char *argv[])
 {
+    //Set the filename for the logger:
+    graipe::Logging::logger(QDir::homePath() + "/.graipe/graipeserver.log");
+    
+    //Install thes logger's message handler
+    qInstallMessageHandler(&graipe::Logging::messageHandler);
+    
+    //Start log
+    qInfo() << "Starting log session";
+    
     qRegisterMetaType<qintptr>("qintptr");
     
     QApplication app(argc, argv);

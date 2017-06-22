@@ -48,9 +48,15 @@
  * \return 0, if nothing went wrong. Else: Anything else.
  */
 int main(int argc, char** argv)
-{    
+{
+    //Initialize logger:
+    graipe::Logging::logger(QDir::homePath() + "/.graipe/graipe.log");
+    
     //Install thes logger's message handler
     qInstallMessageHandler(&graipe::Logging::messageHandler);
+    
+    //Start log
+    qInfo() << "Starting log session";
     
     QApplication app(argc,argv);
 

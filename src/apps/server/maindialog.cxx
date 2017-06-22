@@ -105,12 +105,21 @@ MainDialog::MainDialog(QWidget *parent)
     buttonLayout->addWidget(m_btnQuit);
     buttonLayout->addStretch(1);
     
+    m_txtLog = new QTextEdit("");
+    m_txtLog->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    
     QGridLayout *mainLayout = new QGridLayout;
     
     mainLayout->addWidget(lblServerStatus,0,0,1,1);
     mainLayout->addWidget(m_lblClientStatus,0,1,1,1);
     mainLayout->addWidget(new QTextEdit(env->status),1,0,1,2);
-    mainLayout->addLayout(buttonLayout,2,0,1,2);
+    mainLayout->addWidget(new QLabel("Log:"),2,0,1,2);
+    mainLayout->addWidget(m_txtLog,3,0,1,2);
+    mainLayout->addLayout(buttonLayout,4,0,1,2);
+    
+    QTimer* timer = new QTimer;
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateLog()));
+    timer->start(2000);
     
     setLayout(mainLayout);
     setWindowTitle(tr("Threaded Graipe Server"));
@@ -140,6 +149,25 @@ void MainDialog::updateClientStatus()
     }
     
     m_lblClientStatus->setText(str);
+}
+
+void MainDialog::updateLog()
+{
+    QFile* f = new QFile(QDir::homePath() + "/.graipe/graipeserver.log");
+    
+    if(f->open(QIODevice::ReadOnly))
+    {
+        QTextStream* t = new QTextStream(f);
+        if(t != NULL)
+        {
+            QString str = t->readAll();
+            m_txtLog->setText(str);
+            m_txtLog->moveCursor(QTextCursor::End);
+            m_txtLog->ensureCursorVisible();
+        }
+        delete t;
+    }
+    delete f;
 }
 
 } //namespace graipe

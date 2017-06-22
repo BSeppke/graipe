@@ -70,6 +70,13 @@ class GRAIPE_CORE_EXPORT Logging
         static Logging* logger();
     
         /**
+         * Replaces the constructor by means of the Singleton design pattern (static)
+         *
+         * \return a new logger, if non existed before, else, the old one
+         */
+        static Logging* logger(QString filename);
+    
+        /**
          * Returns the currently used filename (static)
          *
          * \return The complete path of the used filename
@@ -97,6 +104,11 @@ class GRAIPE_CORE_EXPORT Logging
          * Default constructor for the Logging class (protected)
          */
         Logging();
+    
+        /**
+         * Filename constructor for the Logging class (protected)
+         */
+        Logging(QString filename);
             
         /**
          * Basic message handler for the QtDebug interface (non-static)
