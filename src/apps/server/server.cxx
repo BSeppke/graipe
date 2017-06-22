@@ -62,12 +62,54 @@ Server::Server(Environment* env, QObject *parent)
     m_registered_users.push_back(user2 + ":" + QCryptographicHash::hash(pass2.toLatin1(), QCryptographicHash::Algorithm::Md5).toHex());
 }
 
+QVector<ConnectionInfo> Server::connectionInfo() const
+{
+    return m_connections;
+}
+
+void Server::connectionUserAuth(qintptr socketDescriptor, QString user)
+{
+    for(unsigned int i=0; i!=m_connections.size(); ++i)
+    {
+        if(m_connections[i].socketDescriptor == socketDescriptor)
+        {
+            m_connections[i].user = user;
+    emit statusChanged();
+            break;
+        }
+    }
+    
+}
+
+void Server::connectionTerminated(qintptr socketDescriptor)
+{
+    for(unsigned int i=0; i!=m_connections.size(); ++i)
+    {
+        if(m_connections[i].socketDescriptor == socketDescriptor)
+        {
+            m_connections.remove(i);
+            emit statusChanged();
+            break;
+        }
+    }
+}
+
 void Server::incomingConnection(qintptr socketDescriptor)
 {
-    qDebug("New incoming connection");
+    qDebug() << "New incoming connection for socket:" << socketDescriptor;
     
     WorkerThread *thread = new WorkerThread(socketDescriptor, m_registered_users, m_environment, this);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(connectionUserAuth(qintptr, QString)), this, SLOT(connectionUserAuth(qintptr, QString)));
+    connect(thread, SIGNAL(connectionTerminated(qintptr)), this, SLOT(connectionTerminated(qintptr)));
+    
+    connect(this, SIGNAL(destroyed()), thread, SLOT(deleteLater()));
+    
+    ConnectionInfo ci;
+    ci.socketDescriptor = socketDescriptor;
+    m_connections.push_back(ci);
+    emit statusChanged();
+    
     thread->start();
 }
 

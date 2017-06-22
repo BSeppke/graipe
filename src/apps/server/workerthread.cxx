@@ -95,6 +95,9 @@ void WorkerThread::readyRead()
             {
                 m_state = 0;
                 qDebug() << m_socketDescriptor <<  "--- logged in unsing:" << account;
+                
+                //Tell the server
+                emit connectionUserAuth(m_socketDescriptor, split_data[1]);
             }
         }
     }
@@ -176,6 +179,9 @@ void WorkerThread::disconnected()
 {
     qDebug() << m_socketDescriptor << "--- disconnected";
     
+    //Tell the server
+    emit connectionTerminated(m_socketDescriptor);
+
     delete m_environment;
     m_tcpSocket->deleteLater();
     exit(0);

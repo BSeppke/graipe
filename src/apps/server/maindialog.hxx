@@ -40,6 +40,7 @@
 #include "server.hxx"
 
 class QPushButton;
+class QLabel;
 
 namespace graipe {
 
@@ -50,8 +51,13 @@ class MainDialog : public QWidget
 public:
     MainDialog(QWidget *parent = 0);
 
+public slots:
+    void updateClientStatus();
+
 private:
+    QLabel* m_lblClientStatus;
     QPushButton *m_btnQuit;
+    
     Server* m_server;
 };
 

@@ -51,8 +51,14 @@ MainDialog::MainDialog(QWidget *parent)
 {
     Environment* env = new Environment(true);
     
-    QLabel* lblStatus = new QLabel;
-    lblStatus->setWordWrap(true);
+    QLabel* lblServerStatus = new QLabel;
+    lblServerStatus->setAlignment(Qt::AlignTop);
+    lblServerStatus->setWordWrap(true);
+    
+    m_lblClientStatus = new QLabel;
+    m_lblClientStatus->setText("No connections yet!");
+    m_lblClientStatus->setAlignment(Qt::AlignTop);
+    m_lblClientStatus->setWordWrap(true);
     
     m_btnQuit = new QPushButton(tr("Quit"));
     m_btnQuit->setAutoDefault(false);
@@ -66,6 +72,8 @@ MainDialog::MainDialog(QWidget *parent)
         close();
         return;
     }
+    
+    connect(m_server, SIGNAL(statusChanged()), this, SLOT(updateClientStatus()));
 
     QString ipAddress;
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
@@ -87,8 +95,7 @@ MainDialog::MainDialog(QWidget *parent)
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
     
-    lblStatus->setText(tr("The server is running on\n\nIP: %1\nport: %2\n\n"
-                            "Run the Graipe Client now.\n\nCurrent state:")
+    lblServerStatus->setText(tr("The server is running on\n    IP: %1\n    Port: %2\n")
                          .arg(ipAddress).arg(m_server->serverPort()));
 
     connect(m_btnQuit, SIGNAL(clicked()), this, SLOT(close()));
@@ -98,12 +105,41 @@ MainDialog::MainDialog(QWidget *parent)
     buttonLayout->addWidget(m_btnQuit);
     buttonLayout->addStretch(1);
     
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(lblStatus);
-    mainLayout->addWidget(new QTextEdit(env->status));
-    mainLayout->addLayout(buttonLayout);
+    QGridLayout *mainLayout = new QGridLayout;
+    
+    mainLayout->addWidget(lblServerStatus,0,0,1,1);
+    mainLayout->addWidget(m_lblClientStatus,0,1,1,1);
+    mainLayout->addWidget(new QTextEdit(env->status),1,0,1,2);
+    mainLayout->addLayout(buttonLayout,2,0,1,2);
+    
     setLayout(mainLayout);
     setWindowTitle(tr("Threaded Graipe Server"));
+}
+
+void MainDialog::updateClientStatus()
+{
+    QString str;
+    unsigned int i=0;
+    for(ConnectionInfo ci : m_server->connectionInfo())
+    {
+        i++;
+        if(ci.user.isEmpty())
+        {
+            str += QString("Client %1 on Socket-ID: %2 (not authorized yet)\n").arg(i).arg(ci.socketDescriptor);
+        }
+        else
+        {
+            str += QString("Client %1 on Socket-ID: %2 (authorized as user: %3)\n").arg(i).arg(ci.socketDescriptor).arg(ci.user);
+        
+        }
+    }
+    
+    if(str.isEmpty())
+    {
+        str = "No connections yet!";
+    }
+    
+    m_lblClientStatus->setText(str);
 }
 
 } //namespace graipe

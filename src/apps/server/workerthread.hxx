@@ -63,6 +63,8 @@ class WorkerThread
 
     signals:
         void error(QTcpSocket::SocketError socketError);
+        void connectionUserAuth(qintptr socketDescriptor, QString user);
+        void connectionTerminated(qintptr socketDescriptor);
 
     private:
         int m_socketDescriptor;

@@ -42,6 +42,12 @@
 
 namespace graipe {
 
+struct ConnectionInfo
+{
+    qintptr socketDescriptor;
+    QString user;
+};
+
 class Server
 :   public QTcpServer
 {
@@ -49,14 +55,25 @@ class Server
 
 public:
     Server(Environment* env, QObject *parent = NULL);
+    
+    QVector<ConnectionInfo> connectionInfo() const;
+
+public slots:
+    void connectionUserAuth(qintptr socketDescriptor, QString user);
+    void connectionTerminated(qintptr socketDescriptor);
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
+    
+signals:
+    void statusChanged();
 
 private:
     QVector<QString> m_registered_users;
     QMutex m_global_mutex;
     Environment* m_environment;
+    
+    QVector<ConnectionInfo> m_connections;
 };
 
 } //namespace graipe
