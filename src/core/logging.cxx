@@ -80,6 +80,7 @@ Logging* Logging::logger(QString filename)
     }
     if (m_this->m_file != NULL && m_this->m_file->fileName() != filename)
     {
+        delete m_this;
         m_this = new Logging(filename);
     }
     return m_this;
@@ -176,7 +177,6 @@ Logging::Logging(QString filename)
 void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();
-    
     
     QString txt = QString("[%1] ").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz"));
     

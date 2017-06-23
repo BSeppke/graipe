@@ -106,6 +106,7 @@ MainDialog::MainDialog(QWidget *parent)
     buttonLayout->addStretch(1);
     
     m_txtLog = new QTextEdit("");
+    m_txtLog->setWordWrapMode(QTextOption::NoWrap);
     m_txtLog->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     
     QGridLayout *mainLayout = new QGridLayout;
@@ -153,7 +154,7 @@ void MainDialog::updateClientStatus()
 
 void MainDialog::updateLog()
 {
-    QFile* f = new QFile(QDir::homePath() + "/.graipe/graipeserver.log");
+    QFile* f = new QFile(Logging::filename());
     
     if(f->open(QIODevice::ReadOnly))
     {
@@ -161,9 +162,15 @@ void MainDialog::updateLog()
         if(t != NULL)
         {
             QString str = t->readAll();
-            m_txtLog->setText(str);
-            m_txtLog->moveCursor(QTextCursor::End);
-            m_txtLog->ensureCursorVisible();
+            
+            if(str != m_txtLog->toPlainText())
+            {
+                m_txtLog->setEnabled(false);
+                m_txtLog->setText(str);
+                m_txtLog->moveCursor(QTextCursor::End);
+                m_txtLog->ensureCursorVisible();
+                m_txtLog->setEnabled(true);
+            }
         }
         delete t;
     }
