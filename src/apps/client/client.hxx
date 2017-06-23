@@ -62,13 +62,11 @@ signals:
     void clickedAlgorithm(int);
 
 private slots:
-    void loadAndSendModel();
     void sendModel(Model* m);
     void sendAlgorithm(Algorithm* alg);
     
     void readHandler();
     void displayError(QAbstractSocket::SocketError socketError);
-    void enableSendRequestButton();
     void registerAtServer();
     
     /**
@@ -87,10 +85,8 @@ private:
     QLineEdit *m_lneUser;
     QLineEdit *m_lnePassword;
     
-    QLineEdit *m_lneRequest;
     QLabel *m_lblStatus;
     QPushButton *m_btnLogin;
-    QPushButton *m_btnSend;
 
     QTcpSocket *m_tcpSocket;
     

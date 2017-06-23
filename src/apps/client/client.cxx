@@ -49,14 +49,12 @@ Client::Client(QWidget *parent)
     m_lnePort(new QLineEdit),
     m_lneUser(new QLineEdit),
     m_lnePassword(new QLineEdit),
-    m_lneRequest(new QLineEdit("/Users/seppke/Desktop/Lenna_face.xgz")),
     m_btnLogin(new QPushButton(tr("Login"))),
-    m_btnSend(new QPushButton(tr("Send Request"))),
     m_tcpSocket(new QTcpSocket(this)),
     m_algSignalMapper(new QSignalMapper),
     m_environment(new Environment(true))
 {
-    Impex::loadModel(m_lneRequest->text(), m_environment);
+    Impex::loadModel("/Users/seppke/Desktop/Lenna_face.xgz", m_environment);
     
     menuBar();
     
@@ -66,6 +64,11 @@ Client::Client(QWidget *parent)
     QMenu* mnuExport = mnuFile->addMenu("Export");
     
     QMenu* mnuAlgs = menuBar()->addMenu("Algorithms");
+    
+    
+    
+    
+    
     
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
@@ -153,35 +156,19 @@ Client::Client(QWidget *parent)
     userLabel->setBuddy(m_lneUser);
     QLabel *passwordLabel = new QLabel(tr("&Password:"));
     passwordLabel->setBuddy(m_lnePassword);
-    
-    QLabel *requestLabel = new QLabel(tr("&Request:"));
-    requestLabel->setBuddy(m_lneRequest);
 
     m_lblStatus = new QLabel(tr("This examples requires that you run the "
                                 "Graipe Server example as well."));
-
-    m_btnSend->setDefault(true);
-    m_btnSend->setEnabled(false);
-
     QPushButton *quitButton = new QPushButton(tr("Quit"));
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     buttonBox->addButton(m_btnLogin, QDialogButtonBox::ActionRole);
-    buttonBox->addButton(m_btnSend, QDialogButtonBox::ActionRole);
     buttonBox->addButton(quitButton, QDialogButtonBox::RejectRole);
 
-    connect(m_cmbHost, &QComboBox::editTextChanged,
-            this, &Client::enableSendRequestButton);
-    connect(m_lnePort, &QLineEdit::textChanged,
-            this, &Client::enableSendRequestButton);
-    connect(m_lneRequest, &QLineEdit::textChanged,
-            this, &Client::enableSendRequestButton);
-    connect(m_btnLogin, &QAbstractButton::clicked,
-            this, &Client::registerAtServer);
-    connect(m_btnSend, &QAbstractButton::clicked,
-            this, &Client::loadAndSendModel);
+    connect(m_btnLogin, &QAbstractButton::clicked, this, &Client::registerAtServer);
     connect(quitButton, &QAbstractButton::clicked, this, &QWidget::close);
     connect(m_tcpSocket, &QIODevice::readyRead, this, &Client::readHandler);
+    
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(m_tcpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
             this, &Client::displayError);
@@ -198,33 +185,18 @@ Client::Client(QWidget *parent)
     mainLayout->addWidget(m_lneUser, 2, 1);
     mainLayout->addWidget(passwordLabel, 3, 0);
     mainLayout->addWidget(m_lnePassword, 3, 1);
-    mainLayout->addWidget(requestLabel, 4, 0);
-    mainLayout->addWidget(m_lneRequest, 4, 1);
-    mainLayout->addWidget(m_lblStatus, 5, 0, 1, 2);
-    mainLayout->addWidget(buttonBox, 6, 0, 1, 2);
+    mainLayout->addWidget(m_lblStatus, 4, 0, 1, 2);
+    mainLayout->addWidget(buttonBox, 5, 0, 1, 2);
     
     setWindowTitle(QGuiApplication::applicationDisplayName());
     m_lnePort->setFocus();
 
-    m_lblStatus->setText(tr("This examples requires that you run the "
-                            "Image Server example as well."));
-
-    enableSendRequestButton();
-}
-
-void Client::loadAndSendModel()
-{    
-    Model* model = Impex::loadModel(m_lneRequest->text(), m_environment);
-    
-    if (model != NULL)
-    {
-        sendModel(model);
-    }
+    m_lblStatus->setText(tr("This client requires that you run the "
+                            "GraipeServer as well."));
 }
 
 void Client::sendModel(Model* model)
 {
-    m_btnSend->setEnabled(false);
     QByteArray model_data;
     QBuffer out_buf(&model_data);
     
@@ -266,33 +238,39 @@ void Client::sendModel(Model* model)
     }
     
     m_tcpSocket->waitForReadyRead();
-    
-    m_btnSend->setEnabled(true);
 }
+
 void Client::registerAtServer()
 {
-    m_btnSend->setEnabled(false);
-    m_tcpSocket->abort();
-    m_tcpSocket->connectToHost( m_cmbHost->currentText(),
-                                m_lnePort->text().toInt());
+    m_btnLogin->setEnabled(false);
     
-    m_tcpSocket->waitForConnected();
+    if(m_btnLogin->text() == "Logout")
+    {
+        m_tcpSocket->abort();
+        m_btnLogin->setText("Login");
+        m_lblStatus->setText("Successfully logged out!");
+    }
+    else
+    {
+        m_tcpSocket->connectToHost( m_cmbHost->currentText(),
+                                    m_lnePort->text().toInt());
+        
+        m_tcpSocket->waitForConnected();
+        
+        QString account = m_lneUser->text() + ":" + QCryptographicHash::hash(m_lnePassword->text().toLatin1(), QCryptographicHash::Algorithm::Md5).toHex();
+        QString request1("Login:" + account + "\r\n");
+        
+        qDebug() << "--> " << request1;
+        m_tcpSocket->write(request1.toLatin1());
+        m_tcpSocket->flush();
+        m_tcpSocket->waitForBytesWritten();
+    }
     
-    QString account = m_lneUser->text() + ":" + QCryptographicHash::hash(m_lnePassword->text().toLatin1(), QCryptographicHash::Algorithm::Md5).toHex();
-    QString request1("login:" + account + "\r\n");
-    
-    qDebug() << "--> " << request1;
-    m_tcpSocket->write(request1.toLatin1());
-    m_tcpSocket->flush();
-    m_tcpSocket->waitForBytesWritten();
-    
-    m_btnSend->setEnabled(true);
+    m_btnLogin->setEnabled(true);
 }
 
 void Client::sendAlgorithm(Algorithm* alg)
 {
-    m_btnSend->setEnabled(false);
-
     QByteArray alg_data;
     QBuffer out_buf(&alg_data);
     
@@ -331,7 +309,6 @@ void Client::sendAlgorithm(Algorithm* alg)
     {
         QCoreApplication::processEvents();
     }
-    m_btnSend->setEnabled(true);
 }
 
 void Client::readModel(int bytesToRead)
@@ -401,8 +378,6 @@ void Client::readModel(int bytesToRead)
  */
 void Client::readHandler()
 {
-    m_btnSend->setEnabled(false);
-    
     QString data = QString::fromLatin1(m_tcpSocket->readLine());
     
     qDebug() << "<-- " << data << ".";
@@ -432,10 +407,10 @@ void Client::readHandler()
             
             m_lblStatus->setText("Success!" + data_split[1]);
         }
-        if(message_type == "login" && data_split[1] =="ok")
+        if(message_type == "Login" && data_split[1] =="OK")
         {
             m_lblStatus->setText(QString("Successfully logged in!"));
-            m_btnSend->setEnabled(true);
+            m_btnLogin->setText("Logout");
         }
     }
 }
@@ -463,12 +438,14 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
                                  .arg(m_tcpSocket->errorString()));
     }
 
-    m_btnSend->setEnabled(true);
-}
-
-void Client::enableSendRequestButton()
-{
-    m_btnSend->setEnabled(m_tcpSocket->state() == QTcpSocket::ConnectedState);
+    if (m_tcpSocket->state() == QTcpSocket::ConnectedState)
+    {
+        m_btnLogin->setText("Logout");
+    }
+    else
+    {
+        m_btnLogin->setText("Login");
+    }
 }
 
 /**

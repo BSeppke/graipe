@@ -87,7 +87,7 @@ void WorkerThread::readyRead()
         //Still waiting for login:
         QStringList split_data = QString::fromLatin1(data).trimmed().split(":");
         
-        if( split_data.size() == 3 && split_data[0] == "login")
+        if( split_data.size() == 3 && split_data[0] == "Login")
         {
             QString account =  split_data[1] + ":" + split_data[2];
             
@@ -98,6 +98,11 @@ void WorkerThread::readyRead()
                 
                 //Tell the server
                 emit connectionUserAuth(m_socketDescriptor, split_data[1]);
+                
+                //Tell the client:
+                m_tcpSocket->write(QString("Login:OK").toLatin1());
+                m_tcpSocket->flush();
+                m_tcpSocket->waitForBytesWritten();
             }
         }
     }
