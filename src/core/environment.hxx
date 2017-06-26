@@ -57,6 +57,7 @@
 namespace graipe {
 
 class GRAIPE_CORE_EXPORT Environment
+: public Serializable
 {
     public:
         /**
@@ -69,7 +70,12 @@ class GRAIPE_CORE_EXPORT Environment
          * \param auto_load If true, it will auto-load all modules. False by default
          */
         Environment(bool auto_load=false);
-        
+    
+        /**
+         * Virtual destructor of an environment
+         */
+        virtual ~Environment();
+    
         /**
          * Copy Constructor: Creates an environment from another one.
          * This contructor copies all the data from the environment, but uses the same
@@ -98,10 +104,32 @@ class GRAIPE_CORE_EXPORT Environment
          *
          * \param file The filename of the module.
          */
-        void loadModule(QString file);
+        void loadModule(QString file);        
     
-        //One status/report string
-        QString status;
+        /**
+         * The typename of this class.
+         *
+         * \return Always "Environment" as a QString
+         */
+        QString typeName() const
+        {
+            return "Environment";
+        }
+    
+        /**
+         * Deserialization of an environment from an xml file.
+         *
+         * \param xmlReader The QXmlStreamReader, where we read from.
+         * \return True, if the deserialization was successful, else false.
+         */
+        bool deserialize(QXmlStreamReader& xmlReader);
+    
+        /**
+         * Serialization on to an output device.
+         *
+         * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
+         */
+        void serialize(QXmlStreamWriter& xmlWriter) const;
     
         //One global algorithm mutex:
         QMutex global_algorithm_mutex;
@@ -114,6 +142,11 @@ class GRAIPE_CORE_EXPORT Environment
         //And two more holding all currently available Models and ViewControllers:
         std::vector<Model*> models;
         std::vector<ViewController*> viewControllers;
+    
+        //The filenames of each loaded module:
+        std::vector<QString> modules_filenames;
+        //The status messages of each loaded module
+        std::vector<QString> modules_status;
 };
 
 }//end of namespace graipe

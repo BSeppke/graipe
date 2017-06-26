@@ -34,6 +34,7 @@
 /************************************************************************/
 
 #include "core/environment.hxx"
+#include "core/impex.hxx"
 #include "core/module.hxx"
 
 #include <QCoreApplication>
@@ -71,7 +72,7 @@ Environment::Environment(bool auto_load)
 
         //Since this only works after deploying the app, we will also search at the level of the .app directory
         //for loadable modules, iff we found none so far
-        if(status.isEmpty())
+        if(modules_filenames.empty())
         {
             loadModules(QDir::current());
         }
@@ -90,27 +91,30 @@ Environment::Environment(bool auto_load)
  *                         False by default
  */
 Environment::Environment(const Environment& env, bool reload_factories)
-: status(env.status),
-  modelFactory(env.modelFactory),
+: modelFactory(env.modelFactory),
   viewControllerFactory(env.viewControllerFactory),
-  algorithmFactory(env.algorithmFactory)
+  algorithmFactory(env.algorithmFactory),
+  modules_filenames(env.modules_filenames),
+  modules_status(env.modules_status)
 {
     if(reload_factories)
     {
-        //search paths for modules:
-        QDir current_dir = QCoreApplication::applicationDirPath();
-
-        //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
-        //     Graipe.app/Contents/MacOS
-        loadModules(QCoreApplication::applicationDirPath());
-
-        //Since this only works after deploying the app, we will also search at the level of the .app directory
-        //for loadable modules, iff we found none so far
-        if(status.isEmpty())
+        modules_filenames.clear();
+        modules_status.clear();
+  
+        for(QString file : env.modules_filenames)
         {
-            loadModules(QDir::current());
+            loadModule(file);
         }
     }
+}
+
+/**
+ * Virtual destructor of an environment
+ */
+Environment::~Environment()
+{
+    //TODO do something!
 }
 
 /**
@@ -122,7 +126,8 @@ Environment::Environment(const Environment& env, bool reload_factories)
  */
 void Environment::loadModules(QDir dir)
 {
-    status.clear();
+    modules_filenames.clear();
+    modules_status.clear();
     
     for(const QString& file : dir.entryList(QDir::Files))
     {
@@ -147,8 +152,11 @@ void Environment::loadModule(QString file)
     typedef  Module* (*Initialize_f) ();
     Initialize_f module_initialize = (Initialize_f) QLibrary::resolve(file, "initialize");
     
+    QString status;
+    
     if (module_initialize)
     {
+        
         Module* module = module_initialize();
         
         status  += "<h3>" + module->name() + "</h3>\n"
@@ -215,6 +223,178 @@ void Environment::loadModule(QString file)
         }
         
         status  += "</ul>\n\n";
+        
+        modules_filenames.push_back(file);
+        modules_status.push_back(status);
+    }
+}
+
+
+/**
+ * Deserialization of an environment from an xml file.
+ *
+ * \param xmlReader The QXmlStreamReader, where we read from.
+ * \return True, if the deserialization was successful, else false.
+ */
+bool Environment::deserialize(QXmlStreamReader& xmlReader)
+{
+    try
+    {
+        if(xmlReader.readNextStartElement())
+        {
+            if(xmlReader.name() == "Environment")
+            {
+                if(xmlReader.readNextStartElement())
+                {
+                    if(xmlReader.name() =="Header")
+                    {
+                        ParameterGroup w_settings;
+                        IntParameter* p_models = new IntParameter("Model count:", 0, 1e10, 0);
+                        w_settings.addParameter("models", p_models);
+            
+                        IntParameter* p_viewControllers = new IntParameter("ViewController count:", 0, 1e10, 0);
+                        w_settings.addParameter("viewControllers", p_viewControllers);
+                
+                        if(w_settings.deserialize(xmlReader))
+                        {
+                            //Read until </Header> comes....
+                            while(true)
+                            {
+                                if(!xmlReader.readNext())
+                                {
+                                    throw "Error: XML at end before Header End-Tag";
+                                }
+                                
+                                if(xmlReader.isEndElement() && xmlReader.name() == "Header")
+                                {
+                                    break;
+                                }
+                            }
+                                
+                            if(xmlReader.readNextStartElement())
+                            {
+                                if(xmlReader.name() =="Content")
+                                {
+                                    if(xmlReader.readNextStartElement())
+                                    {
+                                        //1. Read in all the saved models
+                                        if(xmlReader.name() =="Models")
+                                        {
+                                            for(int i=0; i!=p_models->value(); i++)
+                                            {
+                                                Model* m = Impex::loadModel(xmlReader, this);
+                                                if(m == NULL)
+                                                {
+                                                    throw "did not load model!";
+                                                }
+                                            }
+                                            
+                                            //Read until </Models> comes....
+                                            while(true)
+                                            {
+                                                if(xmlReader.isEndElement() && xmlReader.name() == "Models")
+                                                {
+                                                    break;
+                                                }
+                                                if(!xmlReader.readNext())
+                                                {
+                                                    throw "Error: XML at end before Models End-Tag";
+                                                }
+                                            }
+                                            
+                                            if(xmlReader.readNextStartElement())
+                                            {
+                                                //2. Read in all the saved views
+                                                if(xmlReader.name() =="ViewControllers")
+                                                {
+                                                    for(int i=0; i!=p_viewControllers->value(); i++)
+                                                    {
+                                                        ViewController* vc = Impex::loadViewController(xmlReader, this);
+                                                        if(vc == NULL)
+                                                        {
+                                                            throw "did not load viewController!";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                             }
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+    }
+    catch (const std::exception & e)
+    {
+        qWarning() << "Environment was not restored!" <<  e.what();
+    }
+    catch (...)
+    {
+        qWarning() << "Environment was not restored!";
+    }
+    return false;
+}
+
+/**
+ * Serialization on to an output device.
+ *
+ * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
+ */
+void Environment::serialize(QXmlStreamWriter& xmlWriter) const
+{    try
+    {
+        //Transform memory address to ID for models and viewControllers:
+        for(Model* model : models)
+        {
+            model->setID(QString::number((long int) model));
+        }
+        for(ViewController* vc : viewControllers)
+        {
+            vc->setID(QString::number((long int) vc));
+        }
+        
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.writeStartDocument();
+            
+        xmlWriter.writeStartElement("Environment");
+        xmlWriter.writeAttribute("ID", id());
+            
+            xmlWriter.writeStartElement("Header");
+                ParameterGroup w_settings;
+                w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, models.size()));
+                w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, viewControllers.size()));
+                w_settings.serialize(xmlWriter);
+            xmlWriter.writeEndElement();
+            
+            xmlWriter.writeStartElement("Content");
+                xmlWriter.writeStartElement("Models");
+                for(Model* m : models)
+                {
+                    m->serialize(xmlWriter);
+                }
+                xmlWriter.writeEndElement();
+                xmlWriter.writeStartElement("ViewControllers");
+                for(ViewController* vc : viewControllers)
+                {
+                    vc->serialize(xmlWriter);
+                }
+                xmlWriter.writeEndElement();
+            xmlWriter.writeEndElement();
+                
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndDocument();
+    }
+    catch (std::exception & e)
+    {
+        qWarning() << "Environment was not saved!" << e.what();
+    }
+    catch (...)
+    {
+        qWarning() << "Environment was not saved!";
     }
 }
 
