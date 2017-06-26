@@ -61,7 +61,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
          * \param features The point feature list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        PointFeatureList2DViewController(QGraphicsScene * scene, PointFeatureList2D* features, int z_value = 0);
+        PointFeatureList2DViewController(PointFeatureList2D* features);
         
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -138,7 +138,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
          * \param features The weighted point feature list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		WeightedPointFeatureList2DViewController(QGraphicsScene * scene, WeightedPointFeatureList2D * features, int z_value = 0);
+		WeightedPointFeatureList2DViewController(WeightedPointFeatureList2D * features);
 		
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -238,7 +238,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController
          * \param features The edgel feature list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		EdgelFeatureList2DViewController(QGraphicsScene * scene, EdgelFeatureList2D* features, int z_value = 0);
+		EdgelFeatureList2DViewController(EdgelFeatureList2D* features);
 		
         /**
          * Implementation/specialization of the WeightedPointFeatureList2DViewController's virtual
@@ -301,7 +301,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
          * \param features The SIFT feature list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		SIFTFeatureList2DViewController(QGraphicsScene * scene, SIFTFeatureList2D* features, int z_value = 0);
+		SIFTFeatureList2DViewController(SIFTFeatureList2D* features);
 		
         /**
          * Implementation/specialization of the EdgelFeatureList2DViewController's virtual

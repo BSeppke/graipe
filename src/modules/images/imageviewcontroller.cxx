@@ -48,8 +48,8 @@ namespace graipe {
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 template <class T>
-ImageSingleBandViewController<T>::ImageSingleBandViewController(QGraphicsScene* scene, Image<T>* img, int z_order)
-: ViewController(scene, img, z_order),
+ImageSingleBandViewController<T>::ImageSingleBandViewController(Image<T>* img)
+: ViewController(img),
     m_stats(new ImageStatistics<T>(img)),
     m_minValue(new FloatParameter("Min. value:",-1e20f, 1e20f, 0)),
     m_transparentBelowMin(new BoolParameter("Transp. (< min):", false)),
@@ -68,8 +68,6 @@ ImageSingleBandViewController<T>::ImageSingleBandViewController(QGraphicsScene* 
     m_parameters->addParameter("maxValue", m_maxValue);
     m_parameters->addParameter("transMaxColor", m_transparentAboveMax);
     m_parameters->addParameter("colorTable", m_colorTable);
-    
-	this->setZValue(z_order);
 	   
     m_parameters->addParameter("bandId", m_bandId);
     m_parameters->addParameter("showIntensityLegend", m_showIntensityLegend);
@@ -243,8 +241,8 @@ void ImageSingleBandViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent *
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 template <class T>
-ImageRGBViewController<T>::ImageRGBViewController(QGraphicsScene* scene, Image<T>* img, int z_order)
-:   ViewController(scene, img, z_order),
+ImageRGBViewController<T>::ImageRGBViewController(Image<T>* img)
+:   ViewController(img),
     m_minValue(new FloatParameter("Min. value:", -1e20f, 1e20f, 0)),
     m_transparentBelowMin(new BoolParameter("Transp. (< min):", false)),
     m_maxValue(new FloatParameter("Max. value:", -1e20f, 1e20f, 255)),
@@ -258,8 +256,6 @@ ImageRGBViewController<T>::ImageRGBViewController(QGraphicsScene* scene, Image<T
     m_parameters->addParameter("transMinColor", m_transparentBelowMin);
     m_parameters->addParameter("maxValue", m_maxValue);
     m_parameters->addParameter("transMaxColor", m_transparentAboveMax);
-    
-	this->setZValue(z_order);
     
     m_parameters->addParameter("redBandId", m_redBandId);
     m_parameters->addParameter("greenBandId", m_greenBandId);

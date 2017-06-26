@@ -719,8 +719,8 @@ void MainWindow::showCurrentModel()
             //if index found: add view/controller
             if(vc_index != -1)
             {
-                ViewController* new_vc = vc_possibilities[vc_index].viewController_fptr(m_scene, model_item->model(), m_ui.listViews->count());
-                addViewControllerItemToList(new_vc);
+                ViewController* new_vc = vc_possibilities[vc_index].viewController_fptr(model_item->model());;
+                addViewControllerItemToSceneAndList(new_vc);
             }
         }
     }
@@ -1153,10 +1153,10 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                                     
                                                         for(int i=0; i!=p_viewControllers->value(); i++)
                                                         {
-                                                            ViewController* vc = Impex::loadViewController(xmlReader, m_scene, m_environment);
+                                                            ViewController* vc = Impex::loadViewController(xmlReader, m_environment);
                                                             if(vc != NULL)
                                                             {
-                                                                addViewControllerItemToList(vc);
+                                                                addViewControllerItemToSceneAndList(vc);
                                                                 
                                                                 if(vc->id() == p_currentVC->value())
                                                                 {
@@ -1397,7 +1397,14 @@ void MainWindow::loadModel(const QString& filename)
  */
 void MainWindow::initializeFactories()
 {
-    m_status_window->updateStatus(m_environment->status);
+    QString status;
+    
+    for(QString str : m_environment->modules_status)
+    {
+        status += str;
+    }
+    
+    m_status_window->updateStatus(status);
     
     //Connect the model factory to the GUI
     unsigned int i=0;
@@ -1579,10 +1586,14 @@ void MainWindow::addModelItemToList(Model* model)
  * 
  * \param viewController The ViewController, which shall be added.
  */
-void MainWindow::addViewControllerItemToList(ViewController* viewController)
+void MainWindow::addViewControllerItemToSceneAndList(ViewController* viewController)
 {
     if (viewController && viewController->model())
     {
+        //Add item to scene first
+        m_scene->addItem(viewController);
+        viewController->setZValue(m_ui.listViews->count());
+        
         Model* model = viewController->model();
         
         if(m_ui.btnWorldView->isChecked())

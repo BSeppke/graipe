@@ -83,11 +83,9 @@ class GRAIPE_CORE_EXPORT ViewController
         /**
          * Default constructor of the ViewController class.
          *
-         * \param scene  The QGraphicsScene, in which the view shall be placed at
          * \param model  The model, which shall be displayed by means of this view
-         * \param z_oder The z-order of the new view
          */
-		ViewController(QGraphicsScene *, Model*, int);
+		ViewController(Model*);
     
         /**
          * The default destructor of the view

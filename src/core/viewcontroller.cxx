@@ -60,7 +60,7 @@ namespace graipe {
  * \param model  The model, which shall be displayed by means of this view
  * \param z_oder The z-order of the new view
  */
-ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order)
+ViewController::ViewController(Model * model)
 :	m_model(model),
     m_name(new StringParameter("Name", "")),
     m_description(new LongStringParameter("Description:", "ViewController of model", 20, 6, NULL)),
@@ -98,10 +98,6 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
     m_parameters->addParameter("axFontSize", m_axisFontSize);
     m_parameters->addParameter("axGridStyle", m_axisGridStyle);
     
-    //Layout parameters on this widget
-	this->setZValue(z_order);
-	scene->addItem(this);
-    
 	//connect other elements to update slot, too:
 	connect(m_parameters, SIGNAL(valueChanged()), this,	SLOT(updateView()));
 	connect(m_model,      SIGNAL(modelChanged()), this, SLOT(updateView()));
@@ -115,7 +111,12 @@ ViewController::ViewController(QGraphicsScene* scene, Model * model, int z_order
  */
 ViewController::~ViewController()
 {
-    this->scene()->removeItem(this);
+    //TODO: Check if neccessary..
+    if(this->scene() != NULL)
+    {
+        this->scene()->removeItem(this);
+    }
+    
     delete m_parameters;
     
     //Remove from global viewControllers list

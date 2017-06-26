@@ -60,7 +60,7 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
          * \param img The image, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        ImageSingleBandViewController(QGraphicsScene * scene, Image<T>* img, int z_value = 0);
+        ImageSingleBandViewController(Image<T>* img);
     
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -152,7 +152,7 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
          * \param img The image, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        ImageRGBViewController(QGraphicsScene * scene, Image<T>* image, int z_value = 0);
+        ImageRGBViewController(Image<T>* image);
         
         /**
          * Implementation/specialization of the ViewController's virtual

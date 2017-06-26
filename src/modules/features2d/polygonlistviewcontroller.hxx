@@ -62,7 +62,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2DViewController
          * \param polygons The polygon list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        PolygonList2DViewController(QGraphicsScene * scene, PolygonList2D* polygons, int z_value = 0);
+        PolygonList2DViewController(PolygonList2D* polygons);
     
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -137,7 +137,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
          * \param polygons The weighted polygon list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        WeightedPolygonList2DViewController(QGraphicsScene * scene, WeightedPolygonList2D* polygons, int z_value = 0);
+        WeightedPolygonList2DViewController(WeightedPolygonList2D* polygons);
     
         /**
          * Implementation/specialization of the ViewController's virtual

@@ -52,8 +52,8 @@ namespace graipe {
  * \param features The point feature list, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-PointFeatureList2DViewController::PointFeatureList2DViewController(QGraphicsScene* scene, PointFeatureList2D* features, int z_order)
-:	ViewController(scene, features, z_order),
+PointFeatureList2DViewController::PointFeatureList2DViewController(PointFeatureList2D* features)
+:	ViewController(features),
     m_stats(new PointFeatureList2DStatistics(features)),
     m_showLabels(new BoolParameter("Show labels:", false)),
     m_fontSize(new FloatParameter("Label font size:", 1.0e-6f, 1.0e+6f, 10, m_showLabels)),
@@ -283,8 +283,8 @@ void PointFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent
  * \param features The weighted point feature list, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewController(QGraphicsScene* scene, WeightedPointFeatureList2D * features, int z_order)
-: ViewController(scene, features, z_order),
+WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewController(WeightedPointFeatureList2D * features)
+: ViewController(features),
     m_stats(new WeightedPointFeatureList2DStatistics(features)),
     m_showLabels(new BoolParameter("Show labels:", false)),
     m_fontSize(new FloatParameter("Label font size:", 1.0e-6f, 1.0e+6f, 10, m_showLabels)),
@@ -334,7 +334,7 @@ WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewControll
 	m_weight_legend->setVisible(false);
     m_weight_legend->setCaption(m_legendCaption->value());
 	m_weight_legend->setDigits(m_legendDigits->value());
-	m_weight_legend->setZValue(z_order); 
+	m_weight_legend->setZValue(zValue());
 	
     //force controller ui update
     updateParameters(true);
@@ -609,8 +609,8 @@ void WeightedPointFeatureList2DViewController::mousePressEvent(QGraphicsSceneMou
  * \param features The edgel feature list, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-EdgelFeatureList2DViewController::EdgelFeatureList2DViewController(QGraphicsScene* scene, EdgelFeatureList2D* features, int z_order)
-:	WeightedPointFeatureList2DViewController(scene, features, z_order),
+EdgelFeatureList2DViewController::EdgelFeatureList2DViewController(EdgelFeatureList2D* features)
+:	WeightedPointFeatureList2DViewController(features),
     m_stats(new EdgelFeatureList2DStatistics(features))
 {
 }
@@ -821,8 +821,8 @@ void EdgelFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent
  * \param features The SIFT feature list, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-SIFTFeatureList2DViewController::SIFTFeatureList2DViewController(QGraphicsScene* scene, SIFTFeatureList2D* features, int z_order)
-:	EdgelFeatureList2DViewController(scene, features, z_order),
+SIFTFeatureList2DViewController::SIFTFeatureList2DViewController(SIFTFeatureList2D* features)
+:	EdgelFeatureList2DViewController(features),
     m_stats(new SIFTFeatureList2DStatistics(features))
 {
 }

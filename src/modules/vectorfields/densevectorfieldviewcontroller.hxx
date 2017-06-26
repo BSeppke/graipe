@@ -61,7 +61,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DViewController
          * \param vf The dense vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		DenseVectorfield2DViewController(QGraphicsScene * scene, DenseVectorfield2D* vf, int z_value=0);
+		DenseVectorfield2DViewController(DenseVectorfield2D* vf);
                 
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -164,7 +164,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DParticleViewController
          * \param vf The dense vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		DenseVectorfield2DParticleViewController(QGraphicsScene * scene, DenseVectorfield2D* vf, int z_value=0);
+		DenseVectorfield2DParticleViewController(DenseVectorfield2D* vf);
                 
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -277,7 +277,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DViewController
          * \param vf The dense weighted vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		DenseWeightedVectorfield2DViewController(QGraphicsScene * scene, DenseWeightedVectorfield2D* vf, int z_value=0);
+		DenseWeightedVectorfield2DViewController(DenseWeightedVectorfield2D* vf);
                 
         /**
          * Specialization of the DenseVectorfield2DViewController's virtual
@@ -361,7 +361,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DParticleViewControlle
          * \param vf The dense weighted vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		DenseWeightedVectorfield2DParticleViewController(QGraphicsScene * scene, DenseWeightedVectorfield2D* vf, int z_value=0);
+		DenseWeightedVectorfield2DParticleViewController(DenseWeightedVectorfield2D* vf);
                 
         /**
          * Implementation/specialization of the ViewController's virtual

@@ -51,8 +51,8 @@ namespace graipe {
  * \param vf The dense vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-DenseVectorfield2DViewController::DenseVectorfield2DViewController(QGraphicsScene* scene, DenseVectorfield2D * vf, int z_value)
-:	ViewController(scene, vf, z_value),
+DenseVectorfield2DViewController::DenseVectorfield2DViewController(DenseVectorfield2D * vf)
+:	ViewController(vf),
 	m_stats(new DenseVectorfield2DStatistics(vf)),
     m_resolution(new PointParameter("Resolution of vectors:",QPoint(1,1), QPoint(vf->width(),vf->height()), QPoint(vf->width()/50,vf->width()/50))),
     m_lineWidth(new FloatParameter("Line width:", 0,100000,1)),
@@ -122,7 +122,7 @@ DenseVectorfield2DViewController::DenseVectorfield2DViewController(QGraphicsScen
     m_velocity_legend->setCaption(m_velocityLegendCaption->value());
     m_velocity_legend->setTicks(m_velocityLegendTicks->value());
     m_velocity_legend->setDigits(m_velocityLegendDigits->value());
-	m_velocity_legend->setZValue(z_value);
+	m_velocity_legend->setZValue(zValue());
 	
 	updateView();
 }
@@ -393,8 +393,8 @@ void DenseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
  * \param vf The dense vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewController(QGraphicsScene* scene, DenseVectorfield2D * vf, int z_value)
-:	ViewController(scene, vf, z_value),
+DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewController(DenseVectorfield2D * vf)
+:	ViewController(vf),
 	m_stats(new DenseVectorfield2DStatistics(vf)),
     m_particles(new IntParameter("Particles:",1,1000000,1000)),
     m_particleRadius(new FloatParameter("Particle size:", 0,100000,1)),
@@ -470,7 +470,7 @@ DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewControll
     m_velocity_legend->setTicks(m_velocityLegendTicks->value());
     m_velocity_legend->setDigits(m_velocityLegendDigits->value());
     
-	m_velocity_legend->setZValue(z_value);
+	m_velocity_legend->setZValue(zValue());
     
     updateView();
 }
@@ -762,8 +762,8 @@ void DenseVectorfield2DParticleViewController::hoverMoveEvent(QGraphicsSceneHove
  * \param vf The dense weighted vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-DenseWeightedVectorfield2DViewController::DenseWeightedVectorfield2DViewController(QGraphicsScene* scene, DenseWeightedVectorfield2D * vf, int z_value)
-: DenseVectorfield2DViewController(scene, vf, z_value),
+DenseWeightedVectorfield2DViewController::DenseWeightedVectorfield2DViewController(DenseWeightedVectorfield2D * vf)
+: DenseVectorfield2DViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
     m_maxWeight(new FloatParameter("Max. weight:",-1.0e10,1.0e10,1)),
     m_showWeightLegend(new BoolParameter("Show weight legend?", false)),
@@ -802,7 +802,7 @@ DenseWeightedVectorfield2DViewController::DenseWeightedVectorfield2DViewControll
     m_weight_legend->setCaption(m_weightLegendCaption->value());
     m_weight_legend->setTicks(m_weightLegendTicks->value());
     m_weight_legend->setDigits(m_weightLegendDigits->value());
-    m_weight_legend->setZValue(z_value);
+    m_weight_legend->setZValue(zValue());
     
     updateView();
 }
@@ -1055,8 +1055,8 @@ void DenseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHove
  * \param vf The dense weighted vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-DenseWeightedVectorfield2DParticleViewController::DenseWeightedVectorfield2DParticleViewController(QGraphicsScene* scene, DenseWeightedVectorfield2D * vf, int z_value)
-:	DenseVectorfield2DParticleViewController(scene, vf, z_value),
+DenseWeightedVectorfield2DParticleViewController::DenseWeightedVectorfield2DParticleViewController(DenseWeightedVectorfield2D * vf)
+:	DenseVectorfield2DParticleViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
     m_maxWeight(new FloatParameter("Max. weight:",-1.0e10,1.0e10,1)),
     m_showWeightLegend(new BoolParameter("Show weight legend?", false)),
@@ -1098,7 +1098,7 @@ DenseWeightedVectorfield2DParticleViewController::DenseWeightedVectorfield2DPart
     m_weight_legend->setCaption(m_weightLegendCaption->value());
     m_weight_legend->setTicks(m_weightLegendTicks->value());
     m_weight_legend->setDigits(m_weightLegendDigits->value());
-    m_weight_legend->setZValue(z_value);
+    m_weight_legend->setZValue(zValue());
 	
 	updateView();
 }

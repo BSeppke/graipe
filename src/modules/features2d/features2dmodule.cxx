@@ -198,9 +198,10 @@ class Features2DModule
          *
          * \return A new PointFeatureList2DViewController.
          */
-        static ViewController* createPointFeatureList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "PointFeatureList2D"){
-                return new PointFeatureList2DViewController(scene, static_cast<PointFeatureList2D*> (model), z_order);
+        static ViewController* createPointFeatureList2DViewController(Model * model){
+            if(model->typeName() == "PointFeatureList2D")
+            {
+                return new PointFeatureList2DViewController(static_cast<PointFeatureList2D*>(model));
             }
             return NULL;
         }
@@ -224,9 +225,10 @@ class Features2DModule
          *
          * \return A new WeightedPointFeatureList2DViewController.
          */
-        static ViewController* createWeightedPointFeatureList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "WeightedPointFeatureList2D"){
-                return new WeightedPointFeatureList2DViewController(scene,  static_cast<WeightedPointFeatureList2D*> (model), z_order);
+        static ViewController* createWeightedPointFeatureList2DViewController(Model * model){
+            if(model->typeName() == "WeightedPointFeatureList2D")
+            {
+                return new WeightedPointFeatureList2DViewController(static_cast<WeightedPointFeatureList2D*>(model));
             }
             return NULL;
         }
@@ -250,9 +252,10 @@ class Features2DModule
          *
          * \return A new SIFTFeatureList2DViewController.
          */
-        static ViewController* createEdgelFeatureList2DViewController(QGraphicsScene * scene, Model * model, int z_order){
-            if(model->typeName() == "EdgelFeatureList2D"){
-                return new EdgelFeatureList2DViewController( scene, static_cast<EdgelFeatureList2D*> (model), z_order);
+        static ViewController* createEdgelFeatureList2DViewController(Model * model){
+            if(model->typeName() == "EdgelFeatureList2D")
+            {
+                return new EdgelFeatureList2DViewController(static_cast<EdgelFeatureList2D*>(model));
             }
             return NULL;
         }
@@ -276,9 +279,10 @@ class Features2DModule
          *
          * \return A new SIFTFeatureList2DViewController.
          */
-        static ViewController* createSIFTFeatureList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "SIFTFeatureList2D"){
-                return new SIFTFeatureList2DViewController(scene, static_cast<SIFTFeatureList2D*> (model), z_order);
+        static ViewController* createSIFTFeatureList2DViewController(Model * model){
+            if(model->typeName() == "SIFTFeatureList2D")
+            {
+                return new SIFTFeatureList2DViewController(static_cast<SIFTFeatureList2D*>(model));
             }
             return NULL;
         }
@@ -305,9 +309,10 @@ class Features2DModule
          *
          * \return A new PolygonList2DViewController.
          */
-        static ViewController* createPolygonList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "PolygonList2D"){
-                return new PolygonList2DViewController(scene, static_cast<PolygonList2D*> (model), z_order);
+        static ViewController* createPolygonList2DViewController(Model * model){
+            if(model->typeName() == "PolygonList2D")
+            {
+                return new PolygonList2DViewController(static_cast<PolygonList2D*>(model));
             }
             return NULL;
         }
@@ -331,9 +336,10 @@ class Features2DModule
          *
          * \return A new WeightedPolygonList2DViewController.
          */
-        static ViewController* createWeightedPolygonList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "WeightedPolygonList2D"){
-                return new WeightedPolygonList2DViewController(scene, static_cast<WeightedPolygonList2D*> (model), z_order);
+        static ViewController* createWeightedPolygonList2DViewController(Model * model){
+            if(model->typeName() == "WeightedPolygonList2D")
+            {
+                return new WeightedPolygonList2DViewController(static_cast<WeightedPolygonList2D*>(model));
             }
             return NULL;
         }
@@ -360,9 +366,10 @@ class Features2DModule
          *
          * \return A new CubicSplineList2DViewController.
          */
-        static ViewController* createCubicSplineList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "CubicSplineList2D"){
-                return new CubicSplineList2DViewController(scene, static_cast<CubicSplineList2D*> (model), z_order);
+        static ViewController* createCubicSplineList2DViewController(Model * model){
+            if(model->typeName() == "CubicSplineList2D")
+            {
+                return new CubicSplineList2DViewController(static_cast<CubicSplineList2D*>(model));
             }
             return NULL;
         }
@@ -386,9 +393,10 @@ class Features2DModule
          *
          * \return A new WeightedCubicSplineList2DViewController.
          */
-        static ViewController* createWeightedCubicSplineList2DViewController(QGraphicsScene* scene, Model * model, int z_order){
-            if(model->typeName() == "WeightedCubicSplineList2D"){
-                return new WeightedCubicSplineList2DViewController(scene, static_cast<WeightedCubicSplineList2D*> (model), z_order);
+        static ViewController* createWeightedCubicSplineList2DViewController(Model * model){
+            if(model->typeName() == "WeightedCubicSplineList2D")
+            {
+                return new WeightedCubicSplineList2DViewController(static_cast<WeightedCubicSplineList2D*>(model));
             }
             return NULL;
         }

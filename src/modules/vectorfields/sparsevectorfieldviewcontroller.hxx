@@ -61,7 +61,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
          * \param vf The sparse vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		SparseVectorfield2DViewController(QGraphicsScene * scene, SparseVectorfield2D* vf, int z_value=0);
+		SparseVectorfield2DViewController(SparseVectorfield2D* vf);
                 
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -169,7 +169,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
          * \param vf The sparse weighted vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		SparseWeightedVectorfield2DViewController(QGraphicsScene * scene, SparseWeightedVectorfield2D* vf, int z_value=0);
+		SparseWeightedVectorfield2DViewController(SparseWeightedVectorfield2D* vf);
                 
         /**
          * Specialization of the SparseVectorfield2DViewController's virtual
@@ -259,7 +259,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
          * \param vf The sparse multi vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		SparseMultiVectorfield2DViewController(QGraphicsScene * scene, SparseMultiVectorfield2D* vf, int z_value=0);
+		SparseMultiVectorfield2DViewController(SparseMultiVectorfield2D* vf);
                 
         /**
          * Implementation/specialization of the SparseVectorfield2DViewController's virtual
@@ -343,7 +343,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          * \param vf The sparse weighted multi vectorfield, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-		SparseWeightedMultiVectorfield2DViewController(QGraphicsScene * scene, SparseWeightedMultiVectorfield2D* vf, int z_value=0);
+		SparseWeightedMultiVectorfield2DViewController(SparseWeightedMultiVectorfield2D* vf);
                 
         /**
          * Implementation/specialization of the SparseMultiVectorfield2DViewController's virtual

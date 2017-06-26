@@ -61,7 +61,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2DViewController
          * \param splines The spline list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        CubicSplineList2DViewController(QGraphicsScene * scene, CubicSplineList2D* splines, int z_value = 0);
+        CubicSplineList2DViewController(CubicSplineList2D* splines);
     
         /**
          * Implementation/specialization of the ViewController's virtual
@@ -148,7 +148,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
          * \param splines The weighted spline list, which we want to show.
          * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
-        WeightedCubicSplineList2DViewController(QGraphicsScene * scene, WeightedCubicSplineList2D* splines, int z_value = 0);
+        WeightedCubicSplineList2DViewController(WeightedCubicSplineList2D* splines);
         
         /**
          * Implementation/specialization of the ViewController's virtual

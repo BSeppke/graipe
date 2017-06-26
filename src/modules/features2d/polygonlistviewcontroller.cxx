@@ -20,8 +20,8 @@ namespace graipe {
  * \param polygons The polygon list, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-PolygonList2DViewController::PolygonList2DViewController(QGraphicsScene* scene, PolygonList2D* polygons, int z_order)
-:	ViewController(scene, polygons, z_order),
+PolygonList2DViewController::PolygonList2DViewController(PolygonList2D* polygons)
+:	ViewController(polygons),
     m_polygons(polygons),
     m_stats(new PolygonList2DStatistics(polygons)),
     m_showLabels(new BoolParameter("Show labels:", false)),
@@ -176,8 +176,8 @@ void PolygonList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * eve
  * \param polygons The weighted polygon list, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-WeightedPolygonList2DViewController::WeightedPolygonList2DViewController(QGraphicsScene* scene, WeightedPolygonList2D * polygons, int z_order)
-:	ViewController(scene, polygons, z_order),
+WeightedPolygonList2DViewController::WeightedPolygonList2DViewController(WeightedPolygonList2D * polygons)
+:	ViewController(polygons),
     m_stats(new WeightedPolygonList2DStatistics(polygons)),
     m_showLabels(new BoolParameter("Show labels:", false)),
     m_fontSize(new FloatParameter("Label font size:", 1.0e-6f, 1.0e+6f, 10, m_showLabels)),

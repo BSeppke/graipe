@@ -373,7 +373,7 @@ protected:
      * 
      * \param viewController The ViewController, which shall be added.
      */
-    void addViewControllerItemToList(ViewController* viewController);
+    void addViewControllerItemToSceneAndList(ViewController* viewController);
     
 	/**
      * To enable drag and drop of listwidget-entries, we use a global EventFilter

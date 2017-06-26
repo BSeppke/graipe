@@ -113,7 +113,15 @@ MainDialog::MainDialog(QWidget *parent)
     
     mainLayout->addWidget(lblServerStatus,0,0,1,1);
     mainLayout->addWidget(m_lblClientStatus,0,1,1,1);
-    mainLayout->addWidget(new QTextEdit(env->status),1,0,1,2);
+    
+    QString status;
+    
+    for(QString str : env->modules_status)
+    {
+        status += str;
+    }
+    
+    mainLayout->addWidget(new QTextEdit(status),1,0,1,2);
     mainLayout->addWidget(new QLabel("Log:"),2,0,1,2);
     mainLayout->addWidget(m_txtLog,3,0,1,2);
     mainLayout->addLayout(buttonLayout,4,0,1,2);

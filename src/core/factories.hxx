@@ -93,7 +93,7 @@ struct ViewControllerFactoryItem
 {
 	QString model_type;
 	QString viewController_name;
-	ViewController* (*viewController_fptr)(QGraphicsScene*, Model *, int);
+	ViewController* (*viewController_fptr)(Model *);
 };
 
 /**

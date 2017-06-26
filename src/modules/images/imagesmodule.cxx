@@ -188,12 +188,12 @@ class ImagesModule
          *
          * \return A new ImageSingleBandViewController<float>.
          */
-        static ViewController* createImageSingleBandViewController(QGraphicsScene* scene, Model * model, int z_order)
+        static ViewController* createImageSingleBandViewController(Model * model)
         
         {
             if(model->typeName() == "Image")
             {
-                return new ImageSingleBandViewController<float>(scene, static_cast<Image<float>*>(model), z_order);
+                return new ImageSingleBandViewController<float>(static_cast<Image<float>*>(model));
             }
             return NULL;
         }
@@ -205,11 +205,11 @@ class ImagesModule
          *
          * \return A new ImageRGGViewController<float>.
          */
-        static ViewController* createImageRGBViewController(QGraphicsScene* scene, Model * model, int z_order)
+        static ViewController* createImageRGBViewController(Model * model)
         
         {
             if(model->typeName() == "Image"){
-                return new ImageRGBViewController<float>(scene, static_cast<Image<float>*> (model), z_order);
+                return new ImageRGBViewController<float>(static_cast<Image<float>*> (model));
             }
             return NULL;
         }
@@ -234,12 +234,12 @@ class ImagesModule
          *
          * \return A new ImageSingleBandViewController<int>.
          */
-        static ViewController* createIntImageSingleBandViewController(QGraphicsScene* scene, Model * model, int z_order)
+        static ViewController* createIntImageSingleBandViewController(Model * model)
         
         {
             if(model->typeName() == "IntImage")
             {
-                return new ImageSingleBandViewController<int>(scene, static_cast<Image<int>*>(model), z_order);
+                return new ImageSingleBandViewController<int>(static_cast<Image<int>*>(model));
             }
             return NULL;
         }
@@ -251,11 +251,11 @@ class ImagesModule
          *
          * \return A new ImageRGBViewController<int>.
          */
-        static ViewController* createIntImageRGBViewController(QGraphicsScene* scene, Model * model, int z_order)
+        static ViewController* createIntImageRGBViewController(Model * model)
         
         {
             if(model->typeName() == "IntImage"){
-                return new ImageRGBViewController<int>(scene, static_cast<Image<int>*> (model), z_order);
+                return new ImageRGBViewController<int>(static_cast<Image<int>*> (model));
             }
             return NULL;
         }
@@ -279,11 +279,11 @@ class ImagesModule
          *
          * \return A new ImageSingleBandViewController<unsigned char>.
          */
-        static ViewController* createByteImageSingleBandViewController(QGraphicsScene* scene, Model * model, int z_order)
+        static ViewController* createByteImageSingleBandViewController(Model * model)
         {
             if(model->typeName() == "ByteImage")
             {
-                return new ImageSingleBandViewController<unsigned char>(scene, static_cast<Image<unsigned char>*>(model), z_order);
+                return new ImageSingleBandViewController<unsigned char>(static_cast<Image<unsigned char>*>(model));
             }
             return NULL;
         }
@@ -295,10 +295,10 @@ class ImagesModule
          *
          * \return A new ImageRGBViewController<unsigned char>.
          */
-        static ViewController* createByteImageRGBViewController(QGraphicsScene* scene, Model * model, int z_order)
+        static ViewController* createByteImageRGBViewController(Model * model)
         {
             if(model->typeName() == "ByteImage"){
-                return new ImageRGBViewController<unsigned char>(scene, static_cast<Image<unsigned char>*> (model), z_order);
+                return new ImageRGBViewController<unsigned char>(static_cast<Image<unsigned char>*> (model));
             }
             return NULL;
         }

@@ -210,10 +210,10 @@ class VectorfieldsModule
          *
          * \return A new SparseVectorfield2DViewController.
          */
-        static ViewController* createSparseVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createSparseVectorfield2DViewController(Model * model){
             if(model->typeName() == "SparseVectorfield2D")
             {
-                return new SparseVectorfield2DViewController(scene, static_cast<SparseVectorfield2D*> (model), z_order);
+                return new SparseVectorfield2DViewController(static_cast<SparseVectorfield2D*> (model));
             }
             return NULL;
         }
@@ -238,10 +238,10 @@ class VectorfieldsModule
          *
          * \return A new SparseWeightedVectorfield2DViewController.
          */
-        static ViewController* createSparseWeightedVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createSparseWeightedVectorfield2DViewController(Model * model){
             if(model->typeName() == "SparseWeightedVectorfield2D")
             {
-                return new SparseWeightedVectorfield2DViewController(scene, static_cast<SparseWeightedVectorfield2D*>(model), z_order);
+                return new SparseWeightedVectorfield2DViewController(static_cast<SparseWeightedVectorfield2D*>(model));
             }
             return NULL;
         }
@@ -265,10 +265,10 @@ class VectorfieldsModule
          *
          * \return A new SparseMultiVectorfield2DViewController.
          */
-        static ViewController* createSparseMultiVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createSparseMultiVectorfield2DViewController(Model * model){
             if(model->typeName() == "SparseMultiVectorfield2D")
             {
-                return new SparseMultiVectorfield2DViewController(scene, static_cast<SparseMultiVectorfield2D*>(model), z_order);
+                return new SparseMultiVectorfield2DViewController(static_cast<SparseMultiVectorfield2D*>(model));
             }
             return NULL;
         }
@@ -292,10 +292,10 @@ class VectorfieldsModule
          *
          * \return A new SparseWeightedMultiVectorfield2DViewController.
          */
-        static ViewController* createSparseWeightedMultiVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createSparseWeightedMultiVectorfield2DViewController(Model * model){
             if(model->typeName() == "SparseWeightedMultiVectorfield2D")
             {
-                return new SparseWeightedMultiVectorfield2DViewController(scene, static_cast<SparseWeightedMultiVectorfield2D*>(model), z_order);
+                return new SparseWeightedMultiVectorfield2DViewController(static_cast<SparseWeightedMultiVectorfield2D*>(model));
             }
             return NULL;
         }
@@ -319,10 +319,10 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfield2DViewController.
          */
-        static ViewController* createDenseVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createDenseVectorfield2DViewController(Model * model){
             if(model->typeName() == "DenseVectorfield2D")
             {
-                return new DenseVectorfield2DViewController(scene, static_cast<DenseVectorfield2D*> (model), z_order);
+                return new DenseVectorfield2DViewController(static_cast<DenseVectorfield2D*>(model));
             }
             return NULL;
         }
@@ -334,10 +334,10 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfield2DParticleViewController.
          */
-        static ViewController* createDenseVectorfield2DParticleView(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createDenseVectorfield2DParticleView(Model * model){
             if(model->typeName() == "DenseVectorfield2D")
             {
-                return new DenseVectorfield2DParticleViewController(scene,  static_cast<DenseVectorfield2D*> (model), z_order);
+                return new DenseVectorfield2DParticleViewController(static_cast<DenseVectorfield2D*>(model));
             }
             return NULL;
         }
@@ -362,10 +362,10 @@ class VectorfieldsModule
          *
          * \return A new DenseWeightedVectorfield2DViewController.
          */
-        static ViewController* createDenseWeightedVectorfield2DViewController(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createDenseWeightedVectorfield2DViewController(Model * model){
             if(model->typeName() == "DenseWeightedVectorfield2D")
             {
-                return new DenseWeightedVectorfield2DViewController(scene, static_cast<DenseWeightedVectorfield2D*> (model), z_order);
+                return new DenseWeightedVectorfield2DViewController(static_cast<DenseWeightedVectorfield2D*>(model));
             }
             return NULL;
         }
@@ -377,10 +377,10 @@ class VectorfieldsModule
          *
          * \return A new DenseWeightedVectorfield2DParticleViewController.
          */
-        static ViewController* createDenseWeightedVectorfield2DParticleView(QGraphicsScene* scene, Model * model, int z_order){
+        static ViewController* createDenseWeightedVectorfield2DParticleView(Model * model){
             if(model->typeName() == "DenseWeightedVectorfield2D")
             {
-                return new DenseWeightedVectorfield2DParticleViewController(scene, static_cast<DenseWeightedVectorfield2D*> (model), z_order);
+                return new DenseWeightedVectorfield2DParticleViewController(static_cast<DenseWeightedVectorfield2D*>(model));
             }
             return NULL;
         }

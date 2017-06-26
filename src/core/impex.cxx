@@ -173,7 +173,7 @@ Model* Impex::loadModel(QXmlStreamReader& xmlReader, Environment* env)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-ViewController* Impex::loadViewController(const QString & filename, QGraphicsScene* scene, Environment* env)
+ViewController* Impex::loadViewController(const QString & filename, Environment* env)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
     ViewController * vc = NULL;
@@ -181,7 +181,7 @@ ViewController* Impex::loadViewController(const QString & filename, QGraphicsSce
     if(device != NULL)
     {
         QXmlStreamReader xmlReader(device);
-        vc = loadViewController(xmlReader, scene, env);
+        vc = loadViewController(xmlReader, env);
         device->close();
     }
     
@@ -197,7 +197,7 @@ ViewController* Impex::loadViewController(const QString & filename, QGraphicsSce
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene, Environment* env)
+ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, Environment* env)
 {
     ViewController * vc = NULL;
 
@@ -234,7 +234,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         {
             if(env->viewControllerFactory[i].viewController_name==vc_type)
             {
-                vc = env->viewControllerFactory[i].viewController_fptr(scene, vc_model, vc_zorder);
+                vc = env->viewControllerFactory[i].viewController_fptr(vc_model);
                 break;
             }
         }
@@ -248,6 +248,7 @@ ViewController* Impex::loadViewController(QXmlStreamReader & xmlReader, QGraphic
         //4. Restore the parameters
         if(vc->deserialize(xmlReader))
         {
+            vc->setZValue(vc_zorder);
             return vc;
         }
         else

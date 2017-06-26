@@ -48,8 +48,8 @@ namespace graipe {
  * \param vf The sparse vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-SparseVectorfield2DViewController::SparseVectorfield2DViewController(QGraphicsScene* scene, SparseVectorfield2D * vf, int z_value)
-:	ViewController(scene, vf, z_value),
+SparseVectorfield2DViewController::SparseVectorfield2DViewController(SparseVectorfield2D * vf)
+:	ViewController(vf),
 	m_stats(new SparseVectorfield2DStatistics(vf)),
     m_lineWidth(new FloatParameter("Arrow width:", 0,100000,1)),
     m_headSize(new FloatParameter("Head size:",0,100000,0.3f)),
@@ -127,7 +127,7 @@ SparseVectorfield2DViewController::SparseVectorfield2DViewController(QGraphicsSc
     m_velocity_legend->setCaption(m_velocityLegendCaption->value());
     m_velocity_legend->setTicks(m_velocityLegendTicks->value());
     m_velocity_legend->setDigits(m_velocityLegendDigits->value());
-	m_velocity_legend->setZValue(z_value);
+	m_velocity_legend->setZValue(zValue());
 	
 	updateView();
 }
@@ -460,8 +460,8 @@ void SparseVectorfield2DViewController::mousePressEvent (QGraphicsSceneMouseEven
  * \param vf The sparse weighted vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewController(QGraphicsScene* scene, SparseWeightedVectorfield2D * vf, int z_value)
- :	SparseVectorfield2DViewController(scene, vf, z_value),
+SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewController(SparseWeightedVectorfield2D * vf)
+ :	SparseVectorfield2DViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
     m_maxWeight(new FloatParameter("Max. weight:",-1.0e10,1.0e10,1)),
     m_showWeightLegend(new BoolParameter("Show weight legend?", false)),
@@ -502,7 +502,7 @@ SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewContro
     m_weight_legend->setCaption(m_weightLegendCaption->value());
     m_weight_legend->setTicks(m_weightLegendTicks->value());
     m_weight_legend->setDigits(m_weightLegendDigits->value());
-	m_weight_legend->setZValue(z_value);
+	m_weight_legend->setZValue(zValue());
 	
 	updateView();
 }
@@ -825,8 +825,8 @@ void SparseWeightedVectorfield2DViewController::mousePressEvent (QGraphicsSceneM
  * \param vf The sparse multi vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-SparseMultiVectorfield2DViewController::SparseMultiVectorfield2DViewController(QGraphicsScene* scene, SparseMultiVectorfield2D * vf, int z_value)
-:	SparseVectorfield2DViewController(scene, vf, z_value),
+SparseMultiVectorfield2DViewController::SparseMultiVectorfield2DViewController(SparseMultiVectorfield2D * vf)
+:	SparseVectorfield2DViewController(vf),
     m_showAlternative(new IntParameter("Show alt. (0=best):",0,0,0))
 {
 
@@ -1149,8 +1149,8 @@ void SparseMultiVectorfield2DViewController::mousePressEvent(QGraphicsSceneMouse
  * \param vf The sparse weighted multi vectorfield, which we want to show.
  * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
-SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2DViewController(QGraphicsScene* scene, SparseWeightedMultiVectorfield2D * vf, int z_value)
- :	SparseMultiVectorfield2DViewController(scene, vf, z_value),
+SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2DViewController(SparseWeightedMultiVectorfield2D * vf)
+ :	SparseMultiVectorfield2DViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
     m_maxWeight(new FloatParameter("Max. weight:",-1.0e10,1.0e10,1)),
     m_showWeightLegend(new BoolParameter("Show weight legend?", false)),
@@ -1191,7 +1191,7 @@ SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2D
     m_weight_legend->setCaption(m_weightLegendCaption->value());
     m_weight_legend->setTicks(m_weightLegendTicks->value());
     m_weight_legend->setDigits(m_weightLegendDigits->value());
-	m_weight_legend->setZValue(z_value);
+	m_weight_legend->setZValue(zValue());
 	
 	updateView();
 }

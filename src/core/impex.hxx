@@ -118,7 +118,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the loading of the object was successful.
          */
-        static ViewController* loadViewController(const QString & filename, QGraphicsScene* scene, Environment* env);
+        static ViewController* loadViewController(const QString & filename, Environment* env);
 
         /**
          * Basic import procedure of a settings dictionary from a given QString
@@ -128,7 +128,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param contents The input QString.
          * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
          */
-        static ViewController* loadViewController(QXmlStreamReader & xmlReader, QGraphicsScene* scene, Environment* env);
+        static ViewController* loadViewController(QXmlStreamReader & xmlReader, Environment* env);
     
         /**
          * Basic import procedure for all algorithms, which implement the serializable interface
