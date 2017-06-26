@@ -158,7 +158,7 @@ class GRAIPE_CORE_EXPORT Impex
          * \param compress If true, the file will be read using the GZip decompressor.
          * \return True, if the storage of the object was successful.
          */
-		static bool save(Serializable * rs_obj, const QString & filename, bool compress=true);
+		static bool save(Serializable * object, const QString & filename, bool compress=true);
 };
 
 } //end of namespace graipe
