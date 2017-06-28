@@ -68,9 +68,12 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	m_status_window(new StatusWindow),
     m_lblMemoryUsage(new QLabel("(Memory: 0 MB, max: 0 MB)")),
     m_recentFileCount(10),
-    m_environment(new Environment(true))
+    m_environment(new Environment)
 {	
     m_ui.setupUi(this);
+    
+    //init the factories from the environment
+    initializeFactories();
 	
     m_ui.scrModelParameters->setWidgetResizable(true);
     m_ui.scrViewParameters->setWidgetResizable(true);
@@ -138,8 +141,6 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     m_printer = NULL;
 	
 	m_displayMode = ImageMode;
-	
-	initializeFactories();
     
     //Prepare the recent file menu:
     QAction* recentFileAction = NULL;
@@ -214,11 +215,21 @@ MainWindow::~MainWindow()
             == QMessageBox::Yes)
     {
         saveWorkspace(m_settings_dir + "workspace.xgz");
+        
+        QFile f(m_settings_dir + "environment.xml");
+        
+        if(f.open(QIODevice::WriteOnly))
+        {
+            QXmlStreamWriter xmlWriter(&f);
+            m_environment->serialize(xmlWriter);
+            f.close();
+        }
     }
     delete m_lblMemoryUsage;
     delete m_view;
     delete m_printer;
     delete m_status_window;
+    delete m_environment;
 }
 
 /**
@@ -245,8 +256,10 @@ void MainWindow::reset()
     
     //and proceed with the models:
     m_ui.listModels->clear();
+    
+    //Also clear models and viewControllers in the Environment
+    m_environment->clearContents();
 }
-
 
 /**
  * This slot is called to load a Model from file system.
@@ -546,6 +559,11 @@ void MainWindow::currentModelChanged(QListWidgetItem * item)
         
             if(model_parameter_widget != NULL)
             {
+                for(Model* m : m_environment->models)
+                {
+                    m->setCurrent(m == model);
+                }
+                
                 m_ui.scrModelParameters->takeWidget();
                 m_ui.dockModelParameters->setWindowTitle(model->parameters()->name());
                 
@@ -575,6 +593,7 @@ void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
         
             if(vc_item == new_item)
             {
+                viewController->setCurrent(true);
                 viewController->setAcceptHoverEvents(true);
                 
                 if (viewController && item->checkState()==Qt::Checked)
@@ -592,6 +611,7 @@ void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
             }
             else
             {
+                viewController->setCurrent(false);
                 viewController->setAcceptHoverEvents(false);
             }
 		}
@@ -719,7 +739,11 @@ void MainWindow::showCurrentModel()
             //if index found: add view/controller
             if(vc_index != -1)
             {
-                ViewController* new_vc = vc_possibilities[vc_index].viewController_fptr(model_item->model());;
+                ViewController* new_vc = vc_possibilities[vc_index].viewController_fptr(model_item->model());
+                
+                //Always show and make current for new ViewControllers
+                new_vc->setVisible(true);
+                new_vc->setCurrent(true);
                 addViewControllerItemToSceneAndList(new_vc);
             }
         }
@@ -961,9 +985,6 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
             w_settings.addParameter("viewTrans", new TransformParameter("Viewport transformation", m_view->transform()));
             w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, m_ui.listModels->count()));
             w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, m_ui.listViews->count()));
-            w_settings.addParameter("currentModel", new FilenameParameter("Current model:", currentModelID));
-            w_settings.addParameter("currentVC", new FilenameParameter("Current viewController:", currentViewControllerID));
-            w_settings.addParameter("activeVCs", new LongStringParameter("Active viewControllers:",visibleViewControllerIDs.join(", ")));
             
             xmlWriter.writeStartDocument();
             
@@ -1074,15 +1095,6 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
             IntParameter* p_viewControllers = new IntParameter("ViewController count:", 0, 1e10, 0);
             w_settings.addParameter("viewControllers", p_viewControllers);
             
-            FilenameParameter* p_currentModel = new FilenameParameter("Current model:", "");
-            w_settings.addParameter("currentModel", p_currentModel);
-            
-            FilenameParameter* p_currentVC = new FilenameParameter("Current viewController:", "");
-            w_settings.addParameter("currentVC", p_currentVC);
-            
-            LongStringParameter* p_activeVCs = new LongStringParameter("Active viewControllers:","");
-            w_settings.addParameter("activeVCs",p_activeVCs);
-        
             QXmlStreamReader xmlReader(device);
         
             if(xmlReader.readNextStartElement())
@@ -1123,8 +1135,11 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                                     Model* m = Impex::loadModel(xmlReader, m_environment);
                                                     if(m != NULL)
                                                     {
+                                                        bool current = m->isCurrent();
+                                                        
                                                         addModelItemToList(m);
-                                                        if(m->id() == p_currentModel->value())
+                                                        
+                                                        if(current)
                                                         {
                                                             m_ui.listModels->setCurrentRow(m_ui.listModels->count()-1);
                                                         }
@@ -1149,25 +1164,12 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
                                                     //2. Read in all the saved views
                                                     if(xmlReader.name() =="ViewControllers")
                                                     {
-                                                        QStringList activeVCs = p_activeVCs->value().split(", ");
-                                                    
                                                         for(int i=0; i!=p_viewControllers->value(); i++)
                                                         {
                                                             ViewController* vc = Impex::loadViewController(xmlReader, m_environment);
                                                             if(vc != NULL)
                                                             {
                                                                 addViewControllerItemToSceneAndList(vc);
-                                                                
-                                                                if(vc->id() == p_currentVC->value())
-                                                                {
-                                                                    m_ui.listViews->setCurrentRow(m_ui.listViews->count()-1);
-                                                                }
-                                                                Qt::CheckState state = Qt::CheckState::Unchecked;
-                                                                if(activeVCs.contains(vc->id()))
-                                                                {
-                                                                    state = Qt::CheckState::Checked;
-                                                                }
-                                                                m_ui.listViews->item(m_ui.listViews->count()-1)->setCheckState(state);
                                                             }
                                                         }
                                                     }
@@ -1609,12 +1611,17 @@ void MainWindow::addViewControllerItemToSceneAndList(ViewController* viewControl
         connect(viewController, SIGNAL(updateStatusDescription(QString)), this,	SLOT(updateStatusDescription(QString)));
 	
         QListWidgetViewControllerItem * vc_item = new QListWidgetViewControllerItem(viewController->typeName() + " of " + model->name(), viewController);
-		vc_item->setCheckState(Qt::Checked);
 		vc_item->setToolTip(viewController->typeName() + " of " + model->description());
 		m_ui.listViews->addItem(vc_item);
-        m_ui.listViews->setCurrentItem(vc_item);
         
-        currentViewControllerChanged(vc_item);
+        vc_item->setCheckState(viewController->isVisible() ? Qt::Checked : Qt::Unchecked);
+        
+        if(viewController->isCurrent())
+        {
+            m_ui.listViews->setCurrentItem(vc_item);
+            currentViewControllerChanged(vc_item);
+        }
+        
         updateMemoryUsage();
 	}
 	else

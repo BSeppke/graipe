@@ -52,31 +52,14 @@ namespace graipe {
 
 /**
  * Constructor: Creates an empty environment
- * or auto-loads all modules, that are in same dir as the core-module.
+ * and auto-loads all modules, that are in same dir as the core-module.
  * Calls loadModules with different paths:
  * Under Mac OS at the place of the executable file (not the app-Bundle) and at
  * the location of the .app-bundle.
- *
- * \param auto_load If true, it will auto-load all modules. False by default
  */
-Environment::Environment(bool auto_load)
+Environment::Environment()
 {
-    if(auto_load)
-    {
-        //search paths for modules:
-        QDir current_dir = QCoreApplication::applicationDirPath();
-
-        //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
-        //     Graipe.app/Contents/MacOS
-        loadModules(QCoreApplication::applicationDirPath());
-
-        //Since this only works after deploying the app, we will also search at the level of the .app directory
-        //for loadable modules, iff we found none so far
-        if(modules_filenames.empty())
-        {
-            loadModules(QDir::current());
-        }
-    }
+    findAndLoadModules();
 }
 
 /**
@@ -94,18 +77,12 @@ Environment::Environment(const Environment& env, bool reload_factories)
 : modelFactory(env.modelFactory),
   viewControllerFactory(env.viewControllerFactory),
   algorithmFactory(env.algorithmFactory),
-  modules_filenames(env.modules_filenames),
+  modules_names(env.modules_names),
   modules_status(env.modules_status)
 {
     if(reload_factories)
     {
-        modules_filenames.clear();
-        modules_status.clear();
-  
-        for(QString file : env.modules_filenames)
-        {
-            loadModule(file);
-        }
+        findAndLoadModules();
     }
 }
 
@@ -118,118 +95,6 @@ Environment::~Environment()
 }
 
 /**
- * Find all available modules in a directory and fill the corresponding registries with their
- * contributions. SymLinks are not loaded to avoid double loading. Updates the report
- * property of this class.
- *
- * \param dir The directory to search for modules.
- */
-void Environment::loadModules(QDir dir)
-{
-    reset();
-    
-    for(const QString& file : dir.entryList(QDir::Files))
-    {
-        //ignore symlinks
-        QString symTarget = QFile::symLinkTarget(file);
-        
-        if(symTarget.isEmpty() && QLibrary::isLibrary(file))
-        {
-            loadModule(dir.absoluteFilePath(file));
-        }
-    }
-}
-
-/**
- * Load one module and fill the corresponding registries with its contributions.
- * Also (incrementally updates the report property of this class.
- *
- * \param file The filename of the module.
- */
-void Environment::loadModule(QString file)
-{
-    typedef  Module* (*Initialize_f) ();
-    Initialize_f module_initialize = (Initialize_f) QLibrary::resolve(file, "initialize");
-    
-    QString status;
-    
-    if (module_initialize)
-    {
-        
-        Module* module = module_initialize();
-        
-        status  += "<h3>" + module->name() + "</h3>\n"
-                + "<ul>\n"
-                + "  <li>loaded from: " + file + "</li>\n";
-        
-        ModelFactory model_items = module->modelFactory();
-        
-        if(model_items.size() != 0)
-        {
-            status += "  <li>Models:</li>\n"
-                      "    <ul>\n";
-            
-            for(const ModelFactoryItem& item : model_items)
-            {
-                status += "      <li>" + item.model_type  + "</li>\n";
-                modelFactory.push_back(item);
-            }
-            
-            status += "    </ul>\n";
-        }
-        else
-        {
-            status += "<li>No models.</li>\n";
-        }
-        
-        ViewControllerFactory vc_items = module->viewControllerFactory();
-        
-        if(vc_items.size() != 0)
-        {
-            status += "  <li>ViewControllers:</li>\n"
-                  "    <ul>\n";
-            
-            for(const ViewControllerFactoryItem& item : vc_items)
-            {
-                status += "      <li>" + item.viewController_name + " <i>(for model: " + item.model_type + ")</i></li>\n";
-                viewControllerFactory.push_back(item);
-            }
-            
-            status += "    </ul>\n";
-        }
-        else
-        {
-            status += "<li>No ViewControllers.</li>\n";
-        }
-        
-        std::vector<AlgorithmFactoryItem> alg_items = module->algorithmFactory();
-        
-        if(alg_items.size() != 0)
-        {
-            status += "  <li>Algorithms:</li>\n"
-                  "    <ul>\n";
-            
-            for(const AlgorithmFactoryItem& item : alg_items)
-            {
-                status += "      <li>" + item.algorithm_name + " <i>(for topic: " + item.topic_name  + ")</i></li>\n";
-                algorithmFactory.push_back(item);
-            }
-            status += "    </ul>\n";
-        }
-        else
-        {
-            status += "<li>No algorithms.</li>\n";
-        }
-        
-        status  += "</ul>\n\n";
-        
-        modules_filenames.push_back(file);
-        modules_status.push_back(status);
-    }
-}
-
-
-/**
  * Deserialization of an environment from an xml file.
  *
  * \param xmlReader The QXmlStreamReader, where we read from.
@@ -237,7 +102,8 @@ void Environment::loadModule(QString file)
  */
 bool Environment::deserialize(QXmlStreamReader& xmlReader)
 {
-    reset();
+    clearContents();
+    
     try
     {
         if(xmlReader.readNextStartElement())
@@ -287,7 +153,12 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
                                             for(int i=0; i!=p_modules->value(); i++)
                                             {
                                                 xmlReader.readNextStartElement();
-                                                loadModule(xmlReader.readElementText());
+                                                QString module_name = xmlReader.readElementText();
+                                                
+                                                if(!modules_names.contains(module_name))
+                                                {
+                                                    throw "Error: Module " + module_name + " was needed but not already loaded...";
+                                                }
                                             }
                                             
                                             //Read until </Modules> comes....
@@ -396,7 +267,7 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
             
             xmlWriter.writeStartElement("Header");
                 ParameterGroup w_settings;
-                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, modules_filenames.size()));
+                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, modules_names.size()));
                 w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, models.size()));
                 w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, viewControllers.size()));
                 w_settings.serialize(xmlWriter);
@@ -405,9 +276,9 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
             xmlWriter.writeStartElement("Content");
         
                 xmlWriter.writeStartElement("Modules");
-                for(QString file : modules_filenames)
+                for(QString name : modules_names)
                 {
-                    xmlWriter.writeTextElement("Module", file);
+                    xmlWriter.writeTextElement("Module", name);
                 }
                 xmlWriter.writeEndElement();
         
@@ -467,14 +338,152 @@ void Environment::clearContents()
  */
 void Environment::reset()
 {
-    modules_filenames.clear();
+    //resets and reloads all modules
+    findAndLoadModules();
+    
+    //clears all contents
+    clearContents();
+}
+
+/**
+ * Auto-loads all modules, that are in same dir as the core-module.
+ * Calls loadModules with different paths:
+ * Under Mac OS at the place of the executable file (not the app-Bundle) and at
+ * the location of the .app-bundle.
+ */
+void Environment::findAndLoadModules()
+{
+    //search paths for modules:
+    QDir current_dir = QCoreApplication::applicationDirPath();
+
+    //First search at the EXACT dir of the executable - under Mac OS X this means inside the bundle
+    //     Graipe.app/Contents/MacOS
+    loadModules(QCoreApplication::applicationDirPath());
+
+    //Since this only works after deploying the app, we will also search at the level of the .app directory
+    //for loadable modules, iff we found none so far
+    if(modules_names.empty())
+    {
+        loadModules(QDir::current());
+    }
+}
+
+/**
+ * Find all available modules in a directory and fill the corresponding registries with their
+ * contributions. SymLinks are not loaded to avoid double loading. Updates the report
+ * property of this class.
+ *
+ * \param dir The directory to search for modules.
+ */
+void Environment::loadModules(QDir dir)
+{
+    modules_names.clear();
     modules_status.clear();
     
     modelFactory.clear();
     viewControllerFactory.clear();
     algorithmFactory.clear();
     
-    clearContents();
+    for(const QString& file : dir.entryList(QDir::Files))
+    {
+        //ignore symlinks
+        QString symTarget = QFile::symLinkTarget(file);
+        
+        if(symTarget.isEmpty() && QLibrary::isLibrary(file))
+        {
+            loadModule(dir.absoluteFilePath(file));
+        }
+    }
+}
+
+/**
+ * Load one module and fill the corresponding registries with its contributions.
+ * Also (incrementally updates the report property of this class.
+ *
+ * \param file The filename of the module.
+ */
+void Environment::loadModule(QString file)
+{
+    typedef  Module* (*Initialize_f) ();
+    Initialize_f module_initialize = (Initialize_f) QLibrary::resolve(file, "initialize");
+    
+    QString status;
+    QString name;
+    
+    if (module_initialize)
+    {
+        Module* module = module_initialize();
+        
+        name = module->name();
+        
+        status  += "<h3>" + module->name() + "</h3>\n"
+                + "<ul>\n"
+                + "  <li>loaded from: " + file + "</li>\n";
+        
+        ModelFactory model_items = module->modelFactory();
+        
+        if(model_items.size() != 0)
+        {
+            status += "  <li>Models:</li>\n"
+                      "    <ul>\n";
+            
+            for(const ModelFactoryItem& item : model_items)
+            {
+                status += "      <li>" + item.model_type  + "</li>\n";
+                modelFactory.push_back(item);
+            }
+            
+            status += "    </ul>\n";
+        }
+        else
+        {
+            status += "<li>No models.</li>\n";
+        }
+        
+        ViewControllerFactory vc_items = module->viewControllerFactory();
+        
+        if(vc_items.size() != 0)
+        {
+            status += "  <li>ViewControllers:</li>\n"
+                  "    <ul>\n";
+            
+            for(const ViewControllerFactoryItem& item : vc_items)
+            {
+                status += "      <li>" + item.viewController_name + " <i>(for model: " + item.model_type + ")</i></li>\n";
+                viewControllerFactory.push_back(item);
+            }
+            
+            status += "    </ul>\n";
+        }
+        else
+        {
+            status += "<li>No ViewControllers.</li>\n";
+        }
+        
+        std::vector<AlgorithmFactoryItem> alg_items = module->algorithmFactory();
+        
+        if(alg_items.size() != 0)
+        {
+            status += "  <li>Algorithms:</li>\n"
+                  "    <ul>\n";
+            
+            for(const AlgorithmFactoryItem& item : alg_items)
+            {
+                status += "      <li>" + item.algorithm_name + " <i>(for topic: " + item.topic_name  + ")</i></li>\n";
+                algorithmFactory.push_back(item);
+            }
+            status += "    </ul>\n";
+        }
+        else
+        {
+            status += "<li>No algorithms.</li>\n";
+        }
+        
+        status  += "</ul>\n\n";
+        
+        modules_names.push_back(name);
+        modules_status.push_back(status);
+    }
 }
 
 } //end of namespace graipe

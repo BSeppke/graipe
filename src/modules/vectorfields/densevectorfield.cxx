@@ -601,7 +601,7 @@ bool DenseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
         {
             xmlReader.readNextStartElement();
             
-            qDebug() << "DenseVectorfield2D::deserialize_content: readNextStartElement" << xmlReader.name();
+            //qDebug() << "DenseVectorfield2D::deserialize_content: readNextStartElement" << xmlReader.name();
             
             if(xmlReader.name() == "Channel"
                 && xmlReader.attributes().hasAttribute("ID")
@@ -951,7 +951,7 @@ bool DenseWeightedVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader
     {
         xmlReader.readNextStartElement();
             
-        qDebug() << "DenseVectorfield2D::deserialize_content: readNextStartElement" << xmlReader.name();
+        //qDebug() << "DenseVectorfield2D::deserialize_content: readNextStartElement" << xmlReader.name();
             
         if(xmlReader.name() == "Channel"
             && xmlReader.attributes().hasAttribute("ID")

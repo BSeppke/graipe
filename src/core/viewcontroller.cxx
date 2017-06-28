@@ -73,7 +73,8 @@ ViewController::ViewController(Model * model)
     m_axisLabelSpacing(new PointParameter("Label spacing:",QPoint(1,1),QPoint(1000,1000),QPoint(100,100),m_showAxis)),
     m_axisFontSize(new FloatParameter("Label font size", 0,1000,10,m_showAxis)),
     m_axisGridStyle(NULL),
-    m_parameters(new ParameterGroup("ViewController Properties"))
+    m_parameters(new ParameterGroup("ViewController Properties")),
+    m_current(false)
 {
     using namespace ::std;
     
@@ -371,11 +372,9 @@ void ViewController::updateView()
 {
     //Update view parameters to the newly changed model
     updateParameters();
-    
-    hide();
-    
+
     prepareGeometryChange();
-	
+    
     QFont f("Arial");
     f.setPointSizeF(m_axisFontSize->value());
     QFontMetricsF fm(f);
@@ -393,8 +392,6 @@ void ViewController::updateView()
 	}
 	
 	m_axis_grid_pen = QPen(m_axisLineColor->value(), m_axisLineWidth->value(),(Qt::PenStyle)m_axisGridStyle->value());
-	
-	show();
 }
 
 /**
@@ -406,6 +403,26 @@ void ViewController::updateView()
  */
 void ViewController::updateParameters(bool /*force_update*/)
 {
+}
+
+/**
+ * Const accessor for the "current" property of a ViewController.
+ *
+ * \return True, if this is the current ViewController.
+ */
+bool ViewController::isCurrent() const
+{
+    return m_current;
+}
+
+/**
+ * Set the "current" property of a ViewController to a given value.
+ *
+ * \param current If true, it becomes the current ViewController.
+ */
+void ViewController::setCurrent(bool current)
+{
+    m_current = current;
 }
 
 /**
@@ -430,6 +447,16 @@ void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
         xmlWriter.writeAttribute("ID", id());
         xmlWriter.writeAttribute("ModelID", m_model->id());
         xmlWriter.writeAttribute("ZOrder", QString::number(zValue()));
+        
+        if(isCurrent())
+        {
+            xmlWriter.writeAttribute("current", "true");
+        }
+        if(isVisible())
+        {
+            xmlWriter.writeAttribute("visible", "true");
+        }
+    
             m_parameters->serialize(xmlWriter);
         xmlWriter.writeEndElement();
     
@@ -458,6 +485,22 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
                 &&  xmlReader.attributes().hasAttribute("ID"))
             {
                 setID(xmlReader.attributes().value("ID").toString());
+                
+                
+                if(xmlReader.attributes().hasAttribute("current"))
+                {
+                    setCurrent(xmlReader.attributes().value("current").toString() == "true");
+                }
+                
+                if(xmlReader.attributes().hasAttribute("visible"))
+                {
+                    setVisible(xmlReader.attributes().value("visible").toString() == "true");
+                }
+                else
+                {
+                    setVisible(false);
+                }
+                
                 
                 bool success = m_parameters->deserialize(xmlReader);
                  

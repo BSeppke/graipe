@@ -49,7 +49,7 @@ MainDialog::MainDialog(QWidget *parent)
 :   QWidget(parent),
     m_server(NULL)
 {
-    Environment* env = new Environment(true);
+    Environment* env = new Environment;
     
     QLabel* lblServerStatus = new QLabel;
     lblServerStatus->setAlignment(Qt::AlignTop);
