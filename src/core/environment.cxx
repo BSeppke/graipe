@@ -114,7 +114,7 @@ Environment::Environment(const Environment& env, bool reload_factories)
  */
 Environment::~Environment()
 {
-    //TODO do something!
+    //TODO: Avoid errors on reset call here: reset();
 }
 
 /**
@@ -126,8 +126,7 @@ Environment::~Environment()
  */
 void Environment::loadModules(QDir dir)
 {
-    modules_filenames.clear();
-    modules_status.clear();
+    reset();
     
     for(const QString& file : dir.entryList(QDir::Files))
     {
@@ -238,6 +237,7 @@ void Environment::loadModule(QString file)
  */
 bool Environment::deserialize(QXmlStreamReader& xmlReader)
 {
+    reset();
     try
     {
         if(xmlReader.readNextStartElement())
@@ -249,6 +249,10 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
                     if(xmlReader.name() =="Header")
                     {
                         ParameterGroup w_settings;
+                        
+                        IntParameter* p_modules = new IntParameter("Module count:", 0, 1e10, 0);
+                        w_settings.addParameter("modules", p_modules);
+                        
                         IntParameter* p_models = new IntParameter("Model count:", 0, 1e10, 0);
                         w_settings.addParameter("models", p_models);
             
@@ -277,42 +281,68 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
                                 {
                                     if(xmlReader.readNextStartElement())
                                     {
-                                        //1. Read in all the saved models
-                                        if(xmlReader.name() =="Models")
+                                        //1. Restor in all the modules
+                                        if(xmlReader.name() =="Modules")
                                         {
-                                            for(int i=0; i!=p_models->value(); i++)
+                                            for(int i=0; i!=p_modules->value(); i++)
                                             {
-                                                Model* m = Impex::loadModel(xmlReader, this);
-                                                if(m == NULL)
-                                                {
-                                                    throw "did not load model!";
-                                                }
+                                                xmlReader.readNextStartElement();
+                                                loadModule(xmlReader.readElementText());
                                             }
                                             
-                                            //Read until </Models> comes....
+                                            //Read until </Modules> comes....
                                             while(true)
                                             {
-                                                if(xmlReader.isEndElement() && xmlReader.name() == "Models")
+                                                if(xmlReader.isEndElement() && xmlReader.name() == "Modules")
                                                 {
                                                     break;
                                                 }
                                                 if(!xmlReader.readNext())
                                                 {
-                                                    throw "Error: XML at end before Models End-Tag";
+                                                    throw "Error: XML at end before Modules End-Tag";
                                                 }
                                             }
-                                            
+
                                             if(xmlReader.readNextStartElement())
                                             {
-                                                //2. Read in all the saved views
-                                                if(xmlReader.name() =="ViewControllers")
+                                                //2. Read in all the saved models
+                                                if(xmlReader.name() =="Models")
                                                 {
-                                                    for(int i=0; i!=p_viewControllers->value(); i++)
+                                                    for(int i=0; i!=p_models->value(); i++)
                                                     {
-                                                        ViewController* vc = Impex::loadViewController(xmlReader, this);
-                                                        if(vc == NULL)
+                                                        Model* m = Impex::loadModel(xmlReader, this);
+                                                        if(m == NULL)
                                                         {
-                                                            throw "did not load viewController!";
+                                                            throw "did not load model!";
+                                                        }
+                                                    }
+                                                    
+                                                    //Read until </Models> comes....
+                                                    while(true)
+                                                    {
+                                                        if(xmlReader.isEndElement() && xmlReader.name() == "Models")
+                                                        {
+                                                            break;
+                                                        }
+                                                        if(!xmlReader.readNext())
+                                                        {
+                                                            throw "Error: XML at end before Models End-Tag";
+                                                        }
+                                                    }
+                                                    
+                                                    if(xmlReader.readNextStartElement())
+                                                    {
+                                                        //3. Read in all the saved views
+                                                        if(xmlReader.name() =="ViewControllers")
+                                                        {
+                                                            for(int i=0; i!=p_viewControllers->value(); i++)
+                                                            {
+                                                                ViewController* vc = Impex::loadViewController(xmlReader, this);
+                                                                if(vc == NULL)
+                                                                {
+                                                                    throw "did not load viewController!";
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -345,7 +375,8 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
  * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
  */
 void Environment::serialize(QXmlStreamWriter& xmlWriter) const
-{    try
+{
+    try
     {
         //Transform memory address to ID for models and viewControllers:
         for(Model* model : models)
@@ -365,24 +396,35 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
             
             xmlWriter.writeStartElement("Header");
                 ParameterGroup w_settings;
+                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, modules_filenames.size()));
                 w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, models.size()));
                 w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, viewControllers.size()));
                 w_settings.serialize(xmlWriter);
             xmlWriter.writeEndElement();
             
             xmlWriter.writeStartElement("Content");
+        
+                xmlWriter.writeStartElement("Modules");
+                for(QString file : modules_filenames)
+                {
+                    xmlWriter.writeTextElement("Module", file);
+                }
+                xmlWriter.writeEndElement();
+        
                 xmlWriter.writeStartElement("Models");
                 for(Model* m : models)
                 {
                     m->serialize(xmlWriter);
                 }
                 xmlWriter.writeEndElement();
+        
                 xmlWriter.writeStartElement("ViewControllers");
                 for(ViewController* vc : viewControllers)
                 {
                     vc->serialize(xmlWriter);
                 }
                 xmlWriter.writeEndElement();
+                
             xmlWriter.writeEndElement();
                 
         xmlWriter.writeEndElement();
@@ -396,6 +438,43 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
     {
         qWarning() << "Environment was not saved!";
     }
+}
+
+/**
+ * Clear all data structures, lie models and viewControllers,
+ * but keeps the modules by means of the factories.
+ */
+void Environment::clearContents()
+{
+    for(ViewController* vc : viewControllers)
+    {
+        delete vc;
+        vc=NULL;
+    }
+    viewControllers.clear();
+    
+    for(Model* m : models)
+    {
+        delete m;
+        m=NULL;
+    }
+    models.clear();
+}
+
+/**
+ * Resets this evironment and clears all data structures, 
+ * deletes all objects etc. Also deletes all modules and facrtories.
+ */
+void Environment::reset()
+{
+    modules_filenames.clear();
+    modules_status.clear();
+    
+    modelFactory.clear();
+    viewControllerFactory.clear();
+    algorithmFactory.clear();
+    
+    clearContents();
 }
 
 } //end of namespace graipe

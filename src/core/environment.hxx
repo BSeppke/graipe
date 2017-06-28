@@ -131,6 +131,19 @@ class GRAIPE_CORE_EXPORT Environment
          */
         void serialize(QXmlStreamWriter& xmlWriter) const;
     
+
+        /**
+         * Clear all data structures, lie models and viewControllers,
+         * but keeps the modules by means of the factories.
+         */
+        void clearContents();
+    
+        /**
+         * Resets this evironment and clears all data structures, 
+         * deletes all objects etc. Also deletes all modules and facrtories.
+         */
+        void reset();
+    
         //One global algorithm mutex:
         QMutex global_algorithm_mutex;
 
