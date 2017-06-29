@@ -169,6 +169,25 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
     m_default_dir = settings.value("defaultDir").toString();
     
+    //Restore the other vierport and window state settings:
+    m_ui.btnWorldView->setChecked(settings.value("geoMode", false).toBool());
+        
+    //Restore view transform
+    QTransform vc_t;
+        
+    vc_t.setMatrix(
+            settings.value("view_m11", 1.0).toFloat(), settings.value("view_m12", 0.0).toFloat(), settings.value("view_m13", 0.0).toFloat(),
+            settings.value("view_m21", 0.0).toFloat(), settings.value("view_m22", 1.0).toFloat(), settings.value("view_m23", 0.0).toFloat(),
+            settings.value("view_m31", 0.0).toFloat(), settings.value("view_m32", 0.0).toFloat(), settings.value("view_m33", 1.0).toFloat());
+    m_view->setTransform(vc_t);
+        
+    //Restore window geometry & dockWidgets state
+    restoreGeometry( settings.value("window_geometry").toByteArray());
+    restoreState( settings.value("window_state").toByteArray());
+        
+    m_view->horizontalScrollBar()->setValue(settings.value("view_hscroll").toInt());
+    m_view->verticalScrollBar()->setValue(settings.value("view_vscroll").toInt());
+
     //Set the GRAIPE settings directory to homeDir()/.graipe/
     //Or, if the folder cannot be created: /tmp/.graipe/
     //Same as for the logger...
@@ -207,6 +226,24 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
  */
 MainWindow::~MainWindow()
 {
+    QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
+
+    settings.setValue("geoMode", m_displayMode == GeographicMode);
+    
+    settings.setValue("window_geometry", saveGeometry());
+    settings.setValue("window_state", saveState());
+    
+    settings.setValue("view_hscroll",  m_view->horizontalScrollBar()->value());
+    settings.setValue("view_vscroll",  m_view->verticalScrollBar()->value());
+    
+    //save the scene's settings to an ini-file
+    QTransform vc_t = m_view->transform();
+    
+    settings.setValue("view_m11", vc_t.m11());    settings.setValue("view_m12", vc_t.m12());    settings.setValue("view_m13", vc_t.m13());
+    settings.setValue("view_m21", vc_t.m21());    settings.setValue("view_m22", vc_t.m22());    settings.setValue("view_m23", vc_t.m23());
+    settings.setValue("view_m31", vc_t.m31());    settings.setValue("view_m32", vc_t.m32());    settings.setValue("view_m33", vc_t.m33());
+
+
     if( QMessageBox::question(this,
                               "Save workspace?",
                              "Do you want to save the current workspace for the next start of GRAIPE?",
@@ -215,15 +252,6 @@ MainWindow::~MainWindow()
             == QMessageBox::Yes)
     {
         saveWorkspace(m_settings_dir + "workspace.xgz");
-        
-        QFile f(m_settings_dir + "environment.xml");
-        
-        if(f.open(QIODevice::WriteOnly))
-        {
-            QXmlStreamWriter xmlWriter(&f);
-            m_environment->serialize(xmlWriter);
-            f.close();
-        }
     }
     delete m_lblMemoryUsage;
     delete m_view;
@@ -448,7 +476,7 @@ void MainWindow::about()
  */
 void MainWindow::newModel(int index)
 {
-    ModelFactoryItem item = m_environment->modelFactory[index];
+    ModelFactoryItem item = m_environment->modelFactory()[index];
     Model * new_model = item.model_fptr(m_environment);
             
     //SHOW EDIT DIALOG
@@ -486,7 +514,7 @@ void MainWindow::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory[index];
+    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory()[index];
 	
 	Algorithm* alg = alg_item.algorithm_fptr(m_environment);
     
@@ -559,10 +587,7 @@ void MainWindow::currentModelChanged(QListWidgetItem * item)
         
             if(model_parameter_widget != NULL)
             {
-                for(Model* m : m_environment->models)
-                {
-                    m->setCurrent(m == model);
-                }
+                m_environment->setCurrentModel(model);
                 
                 m_ui.scrModelParameters->takeWidget();
                 m_ui.dockModelParameters->setWindowTitle(model->parameters()->name());
@@ -593,7 +618,8 @@ void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
         
             if(vc_item == new_item)
             {
-                viewController->setCurrent(true);
+                m_environment->setCurrentViewController(viewController);
+                
                 viewController->setAcceptHoverEvents(true);
                 
                 if (viewController && item->checkState()==Qt::Checked)
@@ -611,7 +637,6 @@ void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
             }
             else
             {
-                viewController->setCurrent(false);
                 viewController->setAcceptHoverEvents(false);
             }
 		}
@@ -706,7 +731,7 @@ void MainWindow::showCurrentModel()
 			
         if(model_item && model_item->model()->isViewable())
         {
-            ViewControllerFactory vc_possibilities =  m_environment->viewControllerFactory.filterByModelType(model_item->model());
+            ViewControllerFactory vc_possibilities =  m_environment->viewControllerFactory().filterByModelType(model_item->model());
             int vc_index = -1;
             
             //Select the view/controller
@@ -743,7 +768,7 @@ void MainWindow::showCurrentModel()
                 
                 //Always show and make current for new ViewControllers
                 new_vc->setVisible(true);
-                new_vc->setCurrent(true);
+                m_environment->setCurrentViewController(new_vc);
                 addViewControllerItemToSceneAndList(new_vc);
             }
         }
@@ -768,7 +793,7 @@ void MainWindow::saveCurrentModel()
 		
 		if(!filename.isEmpty())
 		{	
-			ModelFactory model_possibilities =  m_environment->modelFactory.filterByModelType(model);
+			ModelFactory model_possibilities =  m_environment->modelFactory().filterByModelType(model);
 			
 			if(model_possibilities.size()==1)
 			{
@@ -929,89 +954,10 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
         
         if(device != NULL)
         {
-            QString currentModelID;
-            
-            for(int i=0; i<m_ui.listModels->count(); ++i)
-            {
-                QListWidgetModelItem* model_item = static_cast<QListWidgetModelItem*>(m_ui.listModels->item(i));
-                if(model_item && model_item->model())
-                {
-                    Model* model = model_item->model();
-                    model->setID(QString::number((long int) model));
-                    
-                    if(model == currentModel())
-                    {
-                        currentModelID = model->id();
-                    }
-                }
-            }
-            QString currentViewControllerID;
-            QStringList visibleViewControllerIDs;
-            
-            for(int i=0; i<m_ui.listViews->count(); ++i)
-            {
-                QListWidgetViewControllerItem* vc_item = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->item(i));
-                if(vc_item && vc_item->viewController())
-                {
-                    ViewController* vc = vc_item->viewController();
-                
-                    vc->setID(QString::number((long int) vc));
-                
-                    if(vc == currentViewController())
-                    {
-                        currentViewControllerID = vc->id();
-                    }
-                    if(vc_item->checkState() == Qt::CheckState::Checked)
-                    {
-                        visibleViewControllerIDs.append(vc->id());
-                    }
-                }
-            }
-            
             QXmlStreamWriter xmlWriter(device);
-            
             xmlWriter.setAutoFormatting(true);
             
-            ParameterGroup w_settings;
-            
-            w_settings.addParameter("geoMode", new BoolParameter("Geographic Mode:",m_displayMode == GeographicMode));
-            
-            w_settings.addParameter("winGeometry", new LongStringParameter("Window Geometry:",QString(saveGeometry().toBase64())));
-            w_settings.addParameter("winState", new LongStringParameter("Window State:",QString(saveState().toBase64())));
-            
-            QPoint scrolling(m_view->horizontalScrollBar()->value(),m_view->verticalScrollBar()->value());
-            w_settings.addParameter("viewScroll", new PointParameter("Viewport Scrolling:",QPoint(-1e10,-1e10), QPoint(1e10,1e10), scrolling));
-            
-            w_settings.addParameter("viewTrans", new TransformParameter("Viewport transformation", m_view->transform()));
-            w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, m_ui.listModels->count()));
-            w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, m_ui.listViews->count()));
-            
-            xmlWriter.writeStartDocument();
-            
-            xmlWriter.writeStartElement("Workspace");
-            xmlWriter.writeAttribute("ID", xmlFilename);
-            
-                xmlWriter.writeStartElement("Header");
-                    w_settings.serialize(xmlWriter);
-                xmlWriter.writeEndElement();
-            
-                xmlWriter.writeStartElement("Content");
-                    xmlWriter.writeStartElement("Models");
-                        for(Model* m : m_environment->models)
-                        {
-                            m->serialize(xmlWriter);
-                        }
-                    xmlWriter.writeEndElement();
-                    xmlWriter.writeStartElement("ViewControllers");
-                        for(ViewController* vc : m_environment->viewControllers)
-                        {
-                            vc->serialize(xmlWriter);
-                        }
-                    xmlWriter.writeEndElement();
-                xmlWriter.writeEndElement();
-                
-            xmlWriter.writeEndElement();
-            xmlWriter.writeEndDocument();
+            m_environment->serialize(xmlWriter);
             
             device->close();
         }
@@ -1041,6 +987,29 @@ void MainWindow::restoreLastWorkspace()
     {
         QApplication::processEvents();
         restoreWorkspace(m_settings_dir + "workspace.xgz");
+
+        //We will reload window settings here, and only here to make sure, that the geometry is updated accordingly
+        QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
+        
+        //Restore the other vierport and window state settings:
+        m_ui.btnWorldView->setChecked(settings.value("geoMode", false).toBool());
+            
+        //Restore view transform
+        QTransform vc_t;
+            
+        vc_t.setMatrix(
+                settings.value("view_m11", 1.0).toFloat(), settings.value("view_m12", 0.0).toFloat(), settings.value("view_m13", 0.0).toFloat(),
+                settings.value("view_m21", 0.0).toFloat(), settings.value("view_m22", 1.0).toFloat(), settings.value("view_m23", 0.0).toFloat(),
+                settings.value("view_m31", 0.0).toFloat(), settings.value("view_m32", 0.0).toFloat(), settings.value("view_m33", 1.0).toFloat());
+        m_view->setTransform(vc_t);
+            
+        //Restore window geometry & dockWidgets state
+        restoreGeometry( settings.value("window_geometry").toByteArray());
+        restoreState( settings.value("window_state").toByteArray());
+            
+        m_view->horizontalScrollBar()->setValue(settings.value("view_hscroll").toInt());
+        m_view->verticalScrollBar()->setValue(settings.value("view_vscroll").toInt());
+
     }
 }
 
@@ -1072,132 +1041,20 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
         
         if(device != NULL)
         {
-            ParameterGroup w_settings;
-            BoolParameter* p_geoMode = new BoolParameter("Geographic Mode:",m_displayMode == GeographicMode);
-            w_settings.addParameter("geoMode", p_geoMode);
-            
-            LongStringParameter* p_winGeo = new LongStringParameter("Window Geometry:",QString(saveGeometry().toBase64()));
-            w_settings.addParameter("winGeometry", p_winGeo);
-            
-            LongStringParameter* p_winState = new LongStringParameter("Window State:",QString(saveState().toBase64()));
-            w_settings.addParameter("winState", p_winState);
-            
-            QPoint scrolling(m_view->horizontalScrollBar()->value(),m_view->verticalScrollBar()->value());
-            PointParameter* p_viewScroll = new PointParameter("Viewport Scrolling:",QPoint(-1e10,-1e10), QPoint(1e10,1e10), QPoint(0,0));
-            w_settings.addParameter("viewScroll", p_viewScroll);
-            
-            TransformParameter* p_viewTrans = new TransformParameter("Viewport transformation", m_view->transform());
-            w_settings.addParameter("viewTrans", p_viewTrans);
-            
-            IntParameter* p_models = new IntParameter("Model count:", 0, 1e10, 0);
-            w_settings.addParameter("models", p_models);
-            
-            IntParameter* p_viewControllers = new IntParameter("ViewController count:", 0, 1e10, 0);
-            w_settings.addParameter("viewControllers", p_viewControllers);
-            
             QXmlStreamReader xmlReader(device);
-        
-            if(xmlReader.readNextStartElement())
+            
+            m_environment->deserialize(xmlReader);
+            
+            for(Model* model : m_environment->models)
             {
-                if(xmlReader.name() =="Workspace")
-                {
-                    if(xmlReader.readNextStartElement())
-                    {
-                        if(xmlReader.name() =="Header")
-                        {
-                            if(w_settings.deserialize(xmlReader))
-                            {
-                                //Read until </Header> comes....
-                                while(true)
-                                {
-                                    if(!xmlReader.readNext())
-                                    {
-                                        throw "Error: XML at end before Header End-Tag";
-                                    }
-                                    
-                                    if(xmlReader.isEndElement() && xmlReader.name() == "Header")
-                                    {
-                                        break;
-                                    }
-                                }
-                                
-                                if(xmlReader.readNextStartElement())
-                                {
-                                    if(xmlReader.name() =="Content")
-                                    {
-                                        if(xmlReader.readNextStartElement())
-                                        {
-                                            //1. Read in all the saved models
-                                            if(xmlReader.name() =="Models")
-                                            {
-                                                for(int i=0; i!=p_models->value(); i++)
-                                                {
-                                                    Model* m = Impex::loadModel(xmlReader, m_environment);
-                                                    if(m != NULL)
-                                                    {
-                                                        bool current = m->isCurrent();
-                                                        
-                                                        addModelItemToList(m);
-                                                        
-                                                        if(current)
-                                                        {
-                                                            m_ui.listModels->setCurrentRow(m_ui.listModels->count()-1);
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                //Read until </Models> comes....
-                                                while(true)
-                                                {
-                                                    if(xmlReader.isEndElement() && xmlReader.name() == "Models")
-                                                    {
-                                                        break;
-                                                    }
-                                                    if(!xmlReader.readNext())
-                                                    {
-                                                        throw "Error: XML at end before Models End-Tag";
-                                                    }
-                                                }
-                                                
-                                                if(xmlReader.readNextStartElement())
-                                                {
-                                                    //2. Read in all the saved views
-                                                    if(xmlReader.name() =="ViewControllers")
-                                                    {
-                                                        for(int i=0; i!=p_viewControllers->value(); i++)
-                                                        {
-                                                            ViewController* vc = Impex::loadViewController(xmlReader, m_environment);
-                                                            if(vc != NULL)
-                                                            {
-                                                                addViewControllerItemToSceneAndList(vc);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                 }
-                            }
-                        }
-                    }
-                    //3. Restore the other vierport and window state settings:
-                    m_ui.btnWorldView->setChecked(p_geoMode->value());
-                    
-                    m_view->setTransform(p_viewTrans->value());
-                    
-                    QByteArray block;
-                    block.append(p_winGeo->value());
-                    restoreGeometry(QByteArray::fromBase64(block));
-                    
-                    block.clear();
-                    block.append(p_winState->value());
-                    restoreState(QByteArray::fromBase64(block));
-        
-                    m_view->horizontalScrollBar()->setValue(p_viewScroll->value().x());
-                    m_view->verticalScrollBar()->setValue(p_viewScroll->value().y());
-                }
+                addModelItemToList(model);
             }
+            for(ViewController* vc : m_environment->viewControllers)
+            {
+                addViewControllerItemToSceneAndList(vc);
+            }
+
+            device->close();
         }
     }
     catch (const std::exception & e)
@@ -1319,6 +1176,8 @@ void MainWindow::updateMemoryUsage()
 void MainWindow::updateRecentActionList()
 {
     QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
+
+    //1. Restore the recently opened files
     QStringList recentFilePaths = settings.value("recentFiles").toStringList();
 
     int itEnd = 0;
@@ -1380,7 +1239,7 @@ void MainWindow::loadModel(const QString& filename)
         throw std::runtime_error("Loading model from " + filename.toStdString() + " failed. File does not exists");
     }
     
-	Model* model = Impex::loadModel(filename, m_environment);
+	Model* model = m_environment->loadModel(filename);
     
     if(model != NULL)
     {
@@ -1401,7 +1260,7 @@ void MainWindow::initializeFactories()
 {
     QString status;
     
-    for(QString str : m_environment->modules_status)
+    for(QString str : m_environment->modules_status())
     {
         status += str;
     }
@@ -1410,7 +1269,7 @@ void MainWindow::initializeFactories()
     
     //Connect the model factory to the GUI
     unsigned int i=0;
-    for(const ModelFactoryItem& item : m_environment->modelFactory)
+    for(const ModelFactoryItem& item : m_environment->modelFactory())
     {
         QAction* newAct = new QAction(item.model_type, this);
         m_ui.menuCreate->addAction(newAct);
@@ -1425,7 +1284,7 @@ void MainWindow::initializeFactories()
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     i=0;
-    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory)
+    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory())
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
         
@@ -1570,10 +1429,16 @@ void MainWindow::addModelItemToList(Model* model)
 {
 	if(model)
 	{
-		QListWidgetModelItem * model_item = new QListWidgetModelItem(model->name(), model );
+		QListWidgetModelItem * model_item = new QListWidgetModelItem(model->name(), model);
 		model_item->setToolTip(model->description());
 		m_ui.listModels->addItem(model_item);
 		connect(model, SIGNAL(modelChanged()), this, SLOT(refreshModelNames()));
+        
+        if(m_environment->currentModel() == model)
+        {
+            m_ui.listModels->setCurrentItem(model_item);
+            currentModelChanged(model_item);
+        }
         
         updateMemoryUsage();
 	}
@@ -1616,7 +1481,7 @@ void MainWindow::addViewControllerItemToSceneAndList(ViewController* viewControl
         
         vc_item->setCheckState(viewController->isVisible() ? Qt::Checked : Qt::Unchecked);
         
-        if(viewController->isCurrent())
+        if(m_environment->currentViewController() == viewController)
         {
             m_ui.listViews->setCurrentItem(vc_item);
             currentViewControllerChanged(vc_item);

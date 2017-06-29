@@ -48,9 +48,9 @@ Server::Server(Environment* env, QObject *parent)
     : QTcpServer(parent),
     m_environment(env)
 {
-    qDebug()    << "Server knows factories: models " << m_environment->modelFactory.size()
-                << ", ViewControllers: " << m_environment->viewControllerFactory.size()
-                << ", algorithms: " << m_environment->algorithmFactory.size();
+    qDebug()    << "Server knows factories: models " << m_environment->modelFactory().size()
+                << ", ViewControllers: " << m_environment->viewControllerFactory().size()
+                << ", algorithms: " << m_environment->algorithmFactory().size();
     
     QString user1 = "test";
     QString pass1 = "test";

@@ -116,7 +116,7 @@ MainDialog::MainDialog(QWidget *parent)
     
     QString status;
     
-    for(QString str : env->modules_status)
+    for(QString str : env->modules_status())
     {
         status += str;
     }

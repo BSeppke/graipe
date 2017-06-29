@@ -54,7 +54,7 @@ Client::Client(QWidget *parent)
     m_algSignalMapper(new QSignalMapper),
     m_environment(new Environment)
 {
-    Impex::loadModel("/Users/seppke/Desktop/Lenna_face.xgz", m_environment);
+    m_environment->loadModel("/Users/seppke/Desktop/Lenna_face.xgz");
     
     menuBar();
     
@@ -73,7 +73,7 @@ Client::Client(QWidget *parent)
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     unsigned int i=0;
-    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory)
+    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory())
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
         
@@ -353,7 +353,7 @@ void Client::readModel(int bytesToRead)
         }
         
         QXmlStreamReader xmlReader(compressor);
-        Model* new_model = Impex::loadModel(xmlReader, m_environment);
+        Model* new_model = m_environment->loadModel(xmlReader);
         
         if(new_model == NULL)
         {
@@ -458,7 +458,7 @@ void Client::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory[index];
+    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory()[index];
 	
 	Algorithm* alg = alg_item.algorithm_fptr(m_environment);
     

@@ -52,9 +52,9 @@ WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered
     m_expected_bytes(0),
     m_environment(new Environment(*env))
 {
-    qDebug()    << "Server knows factories: models " << m_environment->modelFactory.size()
-                << ", ViewControllers: " << m_environment->viewControllerFactory.size()
-                << ", algorithms: " << m_environment->algorithmFactory.size();
+    qDebug()    << "Server knows factories: models " << m_environment->modelFactory().size()
+                << ", ViewControllers: " << m_environment->viewControllerFactory().size()
+                << ", algorithms: " << m_environment->algorithmFactory().size();
 }
 
 void WorkerThread::run()
@@ -213,7 +213,7 @@ void WorkerThread::readModel()
         QXmlStreamReader xmlReader(in_compressor);
         
         m_environment->global_algorithm_mutex.lock();
-        Model* new_model = Impex::loadModel(xmlReader, m_environment);
+        Model* new_model = m_environment->loadModel(xmlReader);
         m_environment->global_algorithm_mutex.unlock();
         
         if(new_model == NULL)
@@ -261,7 +261,7 @@ void WorkerThread::readAndRunAlgorithm()
         }
         
         QXmlStreamReader xmlReader(in_compressor);
-        Algorithm* new_alg = Impex::loadAlgorithm(xmlReader, m_environment);
+        Algorithm* new_alg = m_environment->loadAlgorithm(xmlReader);
         
         if(new_alg == NULL)
         {
