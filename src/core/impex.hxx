@@ -89,66 +89,6 @@ class GRAIPE_CORE_EXPORT Impex
          * \return A valid QIODevice Pointer, if the opening was successful esle NULL.
          */
         static QIODevice* openFile(const QString & filename, QIODevice::OpenModeFlag openMode);
-    
-        /**
-         * Basic import procedure for all types, which implement the serializable interface
-         *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
-         */
-        static Model* loadModel(const QString & filename, Environment* env);
-    
-        /**
-         * Basic import procedure for all types, which implement the serializable interface
-         *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
-         */
-        static Model* loadModel(QXmlStreamReader & xmlReader, Environment* env);
-    
-        /**
-         * Basic import procedure for all types, which implement the serializable interface
-         *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
-         */
-        static ViewController* loadViewController(const QString & filename, Environment* env);
-
-        /**
-         * Basic import procedure of a settings dictionary from a given QString
-         * A dictionary is defined by means of a mapping from QString keys
-         * to QString values.
-         *
-         * \param contents The input QString.
-         * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
-         */
-        static ViewController* loadViewController(QXmlStreamReader & xmlReader, Environment* env);
-    
-        /**
-         * Basic import procedure for all algorithms, which implement the serializable interface
-         *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
-         */
-        static Algorithm* loadAlgorithm(const QString & filename, Environment* env);
-    
-        /**
-         * Basic import procedure for all algorithms, which implement the serializable interface
-         *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
-         */
-        static Algorithm* loadAlgorithm(QXmlStreamReader & xmlReader, Environment* env);
             
         /**
          * Standard exporter for everything, which implements the Serializable interface.

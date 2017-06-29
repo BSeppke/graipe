@@ -233,21 +233,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * \return True, if the parameters could be restored,
          */
         bool deserialize(QXmlStreamReader& xmlReader);
-    
-        /**
-         * Const accessor for the "current" property of a ViewController.
-         *
-         * \return True, if this is the current ViewController.
-         */
-        bool isCurrent() const;
-    
-        /**
-         * Set the "current" property of a ViewController to a given value.
-         *
-         * \param current If true, it becomes the current ViewController.
-         */
-        void setCurrent(bool current);
-    
+        
     public slots:
         /**
          * Update the view according to the current parameter settings
@@ -288,8 +274,6 @@ class GRAIPE_CORE_EXPORT ViewController
     
         //height of the scale ticks
 		float m_ticks_height;
-    
-        bool m_current;
 };
 
 } //end of namespace graipe

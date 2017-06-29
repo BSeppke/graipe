@@ -58,6 +58,8 @@ namespace graipe {
  * the location of the .app-bundle.
  */
 Environment::Environment()
+: m_currentModel(NULL),
+  m_currentViewController(NULL)
 {
     findAndLoadModules();
 }
@@ -74,11 +76,12 @@ Environment::Environment()
  *                         False by default
  */
 Environment::Environment(const Environment& env, bool reload_factories)
-: modelFactory(env.modelFactory),
-  viewControllerFactory(env.viewControllerFactory),
-  algorithmFactory(env.algorithmFactory),
-  modules_names(env.modules_names),
-  modules_status(env.modules_status)
+: m_modules_names(env.modules_names()),
+  m_modules_status(env.modules_status()),m_modelFactory(env.modelFactory()),
+  m_viewControllerFactory(env.viewControllerFactory()),
+  m_algorithmFactory(env.algorithmFactory()),
+  m_currentModel(NULL),
+  m_currentViewController(NULL)
 {
     if(reload_factories)
     {
@@ -124,6 +127,12 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
             
                         IntParameter* p_viewControllers = new IntParameter("ViewController count:", 0, 1e10, 0);
                         w_settings.addParameter("viewControllers", p_viewControllers);
+                        
+                        StringParameter* p_currentModel = new StringParameter("Current Model:","0");
+                        w_settings.addParameter("currentModel", p_currentModel);
+            
+                        StringParameter* p_currentViewController = new StringParameter("Current ViewController:", "0");
+                        w_settings.addParameter("currentViewController", p_currentViewController);
                 
                         if(w_settings.deserialize(xmlReader))
                         {
@@ -155,7 +164,7 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
                                                 xmlReader.readNextStartElement();
                                                 QString module_name = xmlReader.readElementText();
                                                 
-                                                if(!modules_names.contains(module_name))
+                                                if(!modules_names().contains(module_name))
                                                 {
                                                     throw "Error: Module " + module_name + " was needed but not already loaded...";
                                                 }
@@ -181,10 +190,15 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
                                                 {
                                                     for(int i=0; i!=p_models->value(); i++)
                                                     {
-                                                        Model* m = Impex::loadModel(xmlReader, this);
+                                                        Model* m = loadModel(xmlReader);
                                                         if(m == NULL)
                                                         {
                                                             throw "did not load model!";
+                                                        }
+                                                        
+                                                        if(m->id() == p_currentModel->value())
+                                                        {
+                                                            m_currentModel = m;
                                                         }
                                                     }
                                                     
@@ -208,10 +222,15 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
                                                         {
                                                             for(int i=0; i!=p_viewControllers->value(); i++)
                                                             {
-                                                                ViewController* vc = Impex::loadViewController(xmlReader, this);
+                                                                ViewController* vc = loadViewController(xmlReader);
                                                                 if(vc == NULL)
                                                                 {
                                                                     throw "did not load viewController!";
+                                                                }
+                                                                
+                                                                if(vc->id() == p_currentViewController->value())
+                                                                {
+                                                                    m_currentViewController = vc;
                                                                 }
                                                             }
                                                         }
@@ -267,16 +286,20 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
             
             xmlWriter.writeStartElement("Header");
                 ParameterGroup w_settings;
-                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, modules_names.size()));
+                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, modules_names().size()));
                 w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, models.size()));
                 w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, viewControllers.size()));
+                w_settings.addParameter("currentModel",
+                                        new StringParameter("Current Model:", (m_currentModel == NULL) ? "0" : m_currentModel->id()));
+                w_settings.addParameter("currentViewController",
+                                        new StringParameter("Current ViewController:", (m_currentViewController == NULL) ? "0" : m_currentViewController->id()));
                 w_settings.serialize(xmlWriter);
             xmlWriter.writeEndElement();
             
             xmlWriter.writeStartElement("Content");
         
                 xmlWriter.writeStartElement("Modules");
-                for(QString name : modules_names)
+                for(QString name : modules_names())
                 {
                     xmlWriter.writeTextElement("Module", name);
                 }
@@ -362,7 +385,7 @@ void Environment::findAndLoadModules()
 
     //Since this only works after deploying the app, we will also search at the level of the .app directory
     //for loadable modules, iff we found none so far
-    if(modules_names.empty())
+    if(modules_names().empty())
     {
         loadModules(QDir::current());
     }
@@ -377,12 +400,12 @@ void Environment::findAndLoadModules()
  */
 void Environment::loadModules(QDir dir)
 {
-    modules_names.clear();
-    modules_status.clear();
+    m_modules_names.clear();
+    m_modules_status.clear();
     
-    modelFactory.clear();
-    viewControllerFactory.clear();
-    algorithmFactory.clear();
+    m_modelFactory.clear();
+    m_viewControllerFactory.clear();
+    m_algorithmFactory.clear();
     
     for(const QString& file : dir.entryList(QDir::Files))
     {
@@ -430,7 +453,7 @@ void Environment::loadModule(QString file)
             for(const ModelFactoryItem& item : model_items)
             {
                 status += "      <li>" + item.model_type  + "</li>\n";
-                modelFactory.push_back(item);
+                m_modelFactory.push_back(item);
             }
             
             status += "    </ul>\n";
@@ -450,7 +473,7 @@ void Environment::loadModule(QString file)
             for(const ViewControllerFactoryItem& item : vc_items)
             {
                 status += "      <li>" + item.viewController_name + " <i>(for model: " + item.model_type + ")</i></li>\n";
-                viewControllerFactory.push_back(item);
+                m_viewControllerFactory.push_back(item);
             }
             
             status += "    </ul>\n";
@@ -470,7 +493,7 @@ void Environment::loadModule(QString file)
             for(const AlgorithmFactoryItem& item : alg_items)
             {
                 status += "      <li>" + item.algorithm_name + " <i>(for topic: " + item.topic_name  + ")</i></li>\n";
-                algorithmFactory.push_back(item);
+                m_algorithmFactory.push_back(item);
             }
             status += "    </ul>\n";
         }
@@ -481,9 +504,264 @@ void Environment::loadModule(QString file)
         
         status  += "</ul>\n\n";
         
-        modules_names.push_back(name);
-        modules_status.push_back(status);
+        m_modules_names.push_back(name);
+        m_modules_status.push_back(status);
     }
+}
+
+/**
+ * Basic import procedure for all types, which implements the serializable interface.
+ *
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
+ * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
+ */
+Model* Environment::loadModel(const QString & filename)
+{
+   QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+   Model* model = NULL;
+
+    if(device != NULL)
+    {
+        QXmlStreamReader xmlReader(device);
+        model = loadModel(xmlReader);
+        device->close();
+    }
+    
+    return model;
+}
+/**
+ * Basic import procedure for all types, which implements the serializable interface.
+ *
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
+ * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
+ */
+Model* Environment::loadModel(QXmlStreamReader& xmlReader)
+{
+    //1. Read the name of the xml root
+    if(xmlReader.readNextStartElement())
+    {
+        //First start element: ViewController's name
+        QString mod_type = xmlReader.name().toString();
+
+        //3. Create a model using the mod_type and the modelFactory:
+        Model* model = NULL;
+        
+        for(unsigned int i=0; i<modelFactory().size(); ++i)
+        {
+            if(modelFactory()[i].model_type==mod_type)
+            {
+                model = modelFactory()[i].model_fptr(this);
+                break;
+            }
+        }
+        
+        //  If it was not found: Indicate error
+        if(model == NULL)
+        {
+            qWarning("Environment::loadModel: Model type was not found in modelFactory.");
+            return NULL;
+        }
+        
+        if(model->deserialize(xmlReader))
+        {
+            return model;
+        }
+        else
+        {
+            qWarning("Environment::loadModel: Deserialization of Model failed");
+            delete model;
+            return NULL;
+        }
+    }
+    else
+    {
+        qWarning("Environment::loadModel: Could not find a single XML start element!");
+        return NULL;
+    }
+    return NULL;
+}
+
+/**
+ * Basic import procedure for all types, which implements the serializable interface.
+ *
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
+ * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
+ */
+ViewController* Environment::loadViewController(const QString & filename)
+{
+    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+    ViewController * vc = NULL;
+    
+    if(device != NULL)
+    {
+        QXmlStreamReader xmlReader(device);
+        vc = loadViewController(xmlReader);
+        device->close();
+    }
+    
+    return vc;
+}
+
+
+/**
+ * Basic import procedure of a settings dictionary from a given QString
+ * A dictionary is defined by means of a mapping from QString keys
+ * to QString values.
+ *
+ * \param contents The input QString.
+ * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
+ */
+ViewController* Environment::loadViewController(QXmlStreamReader & xmlReader)
+{
+    ViewController * vc = NULL;
+
+    //1. Read the root attributes of the xml node as well as the name of the root
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.attributes().hasAttribute("ModelID")
+        &&  xmlReader.attributes().hasAttribute("ZOrder"))
+    {
+        //First start element: ViewController's name
+        QString vc_type = xmlReader.name().toString();
+        QString vc_modelID = xmlReader.attributes().value("ModelID").toString();
+        int vc_zorder = xmlReader.attributes().value("ZOrder").toInt();
+
+        //2. Find the associated model at the model_list (if it was already loaded)
+        Model* vc_model = NULL;
+        for(Model* mod : models)
+        {
+            if(     mod
+                &&  mod->id() == vc_modelID)
+            {
+                vc_model = mod;
+                break;
+            }
+        }
+        //  If it was not found: Indicate error
+        if(vc_model == NULL)
+        {
+            qWarning("Environment::loadViewController: Model was not found among available ones.");
+            return NULL;
+        }
+        
+         //3. Create a controller using the vc_type and the model found above:
+        for(unsigned int i=0; i<viewControllerFactory().size(); ++i)
+        {
+            if(viewControllerFactory()[i].viewController_name==vc_type)
+            {
+                vc = viewControllerFactory()[i].viewController_fptr(vc_model);
+                break;
+            }
+        }
+        //  If it was not found: Indicate error
+        if(vc == NULL)
+        {
+            qWarning("Environment::loadViewController: ViewController type was not found in the factory.");
+            return NULL;
+        }
+        
+        //4. Restore the parameters
+        if(vc->deserialize(xmlReader))
+        {
+            vc->setZValue(vc_zorder);
+            return vc;
+        }
+        else
+        {
+            qWarning("Environment::loadViewController: Deserialization of ViewController failed");
+            delete vc;
+            return NULL;
+        }
+    }
+    else
+    {
+        qWarning("Environment::loadViewController: Could not find a single XML start element!");
+        return NULL;
+    }
+    return NULL;
+}
+/**
+ * Basic import procedure for all types, which implements the serializable interface.
+ *
+ * \param filename The filename of the stored object.
+ * \param object   The object, which shall be deserialized.
+ * \param compress If true, the file will be read using the GZip decompressor.
+ * \return True, if the loading of the object was successful.
+ */
+Algorithm* Environment::loadAlgorithm(const QString & filename)
+{
+    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
+    Algorithm * alg = NULL;
+    
+    if(device != NULL)
+    {
+        QXmlStreamReader xmlReader(device);
+        alg = loadAlgorithm(xmlReader);
+        device->close();
+    }
+    
+    return alg;
+}
+
+
+/**
+ * Basic import procedure of a settings dictionary from a given QString
+ * A dictionary is defined by means of a mapping from QString keys
+ * to QString values.
+ *
+ * \param contents The input QString.
+ * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
+ */
+Algorithm* Environment::loadAlgorithm(QXmlStreamReader & xmlReader)
+{
+    Algorithm * alg = NULL;
+
+    //1. Read the root attributes of the xml node as well as the name of the root
+    if(     xmlReader.readNextStartElement()
+        &&  xmlReader.attributes().hasAttribute("ID"))
+    {
+        //First start element: ViewController's name
+        QString alg_type = xmlReader.name().toString();
+
+        //Create an algorithm using the alg_type:
+        for(unsigned int i=0; i<algorithmFactory().size(); ++i)
+        {
+            if(algorithmFactory()[i].algorithm_type==alg_type)
+            {
+                alg = algorithmFactory()[i].algorithm_fptr(this);
+                break;
+            }
+        }
+        //If it was not found: Indicate error
+        if(alg == NULL)
+        {
+            qWarning("Environment::loadAlgorithm: Algorithm was not found among available ones.");
+            return NULL;
+        }
+        
+        //4. Restore the parameters
+        if(alg->deserialize(xmlReader))
+        {
+            return alg;
+        }
+        else
+        {
+            qWarning("Environment::loadAlgorithm: Deserialization of Algorithm failed");
+            delete alg;
+            return NULL;
+        }
+    }
+    else
+    {
+        qWarning("Environment::loadAlgorithm: Could not find a single XML start element!");
+        return NULL;
+    }
+    return NULL;
 }
 
 } //end of namespace graipe

@@ -126,22 +126,128 @@ class GRAIPE_CORE_EXPORT Environment
          */
         void reset();
     
+        //Three global variables for the factories:
+        const ModelFactory& modelFactory() const
+        {
+            return m_modelFactory;
+        }
+        const ViewControllerFactory& viewControllerFactory() const
+        {
+            return m_viewControllerFactory;
+        }
+        const AlgorithmFactory& algorithmFactory() const
+        {
+            return m_algorithmFactory;
+        }
+    
+        /**
+         * Basic import procedure for all types, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        Model* loadModel(const QString & filename);
+    
+        /**
+         * Basic import procedure for all types, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        Model* loadModel(QXmlStreamReader & xmlReader);
+    
+        /**
+         * Basic import procedure for all types, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        ViewController* loadViewController(const QString & filename);
+
+        /**
+         * Basic import procedure of a settings dictionary from a given QString
+         * A dictionary is defined by means of a mapping from QString keys
+         * to QString values.
+         *
+         * \param contents The input QString.
+         * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
+         */
+        ViewController* loadViewController(QXmlStreamReader & xmlReader);
+    
+        /**
+         * Basic import procedure for all algorithms, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        Algorithm* loadAlgorithm(const QString & filename);
+    
+        /**
+         * Basic import procedure for all algorithms, which implement the serializable interface
+         *
+         * \param filename The filename of the stored object.
+         * \param object   The object, which shall be deserialized.
+         * \param compress If true, the file will be read using the GZip decompressor.
+         * \return True, if the loading of the object was successful.
+         */
+        Algorithm* loadAlgorithm(QXmlStreamReader & xmlReader);
+    
         //One global algorithm mutex:
         QMutex global_algorithm_mutex;
 
-        //Three global variables for the factories:
-        ModelFactory modelFactory;
-        ViewControllerFactory viewControllerFactory;
-        AlgorithmFactory algorithmFactory;
-
-        //And two more holding all currently available Models and ViewControllers:
+        //And two containers holding all currently available Models and ViewControllers:
         std::vector<Model*> models;
         std::vector<ViewController*> viewControllers;
     
         //The filenames of each loaded module:
-        QStringList modules_names;
+        const QStringList& modules_names() const
+        {
+            return m_modules_names;
+        }
         //The status messages of each loaded module
-        QStringList modules_status;
+        const QStringList& modules_status() const
+        {
+            return m_modules_status;
+        }
+    
+        Model* currentModel()
+        {
+            return m_currentModel;
+        }
+        void setCurrentModel(Model * model)
+        {
+            for(Model* m : models)
+            {
+                if(model == m)
+                {
+                    m_currentModel = m;
+                }
+            }
+        }
+    
+    
+        ViewController* currentViewController()
+        {
+            return m_currentViewController;
+        }
+        void setCurrentViewController(ViewController * viewController)
+        {
+            for(ViewController* vc : viewControllers)
+            {
+                if(viewController == vc)
+                {
+                    m_currentViewController = vc;
+                }
+            }
+        }
     
     protected:
         /**
@@ -167,7 +273,21 @@ class GRAIPE_CORE_EXPORT Environment
          *
          * \param file The filename of the module.
          */
-        void loadModule(QString file);        
+        void loadModule(QString file);
+    
+    private:
+        //The filenames of each loaded module:
+        QStringList m_modules_names;
+        //The status messages of each loaded module
+        QStringList m_modules_status;
+    
+        //Three variables for the factories:
+        ModelFactory m_modelFactory;
+        ViewControllerFactory m_viewControllerFactory;
+        AlgorithmFactory m_algorithmFactory;
+    
+        Model* m_currentModel;
+        ViewController* m_currentViewController;
 };
 
 }//end of namespace graipe

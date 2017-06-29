@@ -67,8 +67,7 @@ Model::Model(Environment* env)
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(0,0), NULL)),
     m_global_lr(new PointFParameter("Global lower-right (deg.):", QPointF(-180,-90),QPointF(180,90), QPointF(0,0), NULL)),
     m_parameters(new ParameterGroup("Model Properties", ParameterGroup::storage_type(), QFormLayout::WrapAllRows)),
-    m_environment(env),
-    m_current(false)
+    m_environment(env)
 {
     m_name->setValue(QString("New ") + typeName());
     m_description->setValue(QString("This new ") + typeName() + " has been created on " + QDateTime::currentDateTime().toString());
@@ -453,26 +452,6 @@ QTransform Model::globalTransformation() const
 }
 
 /**
- * Const accessor for the "current" property of a Model.
- *
- * \return True, if this is the current model.
- */
-bool Model::isCurrent() const
-{
-    return m_current;
-}
-
-/**
- * Set the "current" property of a Model to a given value.
- *
- * \param current If true, it becomes the current model.
- */
-void Model::setCurrent(bool current)
-{
-    m_current = current;
-}
-
-/**
  * Const copy model's geometry information to another model.
  *
  * \param other The other model.
@@ -561,10 +540,6 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     }
         xmlWriter.writeStartElement(typeName());
         xmlWriter.writeAttribute("ID", id());
-        if(isCurrent())
-        {
-            xmlWriter.writeAttribute("current", "true");
-        }
             xmlWriter.writeStartElement("Header");
                 serialize_header(xmlWriter);
             xmlWriter.writeEndElement();
@@ -597,11 +572,6 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
                 &&  xmlReader.attributes().hasAttribute("ID"))
             {
                 setID(xmlReader.attributes().value("ID").toString());
-                
-                if(xmlReader.attributes().hasAttribute("current"))
-                {
-                    setCurrent(xmlReader.attributes().value("current").toString() == "true");
-                }
                 
                 while(xmlReader.readNextStartElement())
                 {

@@ -129,7 +129,7 @@ class Factory
          * All items, where model_type == model->typeName() will be returned 
          * by means of a new factory
          */
-		Factory<FactoryItemType> filterByModelType(const Model* model)
+		Factory<FactoryItemType> filterByModelType(const Model* model) const
 		{
             using namespace ::std;
             

@@ -295,20 +295,6 @@ class GRAIPE_CORE_EXPORT Model
 		virtual void setGlobalBottom(float new_bottom);
     
         /**
-         * Const accessor for the "current" property of a Model.
-         *
-         * \return True, if this is the current model.
-         */
-		virtual bool isCurrent() const;
- 
-        /**
-         * Set the "current" property of a Model to a given value.
-         *
-         * \param current If true, it becomes the current model.
-         */
-		virtual void setCurrent(bool current);
-    
-        /**
          * Only models with valid boundaries may be visualized in geometric view mode!
          *
          * \return Returns true, if the lowerRight value is larger than the upperLeft value.
@@ -480,9 +466,6 @@ class GRAIPE_CORE_EXPORT Model
     
         //A group for collecting all
         ParameterGroup      * m_parameters;
-    
-        //currentModel?
-        bool m_current;
     
         //The models environment
         Environment * m_environment;
