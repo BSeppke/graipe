@@ -427,7 +427,7 @@ private:
     QList<QAction*> m_recentFileActions;
     const int       m_recentFileCount;
     
-    Environment* m_environment;
+    Workspace* m_environment;
 };
 
 } //end of namespace graipe

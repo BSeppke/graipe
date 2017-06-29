@@ -71,7 +71,7 @@ class GRAIPE_IMAGES_EXPORT Image
          * Default constructor. Constructs an empty Image
          * with zero size and no bands at all.
          */
-		Image(Environment* env);
+		Image(Workspace* wsp);
 		
 		/**
          * Copy constructor. Constructs a new Image from another Image.
@@ -89,7 +89,7 @@ class GRAIPE_IMAGES_EXPORT Image
          * \param numBands The image's band count.
          
          */
-		Image(Size_Type size, unsigned int numBands, Environment* env);
+		Image(Size_Type size, unsigned int numBands, Workspace* wsp);
     
         /**
          * Specialization of the virtual destructor of RasteredModel

@@ -55,7 +55,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
         /**
          * Default constructor. Creates an empty sparse vectorfield.
          */
-        SparseVectorfield2D(Environment* env);
+        SparseVectorfield2D(Workspace* wsp);
     
         /**
          * Copy constructor. Creates a sparse vectorfield from another one.
@@ -225,7 +225,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
         /**
          * Default constructor. Creates an empty weighted sparse vectorfield.
          */
-        SparseWeightedVectorfield2D(Environment* env);
+        SparseWeightedVectorfield2D(Workspace* wsp);
     
         /**
          * Copy constructor. Creates a weighted sparse vectorfield from another one.
@@ -357,7 +357,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
         /**
          * Default constructor. Creates an empty sparse multi vectorfield.
          */
-        SparseMultiVectorfield2D(Environment* env);
+        SparseMultiVectorfield2D(Workspace* wsp);
     
         /**
          * Copy constructor. Creates a sparse multi vectorfield from another one.
@@ -627,7 +627,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
         /**
          * Default constructor. Creates an empty sparse weighted multi vectorfield.
          */
-        SparseWeightedMultiVectorfield2D(Environment* env);
+        SparseWeightedMultiVectorfield2D(Workspace* wsp);
     
         /**
          * Copy constructor. Creates a sparse weighted multi vectorfield from another one.

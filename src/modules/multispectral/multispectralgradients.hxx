@@ -320,7 +320,7 @@ EdgelFeatureList2D* msCannyFeatures(Image<float>* img, float scale, float thresh
 	// find edgels at scale
     vigra::cannyEdgelListThreshold(gradient, v_edgels, threshold);
 	
-    EdgelFeatureList2D* edgels = new EdgelFeatureList2D(img->environment());
+    EdgelFeatureList2D* edgels = new EdgelFeatureList2D(img->workspace());
 	
 	for(unsigned int i=0; i< v_edgels.size(); ++i)
 	{

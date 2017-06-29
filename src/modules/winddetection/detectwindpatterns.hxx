@@ -382,7 +382,7 @@ SparseWeightedVectorfield2D* estimateWindDirectionFromSARImage(const vigra::Mult
                                                                WindDetectionFunctor &  func,
                                                                int x_res, int y_res,  int mask_width, int mask_height,
                                                                const vigra::TinyVector<int, 2> & wind_knowledge,
-                                                               Environment* env)
+                                                               Workspace* wsp)
 {
 	typedef typename Vectorfield2D::PointType  PointType;
 	
@@ -390,7 +390,7 @@ SparseWeightedVectorfield2D* estimateWindDirectionFromSARImage(const vigra::Mult
                  image_height  = (unsigned int)src.height();
 	
 	//Create resulting vectorfield
-	SparseWeightedVectorfield2D* result_vf = new SparseWeightedVectorfield2D(env);
+	SparseWeightedVectorfield2D* result_vf = new SparseWeightedVectorfield2D(wsp);
 	
 	unsigned int y_step = image_height/y_res,
                  x_step = image_width/x_res;
@@ -446,10 +446,10 @@ template <class T>
 DenseVectorfield2D* estimateWindDirectionFromSARImageUsingStructureTensor(const vigra::MultiArrayView<2,T> & src,
 																		  float inner_scale, float outer_scale,
 																		  const vigra::TinyVector<int, 2> & wind_knowledge,
-                                                                          Environment* env)
+                                                                          Workspace* wsp)
 {
 	//Create resulting vectorfield
-	DenseVectorfield2D* result_vf = new DenseVectorfield2D(src.shape(), env);
+	DenseVectorfield2D* result_vf = new DenseVectorfield2D(src.shape(), wsp);
 	
 	vigra::MultiArray<2, vigra::TinyVector<float, 3> > st(src.shape());
 	

@@ -46,7 +46,7 @@
 
 #include "core/algorithm.hxx"
 #include "core/colortables.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 #include "core/impex.hxx"
 #include "core/logging.hxx"
 #include "core/model.hxx"

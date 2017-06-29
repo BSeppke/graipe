@@ -36,7 +36,7 @@
 #include "core/model.hxx"
 #include "core/impex.hxx"
 #include "core/parameters.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 #include <cmath>
 #include <algorithm>
@@ -57,7 +57,7 @@ namespace graipe {
 /**
  * Default/empty contructor of the Model class
  */
-Model::Model(Environment* env)
+Model::Model(Workspace* wsp)
 :  QObject(),
     Serializable(),
     m_name(new StringParameter("Name:", "", 20, NULL)),
@@ -67,7 +67,7 @@ Model::Model(Environment* env)
     m_global_ul(new PointFParameter("Global upper-left (deg.):", QPointF(-180,-90), QPointF(180,90), QPointF(0,0), NULL)),
     m_global_lr(new PointFParameter("Global lower-right (deg.):", QPointF(-180,-90),QPointF(180,90), QPointF(0,0), NULL)),
     m_parameters(new ParameterGroup("Model Properties", ParameterGroup::storage_type(), QFormLayout::WrapAllRows)),
-    m_environment(env)
+    m_environment(wsp)
 {
     m_name->setValue(QString("New ") + typeName());
     m_description->setValue(QString("This new ") + typeName() + " has been created on " + QDateTime::currentDateTime().toString());
@@ -84,7 +84,7 @@ Model::Model(Environment* env)
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
     
     //Add to global Models list
-    environment()->models.push_back(this);
+    workspace()->models.push_back(this);
 }
 
 /**
@@ -115,7 +115,7 @@ Model::Model(const Model& model)
     connect(m_parameters, SIGNAL(valueChanged()), this, SLOT(updateModel()));
     
     //Add to global Models list
-    environment()->models.push_back(this);
+    workspace()->models.push_back(this);
 }
 
 /**
@@ -127,7 +127,7 @@ Model::~Model()
     delete m_parameters;
     
     //Remove from global models list
-    environment()->models.erase(std::remove(environment()->models.begin(), environment()->models.end(), this), environment()->models.end());
+    workspace()->models.erase(std::remove(workspace()->models.begin(), workspace()->models.end(), this), workspace()->models.end());
 }
 
 /**
@@ -756,8 +756,8 @@ void Model::updateModel()
 /**
  * Default/empty contructor of the RasteredModel class.
  */
-RasteredModel::RasteredModel(Environment* env)
-: Model(env),
+RasteredModel::RasteredModel(Workspace* wsp)
+: Model(wsp),
   m_size(new PointParameter("Raster size:", QPoint(0,0),QPoint(100000,100000), QPoint(0,0), NULL))
 {
     m_parameters->addParameter("size", m_size);

@@ -38,7 +38,7 @@
 
 #include <QStringList>
 #include <QTcpServer>
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 namespace graipe {
 
@@ -54,7 +54,7 @@ class Server
     Q_OBJECT
 
 public:
-    Server(Environment* env, QObject *parent = NULL);
+    Server(Workspace* wsp, QObject *parent = NULL);
     
     QVector<ConnectionInfo> connectionInfo() const;
 
@@ -71,7 +71,7 @@ signals:
 private:
     QVector<QString> m_registered_users;
     QMutex m_global_mutex;
-    Environment* m_environment;
+    Workspace* m_environment;
     
     QVector<ConnectionInfo> m_connections;
 };

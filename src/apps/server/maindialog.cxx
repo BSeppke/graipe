@@ -49,7 +49,7 @@ MainDialog::MainDialog(QWidget *parent)
 :   QWidget(parent),
     m_server(NULL)
 {
-    Environment* env = new Environment;
+    Workspace* wsp = new Workspace;
     
     QLabel* lblServerStatus = new QLabel;
     lblServerStatus->setAlignment(Qt::AlignTop);
@@ -63,7 +63,7 @@ MainDialog::MainDialog(QWidget *parent)
     m_btnQuit = new QPushButton(tr("Quit"));
     m_btnQuit->setAutoDefault(false);
 
-    m_server = new Server(env);
+    m_server = new Server(wsp);
 
     if (!m_server->listen()) {
         QMessageBox::critical(this, tr("Threaded Graipe Server"),
@@ -116,7 +116,7 @@ MainDialog::MainDialog(QWidget *parent)
     
     QString status;
     
-    for(QString str : env->modules_status())
+    for(QString str : wsp->modules_status())
     {
         status += str;
     }

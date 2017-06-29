@@ -89,7 +89,7 @@ class ImageImporter
         /**
          * Default constructor for the image importer class.
          */
-        ImageImporter(Environment* env);
+        ImageImporter(Workspace* wsp);
         
         QString typeName() const
         {
@@ -126,7 +126,7 @@ class ImageExporter
         /**
          * Default constructor for the image exporter class.
          */
-        ImageExporter(Environment* env);
+        ImageExporter(Workspace* wsp);
         
         QString typeName() const
         {

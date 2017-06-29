@@ -43,14 +43,14 @@
 
 namespace graipe {
 
-WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, Environment* env, QObject *parent)
+WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, Workspace* wsp, QObject *parent)
 :   QThread(parent),
     m_socketDescriptor(socketDescriptor),
     m_tcpSocket(NULL),
     m_registered_users(registered_users),
     m_state(-1),
     m_expected_bytes(0),
-    m_environment(new Environment(*env))
+    m_environment(new Workspace(*wsp))
 {
     qDebug()    << "Server knows factories: models " << m_environment->modelFactory().size()
                 << ", ViewControllers: " << m_environment->viewControllerFactory().size()

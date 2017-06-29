@@ -50,7 +50,7 @@ class WorkerThread
     Q_OBJECT
 
     public:
-        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, Environment* env, QObject *parent);
+        WorkerThread(qintptr socketDescriptor, QVector<QString> registered_users, Workspace* wsp, QObject *parent);
         void run() override;
 
     protected slots:
@@ -78,7 +78,7 @@ class WorkerThread
         int m_expected_bytes; //in case state==1 - how many bytes do we want to receive
         QByteArray m_buffer;
     
-        Environment * m_environment;
+        Workspace * m_environment;
 };
 
 } //namespace graipe

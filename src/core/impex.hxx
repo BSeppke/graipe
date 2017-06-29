@@ -41,7 +41,7 @@
 #include "core/model.hxx"
 #include "core/viewcontroller.hxx"
 #include "core/algorithm.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 #include <map>
 

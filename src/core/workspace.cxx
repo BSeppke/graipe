@@ -33,7 +33,7 @@
 /*                                                                      */
 /************************************************************************/
 
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 #include "core/impex.hxx"
 #include "core/module.hxx"
 
@@ -51,13 +51,13 @@
 namespace graipe {
 
 /**
- * Constructor: Creates an empty environment
+ * Constructor: Creates an empty workspace
  * and auto-loads all modules, that are in same dir as the core-module.
  * Calls loadModules with different paths:
  * Under Mac OS at the place of the executable file (not the app-Bundle) and at
  * the location of the .app-bundle.
  */
-Environment::Environment()
+Workspace::Workspace()
 : m_currentModel(NULL),
   m_currentViewController(NULL)
 {
@@ -65,8 +65,8 @@ Environment::Environment()
 }
 
 /**
- * Copy Constructor: Creates an environment from another one.
- * This contructor copies all the data from the environment, but uses the same
+ * Copy Constructor: Creates an workspace from another one.
+ * This contructor copies all the data from the workspace, but uses the same
  * (identical factories). If you want to have new Factories, you need to set the 
  * reload_factories flag to true, or call loadModules() after the copy.
  * This will return a clean-copy version, without other's models and viewControllers.
@@ -75,11 +75,11 @@ Environment::Environment()
  *                         Else, it will use the other environment's factories.
  *                         False by default
  */
-Environment::Environment(const Environment& env, bool reload_factories)
-: m_modules_names(env.modules_names()),
-  m_modules_status(env.modules_status()),m_modelFactory(env.modelFactory()),
-  m_viewControllerFactory(env.viewControllerFactory()),
-  m_algorithmFactory(env.algorithmFactory()),
+Workspace::Workspace(const Workspace& wsp, bool reload_factories)
+: m_modules_names(wsp.modules_names()),
+  m_modules_status(wsp.modules_status()),m_modelFactory(wsp.modelFactory()),
+  m_viewControllerFactory(wsp.viewControllerFactory()),
+  m_algorithmFactory(wsp.algorithmFactory()),
   m_currentModel(NULL),
   m_currentViewController(NULL)
 {
@@ -90,20 +90,20 @@ Environment::Environment(const Environment& env, bool reload_factories)
 }
 
 /**
- * Virtual destructor of an environment
+ * Virtual destructor of an workspace
  */
-Environment::~Environment()
+Workspace::~Workspace()
 {
     //TODO: Avoid errors on reset call here: reset();
 }
 
 /**
- * Deserialization of an environment from an xml file.
+ * Deserialization of an workspace from an xml file.
  *
  * \param xmlReader The QXmlStreamReader, where we read from.
  * \return True, if the deserialization was successful, else false.
  */
-bool Environment::deserialize(QXmlStreamReader& xmlReader)
+bool Workspace::deserialize(QXmlStreamReader& xmlReader)
 {
     clearContents();
     
@@ -111,7 +111,7 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
     {
         if(xmlReader.readNextStartElement())
         {
-            if(xmlReader.name() == "Environment")
+            if(xmlReader.name() == "Workspace")
             {
                 if(xmlReader.readNextStartElement())
                 {
@@ -250,11 +250,11 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
     }
     catch (const std::exception & e)
     {
-        qWarning() << "Environment was not restored!" <<  e.what();
+        qWarning() << "Workspace was not restored!" <<  e.what();
     }
     catch (...)
     {
-        qWarning() << "Environment was not restored!";
+        qWarning() << "Workspace was not restored!";
     }
     return false;
 }
@@ -264,7 +264,7 @@ bool Environment::deserialize(QXmlStreamReader& xmlReader)
  *
  * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
  */
-void Environment::serialize(QXmlStreamWriter& xmlWriter) const
+void Workspace::serialize(QXmlStreamWriter& xmlWriter) const
 {
     try
     {
@@ -281,7 +281,7 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
         xmlWriter.setAutoFormatting(true);
         xmlWriter.writeStartDocument();
             
-        xmlWriter.writeStartElement("Environment");
+        xmlWriter.writeStartElement("Workspace");
         xmlWriter.writeAttribute("ID", id());
             
             xmlWriter.writeStartElement("Header");
@@ -326,11 +326,11 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
     }
     catch (std::exception & e)
     {
-        qWarning() << "Environment was not saved!" << e.what();
+        qWarning() << "Workspace was not saved!" << e.what();
     }
     catch (...)
     {
-        qWarning() << "Environment was not saved!";
+        qWarning() << "Workspace was not saved!";
     }
 }
 
@@ -338,7 +338,7 @@ void Environment::serialize(QXmlStreamWriter& xmlWriter) const
  * Clear all data structures, lie models and viewControllers,
  * but keeps the modules by means of the factories.
  */
-void Environment::clearContents()
+void Workspace::clearContents()
 {
     for(ViewController* vc : viewControllers)
     {
@@ -359,7 +359,7 @@ void Environment::clearContents()
  * Resets this evironment and clears all data structures, 
  * deletes all objects etc. Also deletes all modules and facrtories.
  */
-void Environment::reset()
+void Workspace::reset()
 {
     //resets and reloads all modules
     findAndLoadModules();
@@ -374,7 +374,7 @@ void Environment::reset()
  * Under Mac OS at the place of the executable file (not the app-Bundle) and at
  * the location of the .app-bundle.
  */
-void Environment::findAndLoadModules()
+void Workspace::findAndLoadModules()
 {
     //search paths for modules:
     QDir current_dir = QCoreApplication::applicationDirPath();
@@ -398,7 +398,7 @@ void Environment::findAndLoadModules()
  *
  * \param dir The directory to search for modules.
  */
-void Environment::loadModules(QDir dir)
+void Workspace::loadModules(QDir dir)
 {
     m_modules_names.clear();
     m_modules_status.clear();
@@ -425,7 +425,7 @@ void Environment::loadModules(QDir dir)
  *
  * \param file The filename of the module.
  */
-void Environment::loadModule(QString file)
+void Workspace::loadModule(QString file)
 {
     typedef  Module* (*Initialize_f) ();
     Initialize_f module_initialize = (Initialize_f) QLibrary::resolve(file, "initialize");
@@ -517,7 +517,7 @@ void Environment::loadModule(QString file)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-Model* Environment::loadModel(const QString & filename)
+Model* Workspace::loadModel(const QString & filename)
 {
    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
    Model* model = NULL;
@@ -539,7 +539,7 @@ Model* Environment::loadModel(const QString & filename)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-Model* Environment::loadModel(QXmlStreamReader& xmlReader)
+Model* Workspace::loadModel(QXmlStreamReader& xmlReader)
 {
     //1. Read the name of the xml root
     if(xmlReader.readNextStartElement())
@@ -562,7 +562,7 @@ Model* Environment::loadModel(QXmlStreamReader& xmlReader)
         //  If it was not found: Indicate error
         if(model == NULL)
         {
-            qWarning("Environment::loadModel: Model type was not found in modelFactory.");
+            qWarning("Workspace::loadModel: Model type was not found in modelFactory.");
             return NULL;
         }
         
@@ -572,14 +572,14 @@ Model* Environment::loadModel(QXmlStreamReader& xmlReader)
         }
         else
         {
-            qWarning("Environment::loadModel: Deserialization of Model failed");
+            qWarning("Workspace::loadModel: Deserialization of Model failed");
             delete model;
             return NULL;
         }
     }
     else
     {
-        qWarning("Environment::loadModel: Could not find a single XML start element!");
+        qWarning("Workspace::loadModel: Could not find a single XML start element!");
         return NULL;
     }
     return NULL;
@@ -593,7 +593,7 @@ Model* Environment::loadModel(QXmlStreamReader& xmlReader)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-ViewController* Environment::loadViewController(const QString & filename)
+ViewController* Workspace::loadViewController(const QString & filename)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
     ViewController * vc = NULL;
@@ -617,7 +617,7 @@ ViewController* Environment::loadViewController(const QString & filename)
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-ViewController* Environment::loadViewController(QXmlStreamReader & xmlReader)
+ViewController* Workspace::loadViewController(QXmlStreamReader & xmlReader)
 {
     ViewController * vc = NULL;
 
@@ -645,7 +645,7 @@ ViewController* Environment::loadViewController(QXmlStreamReader & xmlReader)
         //  If it was not found: Indicate error
         if(vc_model == NULL)
         {
-            qWarning("Environment::loadViewController: Model was not found among available ones.");
+            qWarning("Workspace::loadViewController: Model was not found among available ones.");
             return NULL;
         }
         
@@ -661,7 +661,7 @@ ViewController* Environment::loadViewController(QXmlStreamReader & xmlReader)
         //  If it was not found: Indicate error
         if(vc == NULL)
         {
-            qWarning("Environment::loadViewController: ViewController type was not found in the factory.");
+            qWarning("Workspace::loadViewController: ViewController type was not found in the factory.");
             return NULL;
         }
         
@@ -673,14 +673,14 @@ ViewController* Environment::loadViewController(QXmlStreamReader & xmlReader)
         }
         else
         {
-            qWarning("Environment::loadViewController: Deserialization of ViewController failed");
+            qWarning("Workspace::loadViewController: Deserialization of ViewController failed");
             delete vc;
             return NULL;
         }
     }
     else
     {
-        qWarning("Environment::loadViewController: Could not find a single XML start element!");
+        qWarning("Workspace::loadViewController: Could not find a single XML start element!");
         return NULL;
     }
     return NULL;
@@ -693,7 +693,7 @@ ViewController* Environment::loadViewController(QXmlStreamReader & xmlReader)
  * \param compress If true, the file will be read using the GZip decompressor.
  * \return True, if the loading of the object was successful.
  */
-Algorithm* Environment::loadAlgorithm(const QString & filename)
+Algorithm* Workspace::loadAlgorithm(const QString & filename)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
     Algorithm * alg = NULL;
@@ -717,7 +717,7 @@ Algorithm* Environment::loadAlgorithm(const QString & filename)
  * \param contents The input QString.
  * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
  */
-Algorithm* Environment::loadAlgorithm(QXmlStreamReader & xmlReader)
+Algorithm* Workspace::loadAlgorithm(QXmlStreamReader & xmlReader)
 {
     Algorithm * alg = NULL;
 
@@ -740,7 +740,7 @@ Algorithm* Environment::loadAlgorithm(QXmlStreamReader & xmlReader)
         //If it was not found: Indicate error
         if(alg == NULL)
         {
-            qWarning("Environment::loadAlgorithm: Algorithm was not found among available ones.");
+            qWarning("Workspace::loadAlgorithm: Algorithm was not found among available ones.");
             return NULL;
         }
         
@@ -751,14 +751,14 @@ Algorithm* Environment::loadAlgorithm(QXmlStreamReader & xmlReader)
         }
         else
         {
-            qWarning("Environment::loadAlgorithm: Deserialization of Algorithm failed");
+            qWarning("Workspace::loadAlgorithm: Deserialization of Algorithm failed");
             delete alg;
             return NULL;
         }
     }
     else
     {
-        qWarning("Environment::loadAlgorithm: Could not find a single XML start element!");
+        qWarning("Workspace::loadAlgorithm: Could not find a single XML start element!");
         return NULL;
     }
     return NULL;

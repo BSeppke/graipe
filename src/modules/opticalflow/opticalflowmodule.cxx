@@ -46,9 +46,9 @@ namespace graipe {
  *
  * \return A new instance of the OpticalFlowHSEstimator<OpticalFlowHSOriginalFunctor>.
  */
-Algorithm* createOpticalFlowHSOriginalEstimator(Environment* env)
+Algorithm* createOpticalFlowHSOriginalEstimator(Workspace* wsp)
 {
-	return new OpticalFlowHSEstimator<OpticalFlowHSOriginalFunctor>(env);
+	return new OpticalFlowHSEstimator<OpticalFlowHSOriginalFunctor>(wsp);
 }
 
 /** 
@@ -57,9 +57,9 @@ Algorithm* createOpticalFlowHSOriginalEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowHSEstimator<OpticalFlowHSFunctor>.
  */
-Algorithm* createOpticalFlowHSEstimator(Environment* env)
+Algorithm* createOpticalFlowHSEstimator(Workspace* wsp)
 {
-	return new OpticalFlowHSEstimator<OpticalFlowHSFunctor>(env);
+	return new OpticalFlowHSEstimator<OpticalFlowHSFunctor>(wsp);
 }
 
 /** 
@@ -68,9 +68,9 @@ Algorithm* createOpticalFlowHSEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowHSEstimator<OpticalFlowNEFunctor>.
  */
-Algorithm* createOpticalFlowNEEstimator(Environment* env)
+Algorithm* createOpticalFlowNEEstimator(Workspace* wsp)
 {
-	return new OpticalFlowHSEstimator<OpticalFlowNEFunctor>(env);
+	return new OpticalFlowHSEstimator<OpticalFlowNEFunctor>(wsp);
 }
 
 /** 
@@ -79,9 +79,9 @@ Algorithm* createOpticalFlowNEEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowBruhnEstimator<OpticalFlowCLGFunctor>.
  */
-Algorithm* createOpticalFlowCLGEstimator(Environment* env)
+Algorithm* createOpticalFlowCLGEstimator(Workspace* wsp)
 {
-	return new OpticalFlowBruhnEstimator<OpticalFlowCLGFunctor>(env);
+	return new OpticalFlowBruhnEstimator<OpticalFlowCLGFunctor>(wsp);
 }
 
 /** 
@@ -90,9 +90,9 @@ Algorithm* createOpticalFlowCLGEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowBruhnEstimator<OpticalFlowCLGNonlinearFunctor>.
  */
-Algorithm* createOpticalFlowCLGNonlinearEstimator(Environment* env)
+Algorithm* createOpticalFlowCLGNonlinearEstimator(Workspace* wsp)
 {
-	return new OpticalFlowBruhnEstimator<OpticalFlowCLGNonlinearFunctor>(env);
+	return new OpticalFlowBruhnEstimator<OpticalFlowCLGNonlinearFunctor>(wsp);
 }
 
 /** 
@@ -101,9 +101,9 @@ Algorithm* createOpticalFlowCLGNonlinearEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowLKEstimator.
  */
-Algorithm* createOpticalFlowLKEstimator(Environment* env)
+Algorithm* createOpticalFlowLKEstimator(Workspace* wsp)
 {
-	return new OpticalFlowLKEstimator(env);
+	return new OpticalFlowLKEstimator(wsp);
 }
 
 /** 
@@ -112,9 +112,9 @@ Algorithm* createOpticalFlowLKEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowFBEstimator.
  */
-Algorithm* createOpticalFlowFBEstimator(Environment* env)
+Algorithm* createOpticalFlowFBEstimator(Workspace* wsp)
 {
-	return new OpticalFlowFBEstimator(env);
+	return new OpticalFlowFBEstimator(wsp);
 }
 
 /** 
@@ -123,9 +123,9 @@ Algorithm* createOpticalFlowFBEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowTensorEstimator<OpticalFlowSTFunctor>.
  */
-Algorithm* createOpticalFlowSTEstimator(Environment* env)
+Algorithm* createOpticalFlowSTEstimator(Workspace* wsp)
 {
-	return new OpticalFlowTensorEstimator<OpticalFlowSTFunctor>(env);
+	return new OpticalFlowTensorEstimator<OpticalFlowSTFunctor>(wsp);
 }
  
 /** 
@@ -134,9 +134,9 @@ Algorithm* createOpticalFlowSTEstimator(Environment* env)
  *
  * \return A new instance of the OpticalFlowCCEstimator.
  */
-Algorithm* createOpticalFlowCCEstimator(Environment* env)
+Algorithm* createOpticalFlowCCEstimator(Workspace* wsp)
 {
-	return new OpticalFlowCCEstimator(env);
+	return new OpticalFlowCCEstimator(wsp);
 }
 
 /**

@@ -44,9 +44,9 @@
 
 namespace graipe {
 
-Server::Server(Environment* env, QObject *parent)
+Server::Server(Workspace* wsp, QObject *parent)
     : QTcpServer(parent),
-    m_environment(env)
+    m_environment(wsp)
 {
     qDebug()    << "Server knows factories: models " << m_environment->modelFactory().size()
                 << ", ViewControllers: " << m_environment->viewControllerFactory().size()

@@ -59,10 +59,10 @@ class AddImages
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        AddImages(Environment* env)
-        : Algorithm(env)
+        AddImages(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image", NULL, false, env));
+            m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image", NULL, false, wsp));
         }
     
         QString typeName() const
@@ -152,9 +152,9 @@ class AddImages
         }
 };
 
-Algorithm* createAddImages(Environment* env)
+Algorithm* createAddImages(Workspace* wsp)
 {
-	return new AddImages(env);
+	return new AddImages(wsp);
 }
 
 
@@ -171,10 +171,10 @@ class GaussianGradientCalculator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GaussianGradientCalculator(Environment* env)
-        : Algorithm(env)
+        GaussianGradientCalculator(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL, false, env));
+            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Gaussian gradient Scale", 0,9999999, 1.0));
         }
     
@@ -250,9 +250,9 @@ class GaussianGradientCalculator
  *
  * \return A new instance of the GaussianGradientCalculator.
  */
-Algorithm* createGaussianGradientCalculator(Environment* env)
+Algorithm* createGaussianGradientCalculator(Workspace* wsp)
 {
-	return new GaussianGradientCalculator(env);
+	return new GaussianGradientCalculator(wsp);
 }
 
 
@@ -267,10 +267,10 @@ class RecursiveSmoothingFilter : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        RecursiveSmoothingFilter(Environment* env)
-        : Algorithm(env)
+        RecursiveSmoothingFilter(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
             //m_parameters.push_back( new EnumParameter("Border treatment", border_treatment_modes(), 2));
             
@@ -351,9 +351,9 @@ class RecursiveSmoothingFilter : public Algorithm
  *
  * \return A new instance of the RecursiveSmoothingFilter.
  */
-Algorithm* createRecursiveSmoothingFilter(Environment* env)
+Algorithm* createRecursiveSmoothingFilter(Workspace* wsp)
 {
-	return new RecursiveSmoothingFilter(env);
+	return new RecursiveSmoothingFilter(wsp);
 }
 
 
@@ -368,10 +368,10 @@ class GaussianSmoothingFilter : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GaussianSmoothingFilter(Environment* env)
-        : Algorithm(env)
+        GaussianSmoothingFilter(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
         }
         QString typeName() const
@@ -451,9 +451,9 @@ class GaussianSmoothingFilter : public Algorithm
  *
  * \return A new instance of the GaussianSmoothingFilter.
  */
-Algorithm* createGaussianSmoothingFilter(Environment* env)
+Algorithm* createGaussianSmoothingFilter(Workspace* wsp)
 {
-	return new GaussianSmoothingFilter(env);
+	return new GaussianSmoothingFilter(wsp);
 }
 
 
@@ -471,12 +471,12 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        NormalizedGaussianSmoothingFilter(Environment* env)
-        : Algorithm(env)
+        NormalizedGaussianSmoothingFilter(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, env));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, wsp));
         }
         QString typeName() const
         {
@@ -564,9 +564,9 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
  *
  * \return A new instance of the NormalizedGaussianSmoothingFilter.
  */
-Algorithm* createNormalizedGaussianSmoothingFilter(Environment* env)
+Algorithm* createNormalizedGaussianSmoothingFilter(Workspace* wsp)
 {
-	return new NormalizedGaussianSmoothingFilter(env);
+	return new NormalizedGaussianSmoothingFilter(wsp);
 }
 
 
@@ -583,11 +583,11 @@ class ApplyMaskToImage
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ApplyMaskToImage(Environment* env)
-        : Algorithm(env)
+        ApplyMaskToImage(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, wsp));
             
         }
         QString typeName() const
@@ -669,9 +669,9 @@ class ApplyMaskToImage
  *
  * \return A new instance of the ApplyMaskToImage.
  */
-Algorithm* createApplyMaskToImage(Environment* env)
+Algorithm* createApplyMaskToImage(Workspace* wsp)
 {
-	return new ApplyMaskToImage(env);
+	return new ApplyMaskToImage(wsp);
 }
 
 
@@ -688,10 +688,10 @@ class MaskErosion
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskErosion(Environment* env)
-        : Algorithm(env)
+        MaskErosion(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL, false, env) );
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL, false, wsp) );
             m_parameters->addParameter("radius", new IntParameter("Erosion radius", 1, 50, 1) );
             
         }
@@ -768,9 +768,9 @@ class MaskErosion
  *
  * \return A new instance of the MaskErosion.
  */
-Algorithm* createMaskErosion(Environment* env)
+Algorithm* createMaskErosion(Workspace* wsp)
 {
-	return new MaskErosion(env);
+	return new MaskErosion(wsp);
 }
 
 
@@ -787,10 +787,10 @@ class MaskDilation
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskDilation(Environment* env)
-        : Algorithm(env)
+        MaskDilation(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL, false, env) );
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask image Band",NULL, false, wsp) );
             m_parameters->addParameter("radius", new IntParameter("Dilation radius", 1, 50, 1) );
             
         }
@@ -867,9 +867,9 @@ class MaskDilation
  *
  * \return A new instance of the MaskDilation.
  */
-Algorithm* createMaskDilation(Environment* env)
+Algorithm* createMaskDilation(Workspace* wsp)
 {
-	return new MaskDilation(env);
+	return new MaskDilation(wsp);
 }
 
 
@@ -886,11 +886,11 @@ class MaskUnion
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskUnion(Environment* env)
-        : Algorithm(env)
+        MaskUnion(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, env));
-            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, env));
+            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, wsp));
+            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, wsp));
             
         }
         QString typeName() const
@@ -969,9 +969,9 @@ class MaskUnion
  *
  * \return A new instance of the MaskUnion.
  */
-Algorithm* createMaskUnion(Environment* env)
+Algorithm* createMaskUnion(Workspace* wsp)
 {
-	return new MaskUnion(env);
+	return new MaskUnion(wsp);
 }
 
 
@@ -984,8 +984,8 @@ class MaskIntersection: public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskIntersection(Environment* env)
-        : Algorithm(env)
+        MaskIntersection(Workspace* wsp)
+        : Algorithm(wsp)
         {
             m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_environment));
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_environment));
@@ -1067,9 +1067,9 @@ class MaskIntersection: public Algorithm
  *
  * \return A new instance of the MaskIntersection.
  */
-Algorithm* createMaskIntersection(Environment* env)
+Algorithm* createMaskIntersection(Workspace* wsp)
 {
-	return new MaskIntersection(env);
+	return new MaskIntersection(wsp);
 }
 
 
@@ -1084,8 +1084,8 @@ class MaskDifference: public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MaskDifference(Environment* env)
-        : Algorithm(env)
+        MaskDifference(Workspace* wsp)
+        : Algorithm(wsp)
         {
             m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_environment));
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_environment));
@@ -1167,9 +1167,9 @@ class MaskDifference: public Algorithm
  *
  * \return A new instance of the MaskDifference.
  */
-Algorithm* createMaskDifference(Environment* env)
+Algorithm* createMaskDifference(Workspace* wsp)
 {
-	return new MaskDifference(env);
+	return new MaskDifference(wsp);
 }
 
 
@@ -1186,10 +1186,10 @@ class ImageCropper
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageCropper(Environment* env)
-        : Algorithm(env)
+        ImageCropper(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", "Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image", "Image", NULL, false, wsp));
             m_parameters->addParameter("ul_x", new IntParameter("Upper Left x", 0,999999, 0));
             m_parameters->addParameter("ul_y", new IntParameter("Upper Left y", 0,999999, 0));
             m_parameters->addParameter("lr_x", new IntParameter("Lower Right x", 0,999999, 1000));
@@ -1295,9 +1295,9 @@ class ImageCropper
  *
  * \return A new instance of the ImageCropper.
  */
-Algorithm* createImageCropper(Environment* env)
+Algorithm* createImageCropper(Workspace* wsp)
 {
-	return new ImageCropper(env);
+	return new ImageCropper(wsp);
 }
 
 
@@ -1313,10 +1313,10 @@ class ImageResizer : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageResizer(Environment* env)
-        : Algorithm(env)
+        ImageResizer(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image",  new ModelParameter("Image", "Image", NULL, false, env));
+            m_parameters->addParameter("image",  new ModelParameter("Image", "Image", NULL, false, wsp));
             m_parameters->addParameter("width",  new IntParameter("New width", 1,999999, 100));
             m_parameters->addParameter("height", new IntParameter("New height ", 1,999999, 100));
             m_parameters->addParameter("degree", new IntParameter("Spline-Interpolation degree ", 0,5, 1));
@@ -1431,9 +1431,9 @@ class ImageResizer : public Algorithm
  *
  * \return A new instance of the ImageResizer.
  */
-Algorithm* createImageResizer(Environment* env)
+Algorithm* createImageResizer(Workspace* wsp)
 {
-	return new ImageResizer(env);
+	return new ImageResizer(wsp);
 }
 
 
@@ -1444,10 +1444,10 @@ class ImageInverter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageInverter(Environment* env)
-        : Algorithm(env)
+        ImageInverter(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image", "Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image", "Image", NULL, false, wsp));
             m_parameters->addParameter("invert", new BoolParameter("Use maximum band value as inverting offset",true));
             m_parameters->addParameter("invert_offset", new IntParameter("Global inverting offset", 0,999999, 255, (*m_parameters)["invert"]));
             
@@ -1538,9 +1538,9 @@ class ImageInverter
  *
  * \return A new instance of the ImageInverter.
  */
-Algorithm* createImageInverter(Environment* env)
+Algorithm* createImageInverter(Workspace* wsp)
 {
-	return new ImageInverter(env);
+	return new ImageInverter(wsp);
 }
 
 
@@ -1558,10 +1558,10 @@ class ImageThresholder
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ImageThresholder(Environment* env)
-        : Algorithm(env)
+        ImageThresholder(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ImageBandParameter<float>("Image band for thresh.",	NULL, false, env));
+            m_parameters->addParameter("image", new ImageBandParameter<float>("Image band for thresh.",	NULL, false, wsp));
             m_parameters->addParameter("low",  new FloatParameter("Lower threshold", -999999,999999, 0));
             m_parameters->addParameter("hi",   new FloatParameter("Upper threshold", -999999,999999, 255));
             m_parameters->addParameter("no",    new FloatParameter("No Value Mark", 0,999999, 0));
@@ -1647,9 +1647,9 @@ class ImageThresholder
  *
  * \return A new instance of the ImageThresholder.
  */
-Algorithm* createImageThresholder(Environment* env)
+Algorithm* createImageThresholder(Workspace* wsp)
 {
-	return new ImageThresholder(env);
+	return new ImageThresholder(wsp);
 }
 
 
@@ -1667,10 +1667,10 @@ class FloatingImageThresholder
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        FloatingImageThresholder(Environment* env)
-        : Algorithm(env)
+        FloatingImageThresholder(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image",      new ImageBandParameter<float>("Image band for thresh.",	NULL, false, env));
+            m_parameters->addParameter("image",      new ImageBandParameter<float>("Image band for thresh.",	NULL, false, wsp));
             m_parameters->addParameter("lowS",       new FloatParameter("Lower threshold (at start)", -999999,999999, 0));
             m_parameters->addParameter("hiS",        new FloatParameter("Upper threshold (at start)", -999999,999999, 255));
             m_parameters->addParameter("lowE",       new FloatParameter("Lower threshold (at end)", -999999,999999, 0));
@@ -1788,9 +1788,9 @@ class FloatingImageThresholder
  *
  * \return A new instance of the FloatingImageThresholder.
  */
-Algorithm* createFloatingImageThresholder(Environment* env)
+Algorithm* createFloatingImageThresholder(Workspace* wsp)
 {
-	return new FloatingImageThresholder(env);
+	return new FloatingImageThresholder(wsp);
 }
 
 
@@ -1808,8 +1808,8 @@ class ThinLineExtractor
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        ThinLineExtractor(Environment* env)
-        : Algorithm(env)
+        ThinLineExtractor(Workspace* wsp)
+        : Algorithm(wsp)
         {
             
             QStringList statistical_modes;
@@ -1817,7 +1817,7 @@ class ThinLineExtractor
                 statistical_modes.append("minimal");
                 statistical_modes.append("maximal");
 
-            m_parameters->addParameter("mask",        new ImageBandParameter<float>("Mask Image",	NULL, false, env));
+            m_parameters->addParameter("mask",        new ImageBandParameter<float>("Mask Image",	NULL, false, wsp));
             m_parameters->addParameter("linewidth",   new FloatParameter("maximal width of lines", 0,999999, 0));
             m_parameters->addParameter("regions",     new EnumParameter("use region statistic for comparison", statistical_modes,0));
             m_parameters->addParameter("no",          new FloatParameter("No Value Mark", 0,999999, 0));
@@ -1976,9 +1976,9 @@ class ThinLineExtractor
  *
  * \return A new instance of the ThinLineExtractor.
  */
-Algorithm* createThinLineExtractor(Environment* env)
+Algorithm* createThinLineExtractor(Workspace* wsp)
 {
-	return new ThinLineExtractor(env);
+	return new ThinLineExtractor(wsp);
 }
 
 
@@ -1995,10 +1995,10 @@ class DistanceTransformator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        DistanceTransformator(Environment* env)
-        : Algorithm(env)
+        DistanceTransformator(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("mask", new ImageBandParameter<float>("Mask image band",	NULL, false, env));
+            m_parameters->addParameter("mask", new ImageBandParameter<float>("Mask image band",	NULL, false, wsp));
             
         }
     
@@ -2066,9 +2066,9 @@ class DistanceTransformator
  *
  * \return A new instance of the DistanceTransformator.
  */
-Algorithm* createDistanceTransformator(Environment* env)
+Algorithm* createDistanceTransformator(Workspace* wsp)
 {
-	return new DistanceTransformator(env);
+	return new DistanceTransformator(wsp);
 }
 
 

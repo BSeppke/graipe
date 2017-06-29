@@ -63,11 +63,11 @@ class StringParameter;
 class LongStringParameter;
 class PointParameter;
 class PointFParameter;
-class Environment;
+class Workspace;
 
 /**
  * This is the base class of all objects we are working
- * with in the GRAIPE environment. If you want to introduce your own
+ * with in the GRAIPE workspace. If you want to introduce your own
  * type into the framework, you have to inherit from this class or its
  * inheritants.
  *
@@ -95,7 +95,7 @@ class GRAIPE_CORE_EXPORT Model
         /**
          * Default/empty contructor of the Model class
          */
-        Model(Environment* env);
+        Model(Workspace* wsp);
     
         /**
          * Copy contructor of the Model class
@@ -144,11 +144,11 @@ class GRAIPE_CORE_EXPORT Model
 	
     
         /**
-         * Accessor for the Environment of a serializable
+         * Accessor for the Workspace of a serializable
          *
-         * \return The pointer to the environment.
+         * \return The pointer to the workspace.
          */
-        virtual Environment* environment()
+        virtual Workspace* workspace()
         {
             return m_environment;
         }
@@ -467,8 +467,8 @@ class GRAIPE_CORE_EXPORT Model
         //A group for collecting all
         ParameterGroup      * m_parameters;
     
-        //The models environment
-        Environment * m_environment;
+        //The models workspace
+        Workspace * m_environment;
 
     private:
         //keeping track of the locks
@@ -487,7 +487,7 @@ class GRAIPE_CORE_EXPORT RasteredModel
         /**
          * Default/empty contructor of the RasteredModel class.
          */
-        RasteredModel(Environment* env);
+        RasteredModel(Workspace* wsp);
     
         /**
          * Copy contructor of the RasteredModel class.

@@ -56,12 +56,12 @@
  
 namespace graipe {
 
-class GRAIPE_CORE_EXPORT Environment
+class GRAIPE_CORE_EXPORT Workspace
 : public Serializable
 {
     public:
         /**
-         * Constructor: Creates an empty environment
+         * Constructor: Creates an empty workspace
          * and auto-loads all modules, that are in same dir as the core-module.
          * Calls loadModules with different paths:
          * Under Mac OS at the place of the executable file (not the app-Bundle) and at
@@ -69,16 +69,16 @@ class GRAIPE_CORE_EXPORT Environment
          *
          * \param auto_load If true, it will auto-load all modules. False by default
          */
-        Environment();
+        Workspace();
     
         /**
-         * Virtual destructor of an environment
+         * Virtual destructor of an workspace
          */
-        virtual ~Environment();
+        virtual ~Workspace();
     
         /**
-         * Copy Constructor: Creates an environment from another one.
-         * This contructor copies all the data from the environment, but uses the same
+         * Copy Constructor: Creates an workspace from another one.
+         * This contructor copies all the data from the workspace, but uses the same
          * (identical factories). If you want to have new Factories, you need to set the 
          * reload_factories flag to true, or call loadModules() after the copy.
          * This will return a clean-copy version, without other's models and viewControllers.
@@ -87,20 +87,20 @@ class GRAIPE_CORE_EXPORT Environment
          *                         Else, it will use the other environment's factories.
          *                         False by default
          */
-        Environment(const Environment& env, bool reload_factories=false);
+        Workspace(const Workspace& wsp, bool reload_factories=false);
 
         /**
          * The typename of this class.
          *
-         * \return Always "Environment" as a QString
+         * \return Always "Workspace" as a QString
          */
         QString typeName() const
         {
-            return "Environment";
+            return "Workspace";
         }
     
         /**
-         * Deserialization of an environment from an xml file.
+         * Deserialization of an workspace from an xml file.
          *
          * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.

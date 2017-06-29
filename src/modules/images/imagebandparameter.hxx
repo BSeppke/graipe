@@ -62,7 +62,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameterBase
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Environment* env);
+        ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Workspace* wsp);
             
         /**
          * The destructor of the ImageBandParameter class
@@ -150,7 +150,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Environment* env);
+        ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Workspace* wsp);
             
         /**
          * The destructor of the ImageBandParameter class

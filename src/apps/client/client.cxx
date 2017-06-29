@@ -52,7 +52,7 @@ Client::Client(QWidget *parent)
     m_btnLogin(new QPushButton(tr("Login"))),
     m_tcpSocket(new QTcpSocket(this)),
     m_algSignalMapper(new QSignalMapper),
-    m_environment(new Environment)
+    m_environment(new Workspace)
 {
     m_environment->loadModel("/Users/seppke/Desktop/Lenna_face.xgz");
     

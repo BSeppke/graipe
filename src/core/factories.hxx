@@ -76,7 +76,7 @@ namespace graipe {
 struct ModelFactoryItem
 {
 	QString model_type;
-	Model* (*model_fptr)(Environment*);
+	Model* (*model_fptr)(Workspace*);
 };
 
 /**
@@ -108,7 +108,7 @@ struct AlgorithmFactoryItem
 	QString  topic_name;
 	QString  algorithm_name;
     QString algorithm_type;
-	Algorithm* (*algorithm_fptr)(Environment*);
+	Algorithm* (*algorithm_fptr)(Workspace*);
 };
 
 /**

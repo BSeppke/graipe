@@ -101,7 +101,7 @@ SparseWeightedMultiVectorfield2D* matchSIFTFeaturesUsingDistance(const vigra::Mu
     used_max_distance = max(1, int(0.5 + max_geo_dist - sqrt(mat(0,2)*mat(0,2) + mat(1,2)*mat(1,2))));
     
     //Create resulting vectorfield
-    SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(points1.environment());
+    SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(points1.workspace());
     
     for(unsigned int i=0; i<points1.size(); i++)
     {

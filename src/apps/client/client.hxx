@@ -94,7 +94,7 @@ private:
     QSignalMapper* m_algSignalMapper;
     
     //Env
-    Environment* m_environment;
+    Workspace* m_environment;
 };
 
 } //namespace graipe

@@ -6,7 +6,7 @@ project(graipe_core)
 set(SOURCES 
 	algorithm.cxx
 	colortables.cxx
-	environment.cxx
+	workspace.cxx
 	impex.cxx
 	logging.cxx
 	model.cxx
@@ -45,7 +45,7 @@ set(HEADERS
 	config.hxx
 	colortables.hxx
 	factories.hxx
-	environment.hxx
+	workspace.hxx
 	impex.hxx
 	logging.hxx
 	model.hxx

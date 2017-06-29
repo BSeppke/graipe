@@ -144,7 +144,7 @@ ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model)
     connect(m_radNewParameters, SIGNAL(toggled(bool)), m_scrParameters, SLOT(setEnabled(bool)));
     connect(m_radCopyParameters, SIGNAL(toggled(bool)), m_scrParameters, SLOT(setDisabled(bool)));
     
-    m_otherModel = new ModelParameter("Model:", model->typeName(), NULL, false, model->environment());
+    m_otherModel = new ModelParameter("Model:", model->typeName(), NULL, false, model->workspace());
     
     QHBoxLayout * layoutOtherModel = new QHBoxLayout(this);
     layoutOtherModel->addWidget(new QLabel(m_otherModel->name()));

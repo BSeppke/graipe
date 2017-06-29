@@ -51,10 +51,10 @@ class VectorfieldSmoother
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        VectorfieldSmoother(Environment* env)
-        : Algorithm(env)
+        VectorfieldSmoother(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield", "SparseWeightedMultiVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield", "SparseWeightedMultiVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("radius",           new FloatParameter("radius for smoothing", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",          new FloatParameter("weight threshold", 0.0, 9999, 0.0));
             m_parameters->addParameter("iterations",       new IntParameter("iterations", 1, 9999, 10));
@@ -131,9 +131,9 @@ class VectorfieldSmoother
  *
  * \return A new instance of the VectorfieldSmoother.
  */
-Algorithm* createVectorfieldSmoother(Environment * env)
+Algorithm* createVectorfieldSmoother(Workspace * wsp)
 {
-	return new VectorfieldSmoother(env);
+	return new VectorfieldSmoother(wsp);
 }
 
 
@@ -148,10 +148,10 @@ class VectorfieldRelaxer : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        VectorfieldRelaxer(Environment* env)
-        : Algorithm(env)
+        VectorfieldRelaxer(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield", "SparseWeightedMultiVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf",               new ModelParameter("Vectorfield", "SparseWeightedMultiVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("radius",           new FloatParameter("radius for smoothing", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",          new FloatParameter("weight threshold", 0.0, 9999, 0.0));
             m_parameters->addParameter("iterations",       new IntParameter("iterations", 1, 9999, 10));
@@ -228,9 +228,9 @@ class VectorfieldRelaxer : public Algorithm
  *
  * \return A new instance of the VectorfieldRelaxer.
  */
-Algorithm* createVectorfieldRelaxer(Environment * env)
+Algorithm* createVectorfieldRelaxer(Workspace * wsp)
 {
-	return new VectorfieldRelaxer(env);
+	return new VectorfieldRelaxer(wsp);
 }
 
 
@@ -245,10 +245,10 @@ class VectorfieldClustererGreedy : public Algorithm
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        VectorfieldClustererGreedy(Environment* env)
-        : Algorithm(env)
+        VectorfieldClustererGreedy(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf",  new ModelParameter("Vectorfield", "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf",  new ModelParameter("Vectorfield", "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("weight-dir", new FloatParameter("weight direction for clustering", 0.0, 9999, 1.0));
             m_parameters->addParameter("radius", new FloatParameter("radius for clustering sizes", 0.0, 9999, 10));
             m_parameters->addParameter("weightT", new FloatParameter("weight threshold", 0.0, 9999, 0.0));
@@ -338,9 +338,9 @@ class VectorfieldClustererGreedy : public Algorithm
  *
  * \return A new instance of the VectorfieldClustererGreedy.
  */
-Algorithm* createVectorfieldClustererSimple(Environment * env)
+Algorithm* createVectorfieldClustererSimple(Workspace * wsp)
 {
-	return new VectorfieldClustererGreedy(env);
+	return new VectorfieldClustererGreedy(wsp);
 }
 
 
@@ -356,10 +356,10 @@ class VectorfieldClustererKMeans
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        VectorfieldClustererKMeans(Environment* env)
-        : Algorithm(env)
+        VectorfieldClustererKMeans(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseWeightedVectorfield2D|SparseWeightedMultiVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("weight-dir", new FloatParameter("weight direction for clustering", 0.0, 9999, 1.0));
             m_parameters->addParameter("k", new IntParameter("k (count of clusters)", 0.0, 9999, 10));
             m_parameters->addParameter("weightT",  new FloatParameter("weight threshold", 0.0, 9999, 0.0));
@@ -450,9 +450,9 @@ class VectorfieldClustererKMeans
  *
  * \return A new instance of the VectorfieldClustererKMeans.
  */
-Algorithm* createVectorfieldClustererKMeans(Environment* env)
+Algorithm* createVectorfieldClustererKMeans(Workspace* wsp)
 {
-	return new VectorfieldClustererKMeans(env);
+	return new VectorfieldClustererKMeans(wsp);
 }
 
 

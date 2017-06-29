@@ -563,8 +563,8 @@ template bool ImageImpex::exportImage<unsigned char>(const Image<unsigned char>&
 /**
  * Default constructor for the image importer class.
  */
-ImageImporter::ImageImporter(Environment* env)
-:   Algorithm(env),
+ImageImporter::ImageImporter(Workspace* wsp)
+:   Algorithm(wsp),
     m_filename(new FilenameParameter("Image filename", "", NULL)),
     m_pixeltype(NULL)
 {
@@ -576,7 +576,7 @@ ImageImporter::ImageImporter(Environment* env)
 		types.append("unsigned char");
     m_pixeltype = new EnumParameter("Image pixel type:",types,0);
     m_parameters->addParameter("pixeltype",m_pixeltype);
-    m_results.push_back(new Image<float>(env));
+    m_results.push_back(new Image<float>(wsp));
     
     connect(m_pixeltype, SIGNAL(valueChanged()), this, SLOT(pixelTypeChanged()));
 }
@@ -651,15 +651,15 @@ void ImageImporter::pixelTypeChanged()
 /**
  * Default constructor for the image exporter class.
  */
-ImageExporter::ImageExporter(Environment * env)
-: Algorithm(env)
+ImageExporter::ImageExporter(Workspace * wsp)
+: Algorithm(wsp)
 {
 	QStringList format_names;
 		format_names.append("GIF"); format_names.append("GTiff");
 		format_names.append("JPEG"); format_names.append("netCDF");
 		format_names.append("PNG"); format_names.append("XYZ");
 
-    m_parameters->addParameter("image", new ModelParameter("Image",	"Image, IntImage, ByteImage", NULL, false, env));
+    m_parameters->addParameter("image", new ModelParameter("Image",	"Image, IntImage, ByteImage", NULL, false, wsp));
     m_parameters->addParameter("filename", new FilenameParameter("Image filename", "", NULL));
     m_parameters->addParameter("format", new EnumParameter("File format", format_names));
 }

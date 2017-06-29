@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "core/impex.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 #include <QFile>
 #include "core/qt_ext/qiocompressor.hxx"

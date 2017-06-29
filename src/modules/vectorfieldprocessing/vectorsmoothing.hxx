@@ -68,8 +68,8 @@ SparseWeightedVectorfield2D* smoothVectorfield(SparseWeightedMultiVectorfield2D 
 	
     int feature_count = vectorfield->size();					//count of features
 	
-	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
-	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
+	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
+	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
 		
     result_vectorfield->setGlobalMotion(vectorfield->globalMotion());
     work_vectorfield->setGlobalMotion(vectorfield->globalMotion());
@@ -221,8 +221,8 @@ SparseWeightedVectorfield2D * relaxVectorfield(SparseWeightedMultiVectorfield2D 
 {
 	int feature_count = vectorfield->size();					//count of features
 
-	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
-	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
+	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
+	SparseWeightedVectorfield2D * work_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
 
 	result_vectorfield->setGlobalMotion(vectorfield->globalMotion());
 	work_vectorfield->setGlobalMotion(vectorfield->globalMotion());

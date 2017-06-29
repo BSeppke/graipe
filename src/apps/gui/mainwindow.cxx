@@ -37,7 +37,7 @@
 #include "gui/memorystatus.hxx"
 
 #include "core/updatechecker.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 #include <QDir>
 #include <QLibrary>
@@ -68,11 +68,11 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	m_status_window(new StatusWindow),
     m_lblMemoryUsage(new QLabel("(Memory: 0 MB, max: 0 MB)")),
     m_recentFileCount(10),
-    m_environment(new Environment)
+    m_environment(new Workspace)
 {	
     m_ui.setupUi(this);
     
-    //init the factories from the environment
+    //init the factories from the workspace
     initializeFactories();
 	
     m_ui.scrModelParameters->setWidgetResizable(true);
@@ -285,7 +285,7 @@ void MainWindow::reset()
     //and proceed with the models:
     m_ui.listModels->clear();
     
-    //Also clear models and viewControllers in the Environment
+    //Also clear models and viewControllers in the Workspace
     m_environment->clearContents();
 }
 
@@ -460,7 +460,7 @@ void MainWindow::help()
 void MainWindow::about()
 {
     QMessageBox::about(this, "About GRAIPE",
-                "<p><b>About the GrAphical Image Processing Environment<br/>"
+                "<p><b>About the GrAphical Image Processing Workspace<br/>"
                 "a.k.a. GRAIPE</b></p>"
                 "<p>Currently installed version: " + full_version_name + "<br/>"
                 "GIT version (build): " + git_version + "<br />"

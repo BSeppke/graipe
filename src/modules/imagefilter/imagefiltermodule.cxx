@@ -55,8 +55,8 @@ class ImageFilter
          * Default_constructor. Introduces the list of vigra's 
          * BorderTreatmentModes.
          */
-        ImageFilter(Environment * env)
-        : Algorithm(env)
+        ImageFilter(Workspace * wsp)
+        : Algorithm(wsp)
         {
             //According to VIGRA's <vigra/bordertreatment.hxx>:
             /*
@@ -111,14 +111,14 @@ class FrostFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        FrostFilter(Environment * env)
-        : ImageFilter(env)
+        FrostFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -201,9 +201,9 @@ class FrostFilter
  *
  * \return A new instance of the FrostFilter.
  */
-Algorithm* createFrostFilter(Environment * env)
+Algorithm* createFrostFilter(Workspace * wsp)
 {
-	return new FrostFilter(env);
+	return new FrostFilter(wsp);
 }
 
 
@@ -220,15 +220,15 @@ class EnhancedFrostFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        EnhancedFrostFilter(Environment * env)
-        : ImageFilter(env)
+        EnhancedFrostFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -312,9 +312,9 @@ class EnhancedFrostFilter
  *
  * \return A new instance of the EnhancedFrostFilter.
  */
-Algorithm* createEnhancedFrostFilter(Environment * env)
+Algorithm* createEnhancedFrostFilter(Workspace * wsp)
 {
-	return new EnhancedFrostFilter(env);
+	return new EnhancedFrostFilter(wsp);
 }
 
 
@@ -333,14 +333,14 @@ class GammaMAPFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        GammaMAPFilter(Environment * env)
-        : ImageFilter(env)
+        GammaMAPFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -423,9 +423,9 @@ class GammaMAPFilter
  *
  * \return A new instance of the GammaMAPFilter.
  */
-Algorithm* createGammaMAPFilter(Environment * env)
+Algorithm* createGammaMAPFilter(Workspace * wsp)
 {
-	return new GammaMAPFilter(env);
+	return new GammaMAPFilter(wsp);
 }
 
 
@@ -442,14 +442,14 @@ class KuanFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        KuanFilter(Environment * env)
-        : ImageFilter(env)
+        KuanFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -532,9 +532,9 @@ class KuanFilter
  *
  * \return A new instance of the KuanFilter.
  */
-Algorithm* createKuanFilter(Environment * env)
+Algorithm* createKuanFilter(Workspace * wsp)
 {
-	return new KuanFilter(env);
+	return new KuanFilter(wsp);
 }
 
 
@@ -551,14 +551,14 @@ class LeeFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        LeeFilter(Environment * env)
-        : ImageFilter(env)
+        LeeFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -641,9 +641,9 @@ class LeeFilter
  *
  * \return A new instance of the LeeFilter.
  */
-Algorithm* createLeeFilter(Environment * env)
+Algorithm* createLeeFilter(Workspace * wsp)
 {
-	return new LeeFilter(env);
+	return new LeeFilter(wsp);
 }
 
 
@@ -663,15 +663,15 @@ class EnhancedLeeFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        EnhancedLeeFilter(Environment * env)
-        : ImageFilter(env)
+        EnhancedLeeFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("k", new FloatParameter("Damping factor k", 0, 1, 1));
             m_parameters->addParameter("ENL", new IntParameter("Equivalent Number of looks (ENL)", 1, 100, 4));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -755,9 +755,9 @@ class EnhancedLeeFilter
  *
  * \return A new instance of the EnhancedLeeFilter.
  */
-Algorithm* createEnhancedLeeFilter(Environment * env)
+Algorithm* createEnhancedLeeFilter(Workspace * wsp)
 {
-	return new EnhancedLeeFilter(env);
+	return new EnhancedLeeFilter(wsp);
 }
 
 
@@ -774,13 +774,13 @@ class MedianFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        MedianFilter(Environment * env)
-        : ImageFilter(env)
+        MedianFilter(Workspace * wsp)
+        : ImageFilter(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("size", new IntParameter("Filter window size", 1, 9999, 11));
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         QString typeName() const
         {
@@ -861,9 +861,9 @@ class MedianFilter
  *
  * \return A new instance of the MedianFilter.
  */
-Algorithm* createMedianFilter(Environment * env)
+Algorithm* createMedianFilter(Workspace * wsp)
 {
-	return new MedianFilter(env);
+	return new MedianFilter(wsp);
 }
 
 
@@ -880,15 +880,15 @@ class ShockFilter
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */    
-        ShockFilter(Environment * env)
-        : Algorithm(env)
+        ShockFilter(Workspace * wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, env));
+            m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("sigma1", new FloatParameter("inner Sigma", 0.0, 100, 0.7f));
             m_parameters->addParameter("sigma2", new FloatParameter("outer Sigma", 0.0, 100, 3));
             m_parameters->addParameter("upwind", new FloatParameter("upwinding factor", 0.0, 10.0, 0.3f));
             m_parameters->addParameter("iterations", new IntParameter("Iterations", 1, 9999, 10));
-            m_results.push_back(new Image<float>(env));
+            m_results.push_back(new Image<float>(wsp));
         }
         
         QString typeName() const
@@ -972,9 +972,9 @@ class ShockFilter
  *
  * \return A new instance of the ShockFilter.
  */
-Algorithm* createShockFilter(Environment * env)
+Algorithm* createShockFilter(Workspace * wsp)
 {
-	return new ShockFilter(env);
+	return new ShockFilter(wsp);
 }
 
 

@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "core/viewcontroller.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 #include <algorithm>
 
@@ -103,7 +103,7 @@ ViewController::ViewController(Model * model)
 	connect(m_model,      SIGNAL(modelChanged()), this, SLOT(updateView()));
     
     //Add to global viewControllers list
-    model->environment()->viewControllers.push_back(this);
+    model->workspace()->viewControllers.push_back(this);
 }
 
 /**
@@ -120,11 +120,11 @@ ViewController::~ViewController()
     delete m_parameters;
     
     //Remove from global viewControllers list
-    model()->environment()->viewControllers.erase(
-        std::remove(model()->environment()->viewControllers.begin(),
-                    model()->environment()->viewControllers.end(),
+    model()->workspace()->viewControllers.erase(
+        std::remove(model()->workspace()->viewControllers.begin(),
+                    model()->workspace()->viewControllers.end(),
                     this),
-        model()->environment()->viewControllers.end());
+        model()->workspace()->viewControllers.end());
 }
 
 /**

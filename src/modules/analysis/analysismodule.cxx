@@ -53,10 +53,10 @@ class MeanVectorfield
          * Default constructor for the dense mean vectorfield computation.
          * Initializes only one parameter - the vectorfield selection
          */
-        MeanVectorfield(Environment* env)
-        : Algorithm(env)
+        MeanVectorfield(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf", new MultiModelParameter("(Dense) Vectorfields",  "DenseVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf", new MultiModelParameter("(Dense) Vectorfields",  "DenseVectorfield2D", NULL, false, wsp));
         }
     
         QString typeName() const
@@ -149,9 +149,9 @@ class MeanVectorfield
  *
  * \return A new instance of the dense mean vectorfield algorithm.
  */
-Algorithm* createMeanVectorfield(Environment* env)
+Algorithm* createMeanVectorfield(Workspace* wsp)
 {
-	return new MeanVectorfield(env);
+	return new MeanVectorfield(wsp);
 }
 
 
@@ -168,11 +168,11 @@ class Vectorfield2DDenseModelComparison
         /**
          * Default constructor. Initialized additional parameters.
          */
-        Vectorfield2DDenseModelComparison(Environment* env)
-        : Algorithm(env)
+        Vectorfield2DDenseModelComparison(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf1", new ModelParameter("Derived Vectorfield",	"SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
-            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with", "DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf1", new ModelParameter("Derived Vectorfield",	"SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
+            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with", "DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("degree", new IntParameter("Use spline interpolation of degree", 0, 5,1));
         }
     
@@ -307,9 +307,9 @@ class Vectorfield2DDenseModelComparison
  *
  * \return A new instance of the Vectorfield2DDenseModelComparison.
  */
-Algorithm* createVectorfield2DDenseModelComparison(Environment* env)
+Algorithm* createVectorfield2DDenseModelComparison(Workspace* wsp)
 {
-	return new Vectorfield2DDenseModelComparison(env);
+	return new Vectorfield2DDenseModelComparison(wsp);
 };
 
 
@@ -327,11 +327,11 @@ class Vectorfield2DGenericComparison
         /**
          * Default constructor. Initialized additional parameters.
          */
-        Vectorfield2DGenericComparison(Environment* env)
-        : Algorithm(env)
+        Vectorfield2DGenericComparison(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf1", new ModelParameter("First Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
-            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with",  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf1", new ModelParameter("First Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
+            m_parameters->addParameter("vf2", new ModelParameter("Reference Vectorfield to compare with",  "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("n", new IntParameter("use n nearest neighbors in reference vf", 0, 100));
         }
     
@@ -423,9 +423,9 @@ class Vectorfield2DGenericComparison
  *
  * \return A new instance of the Vectorfield2DGenericComparison.
  */
-Algorithm* createVectorfield2DGenericComparison(Environment* env)
+Algorithm* createVectorfield2DGenericComparison(Workspace* wsp)
 {
-	return new Vectorfield2DGenericComparison(env);
+	return new Vectorfield2DGenericComparison(wsp);
 };
 
 
@@ -442,10 +442,10 @@ class Vectorfield2DSeparation
         /**
          * Default constructor. Initializes only one additional parameter, the vectorfield.
          */
-        Vectorfield2DSeparation(Environment* env)
-        : Algorithm(env)
+        Vectorfield2DSeparation(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
         }
     
         QString typeName() const
@@ -528,9 +528,9 @@ class Vectorfield2DSeparation
  *
  * \return A new instance of the Vectorfield2DSeparation.
  */
-Algorithm* createVectorfield2DSeparation(Environment* env)
+Algorithm* createVectorfield2DSeparation(Workspace* wsp)
 {
-	return new Vectorfield2DSeparation(env);
+	return new Vectorfield2DSeparation(wsp);
 };
 
 
@@ -546,10 +546,10 @@ class Vectorfield2DCurl
         /**
          * Default constructor. Initializes only one additional parameter, the vectorfield.
          */
-        Vectorfield2DCurl(Environment* env)
-        : Algorithm(env)
+        Vectorfield2DCurl(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
     
@@ -633,9 +633,9 @@ class Vectorfield2DCurl
  *
  * \return A new instance of the Vectorfield2DCurl.
  */
-Algorithm* computeVectorfield2DCurl(Environment* env)
+Algorithm* computeVectorfield2DCurl(Workspace* wsp)
 {
-	return new Vectorfield2DCurl(env);
+	return new Vectorfield2DCurl(wsp);
 };
 
 
@@ -651,10 +651,10 @@ class Vectorfield2DDiv
         /**
          * Default constructor. Initializes only one additional parameter, the vectorfield.
          */
-        Vectorfield2DDiv(Environment* env)
-        : Algorithm(env)
+        Vectorfield2DDiv(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, env));
+            m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
     
@@ -738,9 +738,9 @@ class Vectorfield2DDiv
  *
  * \return A new instance of the Vectorfield2DDiv.
  */
-Algorithm* computeVectorfield2DDiv(Environment* env)
+Algorithm* computeVectorfield2DDiv(Workspace* wsp)
 {
-	return new Vectorfield2DDiv(env);
+	return new Vectorfield2DDiv(wsp);
 };
 
 

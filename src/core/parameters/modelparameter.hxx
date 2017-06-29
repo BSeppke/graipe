@@ -76,7 +76,7 @@ class GRAIPE_CORE_EXPORT ModelParameter
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
          */
-        ModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Environment* env);
+        ModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp);
     
         /**
          * The destructor of the ModelParameter class

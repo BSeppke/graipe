@@ -43,8 +43,8 @@ namespace graipe {
  * with zero size and no bands at all.
  */
 template<class T>
-Image<T>::Image(Environment* env)
- :  RasteredModel(env),
+Image<T>::Image(Workspace* wsp)
+ :  RasteredModel(wsp),
     m_numBands(new IntParameter("Number of bands:",0,1000, 0)),
     m_timestamp(new DateTimeParameter("Timestamp:", QDateTime::currentDateTime())),
     m_scale(new DoubleParameter("Scale (1 px = X m):", 0, 1000000000, 1)),
@@ -100,9 +100,9 @@ Image<T>::Image(const Image<T> & img)
 template<class T>
 Image<T>::Image(Size_Type size, 
                 unsigned int numBands,
-                Environment* env)
+                Workspace* wsp)
 
- :  RasteredModel(env),
+ :  RasteredModel(wsp),
     m_numBands(new IntParameter("Number of bands:",0,1000, numBands)),
     m_timestamp(new DateTimeParameter("Timestamp:", QDateTime::currentDateTime())),
     m_scale(new DoubleParameter("Scale (1 px = X m):", 0, 1000000000, 1)),

@@ -43,8 +43,8 @@ namespace graipe {
 /**
  * Default constructor. Creates an empty point feature list.
  */
-PointFeatureList2D::PointFeatureList2D(Environment* env)
-: Model(env)
+PointFeatureList2D::PointFeatureList2D(Workspace* wsp)
+: Model(wsp)
 {
 }
 
@@ -310,8 +310,8 @@ bool PointFeatureList2D::deserialize_content(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Creates an empty weighted point feature list.
  */
-WeightedPointFeatureList2D::WeightedPointFeatureList2D(Environment* env)
-:   PointFeatureList2D(env)
+WeightedPointFeatureList2D::WeightedPointFeatureList2D(Workspace* wsp)
+:   PointFeatureList2D(wsp)
 {
 }
 
@@ -505,8 +505,8 @@ bool WeightedPointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Creates an empty edgel feature list.
  */
-EdgelFeatureList2D::EdgelFeatureList2D(Environment* env)
-: WeightedPointFeatureList2D(env)
+EdgelFeatureList2D::EdgelFeatureList2D(Workspace* wsp)
+: WeightedPointFeatureList2D(wsp)
 {
 }
 
@@ -728,8 +728,8 @@ bool EdgelFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 /**
  * Default constructor. Creates an empty SIFT feature list.
  */
-SIFTFeatureList2D::SIFTFeatureList2D(Environment* env)
-: EdgelFeatureList2D(env)
+SIFTFeatureList2D::SIFTFeatureList2D(Workspace* wsp)
+: EdgelFeatureList2D(wsp)
 {
 }
 

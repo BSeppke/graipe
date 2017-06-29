@@ -153,7 +153,7 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
 	MultiArray<2,float>	result(result_w, result_h);
 	
 	//Create resulting vectorfield
-	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(features.environment());
+	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(features.workspace());
 	
 	
 	for(unsigned int i=0 ; i < features.size(); ++i)
@@ -438,7 +438,7 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeatures(const vigra::MultiArra
 	used_max_distance = max(1,int(0.5 + max_distance - sqrt(mat(0,2)*mat(0,2) + mat(1,2)*mat(1,2))));
 	
 	//Create resulting vectorfield
-	SparseWeightedMultiVectorfield2D*  result_vf = new SparseWeightedMultiVectorfield2D(s1_features.environment());
+	SparseWeightedMultiVectorfield2D*  result_vf = new SparseWeightedMultiVectorfield2D(s1_features.workspace());
 		
 	for(unsigned int i=0 ; i < s1_features.size(); ++i)
 	{ 
@@ -660,7 +660,7 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const
 	
 	
 	//Create resulting vectorfield
-	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(s1_features.environment());
+	SparseWeightedMultiVectorfield2D* result_vf = new SparseWeightedMultiVectorfield2D(s1_features.workspace());
 	
 	unsigned int max_radius = max(mask_width,mask_height)/2.0,
 			     angle_bins = 8;

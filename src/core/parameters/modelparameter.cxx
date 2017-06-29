@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "core/parameters/modelparameter.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 #include <QtDebug>
 #include <QXmlStreamWriter>
@@ -60,16 +60,16 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-ModelParameter::ModelParameter(const QString &name, QString type_filter, Parameter* parent, bool invert_parent, Environment* env)
-:   Parameter(name, parent, invert_parent, env),
+ModelParameter::ModelParameter(const QString &name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp)
+:   Parameter(name, parent, invert_parent, wsp),
     m_delegate(NULL),
     m_type_filter(type_filter)
 {
-    if(env!= NULL && env->models.size())
+    if(wsp!= NULL && wsp->models.size())
 	{
 		m_allowed_values.clear();
 		
-		for(Model * model: env->models)
+		for(Model * model: wsp->models)
 		{
 			if(m_type_filter.isEmpty() || m_type_filter.contains(model->typeName()))
 			{

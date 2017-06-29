@@ -92,10 +92,10 @@ class WindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        WindDetector(Environment* env)
-        : Algorithm(env)
+        WindDetector(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("band", new ImageBandParameter<float>("Image band",	NULL, false, env));
+            m_parameters->addParameter("band", new ImageBandParameter<float>("Image band",	NULL, false, wsp));
             m_parameters->addParameter("dir", new EnumParameter("(known) wind direction", direction_names()));
             m_parameters->addParameter("x-samples", new IntParameter("x-samples", 1, 9999, 10));
             m_parameters->addParameter("y-samples", new IntParameter("y-samples", 1, 9999, 10));
@@ -159,8 +159,8 @@ class FourierSpectrumWindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        FourierSpectrumWindDetector(Environment* env)
-        : WindDetector(env)
+        FourierSpectrumWindDetector(Workspace* wsp)
+        : WindDetector(wsp)
         {	
             m_parameters->addParameter("sigma", new FloatParameter("energy smoothing", 0.0, 10.0, 1));
             m_parameters->addParameter("T", new FloatParameter("energy threshold [%]", 0.0, 1, 0.8f));
@@ -224,9 +224,9 @@ class FourierSpectrumWindDetector
  *
  * \return A new instance of the FourierSpectrumWindDetector.
  */
-Algorithm* createFourierSpectrumWindDetector(Environment* env)
+Algorithm* createFourierSpectrumWindDetector(Workspace* wsp)
 {
-	return new FourierSpectrumWindDetector(env);
+	return new FourierSpectrumWindDetector(wsp);
 }
 
 
@@ -243,8 +243,8 @@ class GradientHistogramWindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        GradientHistogramWindDetector(Environment* env)
-        : WindDetector(env)
+        GradientHistogramWindDetector(Workspace* wsp)
+        : WindDetector(wsp)
         {	
             m_parameters->addParameter("sigma", new FloatParameter("gadient scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("T",     new FloatParameter("gradient-threshold", 0.0, 10.0, 1.0));
@@ -307,9 +307,9 @@ class GradientHistogramWindDetector
  *
  * \return A new instance of the GradientHistogramWindDetector.
  */
-Algorithm* createGradientHistogramWindDetector(Environment* env)
+Algorithm* createGradientHistogramWindDetector(Workspace* wsp)
 {
-	return new GradientHistogramWindDetector(env);
+	return new GradientHistogramWindDetector(wsp);
 }
 
 
@@ -326,10 +326,10 @@ class StructureTensorWindDetector
         /**
          * Default constructor. Introduces additional parameters.
          */
-        StructureTensorWindDetector(Environment* env)
-        : Algorithm(env)
+        StructureTensorWindDetector(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("band",   new ImageBandParameter<float>("Image band",	NULL, false, env));
+            m_parameters->addParameter("band",   new ImageBandParameter<float>("Image band",	NULL, false, wsp));
             m_parameters->addParameter("dir",    new EnumParameter("(known) wind direction", direction_names()));
             m_parameters->addParameter("sigma1", new FloatParameter("innner scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("sigma2", new FloatParameter("outer scale", 0.0, 10.0, 1.0));
@@ -403,9 +403,9 @@ class StructureTensorWindDetector
  *
  * \return A new instance of the StructureTensorWindDetector.
  */
-Algorithm* createStructureTensorWindDetector(Environment* env)
+Algorithm* createStructureTensorWindDetector(Workspace* wsp)
 {
-	return new StructureTensorWindDetector(env);
+	return new StructureTensorWindDetector(wsp);
 }
 
 

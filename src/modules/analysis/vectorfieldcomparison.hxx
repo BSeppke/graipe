@@ -238,7 +238,7 @@ WeightedPointFeatureList2D* compareVectorfieldToDenseModel(Vectorfield2D* vf,
                                                            VectorDirectionErrorFunctor& error_measure,
                                                            QString & report)
 {
-	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D(vf->environment());
+	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D(vf->workspace());
 	
 	double error=0, error2=0;
 	double single_error;
@@ -324,7 +324,7 @@ WeightedPointFeatureList2D* compareVectorfieldsGeneric( Vectorfield2D* vf,
                                                         VectorDirectionErrorFunctor& error_measure,
                                                         QString & report)
 {
-	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D(vf->environment());
+	WeightedPointFeatureList2D* comparison = new WeightedPointFeatureList2D(vf->workspace());
 	
 	double error=0, error2=0;
 	double single_error;

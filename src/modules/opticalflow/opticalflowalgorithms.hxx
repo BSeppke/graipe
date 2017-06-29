@@ -99,8 +99,8 @@ class OpticalFlowAlgorithm
          * we want to have control over ther orderung of them. See the following two member 
          * functions for further details.
          */
-        OpticalFlowAlgorithm(Environment* env)
-        : Algorithm(env)
+        OpticalFlowAlgorithm(Workspace* wsp)
+        : Algorithm(wsp)
         {
         }
     
@@ -395,8 +395,8 @@ class OpticalFlowHSEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-		OpticalFlowHSEstimator(Environment* env)
-        : OpticalFlowAlgorithm(env)
+		OpticalFlowHSEstimator(Workspace* wsp)
+        : OpticalFlowAlgorithm(wsp)
 		{
 			addImageAndMaskParameters();
 			
@@ -496,8 +496,8 @@ class OpticalFlowBruhnEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlowBruhnEstimator(Environment* env)
-        : OpticalFlowAlgorithm(env)
+        OpticalFlowBruhnEstimator(Workspace* wsp)
+        : OpticalFlowAlgorithm(wsp)
         {
             addImageAndMaskParameters();
             
@@ -597,8 +597,8 @@ class OpticalFlowLKEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlowLKEstimator(Environment* env)
-        : OpticalFlowAlgorithm(env)
+        OpticalFlowLKEstimator(Workspace* wsp)
+        : OpticalFlowAlgorithm(wsp)
         {
             addImageAndMaskParameters();
             
@@ -684,8 +684,8 @@ class OpticalFlowFBEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlowFBEstimator(Environment* env)
-        : OpticalFlowAlgorithm(env)
+        OpticalFlowFBEstimator(Workspace* wsp)
+        : OpticalFlowAlgorithm(wsp)
         {
             addImageAndMaskParameters();
             
@@ -772,8 +772,8 @@ class OpticalFlowTensorEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlowTensorEstimator(Environment* env)
-        : OpticalFlowAlgorithm(env)
+        OpticalFlowTensorEstimator(Workspace* wsp)
+        : OpticalFlowAlgorithm(wsp)
         {
             addImageAndMaskParameters();
             
@@ -880,8 +880,8 @@ class OpticalFlowCCEstimator
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          */
-        OpticalFlowCCEstimator(Environment* env)
-        : OpticalFlowAlgorithm(env)
+        OpticalFlowCCEstimator(Workspace* wsp)
+        : OpticalFlowAlgorithm(wsp)
         {
             addImageAndMaskParameters();
             

@@ -131,7 +131,7 @@ PointFeatureList2D sortPointListAngular(PointFeatureList2D& points)
 {
 	std::list<PointFeatureList2D::PointType> sorted_list;
 	
-	PointFeatureList2D sorted_features(points.environment());
+	PointFeatureList2D sorted_features(points.workspace());
 	
 	if( points.size())
 	{
@@ -253,7 +253,7 @@ Polygon2D polygonFromPointList(const PointFeatureList2D& points, bool convex = t
  */
 WeightedPolygonList2D* polygonsFromClusteredVectorfield(SparseWeightedVectorfield2D* vectorfield, float direction_weight)
 {
-	WeightedPolygonList2D* result = new WeightedPolygonList2D(vectorfield->environment());
+	WeightedPolygonList2D* result = new WeightedPolygonList2D(vectorfield->workspace());
 	
 	unsigned int vector_count = vectorfield->size();					//count of vectors
 	unsigned int cluster_count = 0;
@@ -281,7 +281,7 @@ WeightedPolygonList2D* polygonsFromClusteredVectorfield(SparseWeightedVectorfiel
 	for (unsigned int cluster_idx=0; cluster_idx< cluster_count; ++cluster_idx)
 	{
 		//initialise point Lists for polygon creation
-		point_lists[cluster_idx] = new PointFeatureList2D(vectorfield->environment());
+		point_lists[cluster_idx] = new PointFeatureList2D(vectorfield->workspace());
 		
 		pos[cluster_idx] /= vec_count[cluster_idx];
 		dir[cluster_idx] /= vec_count[cluster_idx];
@@ -334,8 +334,8 @@ std::vector<Model*> clusterVectorfieldGreedy(Vectorfield_Type * vectorfield,
 {
     int feature_count = vectorfield->size();					//count of features
 	
-	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
-	SparseWeightedVectorfield2D * cluster_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
+	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
+	SparseWeightedVectorfield2D * cluster_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
 	
     result_vectorfield->setGlobalMotion(vectorfield->globalMotion());
     cluster_vectorfield->setGlobalMotion(vectorfield->globalMotion());
@@ -503,8 +503,8 @@ std::vector<Model*> clusterVectorfieldKMeans(Vectorfield_Type * vectorfield, uns
     
 	unsigned int feature_count = vectorfield->size();					//count of features
 		
-	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
-	SparseWeightedVectorfield2D * cluster_vectorfield = new SparseWeightedVectorfield2D(vectorfield->environment());
+	SparseWeightedVectorfield2D * result_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
+	SparseWeightedVectorfield2D * cluster_vectorfield = new SparseWeightedVectorfield2D(vectorfield->workspace());
     
     result_vectorfield->setGlobalMotion(vectorfield->globalMotion());
     cluster_vectorfield->setGlobalMotion(vectorfield->globalMotion());

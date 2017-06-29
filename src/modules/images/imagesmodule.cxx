@@ -176,9 +176,9 @@ class ImagesModule
          *
          * \return A new Image<float>.
          */
-        static Model* createImage(Environment* env)
+        static Model* createImage(Workspace* wsp)
         {
-            return new Image<float>(env);
+            return new Image<float>(wsp);
         }
             
         /**
@@ -222,9 +222,9 @@ class ImagesModule
          *
          * \return A new Image<int>.
          */
-        static Model* createIntImage(Environment* env)
+        static Model* createIntImage(Workspace* wsp)
         {
-            return new Image<int>(env);
+            return new Image<int>(wsp);
         }
     
         /**
@@ -267,9 +267,9 @@ class ImagesModule
          *
          * \return A new Image<unsigned char>.
          */
-        static Model* createByteImage(Environment* env)
+        static Model* createByteImage(Workspace* wsp)
         {
-            return new Image<unsigned char>(env);
+            return new Image<unsigned char>(wsp);
         }
     
         /**
@@ -308,9 +308,9 @@ class ImagesModule
          *
          * \return A new ImageImporter.
          */
-        static Algorithm* createImageImporter(Environment* env)
+        static Algorithm* createImageImporter(Workspace* wsp)
         {
-            return new ImageImporter(env);
+            return new ImageImporter(wsp);
         }
 
         /**
@@ -318,9 +318,9 @@ class ImagesModule
          *
          * \return A new ImageExporter.
          */
-        static Algorithm* createImageExporter(Environment* env)
+        static Algorithm* createImageExporter(Workspace* wsp)
         {
-            return new ImageExporter(env);
+            return new ImageExporter(wsp);
         }
 };
 

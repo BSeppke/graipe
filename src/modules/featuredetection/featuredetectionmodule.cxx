@@ -52,12 +52,12 @@ class MonotonyFeatureDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        MonotonyFeatureDetector(Environment* env)
-        : Algorithm(env)
+        MonotonyFeatureDetector(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL, false, env));
+            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL, false, wsp));
             m_parameters->addParameter("mask?",  new BoolParameter("Use image band as mask", true));
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, env));
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, wsp));
             m_parameters->addParameter("lowM",   new IntParameter("Lowest Monotony class", 0,8, 7));
             m_parameters->addParameter("hiM",    new IntParameter("Highest Monotony class", 0,8, 8));
         }
@@ -149,9 +149,9 @@ class MonotonyFeatureDetector
  *
  * \return A new instance of the MonotonyFeatureDetector.
  */
-Algorithm* createMonotonyFeatureDetector(Environment * env)
+Algorithm* createMonotonyFeatureDetector(Workspace * wsp)
 {
-	return new MonotonyFeatureDetector(env);
+	return new MonotonyFeatureDetector(wsp);
 }
 
 
@@ -168,12 +168,12 @@ class HarrisCornerDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        HarrisCornerDetector(Environment* env)
-        : Algorithm(env)
+        HarrisCornerDetector(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL, false, env));
+            m_parameters->addParameter("image", new ImageBandParameter<float>("Image", NULL, false, wsp));
             m_parameters->addParameter("mask?", new BoolParameter("Use image band as mask", true));
-            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, env));
+            m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("sigma for calculation of gauss. gradient", 0,99, 0.6f));
             m_parameters->addParameter("T",     new FloatParameter("Corner response threshold", 0,999999, 0));
         }
@@ -262,9 +262,9 @@ class HarrisCornerDetector
  *
  * \return A new instance of the HarrisCornerDetector.
  */
-Algorithm* createHarrisCornerDetector(Environment * env)
+Algorithm* createHarrisCornerDetector(Workspace * wsp)
 {
-	return new HarrisCornerDetector(env);
+	return new HarrisCornerDetector(wsp);
 }
 
 
@@ -281,12 +281,12 @@ class CannyFeatureDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        CannyFeatureDetector(Environment* env)
-        : Algorithm(env)
+        CannyFeatureDetector(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL, false, env));
+            m_parameters->addParameter("image",  new ImageBandParameter<float>("Image", NULL, false, wsp));
             m_parameters->addParameter("mask?",  new BoolParameter("Use image band as mask", true));
-            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, env));
+            m_parameters->addParameter("mask",   new ImageBandParameter<float>("Mask Image band", (*m_parameters)["mask?"], false, wsp));
             m_parameters->addParameter("sigma",  new FloatParameter("Canny Scale", 0,9999999, 0));
             m_parameters->addParameter("sigmaT", new FloatParameter("Canny (gradient strength) threshold", 0,9999999, 0));
         }
@@ -375,9 +375,9 @@ class CannyFeatureDetector
  *
  * \return A new instance of the CannyFeatureDetector.
  */
-Algorithm* createCannyFeatureDetector(Environment * env)
+Algorithm* createCannyFeatureDetector(Workspace * wsp)
 {
-	return new CannyFeatureDetector(env);
+	return new CannyFeatureDetector(wsp);
 }
 
 
@@ -393,10 +393,10 @@ class CannyFeatureLengthFilter
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        CannyFeatureLengthFilter(Environment* env)
-        : Algorithm(env)
+        CannyFeatureLengthFilter(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("edgels",     new ModelParameter("Edgel Featurelist (2D)", "EdgelFeatureList2D", NULL, false, env));
+            m_parameters->addParameter("edgels",     new ModelParameter("Edgel Featurelist (2D)", "EdgelFeatureList2D", NULL, false, wsp));
             m_parameters->addParameter("min-length", new FloatParameter("Minimal Edgel length", 0,9999999, 0));
             m_parameters->addParameter("radius",     new FloatParameter("Search radius for Edgel-unions", 0,9999999, 1.5));
         }
@@ -469,7 +469,7 @@ class CannyFeatureLengthFilter
          */
         EdgelFeatureList2D* removeShortEdgesFromEdgelList(EdgelFeatureList2D* features, double min_length, float search_radius)
         {
-            EdgelFeatureList2D* new_featurelist = new EdgelFeatureList2D(features->environment());
+            EdgelFeatureList2D* new_featurelist = new EdgelFeatureList2D(features->workspace());
             
             std::vector<bool> marked(features->size(), false);
             std::vector<unsigned int> trace, boundary;
@@ -536,9 +536,9 @@ class CannyFeatureLengthFilter
  *
  * \return A new instance of the CannyFeatureLengthFilter.
  */
-Algorithm* createCannyFeatureLengthFilter(Environment * env)
+Algorithm* createCannyFeatureLengthFilter(Workspace * wsp)
 {
-	return new CannyFeatureLengthFilter(env);
+	return new CannyFeatureLengthFilter(wsp);
 }
 
 
@@ -555,10 +555,10 @@ class SIFTFeatureDetector
         /**
          * Default constructor. Initializes additional parameters of the algorithm.
          */
-        SIFTFeatureDetector(Environment* env)
-        : Algorithm(env)
+        SIFTFeatureDetector(Workspace* wsp)
+        : Algorithm(wsp)
         {
-            m_parameters->addParameter("image",     new ImageBandParameter<float>("Image", NULL, false, env));
+            m_parameters->addParameter("image",     new ImageBandParameter<float>("Image", NULL, false, wsp));
             m_parameters->addParameter("sigma",     new FloatParameter("sigma of first octave", 0, 100,  1));
             m_parameters->addParameter("octaves",   new IntParameter("octaves", 0,100, 4));
             m_parameters->addParameter("levels",    new IntParameter("intra-octave levels", 0, 100, 3));
@@ -646,9 +646,9 @@ class SIFTFeatureDetector
  *
  * \return A new instance of the SIFTFeatureDetector.
  */
-Algorithm* createSIFTFeatureDetector(Environment * env)
+Algorithm* createSIFTFeatureDetector(Workspace * wsp)
 {
-	return new SIFTFeatureDetector(env);
+	return new SIFTFeatureDetector(wsp);
 }
 
 

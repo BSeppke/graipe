@@ -34,7 +34,7 @@
 /************************************************************************/
 
 #include "images/imagebandparameter.hxx"
-#include "core/environment.hxx"
+#include "core/workspace.hxx"
 
 namespace graipe {
 
@@ -46,8 +46,8 @@ namespace graipe {
  *                       be enabled/disabled, if the parent is a BoolParameter.
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
-ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Environment* env)
-:	Parameter(name, parent, invert_parent, env),
+ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Workspace* wsp)
+:	Parameter(name, parent, invert_parent, wsp),
     m_delegate(NULL),
 	m_cmbImage(NULL),
 	m_spbBand(NULL)
@@ -138,21 +138,21 @@ void ImageBandParameterBase::initConnections()
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
 template <class T>
-ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Environment* env)
-:	ImageBandParameterBase(name, parent, invert_parent,env),
+ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Workspace* wsp)
+:	ImageBandParameterBase(name, parent, invert_parent,wsp),
     m_image(NULL),
     m_bandId(0)
 {
-    if(env->models.size())
+    if(wsp->models.size())
     {
         m_allowed_images.clear();
         
-        Image<T> * img = new Image<T>(env);
+        Image<T> * img = new Image<T>(wsp);
         QString typeName = img->typeName();
         delete img;
         img=NULL;
         
-        for(Model* model :env->models )
+        for(Model* model :wsp->models )
         {
             if(model->typeName() ==typeName)
             {

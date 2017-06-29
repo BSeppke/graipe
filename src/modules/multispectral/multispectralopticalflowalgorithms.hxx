@@ -56,8 +56,8 @@ class OpticalFlowAlgorithm2Bands
          * we want to have control over ther orderung of them. See the following two member 
          * functions for further details.
          */
-        OpticalFlowAlgorithm2Bands(Environment* env)
-        : Algorithm(env)
+        OpticalFlowAlgorithm2Bands(Workspace* wsp)
+        : Algorithm(wsp)
         {
         }
 

@@ -77,9 +77,9 @@ template <class T>
 SIFTFeatureList2D* detectFeaturesUsingSIFT(const vigra::MultiArrayView<2,T>& src,
                                           float sigma, unsigned int octaves, unsigned int levels,
 									      float contrast_threshold, float curvature_threshold, bool double_image_size, bool normalize_image,
-                                          Environment * env)
+                                          Workspace * wsp)
 {
-	SIFTFeatureList2D * result = new SIFTFeatureList2D(env);
+	SIFTFeatureList2D * result = new SIFTFeatureList2D(wsp);
     
     std::vector<SIFTFeature> std_result = computeSIFTDescriptors(src, sigma, octaves, levels, contrast_threshold, curvature_threshold, double_image_size, normalize_image);
         

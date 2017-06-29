@@ -198,9 +198,9 @@ class VectorfieldsModule
          *
          * \return A new SparseVectorfield2D.
          */
-        static Model* createSparseVectorfield2D(Environment* env)
+        static Model* createSparseVectorfield2D(Workspace* wsp)
         {
-            return new SparseVectorfield2D(env);
+            return new SparseVectorfield2D(wsp);
         }
     
         /**
@@ -226,9 +226,9 @@ class VectorfieldsModule
          *
          * \return A new SparseWeightedVectorfield2D.
          */
-        static Model* createSparseWeightedVectorfield2D(Environment* env)
+        static Model* createSparseWeightedVectorfield2D(Workspace* wsp)
         {
-            return new SparseWeightedVectorfield2D(env);
+            return new SparseWeightedVectorfield2D(wsp);
         }
     
         /**
@@ -253,9 +253,9 @@ class VectorfieldsModule
          *
          * \return A new SparseMultiVectorfield2D.
          */
-        static Model* createSparseMultiVectorfield2D(Environment* env)
+        static Model* createSparseMultiVectorfield2D(Workspace* wsp)
         {
-            return new SparseMultiVectorfield2D(env);
+            return new SparseMultiVectorfield2D(wsp);
         }
         
         /**
@@ -280,9 +280,9 @@ class VectorfieldsModule
          *
          * \return A new SparseWeightedMultiVectorfield2D.
          */
-        static Model* createSparseWeightedMultiVectorfield2D(Environment* env)
+        static Model* createSparseWeightedMultiVectorfield2D(Workspace* wsp)
         {
-            return new SparseWeightedMultiVectorfield2D(env);
+            return new SparseWeightedMultiVectorfield2D(wsp);
         }
         
         /**
@@ -307,9 +307,9 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfield2D.
          */
-        static Model* createDenseVectorfield2D(Environment* env)
+        static Model* createDenseVectorfield2D(Workspace* wsp)
         {
-            return new DenseVectorfield2D(env);
+            return new DenseVectorfield2D(wsp);
         }
     
         /**
@@ -350,9 +350,9 @@ class VectorfieldsModule
          *
          * \return A new DenseWeightedVectorfield2D.
          */
-        static Model* createDenseWeightedVectorfield2D(Environment* env)
+        static Model* createDenseWeightedVectorfield2D(Workspace* wsp)
         {
-            return new DenseWeightedVectorfield2D(env);
+            return new DenseWeightedVectorfield2D(wsp);
         }    
     
         /**
@@ -389,9 +389,9 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfieldImporter.
          */
-        static Algorithm* createDenseVectorfieldImporter(Environment* env)
+        static Algorithm* createDenseVectorfieldImporter(Workspace* wsp)
         {
-            return new DenseVectorfieldImporter(env);
+            return new DenseVectorfieldImporter(wsp);
         }
 
         /**
@@ -399,9 +399,9 @@ class VectorfieldsModule
          *
          * \return A new DenseVectorfieldExporter.
          */
-        static Algorithm* createDenseVectorfieldExporter(Environment* env)
+        static Algorithm* createDenseVectorfieldExporter(Workspace* wsp)
         {
-            return new DenseVectorfieldExporter(env);
+            return new DenseVectorfieldExporter(wsp);
         }
 };
 

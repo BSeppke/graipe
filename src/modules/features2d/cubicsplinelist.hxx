@@ -59,7 +59,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
         /**
          * Default constructor. Constructs an empty list of 2D cubic splines.
          */
-		CubicSplineList2D(Environment* env);
+		CubicSplineList2D(Workspace* wsp);
     
         /**
          * Copy constructor. Creates a copy from another list of 2D cubic splines.
@@ -197,7 +197,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
         /**
          * Default constructor. Constructs an empty list of weighted 2D cubic splines.
          */
-        WeightedCubicSplineList2D(Environment* env);
+        WeightedCubicSplineList2D(Workspace* wsp);
     
         /**
          * Copy constructor. Creates a copy from another list of weighted 2D cubic splines.

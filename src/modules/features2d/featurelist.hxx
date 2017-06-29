@@ -59,7 +59,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
         /**
          * Default constructor. Creates an empty point feature list.
          */
-		PointFeatureList2D(Environment* env);
+		PointFeatureList2D(Workspace* wsp);
 		
         /**
          * The typename of this feature list
@@ -205,7 +205,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
         /**
          * Default constructor. Creates an empty weighted point feature list.
          */
-		WeightedPointFeatureList2D(Environment* env);
+		WeightedPointFeatureList2D(Workspace* wsp);
 		
         /**
          * The typename of this feature list
@@ -334,7 +334,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D
         /**
          * Default constructor. Creates an empty edgel feature list.
          */
-		EdgelFeatureList2D(Environment* env);
+		EdgelFeatureList2D(Workspace* wsp);
 		
         /**
          * The typename of this feature list
@@ -487,7 +487,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
         /**
          * Default constructor. Creates an empty SIFT feature list.
          */
-		SIFTFeatureList2D(Environment* env);
+		SIFTFeatureList2D(Workspace* wsp);
 		
         /**
          * The typename of this feature list
