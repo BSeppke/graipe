@@ -349,15 +349,13 @@ void Workspace::clear()
 {
     for(ViewController* vc : viewControllers)
     {
-        delete vc;
-        vc=NULL;
+        vc->deleteLater();
     }
     viewControllers.clear();
     
     for(Model* m : models)
     {
-        delete m;
-        m=NULL;
+        m->deleteLater();
     }
     models.clear();
 }
