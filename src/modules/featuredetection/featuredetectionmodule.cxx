@@ -107,14 +107,14 @@ class MonotonyFeatureDetector
                                                                                        mask,
                                                                                        param_lowestMonotonyClass->value(), param_highestMonotonyClass->value(),
                                                                                        1,
-                                                                                       m_environment);
+                                                                                       m_workspace);
                     }
                     else
                     {
                         new_feature_list = detectFeaturesUsingMonotonyOperator(imageband,
                                                                                param_lowestMonotonyClass->value(), param_highestMonotonyClass->value(),
                                                                                1,
-                                                                               m_environment);
+                                                                               m_workspace);
                     }
                     new_feature_list->setName(QString("Monotony Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the Monotony Features:\n");
@@ -221,14 +221,14 @@ class HarrisCornerDetector
                         new_feature_list = detectFeaturesUsingHarrisWithMask(imageband,
                                                                              mask,
                                                                              param_gradientSigma->value(), param_responseThreshold->value(),
-                                                                             m_environment);
+                                                                             m_workspace);
                         
                     }
                     else
                     {
                         new_feature_list = detectFeaturesUsingHarris(imageband,
                                                                      param_gradientSigma->value(), param_responseThreshold->value(),
-                                                                     m_environment);
+                                                                     m_workspace);
                     }
                         
                     new_feature_list->setName(QString("Harris Features of ") + param_imageBand->toString());
@@ -334,13 +334,13 @@ class CannyFeatureDetector
                         new_edgel_feature_list = detectFeaturesUsingCannyWithMask(imageband,
                                                                                   mask,
                                                                                   param_cannyScale->value(), param_cannyThreshold->value(),
-                                                                                  m_environment);
+                                                                                  m_workspace);
                     }
                     else
                     {
                         new_edgel_feature_list = detectFeaturesUsingCanny(imageband,
                                                                           param_cannyScale->value(), param_cannyThreshold->value(),
-                                                                          m_environment);
+                                                                          m_workspace);
                     }
                     
                     new_edgel_feature_list->setName(QString("Canny-Edgel Features of ") + param_imageBand->toString());
@@ -612,7 +612,7 @@ class SIFTFeatureDetector
                                                                                    param_sigma->value(), param_octaves->value(), param_levels->value(),
                                                                                    param_contrast_threshold->value(), param_curvature_threshold->value(),
                                                                                    param_double_size->value(), param_normalize->value(),
-                                                                                   m_environment);
+                                                                                   m_workspace);
                     
                     new_feature_list->setName(QString("SIFT Features of ") + param_imageBand->toString());
                     QString descr("The following parameters were used to determine the SIFT Features:\n");

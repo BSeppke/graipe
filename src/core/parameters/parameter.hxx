@@ -258,7 +258,7 @@ class GRAIPE_CORE_EXPORT Parameter
         bool m_invert_parent;
     
         //Workspace
-        Workspace* m_environment;
+        Workspace* m_workspace;
 };
 
 } //end of namespace graipe

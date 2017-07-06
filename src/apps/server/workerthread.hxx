@@ -78,7 +78,7 @@ class WorkerThread
         int m_expected_bytes; //in case state==1 - how many bytes do we want to receive
         QByteArray m_buffer;
     
-        Workspace * m_environment;
+        Workspace * m_workspace;
 };
 
 } //namespace graipe

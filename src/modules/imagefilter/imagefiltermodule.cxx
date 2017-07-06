@@ -152,7 +152,7 @@ class FrostFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -263,7 +263,7 @@ class EnhancedFrostFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -374,7 +374,7 @@ class GammaMAPFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -483,7 +483,7 @@ class KuanFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -592,7 +592,7 @@ class LeeFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -706,7 +706,7 @@ class EnhancedLeeFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -813,7 +813,7 @@ class MedianFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -924,7 +924,7 @@ class ShockFilter
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //copy metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);

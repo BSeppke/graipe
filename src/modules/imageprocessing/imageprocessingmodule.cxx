@@ -108,7 +108,7 @@ class AddImages
                         Image<float>* image = static_cast<Image<float>*>( selected_images[0] );
                         
                         //create new image to do the addition
-                        Image<float>* new_image = new Image<float>(image->size(), image->numBands(), m_environment);
+                        Image<float>* new_image = new Image<float>(image->size(), image->numBands(), m_workspace);
                         
                         //Copy all metadata from current image (will be overwritten later)
                         image->copyMetadata(*new_image);
@@ -216,7 +216,7 @@ class GaussianGradientCalculator
                     
                     vigra::gaussianGradientMultiArray(imageband, grad, sigma);
                     
-                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(grad.bindElementChannel(0), grad.bindElementChannel(1), m_environment);
+                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(grad.bindElementChannel(0), grad.bindElementChannel(1), m_workspace);
                     
                     //Copy only geometry metadata from current image
                     ((Model*)param_imageband->image())->copyGeometry(*new_gradient_vf);
@@ -308,7 +308,7 @@ class RecursiveSmoothingFilter : public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -405,7 +405,7 @@ class GaussianSmoothingFilter : public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -514,7 +514,7 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -625,7 +625,7 @@ class ApplyMaskToImage
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(image->size(), image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(image->size(), image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     image->copyMetadata(*new_image);
@@ -729,7 +729,7 @@ class MaskErosion
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(mask.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask->image()->copyMetadata(*new_image);
@@ -828,7 +828,7 @@ class MaskDilation
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(mask.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask->image()->copyMetadata(*new_image);
@@ -927,7 +927,7 @@ class MaskUnion
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
@@ -987,8 +987,8 @@ class MaskIntersection: public Algorithm
         MaskIntersection(Workspace* wsp)
         : Algorithm(wsp)
         {
-            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_environment));
-            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_environment));
+            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_workspace));
+            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_workspace));
             
         }
         QString typeName() const
@@ -1025,7 +1025,7 @@ class MaskIntersection: public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
@@ -1087,8 +1087,8 @@ class MaskDifference: public Algorithm
         MaskDifference(Workspace* wsp)
         : Algorithm(wsp)
         {
-            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_environment));
-            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_environment));
+            m_parameters->addParameter("mask1", new ImageBandParameter<float>("First mask image band", NULL, false, m_workspace));
+            m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_workspace));
             
         }
         QString typeName() const
@@ -1125,7 +1125,7 @@ class MaskDifference: public Algorithm
                     emit statusMessage(1.0, QString("starting computation"));
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(mask1.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_mask1->image()->copyMetadata(*new_image);
@@ -1242,7 +1242,7 @@ class ImageCropper
                     
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(vigra::Shape2(lr_x - ul_x, lr_y - ul_y), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(vigra::Shape2(lr_x - ul_x, lr_y - ul_y), current_image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -1358,7 +1358,7 @@ class ImageResizer : public Algorithm
                         height = param_height->value();
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(vigra::Shape2(width,height), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(vigra::Shape2(width,height), current_image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -1484,7 +1484,7 @@ class ImageInverter
                     Image<float>* current_image = static_cast<Image<float>*>(  param_image->value() );	
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(current_image->size(), current_image->numBands(), m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     current_image->copyMetadata(*new_image);
@@ -1605,7 +1605,7 @@ class ImageThresholder
                     
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);
@@ -1752,7 +1752,7 @@ class FloatingImageThresholder
                     }
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_workspace);
                     new_image->setBand(0, res);
                     
                     //Copy all metadata from current image (will be overwritten later)
@@ -1921,10 +1921,10 @@ class ThinLineExtractor
                     }
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_workspace);
                     new_image->setBand(0, res);
                     
-                    Image<float>* new_stat_image = new Image<float>(imageband.shape(), 2, m_environment);
+                    Image<float>* new_stat_image = new Image<float>(imageband.shape(), 2, m_workspace);
                     new_stat_image->setBand(0, res_stats_val);
                     new_stat_image->setBand(1, res_stats_val);
                     
@@ -2030,7 +2030,7 @@ class DistanceTransformator
                     vigra::MultiArrayView<2,float> imageband =  param_imageBand->value();
                     
                     //create new image and do the transform
-                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(imageband.shape(), 1, m_workspace);
                     
                     //Copy all metadata from current image (will be overwritten later)
                     param_imageBand->image()->copyMetadata(*new_image);

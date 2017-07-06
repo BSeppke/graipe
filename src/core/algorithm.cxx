@@ -56,7 +56,7 @@ namespace graipe {
  */
 Algorithm::Algorithm(Workspace* wsp)
 :   m_parameters(new ParameterGroup),
-    m_environment(wsp)
+    m_workspace(wsp)
 {
 }
 

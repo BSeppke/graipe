@@ -137,7 +137,7 @@ class WindDetector
                                                     param_xSamples->value(), param_ySamples->value(), 
                                                     param_maskWidth->value(), param_maskHeight->value(),
                                                     direction_vectors()[param_wind_knowledge->value()],
-                                                    m_environment);
+                                                    m_workspace);
             
             ((Model*)param_imageBand->image())->copyGeometry(*new_wind_vectorfield);
             
@@ -369,7 +369,7 @@ class StructureTensorWindDetector
                         = estimateWindDirectionFromSARImageUsingStructureTensor(imageband,
                                                                                 param_innerScale->value(), param_outerScale->value(), 
                                                                                 direction_vectors()[param_wind_knowledge->value()],
-                                                                                m_environment);
+                                                                                m_workspace);
                 
                     new_wind_vectorfield->setName(QString("ST Wind estimation using ") + param_imageBand->toString());
                     

@@ -109,7 +109,7 @@ class BlockWiseImageMatcher
                     vigra::MultiArrayView<2,float> imageband1 = param_imageBand1->value();
                     vigra::MultiArrayView<2,float> imageband2 = param_imageBand2->value();
                         
-                    PointFeatureList2D features_of_image1(m_environment);
+                    PointFeatureList2D features_of_image1(m_workspace);
                         
                     unsigned int y_step = param_imageBand1->image()->height()/param_ySamples->value();
                     unsigned int x_step = param_imageBand1->image()->width()/param_xSamples->value();

@@ -50,11 +50,11 @@ WorkerThread::WorkerThread(qintptr socketDescriptor, QVector<QString> registered
     m_registered_users(registered_users),
     m_state(-1),
     m_expected_bytes(0),
-    m_environment(new Workspace(*wsp))
+    m_workspace(new Workspace(*wsp))
 {
-    qDebug()    << "Server knows factories: models " << m_environment->modelFactory().size()
-                << ", ViewControllers: " << m_environment->viewControllerFactory().size()
-                << ", algorithms: " << m_environment->algorithmFactory().size();
+    qDebug()    << "Server knows factories: models " << m_workspace->modelFactory().size()
+                << ", ViewControllers: " << m_workspace->viewControllerFactory().size()
+                << ", algorithms: " << m_workspace->algorithmFactory().size();
 }
 
 void WorkerThread::run()
@@ -187,7 +187,7 @@ void WorkerThread::disconnected()
     //Tell the server
     emit connectionTerminated(m_socketDescriptor);
 
-    delete m_environment;
+    delete m_workspace;
     m_tcpSocket->deleteLater();
     exit(0);
 }
@@ -212,9 +212,9 @@ void WorkerThread::readModel()
         
         QXmlStreamReader xmlReader(in_compressor);
         
-        m_environment->global_algorithm_mutex.lock();
-        Model* new_model = m_environment->loadModel(xmlReader);
-        m_environment->global_algorithm_mutex.unlock();
+        m_workspace->global_algorithm_mutex.lock();
+        Model* new_model = m_workspace->loadModel(xmlReader);
+        m_workspace->global_algorithm_mutex.unlock();
         
         if(new_model == NULL)
         {
@@ -224,7 +224,7 @@ void WorkerThread::readModel()
         }
         
         qDebug() << m_socketDescriptor << "--- Model loaded and added sucessfully!";
-        qDebug() << m_socketDescriptor << "--- Now: " << m_environment->models.size() << " models available!";
+        qDebug() << m_socketDescriptor << "--- Now: " << m_workspace->models.size() << " models available!";
         
         m_tcpSocket->write(QString("Success:0").toLatin1());
         m_tcpSocket->flush();
@@ -261,7 +261,7 @@ void WorkerThread::readAndRunAlgorithm()
         }
         
         QXmlStreamReader xmlReader(in_compressor);
-        Algorithm* new_alg = m_environment->loadAlgorithm(xmlReader);
+        Algorithm* new_alg = m_workspace->loadAlgorithm(xmlReader);
         
         if(new_alg == NULL)
         {

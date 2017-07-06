@@ -52,9 +52,9 @@ Client::Client(QWidget *parent)
     m_btnLogin(new QPushButton(tr("Login"))),
     m_tcpSocket(new QTcpSocket(this)),
     m_algSignalMapper(new QSignalMapper),
-    m_environment(new Workspace)
+    m_workspace(new Workspace)
 {
-    m_environment->loadModel("/Users/seppke/Desktop/Lenna_face.xgz");
+    m_workspace->loadModel("/Users/seppke/Desktop/Lenna_face.xgz");
     
     menuBar();
     
@@ -73,7 +73,7 @@ Client::Client(QWidget *parent)
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     unsigned int i=0;
-    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory())
+    for(const AlgorithmFactoryItem& item : m_workspace->algorithmFactory())
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
         
@@ -353,7 +353,7 @@ void Client::readModel(int bytesToRead)
         }
         
         QXmlStreamReader xmlReader(compressor);
-        Model* new_model = m_environment->loadModel(xmlReader);
+        Model* new_model = m_workspace->loadModel(xmlReader);
         
         if(new_model == NULL)
         {
@@ -363,9 +363,9 @@ void Client::readModel(int bytesToRead)
         }
         
         qDebug("    Model loaded and added sucessfully!");
-        qDebug() << "Now: " << m_environment->models.size() << " models available!";
+        qDebug() << "Now: " << m_workspace->models.size() << " models available!";
         
-        m_lblStatus->setText(QString("Models: %1, latest model: %2, type:%3, ID:%4, descripton:%5").arg(m_environment->models.size()).arg(new_model->name()).arg(new_model->typeName()).arg(new_model->id()).arg(new_model->description()));
+        m_lblStatus->setText(QString("Models: %1, latest model: %2, type:%3, ID:%4, descripton:%5").arg(m_workspace->models.size()).arg(new_model->name()).arg(new_model->typeName()).arg(new_model->id()).arg(new_model->description()));
     }
     catch(...)
     {
@@ -458,9 +458,9 @@ void Client::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory()[index];
+    AlgorithmFactoryItem alg_item = m_workspace->algorithmFactory()[index];
 	
-	Algorithm* alg = alg_item.algorithm_fptr(m_environment);
+	Algorithm* alg = alg_item.algorithm_fptr(m_workspace);
     
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);

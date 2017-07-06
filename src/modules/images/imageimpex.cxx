@@ -637,13 +637,13 @@ void ImageImporter::pixelTypeChanged()
     switch(m_pixeltype->value())
     {
         case 0:
-            m_results.push_back(new Image<float>(m_environment));
+            m_results.push_back(new Image<float>(m_workspace));
             break;
         case 1:
-            m_results.push_back(new Image<int>(m_environment));
+            m_results.push_back(new Image<int>(m_workspace));
             break;
         case 2:
-            m_results.push_back(new Image<unsigned char>(m_environment));
+            m_results.push_back(new Image<unsigned char>(m_workspace));
             break;
     }
 }

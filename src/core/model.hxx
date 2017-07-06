@@ -150,7 +150,7 @@ class GRAIPE_CORE_EXPORT Model
          */
         virtual Workspace* workspace()
         {
-            return m_environment;
+            return m_workspace;
         }
     
         /**
@@ -468,7 +468,7 @@ class GRAIPE_CORE_EXPORT Model
         ParameterGroup      * m_parameters;
     
         //The models workspace
-        Workspace * m_environment;
+        Workspace * m_workspace;
 
     private:
         //keeping track of the locks

@@ -220,7 +220,7 @@ class GRAIPE_CORE_EXPORT Algorithm
 		/** The results **/
         std::vector<Model*> m_results;
         /** The Workspace **/
-        Workspace* m_environment;
+        Workspace* m_workspace;
 };
 
 }//end of namespace graipe

@@ -46,11 +46,11 @@ namespace graipe {
 
 Server::Server(Workspace* wsp, QObject *parent)
     : QTcpServer(parent),
-    m_environment(wsp)
+    m_workspace(wsp)
 {
-    qDebug()    << "Server knows factories: models " << m_environment->modelFactory().size()
-                << ", ViewControllers: " << m_environment->viewControllerFactory().size()
-                << ", algorithms: " << m_environment->algorithmFactory().size();
+    qDebug()    << "Server knows factories: models " << m_workspace->modelFactory().size()
+                << ", ViewControllers: " << m_workspace->viewControllerFactory().size()
+                << ", algorithms: " << m_workspace->algorithmFactory().size();
     
     QString user1 = "test";
     QString pass1 = "test";
@@ -98,7 +98,7 @@ void Server::incomingConnection(qintptr socketDescriptor)
 {
     qDebug() << "New incoming connection for socket:" << socketDescriptor;
     
-    WorkerThread *thread = new WorkerThread(socketDescriptor, m_registered_users, m_environment, this);
+    WorkerThread *thread = new WorkerThread(socketDescriptor, m_registered_users, m_workspace, this);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     connect(thread, SIGNAL(connectionUserAuth(qintptr, QString)), this, SLOT(connectionUserAuth(qintptr, QString)));
     connect(thread, SIGNAL(connectionTerminated(qintptr)), this, SLOT(connectionTerminated(qintptr)));

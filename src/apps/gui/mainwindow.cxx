@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	m_status_window(new StatusWindow),
     m_lblMemoryUsage(new QLabel("(Memory: 0 MB, max: 0 MB)")),
     m_recentFileCount(10),
-    m_environment(new Workspace)
+    m_workspace(new Workspace)
 {	
     m_ui.setupUi(this);
     
@@ -257,7 +257,7 @@ MainWindow::~MainWindow()
     delete m_view;
     delete m_printer;
     delete m_status_window;
-    delete m_environment;
+    delete m_workspace;
 }
 
 /**
@@ -286,7 +286,7 @@ void MainWindow::reset()
     m_ui.listModels->clear();
     
     //Also clear models and viewControllers in the Workspace
-    m_environment->clearContents();
+    m_workspace->clear();
 }
 
 /**
@@ -476,8 +476,8 @@ void MainWindow::about()
  */
 void MainWindow::newModel(int index)
 {
-    ModelFactoryItem item = m_environment->modelFactory()[index];
-    Model * new_model = item.model_fptr(m_environment);
+    ModelFactoryItem item = m_workspace->modelFactory()[index];
+    Model * new_model = item.model_fptr(m_workspace);
             
     //SHOW EDIT DIALOG
     ModelParameterSelection parameter_selection(this, new_model);
@@ -514,9 +514,9 @@ void MainWindow::runAlgorithm(int index)
 {
     using namespace ::std;
     
-    AlgorithmFactoryItem alg_item = m_environment->algorithmFactory()[index];
+    AlgorithmFactoryItem alg_item = m_workspace->algorithmFactory()[index];
 	
-	Algorithm* alg = alg_item.algorithm_fptr(m_environment);
+	Algorithm* alg = alg_item.algorithm_fptr(m_workspace);
     
 	AlgorithmParameterSelection parameter_selection(this, alg);
 	parameter_selection.setWindowTitle(alg_item.algorithm_name);
@@ -587,7 +587,7 @@ void MainWindow::currentModelChanged(QListWidgetItem * item)
         
             if(model_parameter_widget != NULL)
             {
-                m_environment->setCurrentModel(model);
+                m_workspace->setCurrentModel(model);
                 
                 m_ui.scrModelParameters->takeWidget();
                 m_ui.dockModelParameters->setWindowTitle(model->parameters()->name());
@@ -618,7 +618,7 @@ void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
         
             if(vc_item == new_item)
             {
-                m_environment->setCurrentViewController(viewController);
+                m_workspace->setCurrentViewController(viewController);
                 
                 viewController->setAcceptHoverEvents(true);
                 
@@ -731,7 +731,7 @@ void MainWindow::showCurrentModel()
 			
         if(model_item && model_item->model()->isViewable())
         {
-            ViewControllerFactory vc_possibilities =  m_environment->viewControllerFactory().filterByModelType(model_item->model());
+            ViewControllerFactory vc_possibilities =  m_workspace->viewControllerFactory().filterByModelType(model_item->model());
             int vc_index = -1;
             
             //Select the view/controller
@@ -768,7 +768,7 @@ void MainWindow::showCurrentModel()
                 
                 //Always show and make current for new ViewControllers
                 new_vc->setVisible(true);
-                m_environment->setCurrentViewController(new_vc);
+                m_workspace->setCurrentViewController(new_vc);
                 addViewControllerItemToSceneAndList(new_vc);
             }
         }
@@ -793,7 +793,7 @@ void MainWindow::saveCurrentModel()
 		
 		if(!filename.isEmpty())
 		{	
-			ModelFactory model_possibilities =  m_environment->modelFactory().filterByModelType(model);
+			ModelFactory model_possibilities =  m_workspace->modelFactory().filterByModelType(model);
 			
 			if(model_possibilities.size()==1)
 			{
@@ -957,7 +957,7 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
             QXmlStreamWriter xmlWriter(device);
             xmlWriter.setAutoFormatting(true);
             
-            m_environment->serialize(xmlWriter);
+            m_workspace->serialize(xmlWriter);
             
             device->close();
         }
@@ -1043,13 +1043,13 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
         {
             QXmlStreamReader xmlReader(device);
             
-            m_environment->deserialize(xmlReader);
+            m_workspace->deserialize(xmlReader);
             
-            for(Model* model : m_environment->models)
+            for(Model* model : m_workspace->models)
             {
                 addModelItemToList(model);
             }
-            for(ViewController* vc : m_environment->viewControllers)
+            for(ViewController* vc : m_workspace->viewControllers)
             {
                 addViewControllerItemToSceneAndList(vc);
             }
@@ -1167,7 +1167,7 @@ void MainWindow::updateStatusDescription(QString str)
  */
 void MainWindow::updateMemoryUsage()
 {
-    m_lblMemoryUsage->setText(QString("%1 Models, %2 Views (Memory: %3 MB, max: %4 MB)").arg(m_environment->models.size()).arg(m_environment->viewControllers.size()).arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
+    m_lblMemoryUsage->setText(QString("%1 Models, %2 Views (Memory: %3 MB, max: %4 MB)").arg(m_workspace->models.size()).arg(m_workspace->viewControllers.size()).arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
 }
 
 /**
@@ -1239,7 +1239,7 @@ void MainWindow::loadModel(const QString& filename)
         throw std::runtime_error("Loading model from " + filename.toStdString() + " failed. File does not exists");
     }
     
-	Model* model = m_environment->loadModel(filename);
+	Model* model = m_workspace->loadModel(filename);
     
     if(model != NULL)
     {
@@ -1260,7 +1260,7 @@ void MainWindow::initializeFactories()
 {
     QString status;
     
-    for(QString str : m_environment->modules_status())
+    for(QString str : m_workspace->modules_status())
     {
         status += str;
     }
@@ -1269,7 +1269,7 @@ void MainWindow::initializeFactories()
     
     //Connect the model factory to the GUI
     unsigned int i=0;
-    for(const ModelFactoryItem& item : m_environment->modelFactory())
+    for(const ModelFactoryItem& item : m_workspace->modelFactory())
     {
         QAction* newAct = new QAction(item.model_type, this);
         m_ui.menuCreate->addAction(newAct);
@@ -1284,7 +1284,7 @@ void MainWindow::initializeFactories()
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
     i=0;
-    for(const AlgorithmFactoryItem& item : m_environment->algorithmFactory())
+    for(const AlgorithmFactoryItem& item : m_workspace->algorithmFactory())
     {
         QAction* newAct = new QAction(item.algorithm_name, this);
         
@@ -1434,7 +1434,7 @@ void MainWindow::addModelItemToList(Model* model)
 		m_ui.listModels->addItem(model_item);
 		connect(model, SIGNAL(modelChanged()), this, SLOT(refreshModelNames()));
         
-        if(m_environment->currentModel() == model)
+        if(m_workspace->currentModel() == model)
         {
             m_ui.listModels->setCurrentItem(model_item);
             currentModelChanged(model_item);
@@ -1481,7 +1481,7 @@ void MainWindow::addViewControllerItemToSceneAndList(ViewController* viewControl
         
         vc_item->setCheckState(viewController->isVisible() ? Qt::Checked : Qt::Unchecked);
         
-        if(m_environment->currentViewController() == viewController)
+        if(m_workspace->currentViewController() == viewController)
         {
             m_ui.listViews->setCurrentItem(vc_item);
             currentViewControllerChanged(vc_item);

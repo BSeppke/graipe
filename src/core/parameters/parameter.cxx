@@ -55,7 +55,7 @@ Parameter::Parameter( Workspace* wsp)
 :	m_name(""),
     m_parent(NULL),
     m_invert_parent(false),
-    m_environment(wsp)
+    m_workspace(wsp)
 {
 }
 
@@ -72,7 +72,7 @@ Parameter::Parameter(const QString&  name, Parameter* parent, bool invert_parent
 :	m_name(name), 
     m_parent(parent),
     m_invert_parent(invert_parent),
-    m_environment(wsp)
+    m_workspace(wsp)
 {
 }
 

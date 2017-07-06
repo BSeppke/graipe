@@ -115,11 +115,11 @@ class OpticalFlowAlgorithm
          */
         virtual void addImageAndMaskParameters()
         {
-            m_param_imageBand1		= new ImageBandParameter<float>("Reference Image", NULL, false, m_environment);
-            m_param_imageBand2		= new ImageBandParameter<float>("Second Image",	NULL, false, m_environment);
+            m_param_imageBand1		= new ImageBandParameter<float>("Reference Image", NULL, false, m_workspace);
+            m_param_imageBand2		= new ImageBandParameter<float>("Second Image",	NULL, false, m_workspace);
             
             m_param_useMask			= new BoolParameter("use image band for masking flow");
-            m_param_mask			= new ImageBandParameter<float>("Mask Image", m_param_useMask, false, m_environment);
+            m_param_mask			= new ImageBandParameter<float>("Mask Image", m_param_useMask, false, m_workspace);
             
             m_parameters->addParameter("band1", m_param_imageBand1 );
             m_parameters->addParameter("band2", m_param_imageBand2 );
@@ -296,12 +296,12 @@ class OpticalFlowAlgorithm
                     
                     if(FlowValueType().size() == 2)
                     {
-                       new_vectorfield =  new DenseVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1), m_environment);
+                       new_vectorfield =  new DenseVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1), m_workspace);
                     }
                     //Has to be larger
                     else
                     {
-                        new_vectorfield =  new DenseWeightedVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1),flow_list[i].bindElementChannel(2), m_environment);
+                        new_vectorfield =  new DenseWeightedVectorfield2D(flow_list[i].bindElementChannel(0),flow_list[i].bindElementChannel(1),flow_list[i].bindElementChannel(2), m_workspace);
                     }
                     
                     QString functor_name = QString::fromStdString(OpticalFlowFunctor::name());
@@ -343,7 +343,7 @@ class OpticalFlowAlgorithm
                 //Also save warped images on demand
                 if(m_param_pmode->value() !=0 && i!=0 && m_param_saveIntermediateImages->value()) 
                 {
-                    Image<float>* new_image = new Image<float>(img_list[i].shape(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(img_list[i].shape(), 1, m_workspace);
                     new_image->setBand(0,img_list[i]);
                     
                     m_param_imageBand1->image()->copyMetadata(*new_image);

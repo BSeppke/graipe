@@ -120,7 +120,7 @@ class MeanVectorfield
                         temp_v /= selected_vectorfields.size();
                         
                         //create new image to do the addition
-                        DenseVectorfield2D* new_vf = new DenseVectorfield2D(temp_u, temp_v, m_environment);
+                        DenseVectorfield2D* new_vf = new DenseVectorfield2D(temp_u, temp_v, m_workspace);
                         
                         //Copy all metadata from current image (will be overwritten later)
                         vf->copyMetadata(*new_vf);
@@ -586,7 +586,7 @@ class Vectorfield2DCurl
                     unsigned int w = vf->width(),
                                  h = vf->height();
                     
-                    Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1, m_environment);
+                    Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1, m_workspace);
                     vf->copyGeometry(*img);
                     
                     vigra::Kernel1D<double> kernel;
@@ -691,7 +691,7 @@ class Vectorfield2DDiv
                     unsigned int w = vf->width(),
                                  h = vf->height();
                     
-                    Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1, m_environment);
+                    Image<float>* img = new Image<float>(Image<float>::Size_Type(w,h), 1, m_workspace);
                     vf->copyGeometry(*img);
                     
                     vigra::Kernel1D<double> kernel;

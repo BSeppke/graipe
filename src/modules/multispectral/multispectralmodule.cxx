@@ -233,7 +233,7 @@ class MSGradientCalculator
                     MS_GRADIENT_FUNCTOR func;
                     func(jacobian, gradient);
                     
-                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(gradient.bindElementChannel(0) , gradient.bindElementChannel(1), m_environment);
+                    DenseVectorfield2D* new_gradient_vf = new DenseVectorfield2D(gradient.bindElementChannel(0) , gradient.bindElementChannel(1), m_workspace);
                     
                     new_gradient_vf->setName(func.shortName() + QString(" gradient ") + image->name());
                     QString descr = QString("The following parameters were used to determine the %1 gradient\n").arg(func.name());
@@ -370,7 +370,7 @@ class NDVIEstimator
                     
                     emit statusMessage(1.0, QString("starting computation"));
                     
-                    Image<float>* new_image = new Image<float>(image->size(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(image->size(), 1, m_workspace);
                     
                     using namespace vigra::functor;
                     
@@ -487,7 +487,7 @@ class EVIEstimator
                     
                     emit statusMessage(1.0, QString("starting computation"));
                     
-                    Image<float>* new_image = new Image<float>(image->size(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(image->size(), 1, m_workspace);
                     
                     computeEVI(image->band(nir_band_param->value()),
                                image->band(red_band_param->value()),
@@ -602,7 +602,7 @@ class EVI2BandsEstimator
                     
                     emit statusMessage(1.0, QString("starting computation"));
                     
-                    Image<float>* new_image = new Image<float>(image->size(), 1, m_environment);
+                    Image<float>* new_image = new Image<float>(image->size(), 1, m_workspace);
                     
                     computeEVI2(image->band(nir_band_param->value()),
                                 image->band(red_band_param->value()),

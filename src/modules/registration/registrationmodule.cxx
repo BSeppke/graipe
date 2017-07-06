@@ -110,7 +110,7 @@ class GlobalMotionCorrector
                                                       rotation_correlation,
                                                       translation_correlation);
                     
-                    Image<float>* displaced_image = new Image<float>(imageband2.shape(), m_param_imageBand1->image()->numBands(), m_environment);
+                    Image<float>* displaced_image = new Image<float>(imageband2.shape(), m_param_imageBand1->image()->numBands(), m_workspace);
                     
                     for( unsigned int c=0; c < m_param_imageBand1->image()->numBands(); c++)
                     {
@@ -237,7 +237,7 @@ class GenericRegistration
                     
                     WARPING_FUNCTOR func_a;
                     
-                    Image<float>* new_image = new Image<float>(image2->size(), image1->numBands(), m_environment);
+                    Image<float>* new_image = new Image<float>(image2->size(), image1->numBands(), m_workspace);
                     
                     vigra::MultiArray<2,float> res_img_band(image2->size());
                     std::vector<vigra::TinyVector<double,2> > src_points(vf->size()), dest_points(vf->size());

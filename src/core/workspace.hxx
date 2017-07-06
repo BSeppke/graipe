@@ -49,7 +49,7 @@
 
 /**
  * @file
- * @brief This file holds all global data structures
+ * @brief This file holds all global data structures and the loaded Modules
  * @addtogroup core
  * @{
  */
@@ -61,33 +61,31 @@ class GRAIPE_CORE_EXPORT Workspace
 {
     public:
         /**
-         * Constructor: Creates an empty workspace
-         * and auto-loads all modules, that are in same dir as the core-module.
-         * Calls loadModules with different paths:
-         * Under Mac OS at the place of the executable file (not the app-Bundle) and at
-         * the location of the .app-bundle.
-         *
-         * \param auto_load If true, it will auto-load all modules. False by default
+         * Constructor: Creates an empty Workspace and calls the function
+         * findAndloadModules() to load the Modules from the corresponding
+         * directories.
          */
         Workspace();
     
         /**
-         * Virtual destructor of an workspace
-         */
-        virtual ~Workspace();
-    
-        /**
          * Copy Constructor: Creates an workspace from another one.
          * This contructor copies all the data from the workspace, but uses the same
-         * (identical factories). If you want to have new Factories, you need to set the 
-         * reload_factories flag to true, or call loadModules() after the copy.
-         * This will return a clean-copy version, without other's models and viewControllers.
+         * (identical) factories. 
+         * If you want to have new Factories, you  will need to set the
+         * reload_factories flag to true, or call loadModules() after the copying.
          *
+         * \param wsp The other workspace.
          * \param reload_factories If true, it reload all modules and thus use new factories.
          *                         Else, it will use the other environment's factories.
          *                         False by default
          */
         Workspace(const Workspace& wsp, bool reload_factories=false);
+    
+        /**
+         * Virtual destructor of a workspace.
+         */
+        virtual ~Workspace();
+    
 
         /**
          * The typename of this class.
@@ -100,8 +98,12 @@ class GRAIPE_CORE_EXPORT Workspace
         }
     
         /**
-         * Deserialization of an workspace from an xml file.
-         *
+         * Deserialization of a workspace from an xml file.
+         * This will copy all the data from the workspace, but use the same
+         * (identical) factories. If you want to have new Factories, you will 
+         * need to call loadModules() after the copy manually. However, it checks
+         * if all modules of the serialization are avaible in the current workspace.
+         *      
          * \param xmlReader The QXmlStreamReader, where we read from.
          * \return True, if the deserialization was successful, else false.
          */
@@ -109,152 +111,191 @@ class GRAIPE_CORE_EXPORT Workspace
     
         /**
          * Serialization on to an output device.
+         * This performes an XML-serialization of all Modules (by their names),
+         * all loaded Models and all ViewControllers.
          *
          * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
          */
         void serialize(QXmlStreamWriter& xmlWriter) const;
 
         /**
-         * Clear all data structures, lie models and viewControllers,
-         * but keeps the modules by means of the factories.
+         * Clear all data structures, namely: Models and ViewControllers,
+         * but keeps the Modules by means of the factories.
+         * If you want to reload the factories, you will need to call loadModules
+         * manually afterwards.
          */
-        void clearContents();
+        void clear();
     
         /**
-         * Resets this evironment and clears all data structures, 
-         * deletes all objects etc. Also deletes all modules and facrtories.
+         * Read-only access to the modelFactory, which may be used for the creation
+         * of new Models.
+         *
+         * \return the currently loaded modelFactory.
          */
-        void reset();
-    
-        //Three global variables for the factories:
         const ModelFactory& modelFactory() const
         {
             return m_modelFactory;
         }
+    
+        /**
+         * Read-only access to the viewControllerFactory, which may be used for the creation
+         * of new ViewControllers.
+         *
+         * \return the currently loaded viewController.
+         */
         const ViewControllerFactory& viewControllerFactory() const
         {
             return m_viewControllerFactory;
         }
+    
+        /**
+         * Read-only access to the algorithmFactory, which may be used for the creation
+         * and running of new Algorithms
+         *
+         * \return the currently loaded algorithmFactory.
+         */
         const AlgorithmFactory& algorithmFactory() const
         {
             return m_algorithmFactory;
         }
     
         /**
-         * Basic import procedure for all types, which implement the serializable interface
+         * Import procedure for available Models from a filename.
          *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
+         * \param filename The filename of the stored Model.
+         * \return A valid pointer to a new Model, if the loading of the Model was successful.
+         *         else: a null pointer.
          */
         Model* loadModel(const QString & filename);
     
+    
         /**
-         * Basic import procedure for all types, which implement the serializable interface
+         * Basic import procedure for available Models from an XMLStream.
          *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
+         * \param xmlReader The QXmlStreamReader of the stored Model.
+         * \return A valid pointer to a new Model, if the loading of the Model was successful.
+         *         else: a null pointer.
          */
         Model* loadModel(QXmlStreamReader & xmlReader);
     
         /**
-         * Basic import procedure for all types, which implement the serializable interface
+         * Import procedure for available ViewControllers from a filename.
          *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
+         * \param filename The filename of the stored ViewController.
+         * \return A valid pointer to a new ViewController, if the loading of the ViewController was successful.
+         *         else: a null pointer.
          */
         ViewController* loadViewController(const QString & filename);
 
         /**
-         * Basic import procedure of a settings dictionary from a given QString
-         * A dictionary is defined by means of a mapping from QString keys
-         * to QString values.
+         * Import procedure for available ViewControllers from an XMLStream.
          *
-         * \param contents The input QString.
-         * \param separator The seaparator, which will be used to split the key/value pairs, default is ": "
+         * \param xmlReader The QXmlStreamReader of the stored ViewController.
+         * \return A valid pointer to a new ViewController, if the loading of the ViewController was successful.
+         *         else: a null pointer.
          */
         ViewController* loadViewController(QXmlStreamReader & xmlReader);
     
         /**
-         * Basic import procedure for all algorithms, which implement the serializable interface
+         * Import procedure for available Algorithms from a filename.
          *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
+         * \param filename The filename of the stored Algorithm.
+         * \return A valid pointer to a new Algorithm, if the loading of the Algorithm was successful.
+         *         else: a null pointer.
          */
         Algorithm* loadAlgorithm(const QString & filename);
     
         /**
-         * Basic import procedure for all algorithms, which implement the serializable interface
+         * Import procedure for available Algorithms from an XMLStream.
          *
-         * \param filename The filename of the stored object.
-         * \param object   The object, which shall be deserialized.
-         * \param compress If true, the file will be read using the GZip decompressor.
-         * \return True, if the loading of the object was successful.
+         * \param xmlReader The QXmlStreamReader of the stored Algorithms.
+         * \return A valid pointer to a new Algorithm, if the loading of the Algorithm was successful.
+         *         else: a null pointer.
          */
         Algorithm* loadAlgorithm(QXmlStreamReader & xmlReader);
     
-        //One global algorithm mutex:
-        QMutex global_algorithm_mutex;
-
-        //And two containers holding all currently available Models and ViewControllers:
-        std::vector<Model*> models;
-        std::vector<ViewController*> viewControllers;
-    
-        //The filenames of each loaded module:
+        /**
+         * Returns the names of all loaded Modules. The names are stored in a
+         * member variable, which is updated on each loadModule(..) call.
+         *
+         * \return a list of QStrings containing all loaded module names.
+         */
         const QStringList& modules_names() const
         {
             return m_modules_names;
         }
-        //The status messages of each loaded module
+    
+        /**
+         * Returns more detailled info for all loaded Modules. 
+         * This ifo is stored in a member variable, which is updated on each
+         * loadModule(..) call.
+         *
+         * \return a list of QStrings containing all loaded module statuses.
+         */
         const QStringList& modules_status() const
         {
             return m_modules_status;
         }
+
+        /**
+         * Public global algorithm mutex.
+         */
+        QMutex global_algorithm_mutex;
     
-        Model* currentModel()
-        {
-            return m_currentModel;
-        }
-        void setCurrentModel(Model * model)
-        {
-            for(Model* m : models)
-            {
-                if(model == m)
-                {
-                    m_currentModel = m;
-                }
-            }
-        }
+        /**
+         * A public container holding all loaded Models.
+         */
+        std::vector<Model*> models;
+    
+        /**
+         * A public container holding all loaded ViewControllers.
+         */
+        std::vector<ViewController*> viewControllers;
     
     
-        ViewController* currentViewController()
-        {
-            return m_currentViewController;
-        }
-        void setCurrentViewController(ViewController * viewController)
-        {
-            for(ViewController* vc : viewControllers)
-            {
-                if(viewController == vc)
-                {
-                    m_currentViewController = vc;
-                }
-            }
-        }
+        /**
+         * Returns the currently active Model. Change it using 
+         * setCurrentModel(model).
+         * 
+         * \return A valid pointer to a Model, if any was set as a current model.
+         *         Else: a null pointer.
+         */
+        Model* currentModel();
+    
+        /**
+         * Sets the currently active Model. Does nothing if the given model is not
+         * among the the available ones.
+         *
+         * \param model The Model, which shall become the next current model.
+         */
+        void setCurrentModel(Model * model);
+    
+        /**
+         * Returns the currently active ViewController. Change it using 
+         * setCurrentViewController(vc).
+         * 
+         * \return A valid pointer to a ViewController, if any was set as a 
+         *         current ViewController.
+         *         Else: a null pointer.
+         */
+        ViewController* currentViewController();
+    
+        /**
+         * Sets the currently active ViewController. Does nothing if the given 
+         * ViewController is not among the the available ones.
+         *
+         * \param viewController The ViewController, which shall become the next
+         *                       current ViewController.
+         */
+        void setCurrentViewController(ViewController * viewController);
     
     protected:
         /**
          * Auto-loads all modules, that are in same dir as the core-module.
          * Calls loadModules with different paths:
-         * Under Mac OS at the place of the executable file (not the app-Bundle) and at
-         * the location of the .app-bundle.
+         * Under Mac OS at the place of the executable file (not the app-Bundle).
+         * If there were no Modules found there, it also searches at the location
+         * of the .app-bundle itself.
          */
         void findAndLoadModules();
     
@@ -286,6 +327,7 @@ class GRAIPE_CORE_EXPORT Workspace
         ViewControllerFactory m_viewControllerFactory;
         AlgorithmFactory m_algorithmFactory;
     
+        //The current Model and ViewController
         Model* m_currentModel;
         ViewController* m_currentViewController;
 };

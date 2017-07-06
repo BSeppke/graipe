@@ -71,7 +71,7 @@ signals:
 private:
     QVector<QString> m_registered_users;
     QMutex m_global_mutex;
-    Workspace* m_environment;
+    Workspace* m_workspace;
     
     QVector<ConnectionInfo> m_connections;
 };
