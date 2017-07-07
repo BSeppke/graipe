@@ -36,6 +36,14 @@
 #ifndef GRAIPE_FEATURES2D_H
 #define GRAIPE_FEATURES2D_H
 
+/**
+ * @file
+ * @brief Header file for the outer API of GRAIPE's features2d module
+ *
+ * @defgroup features2d 2D features (without algorithms) for GRAIPE
+ * @{
+ */
+
 #include "features2d/featurelist.hxx"
 #include "features2d/featureliststatistics.hxx"
 #include "features2d/featurelistviewcontroller.hxx"
@@ -49,5 +57,9 @@
 #include "features2d/cubicsplinelist.hxx"
 #include "features2d/cubicsplineliststatistics.hxx"
 #include "features2d/cubicsplinelistviewcontroller.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_H

@@ -36,10 +36,22 @@
 #ifndef GRAIPE_IMAGES_H
 #define GRAIPE_IMAGES_H
 
+/**
+ * @file
+ * @brief Header file for the outer API of GRAIPE's images module
+ *
+ * @defgroup images Images (without algorithms) for GRAIPE
+ * @{
+ */
+
 #include "images/image.hxx"
 #include "images/imagebandparameter.hxx"
 #include "images/imageimpex.hxx"
 #include "images/imagestatistics.hxx"
 #include "images/imageviewcontroller.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_IMAGES_H

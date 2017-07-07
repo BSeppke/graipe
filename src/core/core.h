@@ -45,8 +45,9 @@
  */
 
 #include "core/algorithm.hxx"
+#include "core/basicstatistics.hxx"
 #include "core/colortables.hxx"
-#include "core/workspace.hxx"
+#include "core/factories.hxx"
 #include "core/impex.hxx"
 #include "core/logging.hxx"
 #include "core/model.hxx"
@@ -54,10 +55,10 @@
 #include "core/parameters.hxx"
 #include "core/parameterselection.hxx"
 #include "core/qt_ext.hxx"
-#include "core/factories.hxx"
 #include "core/serializable.hxx"
 #include "core/updatechecker.hxx"
 #include "core/viewcontroller.hxx"
+#include "core/workspace.hxx"
 
 /**
  * @}

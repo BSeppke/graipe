@@ -33,8 +33,8 @@
 /*                                                                      */
 /************************************************************************/
 
-#ifndef GRAIPE_CORE_ENVIRONMENT_HXX
-#define GRAIPE_CORE_ENVIRONMENT_HXX
+#ifndef GRAIPE_CORE_WORKSPACE_HXX
+#define GRAIPE_CORE_WORKSPACE_HXX
 
 #include "core/factories.hxx"
 #include "core/model.hxx"
@@ -49,13 +49,23 @@
 
 /**
  * @file
- * @brief This file holds all global data structures and the loaded Modules
+ * @brief This file holds all Workspace information
  * @addtogroup core
  * @{
  */
  
 namespace graipe {
 
+/**
+ * This is the Workspace class.
+ * Before you start working with Graipe, you should always create a workspace.
+ * A workspace is the entity, which loads and provides the Modules, the Models,
+ * the ViewControllers and the Algorithms by means of the corresponding Factories
+ * and the collections of currently available Models and ViewControllers.
+ * Moreover, a workspace might be serialized/deserialized to hibernate the current
+ * state  - at least of the active Models and ViewControllers. Currently running
+ * Algorithms as not supported for de/serialization.
+ */
 class GRAIPE_CORE_EXPORT Workspace
 : public Serializable
 {
@@ -338,4 +348,4 @@ class GRAIPE_CORE_EXPORT Workspace
  * @}
  */
 
-#endif //GRAIPE_CORE_FACTORIES_HXX
+#endif //GRAIPE_CORE_WORKSPACE_HXX
