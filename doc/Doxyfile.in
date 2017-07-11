@@ -1,14 +1,12 @@
 # Doxyfile 1.6.3
 
-INPUT = @CMAKE_CURRENT_SOURCE_DIR@/../src/
+INPUT = @CMAKE_CURRENT_SOURCE_DIR@/../src/  @CMAKE_CURRENT_SOURCE_DIR@/../README.md
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
 # If left blank NO is used.
 
 RECURSIVE              = YES
-
-
 
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded by 
 # double-quotes, unless you are using Doxywizard) that should identify the project
@@ -20,14 +18,10 @@ RECURSIVE              = YES
 PROJECT_NAME = Graipe
 
 
-
-
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This could be
 # handy for archiving the generated documentation or if some version control system is 
 # used.
-
-PROJECT_NUMBER = 1.0
-
+# PROJECT_NUMBER = 1.0
 
 
 
@@ -36,6 +30,18 @@ PROJECT_NUMBER = 1.0
 # the purpose of the project. Keep the description short.
 
 PROJECT_BRIEF = "The GRAphical Image Processing Environment" 
+
+# If the ALPHABETICAL_INDEX tag is set to YES, an alphabetical index 
+# of all compounds will be generated. Enable this if the project 
+# contains a lot of classes, structs, unions or interfaces.
+
+ALPHABETICAL_INDEX     = YES
+
+# If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then 
+# the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns 
+# in which this list will be split (can be a number in the range [1..20])
+
+COLS_IN_ALPHA_INDEX    = 6 
 
 
 
