@@ -44,6 +44,7 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QLibrary>
+#include <QMutex>
 
 #include <vector>
 
