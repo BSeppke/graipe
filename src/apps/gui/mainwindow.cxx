@@ -838,12 +838,15 @@ void MainWindow::removeCurrentModel()
 		{
             m_ui.scrModelParameters->takeWidget();
             m_ui.listModels->takeItem(m_ui.listModels->currentRow());
-            updateMemoryUsage();
+            
+            //Remove the model
+            delete model;
             
             if (m_ui.listModels->count() != 0)
             {
                 currentModelChanged(m_ui.listModels->currentItem());
             }
+            updateMemoryUsage();
         }
 	}
 }
@@ -874,12 +877,15 @@ void MainWindow::removeCurrentViewController()
 		viewController->hide();
         m_ui.scrViewParameters->takeWidget();
 		m_ui.listViews->takeItem(m_ui.listViews->currentRow());
-		updateMemoryUsage();
-            
+        
+        //Remove the view controller
+        delete viewController;
+        
         if (m_ui.listViews->count() != 0)
         {
             currentViewControllerChanged(m_ui.listViews->currentItem());
         }
+        updateMemoryUsage();
 	}
 }
 

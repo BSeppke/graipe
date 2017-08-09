@@ -434,6 +434,8 @@ std::vector<Model*> ImageBandParameter<T>::needsModels() const
 template <class T>
 void ImageBandParameter<T>::initConnections()
 {
+    ImageBandParameterBase::initConnections();
+    
     m_cmbImage->clear();
             
     for(Image<T>* image : m_allowed_images)
@@ -445,7 +447,6 @@ void ImageBandParameter<T>::initConnections()
     if(m_allowed_images.size() != 0)
     {
         m_cmbImage->setCurrentIndex(0);
-        updateImage();
     }
 }
 
@@ -459,7 +460,7 @@ void ImageBandParameter<T>::handleUpdateImage()
     if(m_delegate != NULL)
     {
         int idx = m_cmbImage->currentIndex();
-            
+        
         if(idx>=0 && idx<(int)m_allowed_images.size())
         {
             Image<T>* image = static_cast<Image<T>*>(m_allowed_images[m_cmbImage->currentIndex()]);
