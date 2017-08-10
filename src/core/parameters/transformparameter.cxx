@@ -43,21 +43,11 @@ namespace graipe {
  *
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the TransformParameter class
+ *     @file
+ *     @brief Implementation file for the TransformParameter class
+ * @}
  */
 
-/**
- * Default constructor of the TransformParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 TransformParameter::TransformParameter(const QString& name, QTransform value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_value(value),
@@ -74,9 +64,6 @@ TransformParameter::TransformParameter(const QString& name, QTransform value, Pa
 {
 }
 
-/**
- * Destructor of the TransformParameter class.
- */
 TransformParameter::~TransformParameter()
 {
     //Also deletes other widget, since they are owned
@@ -85,21 +72,11 @@ TransformParameter::~TransformParameter()
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 QTransform TransformParameter::value() const
 {
     return m_value;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void TransformParameter::setValue(const QTransform& value)
 {
     m_value = value;
@@ -114,30 +91,6 @@ void TransformParameter::setValue(const QTransform& value)
     }
 }
 
-/**
- * Serialization of the parameter's state to an output device.
- * Writes the following XML on the device:
- * 
- * <TYPENAME>
- *     <Name>NAME</Name>
- *     <Transform Type="Affine">
- *       <m11>value().m11()</m11>
- *       <m12>value().m12()</m12>
- *       <m13>value().m13()</m13>
- *       <m21>value().m21()</m21>
- *       <m22>value().m22()</m22>
- *       <m23>value().m23()</m23>
- *       <m31>value().m31()</m31>
- *       <m32>value().m32()</m32>
- *       <m33>value().m33()</m33>
- *     </Transform>
- * </TYPENAME>
- *
- * with TYPENAME = typeName(),
- *         NAME = name().
- *
- * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
- */
 void TransformParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
@@ -160,12 +113,6 @@ void TransformParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeEndElement();
 }
 
-/**
- * Deserialization of a parameter's state from an xml file.
- *
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
 bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -225,24 +172,10 @@ bool TransformParameter::deserialize(QXmlStreamReader& xmlReader)
     return false;
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 bool TransformParameter::isValid() const
 {
     return true;
 }
-
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 
 QWidget*  TransformParameter::delegate()
 {
@@ -281,10 +214,6 @@ QWidget*  TransformParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void TransformParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -297,9 +226,5 @@ void TransformParameter::updateValue()
         Parameter::updateValue();
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

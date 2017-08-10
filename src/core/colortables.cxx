@@ -40,19 +40,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the color table classes
+ *     @file
+ *     @brief Implementation file for the color table classes
+ * @}
  */
  
-/**
- * Helper function to create a color table as a gradient between three colors.
- * 
- * \param col1 First color (at start)
- * \param col2 Second color (at middle)
- * \param col3 Third color (at end)
- * \return 256-element color table by means of gradient w.r.t. three colors given.
- */
 QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & col2, const QColor & col3)
 {
     QVector<QRgb> ct(256);
@@ -80,10 +72,6 @@ QVector<QRgb> createColorTableFrom3Colors(const QColor & col1, const QColor & co
     return ct;
 }
 
-/**
- * Accessor for the global color tables
- * \return The globally defined color tables
- */
 QVector<QVector<QRgb> > colorTables()
 {
     if(detail::colorTables.size()==22)
@@ -1574,10 +1562,6 @@ QVector<QVector<QRgb> > colorTables()
     
     return detail::colorTables;
 }
-
-/**
- * @}
- */
  
 } //end of namespace graipe
 

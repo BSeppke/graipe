@@ -51,19 +51,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the ParameterSelection class
+ *     @file
+ *     @brief Implementation file for the ParameterSelection class
+ * @}
  */
-    
-/**
- * Constructor of the parameter selection. This constructor
- * may be used to create a Dialog for a single or multiple parameter
- * choices.
- * 
- * \param parent The parent widget, to make this selection modal.
- * \param param  The parameter, for which the selection shall be generated.
- */
+
 ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
 :	QDialog(parent),
     m_widget(param->delegate()),
@@ -96,26 +88,11 @@ ParameterSelection::ParameterSelection(QWidget *parent, Parameter* param)
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
-/**
- * Destructor of the parameter selection. This destructor returns the
- * ownership of the parameter's widget back to the caller. 
- * Thus, it's widget(s) is(are) not destroyed here!
- *
- */
 ParameterSelection::~ParameterSelection()
 {
     m_verticalLayout->removeWidget(m_widget);
 }
 
-/**
- * Constructor of the parameter selection. This constructor
- * may be used to create a Dialog for all parameter choices of a Model.
- * Moreover, it is possible to generate a new (empty) model based on the
- * properties of another existing model.
- * 
- * \param parent      The parent widget, to make this selection modal.
- * \param model       The model, for which the selection shall be generated.
- */
 ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model)
 :	QDialog(parent),
     m_radNewParameters(NULL),
@@ -179,23 +156,11 @@ ModelParameterSelection::ModelParameterSelection(QWidget *parent, Model* model)
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
-
-/**
- * Destructor of the parameter selection. This destructor returns the
- * ownership of the parameter's widget back to the caller. 
- * Thus, it's widget(s) is(are) not destroyed here!
- *
- */
 ModelParameterSelection::~ModelParameterSelection()
 {
     m_scrParameters->takeWidget();
 }
-/**
- * Indicates, whether an existing Model* should be used to copy the 
- * metadata from.
- *
- * \return NULL, if no metadata copying shall occur, else valid pointer to the other model.
- */
+
 Model* ModelParameterSelection::useOtherModel()
 {
     if (m_radCopyParameters->isChecked())
@@ -208,26 +173,11 @@ Model* ModelParameterSelection::useOtherModel()
     }
 }
 
-/**
- * Indicated, whether the complete Model shall be cloned into the new one. Only will
- * return true, if useOtherModel() == true.
- *
- * \return If true, the new model will be an exact copy of the given one.
- */
 bool ModelParameterSelection::cloneOtherModel() const
 {
     return m_radCopyParameters->isChecked() && m_chkCloneOtherModel->isChecked();
 }
 
-/**
- * Constructor of the parameter selection. This constructor
- * may be used to create a Dialog for all parameter choices of a algorithm.
- * It also displays the return type of the algorithm, if it is given as a 
- * prototypic result in alg->results().
- * 
- * \param parent The parent widget, to make this selection modal.
- * \param alg    The algorithm, for which the selection shall be generated.
- */
 AlgorithmParameterSelection::AlgorithmParameterSelection(QWidget *parent, Algorithm* alg)
 :   QDialog(parent),
     m_lblResults(NULL),
@@ -264,26 +214,13 @@ AlgorithmParameterSelection::AlgorithmParameterSelection(QWidget *parent, Algori
     
     connect(btnOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    
 }
 
-/**
- * Destructor of the parameter selection. This destructor returns the
- * ownership of the parameter's widget back to the caller. 
- * Thus, it's widget(s) is(are) not destroyed here!
- *
- */
 AlgorithmParameterSelection::~AlgorithmParameterSelection()
 {
     m_algorithm->parameters()->delegate()->setParent(NULL);
 }
 
-/**
- * Since the results of an algorithm may depend on the "input" parameter's
- * settings, it is neccessary to update them if any parameter has changed.
- * This slot is connected to the parameter's valueChanged()-signal and will
- * be called in this case to update the results' QLabel
- */
 void AlgorithmParameterSelection::updateResults()
 {
     if(m_algorithm->results().size() != 0)
@@ -305,9 +242,5 @@ void AlgorithmParameterSelection::updateResults()
         m_lblResults->setVisible(true);
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

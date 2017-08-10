@@ -42,9 +42,9 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implmentation file for the logging facilities
+ *     @file
+ *     @brief Implmentation file for the logging facilities
+ * @}
  */
 
 
@@ -54,11 +54,6 @@ namespace graipe {
 Logging* Logging::m_this;
 
 
-/**
- * Replaces the constructor by means of the Singleton design pattern (static)
- *
- * \return a new logger, if non existed before, else, the old one
- */
 Logging* Logging::logger()
 {
     if (m_this == NULL)
@@ -68,11 +63,6 @@ Logging* Logging::logger()
     return m_this;
 }
 
-/**
- * Replaces the constructor by means of the Singleton design pattern (static)
- *
- * \return a new logger, if non existed before, else, the old one
- */
 Logging* Logging::logger(QString filename)
 {
     if (m_this == NULL)
@@ -86,42 +76,22 @@ Logging* Logging::logger(QString filename)
     }
     return m_this;
 }
- 
-/**
- * Returns the currently used filename (static)
- *
- * \return The complete path of the used filename
- */
+
 QString Logging::filename()
 {
     return logger()->m_file->fileName();
 }
 
-/**
- * returns the currently used textStream pointer (static)
- *
- * \return If existing, it returns the pointer for textstreaming, NULL otherwise
- */
 QTextStream* Logging::textStream()
 {
     return logger()->m_textStream;
 }
 
-/**
- * Basic message handler for the QtDebug interface (static)
- *
- * \param type The type of the incoming message.
- * \param context The context of the incoming message.
- * \param msg  The message itself.
- */
 void Logging::messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     logger()->logMessage(type, context, msg);
 }
 
-/**
- * Default constructor for the Logging class (protected)
- */
 Logging::Logging()
 : m_file(NULL),
   m_textStream(NULL)
@@ -149,9 +119,7 @@ Logging::Logging()
         m_textStream = new QTextStream(m_file);
     }
 }
-/**
- * Default constructor for the Logging class (protected)
- */
+
 Logging::Logging(QString filename)
 : m_file(NULL),
   m_textStream(NULL)
@@ -168,13 +136,6 @@ Logging::Logging(QString filename)
     }
 }
 
-/**
- * Basic message handler for the QtDebug interface (non-static)
- *
- * \param type The type of the incoming message.
- * \param context The context of the incoming message.
- * \param msg  The message itself.
- */
 void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();
@@ -202,9 +163,5 @@ void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, cons
     *m_textStream << txt << "\n";
     m_textStream->flush();
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe

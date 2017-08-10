@@ -47,18 +47,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the import and export of data
+ *     @file
+ *     @brief Implementation file for the import and export of data
+ * @}
  */
-
-/**
- * Basic open procedure for compressed and uncompressed files.
- *
- * \param filename The filename of the stored object.
- * \param openMode An openind mode, read/write-only etc.
- * \return A valid QIODevice Pointer, if the opening was successful esle NULL.
- */
+ 
 QIODevice* Impex::openFile(const QString & filename, QIODevice::OpenModeFlag openMode)
 {
     QIODevice* device = NULL;
@@ -89,15 +82,6 @@ QIODevice* Impex::openFile(const QString & filename, QIODevice::OpenModeFlag ope
     return device;
 }
 
-
-/**
- * Standard exporter for everything, which implements the Serializable interface.
- *
- * \param object   The object, which shall be serialized.
- * \param filename The filename, where the object shall be stored.
- * \param compress If true, the file will be read using the GZip decompressor.
- * \return True, if the storage of the object was successful.
- */
 bool Impex::save(Serializable * object, const QString & filename, bool compress)
 {
 	QIODevice* device = Impex::openFile(filename, QIODevice::WriteOnly);
@@ -111,10 +95,6 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
     }
 	return false;
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe
 

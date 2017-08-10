@@ -44,22 +44,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implmentation file for the MultiModelParameter class
+ *     @file
+ *     @brief Implmentation file for the MultiModelParameter class
+ * @}
  */
 
-/**
- * Default constructor of the MultiModelParameter class with a setting of the
- * most important values directly.
- *
- * \param name           The name (label) of this parameter.
- * \param allowed_models A vector containing all currently available models.
- * \param type_filter    A QString to restrict the model list to certain model types.
- * \param parent         If given (!= NULL), this parameter has a parent and will
- *                       be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
- */
 MultiModelParameter::MultiModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp)
 :	Parameter(name, parent, invert_parent, wsp),
     m_delegate(NULL),
@@ -80,20 +69,12 @@ MultiModelParameter::MultiModelParameter(const QString& name, QString type_filte
 	}
 }
 
-/**
- * Destructor of the MultiModel class
- */
 MultiModelParameter::~MultiModelParameter()
 {
     if(m_delegate != NULL)
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 std::vector<Model*> MultiModelParameter::value() const
 {
     std::vector<Model*> selected_models;
@@ -106,11 +87,6 @@ std::vector<Model*> MultiModelParameter::value() const
     return selected_models;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void MultiModelParameter::setValue(const std::vector<Model*>& value)
 {
    m_model_idxs.clear();
@@ -142,14 +118,6 @@ void MultiModelParameter::setValue(const std::vector<Model*>& value)
     }
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString MultiModelParameter::toString() const
 { 
 	QString res;
@@ -161,25 +129,6 @@ QString MultiModelParameter::toString() const
 	return res.left(res.length()-2);
 }
 
-/**
- * Serialization of the parameter's state to a xml stream.
- * Writes the following XML code by default:
- * 
- * <MultiModelParameter>
- *     <Name>NAME</Name>
- *     <Values>N</Value>
- *     <Value ID="0">VALUE_0_ID</Value>
- *     ...
- *     <Value ID="N-1">VALUE_N-1_ID</Value>
- * </MultiModelParameter>
- *
- * with     NAME = name(),
- *             N = QString::number(value().size()), and
- *    VALUE_0_ID = values()[0]->id().
- *
- * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
- *                  parameter's type, name and value.
- */
 void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
     
@@ -200,12 +149,6 @@ void MultiModelParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeEndElement();
 }
 
-/**
- * Deserialization of a parameter's state from an xml file.
- *
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
 bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -255,15 +198,7 @@ bool MultiModelParameter::deserialize(QXmlStreamReader& xmlReader)
     }
     return true;
 }
-    
-/**
- * This function locks the parameters value. 
- * This means, that after a lock() call, only const acess to the parameter is 
- * possible until someone unlocks it. 
- * To work properly, the inner parameter class has to be designed accordingly.
- * As an example, you may look at the Model class, which supports locking and
- * unlocking - so do the parameter classes based on models!
- */
+
 void MultiModelParameter::lock()
 {	
     m_locks.clear();
@@ -275,14 +210,6 @@ void MultiModelParameter::lock()
 	}
 }
 
-/**
- * This function unlocks the parameters value.
- * This means, that after a lock() call, only const acess to the parameter is 
- * possible until someone unlocks it. 
- * To work properly, the inner parameter class has to be designed accordingly.
- * As an example, you may look at the Model class, which supports locking and
- * unlocking - so do the parameter classes based on models!
- */
 void MultiModelParameter::unlock()
 {
     unsigned int i=0;
@@ -294,38 +221,16 @@ void MultiModelParameter::unlock()
     }
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
-    
 bool MultiModelParameter::isValid() const
 {
 	return true;
 }
 
-/**
- * This function indicates whether the value of a parameter is a Model* or 
- * many of them or needs one at least. These parameters need to access the
- * global 'models' variable, too!
- *
- * \return A filled vector, if the parameter's value is related to a Model*.
- *         An empty vector by default.
- */
 std::vector<Model*> MultiModelParameter::needsModels() const
 {
     return value();
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  MultiModelParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -347,10 +252,6 @@ QWidget*  MultiModelParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void MultiModelParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:

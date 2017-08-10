@@ -156,11 +156,13 @@ class GRAIPE_CORE_EXPORT PointFParameter
          * Serialization of the parameter's state to an output device.
          * Writes the following XML on the device:
          * 
-         * <TYPENAME>
-         *     <Name>NAME</Name>
-         *     <x>X</x>
-         *     <y>Y</y>
-         * </TYPENAME>
+         * \verbatim
+           <TYPENAME>
+               <Name>NAME</Name>
+               <x>X</x>
+               <y>Y</y>
+           </TYPENAME>
+           \endverbatim
          *
          * with TYPENAME = typeName(),
          *         NAME = name(),

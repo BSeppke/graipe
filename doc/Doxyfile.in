@@ -52,7 +52,8 @@ COLS_IN_ALPHA_INDEX    = 6
 # directory.
 PROJECT_LOGO = @CMAKE_CURRENT_SOURCE_DIR@/graipe_small.png
 
-
+# Does something related to grouping...
+DISTRIBUTE_GROUP_DOC = YES
 
 
 # Show the readme.md as mainpage

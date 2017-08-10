@@ -42,20 +42,15 @@
 
 namespace graipe {
 
-/*
+/**
  *
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the global vars
+ *     @file
+ *     @brief Implementation file for the global vars
+ * @}
  */
 
-/**
- * Constructor: Creates an empty Workspace and calls the function
- * findAndloadModules() to load the Modules from the corresponding
- * directories.
- */
 Workspace::Workspace()
 : m_currentModel(NULL),
   m_currentViewController(NULL)
@@ -63,18 +58,6 @@ Workspace::Workspace()
     findAndLoadModules();
 }
 
-/**
- * Copy Constructor: Creates an workspace from another one.
- * This contructor copies all the data from the workspace, but uses the same
- * (identical) factories. 
- * If you want to have new Factories, you  will need to set the
- * reload_factories flag to true, or call loadModules() after the copying.
- *
- * \param wsp The other workspace.
- * \param reload_factories If true, it reload all modules and thus use new factories.
- *                         Else, it will use the other environment's factories.
- *                         False by default
- */
 Workspace::Workspace(const Workspace& wsp, bool reload_factories)
 : m_modules_names(wsp.modules_names()),
   m_modules_status(wsp.modules_status()),m_modelFactory(wsp.modelFactory()),
@@ -89,24 +72,11 @@ Workspace::Workspace(const Workspace& wsp, bool reload_factories)
     }
 }
 
-/**
- * Virtual destructor of an workspace.
- */
 Workspace::~Workspace()
 {
     clear();
 }
 
-/**
- * Deserialization of a workspace from an xml file.
- * This will copy all the data from the workspace, but use the same
- * (identical) factories. If you want to have new Factories, you will 
- * need to call loadModules() after the copy manually. However, it checks
- * if all modules of the serialization are avaible in the current workspace.
- *      
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
 bool Workspace::deserialize(QXmlStreamReader& xmlReader)
 {
     clear();
@@ -263,13 +233,6 @@ bool Workspace::deserialize(QXmlStreamReader& xmlReader)
     return false;
 }
 
-/**
- * Serialization on to an output device.
- * This performes an XML-serialization of all Modules (by their names),
- * all loaded Models and all ViewControllers.
- *
- * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
- */
 void Workspace::serialize(QXmlStreamWriter& xmlWriter) const
 {
     try
@@ -340,12 +303,6 @@ void Workspace::serialize(QXmlStreamWriter& xmlWriter) const
     }
 }
 
-/**
- * Clear all data structures, namely: Models and ViewControllers,
- * but keeps the Modules by means of the factories.
- * If you want to reload the factories, you will need to call loadModules
- * manually afterwards.
- */
 void Workspace::clear()
 {
     for(ViewController* vc : viewControllers)
@@ -361,13 +318,6 @@ void Workspace::clear()
     models.clear();
 }
 
-/**
- * Import procedure for available Models from a filename.
- *
- * \param filename The filename of the stored Model.
- * \return A valid pointer to a new Model, if the loading of the Model was successful.
- *         else: a null pointer.
- */
 Model* Workspace::loadModel(const QString & filename)
 {
    QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
@@ -383,13 +333,6 @@ Model* Workspace::loadModel(const QString & filename)
     return model;
 }
 
-/**
- * Basic import procedure for available Models from an XMLStream.
- *
- * \param xmlReader The QXmlStreamReader of the stored Model.
- * \return A valid pointer to a new Model, if the loading of the Model was successful.
- *         else: a null pointer.
- */
 Model* Workspace::loadModel(QXmlStreamReader& xmlReader)
 {
     //1. Read the name of the xml root
@@ -436,13 +379,6 @@ Model* Workspace::loadModel(QXmlStreamReader& xmlReader)
     return NULL;
 }
 
-/**
- * Import procedure for available ViewControllers from a filename.
- *
- * \param filename The filename of the stored ViewController.
- * \return A valid pointer to a new ViewController, if the loading of the ViewController was successful.
- *         else: a null pointer.
- */
 ViewController* Workspace::loadViewController(const QString & filename)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
@@ -458,13 +394,6 @@ ViewController* Workspace::loadViewController(const QString & filename)
     return vc;
 }
 
-/**
- * Import procedure for available ViewControllers from an XMLStream.
- *
- * \param xmlReader The QXmlStreamReader of the stored ViewController.
- * \return A valid pointer to a new ViewController, if the loading of the ViewController was successful.
- *         else: a null pointer.
- */
 ViewController* Workspace::loadViewController(QXmlStreamReader & xmlReader)
 {
     ViewController * vc = NULL;
@@ -533,14 +462,7 @@ ViewController* Workspace::loadViewController(QXmlStreamReader & xmlReader)
     }
     return NULL;
 }
-    
-/**
- * Import procedure for available Algorithms from a filename.
- *
- * \param filename The filename of the stored Algorithm.
- * \return A valid pointer to a new Algorithm, if the loading of the Algorithm was successful.
- *         else: a null pointer.
- */
+
 Algorithm* Workspace::loadAlgorithm(const QString & filename)
 {
     QIODevice* device = Impex::openFile(filename, QIODevice::ReadOnly);
@@ -556,13 +478,6 @@ Algorithm* Workspace::loadAlgorithm(const QString & filename)
     return alg;
 }
 
-/**
- * Import procedure for available Algorithms from an XMLStream.
- *
- * \param xmlReader The QXmlStreamReader of the stored Algorithms.
- * \return A valid pointer to a new Algorithm, if the loading of the Algorithm was successful.
- *         else: a null pointer.
- */
 Algorithm* Workspace::loadAlgorithm(QXmlStreamReader & xmlReader)
 {
     Algorithm * alg = NULL;
@@ -609,13 +524,7 @@ Algorithm* Workspace::loadAlgorithm(QXmlStreamReader & xmlReader)
     }
     return NULL;
 }
-/**
- * Returns the currently active Model. Change it using 
- * setCurrentModel(model).
- * 
- * \return A valid pointer to a Model, if any was set as a current model.
- *         Else: a null pointer.
- */
+
 Model* Workspace::currentModel()
 {
     for(Model* m: models)
@@ -633,12 +542,6 @@ Model* Workspace::currentModel()
     return m_currentModel;
 }
 
-/**
- * Sets the currently active Model. Does nothing if the given model is not
- * among the the available ones.
- *
- * \param model The Model, which shall become the next current model.
- */
 void Workspace::setCurrentModel(Model * model)
 {
     for(Model* m : models)
@@ -650,14 +553,6 @@ void Workspace::setCurrentModel(Model * model)
     }
 }
 
-/**
- * Returns the currently active ViewController. Change it using 
- * setCurrentViewController(vc).
- * 
- * \return A valid pointer to a ViewController, if any was set as a 
- *         current ViewController.
- *         Else: a null pointer.
- */
 ViewController* Workspace::currentViewController()
 {
     for(ViewController* vc : viewControllers)
@@ -675,13 +570,6 @@ ViewController* Workspace::currentViewController()
     return m_currentViewController;
 }
 
-/**
- * Sets the currently active ViewController. Does nothing if the given 
- * ViewController is not among the the available ones.
- *
- * \param viewController The ViewController, which shall become the next
- *                       current ViewController.
- */
 void Workspace::setCurrentViewController(ViewController * viewController)
 {
     for(ViewController* vc : viewControllers)
@@ -693,13 +581,6 @@ void Workspace::setCurrentViewController(ViewController * viewController)
     }
 }
 
-/**
- * Auto-loads all modules, that are in same dir as the core-module.
- * Calls loadModules with different paths:
- * Under Mac OS at the place of the executable file (not the app-Bundle).
- * If there were no Modules found there, it also searches at the location
- * of the .app-bundle itself.
- */
 void Workspace::findAndLoadModules()
 {
     //search paths for modules:
@@ -717,13 +598,6 @@ void Workspace::findAndLoadModules()
     }
 }
 
-/**
- * Find all available modules in a directory and fill the corresponding registries with their
- * contributions. SymLinks are not loaded to avoid double loading. Updates the report
- * property of this class.
- *
- * \param dir The directory to search for modules.
- */
 void Workspace::loadModules(QDir dir)
 {
     m_modules_names.clear();
@@ -745,12 +619,6 @@ void Workspace::loadModules(QDir dir)
     }
 }
 
-/**
- * Load one module and fill the corresponding registries with its contributions.
- * Also (incrementally updates the report property of this class.
- *
- * \param file The filename of the module.
- */
 void Workspace::loadModule(QString file)
 {
     typedef  Module* (*Initialize_f) ();
@@ -834,9 +702,5 @@ void Workspace::loadModule(QString file)
         m_modules_status.push_back(status);
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

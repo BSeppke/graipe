@@ -40,43 +40,22 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the Algorithm class
+ *     @file
+ *     @brief Implementation file for the Algorithm class
+ * @}
  */
 
-/**
- * Default Constructor of the Algorithm class.
- *
- * In a "real" algorithm implementation, please take care that
- * the results (m_results) are initialised here with the correct
- * Model classes using their empty/default constructors. This will
- * allow the further classes to derive the result types before the
- * algorithm's run.
- */
 Algorithm::Algorithm(Workspace* wsp)
 :   m_parameters(new ParameterGroup),
     m_workspace(wsp)
 {
 }
 
-/**
- * Destructor of the Algorithm class
- *
- * Since only the parameters of the algorithm have been created on 
- * the stack, we need to clean them up here
- */
 Algorithm::~Algorithm() 
 {
     delete m_parameters;
 }
-    
-/**
- * Deserialization of the parameters' state from an xml file.
- *
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
+
 bool Algorithm::deserialize(QXmlStreamReader& xmlReader)
 {
     if(     xmlReader.name() == typeName()
@@ -88,12 +67,6 @@ bool Algorithm::deserialize(QXmlStreamReader& xmlReader)
     return false;
 }
 
-/**
- * Serialization on to an output device. Simply serialized the parameters
- * onto the given device.
- *
- * \param xmlWriter The QXmlStreamWriter on which we want to serialize.
- */
 void Algorithm::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
@@ -116,20 +89,11 @@ void Algorithm::serialize(QXmlStreamWriter& xmlWriter) const
     }
 }
 
-/**
- * Potentially non-const accessor of the algorithms parameters.
- */
 ParameterGroup* Algorithm::parameters()
 {
 	return m_parameters;
 }
 
-/**
- * This functions is a convenience wrapper, which checks if all parameters are valid
- * If this is not the case, the algorithm must not be executed.
- *
- * \return true, if the parameters are valid.
- */
 bool Algorithm::parametersValid() const
 {
     unsigned int i=0;
@@ -152,19 +116,6 @@ bool Algorithm::parametersValid() const
 	return true;
 }
 
-/**
- * Running an algorithm is held inside this method
- *
- * During each run, different signals may be emitted by this class:
- * - statusMessage(percent, "some text")
- * - errorMessage("something went wrong")
- * - finished()
- *
- * After the receiver got the finished() signal, it may access the results
- * of each algorithm and destroy the worker thread of the algorithm. The
- * results will than be "grabbed" by the caller of the algorithms, which
- * changed the ownership from algorithm to the caller.
- */
 void Algorithm::run()
 {
 	//Tell the caller about status updates
@@ -188,13 +139,6 @@ void Algorithm::run()
 	}
 }
 
-/**
- * During the running of an algorithm, each parameter (especially the 
- * Model types) need to be locked, to prevent instable states during
- * the processes.
- *
- * This method locks each parameter.
- */
 void Algorithm::lockModels()
 {
     for(auto item : *m_parameters)
@@ -203,13 +147,6 @@ void Algorithm::lockModels()
     }
 }
 
-/**
- * During the running of an algorithm, each parameter (especially the 
- * Model types) need to be locked, to prevent instable states during
- * the processes.
- *
- * This method unlocks each parameter.
- */
 void Algorithm::unlockModels()
 {
     for(auto item : *m_parameters)
@@ -218,16 +155,6 @@ void Algorithm::unlockModels()
     }
 }
 
-/**
- * For monitoring purpose, algorithms may send progress signals by means of
- * status messages. This method provids a slot, which creates and sends the
- * appropriate processing signal 0...99.9 (%) as a status message.
- * This function also takes into account the different phases of an algorithm,
- * which are defined by the total number of phases: m_pase_count and
- * the current phase: m_phase.
- *
- * \param percent The current progress of the algorithm in percent (0...99.9)
- */
 void Algorithm::status_update(float percent)
 {
 	//restrict to 99.9% because otherwise the processing of the algorithm 
@@ -238,25 +165,9 @@ void Algorithm::status_update(float percent)
 	emit statusMessage(std::min(p_overall, 99.9f), QString("processing"));	
 }
 
-/**
- * This method returns the result of the algorithm. There are two use cases for this 
- * function:
- * 1. Before the running of the algorithm:
- *    If properly initialized, the results contain empty prototypes of the (not yet
- *    exisiting) results. These can be used to the derive the expected result types.
- *
- * 2. After the algorithm sent the finished() signal
- *    Then, the "real" results can be obtained using this function.
- *
- * \return The results of the algorithm (if finished).
- */
 std::vector<Model *>  Algorithm::results()
 {
 	return m_results;
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe

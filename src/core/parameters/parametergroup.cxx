@@ -43,22 +43,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the ParameterGroup class
+ *     @file
+ *     @brief Implementation file for the ParameterGroup class
+ * @}
  */
 
-/**
- * Default constructor of the ParameterGroup class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter group.
- * \param items         A std::map from QString to Parameter pointers containing all parameters.
- * \param policy        Layout settings for the used QFormLayout.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 ParameterGroup::ParameterGroup(const QString&  name, storage_type items, QFormLayout::RowWrapPolicy policy, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_parameters(items),
@@ -68,11 +57,6 @@ ParameterGroup::ParameterGroup(const QString&  name, storage_type items, QFormLa
 {
 }
 
-/**
- * Destructor of the ParameterGroup class. 
- * On destruction, every parameter of the group will be deleted, too.
- * as we assume to have the ownership of the added parameter pointers.
- */
 ParameterGroup::~ParameterGroup()
 {
     for(item_type item: m_parameters)
@@ -81,15 +65,6 @@ ParameterGroup::~ParameterGroup()
     }
 }
 
-    
-/**
- * This function indicates whether the value of a parameter is a Model* or 
- * many of them or needs one at least. These parameters need to access the
- * global 'models' variable, too!
- *
- * \return A filled vector, if the parameter's value is related to a Model*.
- *         An empty vector by default.
- */
 std::vector<Model*> ParameterGroup::needsModels() const
 {
     std::vector<Model*> modelList;
@@ -113,14 +88,6 @@ std::vector<Model*> ParameterGroup::needsModels() const
     return modelList;
 }
 
-/**
- * Add an already existing parameter to the ParameterGroup.
- *
- * \param id     The key for this parameter for easy access inside the group
- * \param param  The pointer to the existing parameter.
- * \param hidden If true, the parameter will be displayed by the group.
- * \return The index of the inserted parameter (size()-1)
- */
 unsigned int ParameterGroup::addParameter(const QString& id, Parameter* param, bool hidden)
 {
     unsigned int idx = (unsigned int)m_parameters.size();
@@ -137,90 +104,41 @@ unsigned int ParameterGroup::addParameter(const QString& id, Parameter* param, b
     return idx;
 }
 
-/**
- * Accessor to a parameter specified by the (QString) id.
- *
- * \param id The id of the parameter.
- * \return The pointer to the parameter inside the group or NULL, if not found.
- */
 Parameter* ParameterGroup::operator[](const QString& id)
 {
     return m_parameters.at(id);
 }
 
-/**
- * Const accessor to a parameter specified by the (QString) id.
- *
- * \param id The id of the parameter.
- * \return The const pointer to the parameter inside the group or NULL, if not found.
- */
 Parameter const * ParameterGroup::operator[](const QString& id) const
 {
     return m_parameters.at(id);
 }
 
-/**
- * Const iterator pointing to the beginning of the QString -> parameter pointer
- * map storage. This may be used to support const for-looping in stl-style.
- *
- * \return The const iterator to the beginning of the QString -> parameter pointer map.
- */
 ParameterGroup::storage_type::const_iterator ParameterGroup::begin() const
 {
     return m_parameters.cbegin();
 }
 
-/**
- * Const iterator pointing after the end of the QString -> parameter pointer
- * map storage. This may be used to support const for-looping in stl-style.
- *
- * \return The const iterator after the end of the QString -> parameter pointer map.
- */
  ParameterGroup::storage_type::const_iterator ParameterGroup::end() const
 {
     return m_parameters.cend();
 }
 
-/**
- * Iterator pointing to the beginning of the QString -> parameter pointer
- * map storage. This may be used to support for-looping in stl-style.
- *
- * \return The iterator to the beginning of the QString -> parameter pointer map.
- */
 ParameterGroup::storage_type::iterator ParameterGroup::begin()
 {
     return m_parameters.begin();
 }
 
-/**
- * Iterator pointing after the end of the QString -> parameter pointer
- * map storage. This may be used to support for-looping in stl-style.
- *
- * \return The iterator after the end of the QString -> parameter pointer map.
- */
 ParameterGroup::storage_type::iterator ParameterGroup::end()
 {
     return m_parameters.end();
 }
 
-/**
- * This function gives the parameter count of all existing parameters.
- *
- * \return The size of the QString -> parameter pointer map.
- */
 unsigned int ParameterGroup::size() const
 {
     return (unsigned int)m_parameters.size();
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString ParameterGroup::toString() const
 {
     QString report;
@@ -237,15 +155,6 @@ QString ParameterGroup::toString() const
     return report;
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \param filter_types Only special parameters are given out - filtered by their type. 
- * \return The value of the parameter converted to an QString.
- */
 QString ParameterGroup::valueText(const QString & filter_types) const
 {
     QString report;
@@ -264,25 +173,6 @@ QString ParameterGroup::valueText(const QString & filter_types) const
     return report;
 }
 
-/**
- * Serialization of the parameter groups's state to a xml stream.
- * Writes the following XML code by default:
- * 
- * <ParameterGroup>
- *     <Name>NAME</Name>
- *     <Parameters>N</Parameters>
- *     PARAM_0_SERIALIZATION
- *     ...
- *     PARAM_N-1_SERIALIZATION
- * </ParameterGroup>
- *
- * with                NAME = name(), and
- *               ID_PARAM_0 = m_parameters.front()->first.
- *    PARAM_0_SERIALIZATION = m_parameters.front()->second->serialize().
- *
- * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
- *                  parameter's type, name and value.
- */
 void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
@@ -302,12 +192,6 @@ void ParameterGroup::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeEndElement();
 }
 
-/**
- * Deserialization of a parameter's state from an xml file.
- *
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
 bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -383,14 +267,6 @@ bool ParameterGroup::deserialize(QXmlStreamReader& xmlReader)
     return true;
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget * ParameterGroup::delegate()
 {
     if(m_delegate == NULL)
@@ -419,9 +295,5 @@ QWidget * ParameterGroup::delegate()
     }
     return m_delegate;
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

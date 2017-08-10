@@ -47,21 +47,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the ColorTableParameter class
+ *     @file
+ *     @brief Implementation file for the ColorTableParameter class
+ * @}
  */
 
-/**
- * Default constructor of the ColorTableParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_delegate(NULL)
@@ -69,19 +59,11 @@ ColorTableParameter::ColorTableParameter(const QString& name, QVector<QRgb> valu
     setValue(value);
 }
 
-/**
- * The destructor of the ColorTableParameter class.
- */
 ColorTableParameter::~ColorTableParameter()
 {
     delete m_delegate;
 }
-    
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
+
 QVector<QRgb> ColorTableParameter::value() const
 {
     if(m_ct_idx >= 0 && m_ct_idx < colorTables().size())
@@ -98,14 +80,6 @@ QVector<QRgb> ColorTableParameter::value() const
     }
 }
 
-/**
- * Gives information if a colortable is already knwon or not,
- * either in the system-wide colorTables or in the extraTables
- *
- * \param ct The color table to be checked for.
- * \return Positive index, if the color table is either in colorTables() or in m_extra_tables.
- *         The index corresponds to the comboBox index. Else, -1
- */
 int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
 {
     int ct_idx=-1;
@@ -137,11 +111,6 @@ int ColorTableParameter::colorTableIndex(const QVector<QRgb> & ct) const
     return ct_idx;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void ColorTableParameter::setValue(const QVector<QRgb>& value)
 {
     int ct_idx = colorTableIndex(value);
@@ -169,11 +138,6 @@ void ColorTableParameter::setValue(const QVector<QRgb>& value)
     }
 }
 
-/**
- * Add another (user defined) color table to this parameter.
- *
- * \param ct The new user defined ct of this parameter.
- */
 int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
 {
     if(ct.size()==256)
@@ -216,16 +180,10 @@ int ColorTableParameter::addCustomColorTable(const QVector<QRgb>& ct)
         return -1;
     }
 }
-/**
- * The value converted to a QString. This returns a comma-separated list of all
- * Colors by means of #AARRGGBB values for each color.
- *
- * \return The value of the parameter converted to an QString.
- */
+
 QString  ColorTableParameter::toString() const
 {
     QVector<QRgb> ct = value();
-    
     
     QString res;
     
@@ -242,24 +200,6 @@ QString  ColorTableParameter::toString() const
     return res;
 }
 
-/**
- * Serialization of the parameter's state to a xml stream.
- * Writes the following XML code by default:
- * 
- * <ColorTableParameter>
- *     <Name>NAME</Name>
- *     <Colors>COLORCOUNT</Colors>
- *     <Color ID="0">#AARRGGBB</Color>
- *     ...
- *     <Color ID="COLORCOUNT-1">#AARRGGBB</Color>
- * </ColorTableParameter>
- *
- * with TYPENAME = typeName() and
- *    COLORCOUNT = ct.size().
- *
- * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
- *                  parameter's type, name and value.
- */
 void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
     QVector<QRgb> ct = value();
@@ -281,12 +221,6 @@ void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeEndElement();
 }
 
-/**
- * Deserialization of a parameter's state from an xml file.
- *
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
 bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -333,24 +267,11 @@ bool ColorTableParameter::deserialize(QXmlStreamReader& xmlReader)
     }
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
  bool ColorTableParameter::isValid() const
 {
     return true;
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  ColorTableParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -394,10 +315,6 @@ QWidget*  ColorTableParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void ColorTableParameter::updateValue()
 {
     if(m_delegate->currentIndex() < m_delegate->count()-1)
@@ -480,9 +397,5 @@ void ColorTableParameter::updateValue()
     }
     Parameter::updateValue();
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

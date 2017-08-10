@@ -45,21 +45,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the FilenameParameter class
+ *     @file
+ *     @brief Implementation file for the FilenameParameter class
+ * @}
  */
 
-/**
- * Default constructor of the FilenameParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 FilenameParameter::FilenameParameter(const QString& name, QString value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_value(value),
@@ -69,30 +59,17 @@ FilenameParameter::FilenameParameter(const QString& name, QString value, Paramet
 {
 }
 
-/**
- * Destructor of the FilenameParameter class.
- */
 FilenameParameter::~FilenameParameter()
 {
     if (m_delegate != NULL)
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter (For filename: QString).
- */
 QString FilenameParameter::value()  const
 {
     return m_value;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void FilenameParameter::setValue(const QString & value)
 {
     m_value = value;
@@ -104,37 +81,17 @@ void FilenameParameter::setValue(const QString & value)
     }
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString  FilenameParameter::toString() const
 {
     return value();
 }
 
-
-/**
- * Deserialization of a parameter's state from a string.
- *
- * \param str the input QString.
- * \return True, if the deserialization was successful, else false.
- */
 bool FilenameParameter::fromString(QString& str)
 {
     setValue(str);
     return true;
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 bool FilenameParameter::isValid() const
 {
     QFile file(value());
@@ -142,14 +99,6 @@ bool FilenameParameter::isValid() const
     return file.exists();
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  FilenameParameter::delegate()
 {
     if(m_delegate==NULL)
@@ -171,10 +120,6 @@ QWidget*  FilenameParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called if the user pressed the file-selection button. It is mainly
- * used to present the file selection dialog to the user.
- */
 void FilenameParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -188,9 +133,5 @@ void FilenameParameter::updateValue()
         }
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

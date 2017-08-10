@@ -44,21 +44,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the ColorParameter class
+ *     @file
+ *     @brief Implementation file for the ColorParameter class
+ * @}
  */
 
-/**
- * Default constructor of the ColorParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_value(value),
@@ -66,30 +56,17 @@ ColorParameter::ColorParameter(const QString& name, QColor value, Parameter* par
 {
 }
 
-/**
- * The destructor of the ColorParameter class.
- */
 ColorParameter::~ColorParameter()
 {
     if(m_delegate!=NULL)
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 const QColor& ColorParameter::value() const
 {
     return m_value;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void ColorParameter::setValue(const QColor& value)
 {
     m_value = value;
@@ -105,23 +82,11 @@ void ColorParameter::setValue(const QColor& value)
     }
 }
 
-/**
- * The value converted to a QString. 
- * This denotes the name of the color in the format #AARRGGBB.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString  ColorParameter::toString() const
 {
     return m_value.name(QColor::HexArgb);
 }
 
-/**
- * Deserialization of a parameter's state from a string.
- *
- * \param str The input QString.
- * \return True, if the deserialization was successful, else false.
- */
 bool ColorParameter::fromString(QString & str)
 {
     QColor new_color(str);
@@ -138,24 +103,11 @@ bool ColorParameter::fromString(QString & str)
     }
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
  bool ColorParameter::isValid() const
 {
     return m_value.isValid();
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  ColorParameter::delegate()
 {
     if (m_delegate == NULL)
@@ -173,11 +125,6 @@ QWidget*  ColorParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called on every button click on the color button. It mainly 
- * presents the color selection dialog. Then the user can select between
- * the different colors.
- */
 void ColorParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -191,9 +138,5 @@ void ColorParameter::updateValue()
         }
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

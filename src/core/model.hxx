@@ -346,15 +346,16 @@ class GRAIPE_CORE_EXPORT Model
         /**
          * This function serializes a complete Model to a xml stream.
          * Writes the following XML code by default:
-         *
-         * <TYPENAME>
-         *     <Header>
-         *         HEADER
-         *     </Header>
-         *     <Content>
-         *         CONTENT
-         *     </Content>
-         * </TYPENAME>
+         * \verbatim
+           <TYPENAME>
+               <Header>
+                   HEADER
+               </Header>
+               <Content>
+                   CONTENT
+               </Content>
+           </TYPENAME>
+           \endverbatim
          *
          * with TYPENAME = typeName(),
          *        HEADER = serialize_header(), and

@@ -206,17 +206,15 @@ class GRAIPE_CORE_EXPORT ParameterGroup
          * Serialization of the parameter groups's state to a xml stream.
          * Writes the following XML code by default:
          * 
-         * <ParameterGroup>
-         *     <Name>NAME</Name>
-         *     <Parameters>N</Parameters>
-         *     <Parameter ID="ID_PARAM_0">
-         *         PARAM_0_SERIALIZATION
-         *     </Parameter>
-         *     ...
-         *     <Parameter ID="ID_PARAM_N-1">
-         *         PARAM_N-1_SERIALIZATION
-         *      </Parameter>
-         * </ParameterGroup>
+         * \verbatim
+           <ParameterGroup>
+               <Name>NAME</Name>
+               <Parameters>N</Parameters>
+               PARAM_0_SERIALIZATION
+               ...
+               PARAM_N-1_SERIALIZATION
+           </ParameterGroup>
+           \endverbatim
          *
          * with                NAME = name(), and
          *               ID_PARAM_0 = m_parameters.front()->first.

@@ -49,14 +49,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the base types of all data: The Model, ModelList and RasteredModel classes.
+ *     @file
+ *     @brief Implementation file for the base types of all data: The Model, ModelList and RasteredModel classes.
+ * @}
  */
 
-/**
- * Default/empty contructor of the Model class
- */
 Model::Model(Workspace* wsp)
 :  QObject(),
     Serializable(),
@@ -87,11 +84,6 @@ Model::Model(Workspace* wsp)
     workspace()->models.push_back(this);
 }
 
-/**
- * Copy contructor of the Model class
- *
- * \param model The other model, from which the parameters will be copied.
- */
 Model::Model(const Model& model)
 :	QObject(),
     Serializable(),
@@ -118,9 +110,6 @@ Model::Model(const Model& model)
     workspace()->models.push_back(this);
 }
 
-/**
- * Destructor of the Model class
- */
 Model::~Model()
 {
     //Delete the parameters
@@ -130,23 +119,11 @@ Model::~Model()
     workspace()->models.erase(std::remove(workspace()->models.begin(), workspace()->models.end(), this), workspace()->models.end());
 }
 
-/**
- * Const accessor for the (full) model name. This returns the complete name.
- *
- * \return The name of the model.
- */
 QString Model::name() const
 {
     return m_name->value();
 }
 
-/**
- * The short model name. The short name is restricted to a certain amount of digits
- * and will be filled with "..."
- *
- * \param length The length of the short QString (default=60).
- * \return The short name of the model.
- */
 QString Model::shortName(unsigned int length) const
 {
 	if(name().length() < (int)length)
@@ -158,11 +135,6 @@ QString Model::shortName(unsigned int length) const
 	return name().left(length/2+length%2) + "..." + name().right(length/2-3-1);
 }
 
-/**
- * Set the model's name to a new QString.
- *
- * \param new_name The new name of the model.
- */
 void Model::setName (const QString& new_name)
 {
     if(locked())
@@ -172,21 +144,11 @@ void Model::setName (const QString& new_name)
     updateModel();
 }
 
-/**
- * Const accessor for the model description QString. 
- *
- * \return The description of the model.
- */
 QString Model::description() const
 {
 	return m_description->value();
 }
 
-/**
- * Set the model's description to a new QString.
- *
- * \param new_description The new description of the model.
- */
 void Model::setDescription(const QString & new_description)
 {
     if(locked())
@@ -196,21 +158,11 @@ void Model::setDescription(const QString & new_description)
     updateModel();
 }
 
-/**
- * Const accessor for the left (x-coordinate) of a Model.
- *
- * \return The left boundary of the Model.
- */
 float Model::left() const 
 {
 	return m_ul->value().x();
 }
 
-/**
- * Set the left (x-coordinate) of a Model to a given value.
- *
- * \param new_left The new left boundary of the Model.
- */
 void Model::setLeft(float new_left)
 {
     if(locked())
@@ -220,21 +172,11 @@ void Model::setLeft(float new_left)
     updateModel();
 }
 
-/**
- * Const accessor for the top (y-coordinate) of a Model.
- *
- * \return The top boundary of the Model.
- */
 float Model::top() const
 {
         return m_ul->value().y();
 }
 
-/**
- * Set the top (y-coordinate) of a Model to a given value.
- *
- * \param new_top The new top boundary of the Model.
- */
 void Model::setTop(float new_top)
 {
     if(locked())
@@ -244,21 +186,11 @@ void Model::setTop(float new_top)
     updateModel();
 }
 
-/**
- * Const accessor for the right (x-coordinate) of a Model.
- *
- * \return The right boundary of the Model.
- */
 float Model::right() const 
 {
         return m_lr->value().x();
 }
 
-/**
- * Set the right (x-coordinate) of a Model to a given value.
- *
- * \param new_right The new right boundary of the Model.
- */
 void Model::setRight(float new_right)
 {
     if(locked())
@@ -268,21 +200,11 @@ void Model::setRight(float new_right)
     updateModel();
 }
 
-/**
- * Const accessor for the bottom (y-coordinate) of a Model.
- *
- * \return The bottom boundary of the Model.
- */
 float Model::bottom() const
 {
     return m_lr->value().y();
 }
 
-/**
- * Set the bottom (y-coordinate) of a Model to a given value.
- *
- * \param new_bottom The new bottom boundary of the Model.
- */
 void Model::setBottom(float new_bottom)
 {
     if(locked())
@@ -292,41 +214,21 @@ void Model::setBottom(float new_bottom)
     updateModel();
 }
 
-/**
- * Const accessor to the width (right-left) of the model.
- *
- * \return The width of the model.
- */
 unsigned int Model::width() const
 {
     return fabs(right()-left());
 }
 
-/**
- * Const accessor to the height (bottom-top) of the model.
- *
- * \return The height of the model.
- */
 unsigned int Model::height() const
 {
     return fabs(bottom()-top());
 }
 
-/**
- * Const accessor for the global left (x-coordinate) of a Model.
- *
- * \return The global left boundary of the Model.
- */
 float Model::globalLeft() const
 {
 	return m_global_ul->value().x();
 }
 
-/**
- * Set the global left (x-coordinate) of a Model to a given value.
- *
- * \param new_left The new global left boundary of the Model.
- */
 void Model::setGlobalLeft(float new_left)
 {
     if(locked())
@@ -336,21 +238,11 @@ void Model::setGlobalLeft(float new_left)
     updateModel();
 }
 
-/**
- * Const accessor for the global top (y-coordinate) of a Model.
- *
- * \return The global top boundary of the Model.
- */
 float Model::globalTop() const
 {
     return m_global_ul->value().y();
 }
 
-/**
- * Set the global top (y-coordinate) of a Model to a given value.
- *
- * \param new_top The new global top boundary of the Model.
- */
 void Model::setGlobalTop(float new_top)
 {
     if(locked())
@@ -360,21 +252,11 @@ void Model::setGlobalTop(float new_top)
     updateModel();
 }
 
-/**
- * Const accessor for the global right (x-coordinate) of a Model.
- *
- * \return The global right boundary of the Model.
- */
 float Model::globalRight() const
 {
     return m_global_lr->value().x();
 }
 
-/**
- * Set the global right (x-coordinate) of a Model to a given value.
- *
- * \param new_right The new global right boundary of the Model.
- */
 void Model::setGlobalRight(float new_right)
 {
     if(locked())
@@ -384,21 +266,11 @@ void Model::setGlobalRight(float new_right)
     updateModel();
 }
 
-/**
- * Const accessor for the global bottom (y-coordinate) of a Model.
- *
- * \return The global bottom boundary of the Model.
- */
 float Model::globalBottom() const
 {
     return m_global_lr->value().y();
 }
 
-/**
- * Set the global bottom (y-coordinate) of a Model to a given value.
- *
- * \param new_bottom The new global bottom boundary of the Model.
- */
 void Model::setGlobalBottom(float new_bottom)
 {
     if(locked())
@@ -407,12 +279,7 @@ void Model::setGlobalBottom(float new_bottom)
     m_global_lr->setValue(QPointF(globalRight(), new_bottom));
     updateModel();
 }
-    
-/**
- * Only models with valid boundaries may be visualized in geometric view mode!
- *
- * \return Returns true, if the lowerRight value is larger than the upperLeft value.
- */
+
 bool Model::isViewable() const
 {
     QPointF d_spt    = m_lr->value() - m_ul->value();
@@ -420,10 +287,6 @@ bool Model::isViewable() const
     return !d_spt.isNull();
 }
 
-/** Only models with valid boundaries may be visualized in geographic view mode!
- *
- * \return Returns true, if the globalLowerRight value is larger than the upperLeft value.
- */
 bool Model::isGeoViewable() const
 {
     QPointF d_geo    = m_global_lr->value() - m_global_ul->value();
@@ -431,31 +294,16 @@ bool Model::isGeoViewable() const
     return !d_geo.isNull();
 }
 
-/**
- * Convenience function to get the local transformation in Qt style.
- *
- * \return The local translation matrix of the model.
- */
 QTransform Model::localTransformation() const
 {
 	return QTransform::fromTranslate(left(), top());
 }
 
-/**
- * Convenience function to get the global transformation in Qt style.
- *
- * \return The global translation matrix of the model.
- */
 QTransform Model::globalTransformation() const
 {
 	return  QTransform::fromTranslate(globalLeft(), -globalTop());
 }
 
-/**
- * Const copy model's geometry information to another model.
- *
- * \param other The other model.
- */
 void Model::copyGeometry(Model& other) const
 {
 	//ensure constness
@@ -473,11 +321,6 @@ void Model::copyGeometry(Model& other) const
 	}
 }
 
-/**
- * Const copy model's complete metadata to another model.
- *
- * \param other The other model.
- */
 void Model::copyMetadata(Model& other) const
 {
 	//ensure constness
@@ -490,11 +333,6 @@ void Model::copyMetadata(Model& other) const
 	}
 }
 
-/**
- * Const copy model's complete data (and metadata) to another model.
- *
- * \param other The other model.
- */
 void Model::copyData(Model& other) const
 {
 	//ensure constness
@@ -504,29 +342,6 @@ void Model::copyData(Model& other) const
 	}
 }
 
-/**
- * This function serializes a complete Model to a xml stream.
- * Writes the following XML code by default:
- *
- * <TYPENAME>
- *     <Header>
- *         HEADER
- *     </Header>
- *     <Content>
- *         CONTENT
- *     </Content>
- * </TYPENAME>
- *
- * with TYPENAME = typeName(),
- *        HEADER = serialize_header(), and
- *       CONTENT = serialize_content().
- *
- * If the device, on which the writer writes, is not on the beginning (pos!=0),
- * the writeStartDocument() and writeEndDocument() calls will be suppressed in
- * order to allow multi-object files.
- *
- * \param xmlWriter The QXmlStreamWriter used for the serialization.
- */
 void Model::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
@@ -553,12 +368,6 @@ void Model::serialize(QXmlStreamWriter& xmlWriter) const
     }
 }
 
-/**
- * This function deserializes the model by means of its header and content
- *
- * \param  in The input device.
- * \return True, if the Model could be restored,
- */
 bool Model::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -623,23 +432,11 @@ bool Model::deserialize(QXmlStreamReader& xmlReader)
     return  false;
 }
 
-/**
- * This function serializes the header of a model by means of a serialization of the
- * models parameters (given as a ParameterGroup in m_parameters).
- *
- * \param xmlWriter The QXmlStreamWriter, on which we write.
- */
 void Model::serialize_header(QXmlStreamWriter& xmlWriter) const
 {
     m_parameters->serialize(xmlWriter);
 }
 
-/**
- * This function deserializes the Model's header.
- *
- * \param  in The input device.
- * \return True, if the Model's header could be restored,
- */
 bool Model::deserialize_header(QXmlStreamReader& xmlReader)
 {
     if(locked())
@@ -656,56 +453,25 @@ bool Model::deserialize_header(QXmlStreamReader& xmlReader)
     return res;
 }
 
-/**
- * This function serializes the content of a model.
- * Has to be specialized, here always "".
- *
- * \param xmlWriter The QXmlStreamWriter, on which we write.
- */
 void Model::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
 }
 
-/**
- * This function deserializes the Model's content.
- *
- * \param  in The input device.
- * \return True, if the Model's content could be restored,
- */
 bool Model::deserialize_content(QXmlStreamReader& xmlReader)
 {
     return true;
 }
 
-/**
- * Models may be locked (to read only access, while algorithms are using them e.g.
- * This function can be used to query, if the Model is locked or not.
- *
- * \return True, if the model has been locked by somebody
- */
 bool Model::locked() const
 {
     return (m_locks.size() > 0);
 }
 
-/**
- * Models may be locked (to read only access), while algorithms are using them e.g.
- * This function can be used to query, how many locks are currently active.
- *
- * \return the number of locks currently active.
- */
 unsigned int Model::lockedBy() const
 {
     return m_locks.size();
 }
 
-/**
- * Put a lock request on the model. Since the locking is a secured operation,
- * each lock-requester will get a personal (random) unlock code by its request.
- * He has to take for this code, because otherwise, unlocking is impossible.
- *
- * \return The code needed for unlocking afterwards
- */
 unsigned int Model::lock()
 {
     unsigned int unlock_code = rand();
@@ -716,11 +482,6 @@ unsigned int Model::lock()
     return unlock_code;
 }
 
-/**
- * Remove the locking of the model using your unlock code.
- *
- * \param unlock_code the code, which unlocks the lock.
- */
 void Model::unlock(unsigned int unlock_code)
 {    
     QVector<unsigned int>::iterator iter = std::find(m_locks.begin(), m_locks.end(), unlock_code);
@@ -731,21 +492,11 @@ void Model::unlock(unsigned int unlock_code)
     }
 }
 
-/**
- * Potentially non-const access to the parameters of the model.
- * These can be used to edit the model in a GUI!
- *
- * \return The parameters of this model
- */
 ParameterGroup* Model::parameters()
 {
     return m_parameters;
 }
 
-/**
- * This slot is called, whenever some parameter is changed.
- * It then emits simply the modelChanged signal to inform connected views etc.
- */
 void Model::updateModel()
 {
     emit modelChanged();
@@ -753,9 +504,15 @@ void Model::updateModel()
 
 
 
-/**
- * Default/empty contructor of the RasteredModel class.
- */
+
+
+
+
+
+
+
+
+
 RasteredModel::RasteredModel(Workspace* wsp)
 : Model(wsp),
   m_size(new PointParameter("Raster size:", QPoint(0,0),QPoint(100000,100000), QPoint(0,0), NULL))
@@ -763,11 +520,6 @@ RasteredModel::RasteredModel(Workspace* wsp)
     m_parameters->addParameter("size", m_size);
 }
 
-/**
- * Copy contructor of the RasteredModel class.
- *
- * \param model The other model, from which the parameters will be copied.
- */
 RasteredModel::RasteredModel(const RasteredModel& model)
 : Model(model),
   m_size(new PointParameter("Raster size:", QPoint(0,0),QPoint(100000,100000), QPoint(model.width(), model.height()), NULL))
@@ -775,28 +527,15 @@ RasteredModel::RasteredModel(const RasteredModel& model)
     m_parameters->addParameter("size", m_size);
 }
 
-/**
- * Destructor of the RasteredModel class.
- */
 RasteredModel::~RasteredModel()
 {
 }
 
-/**
- * Const accessor to the raster resolution in x-direction of the model.
- *
- * \return The raster width of the model.
- */
 unsigned int RasteredModel::width() const
 {
 	return m_size->value().x();
 }
 
-/**
- * Set the raster resolution in x-direction of the model to a new width.
- *
- * \param new_w The new raster width of the model.
- */
 void RasteredModel::setWidth(unsigned int new_w)
 {
     if(locked())
@@ -806,21 +545,11 @@ void RasteredModel::setWidth(unsigned int new_w)
     updateModel();
 }
 
-/**
- * Const accessor to the raster resolution in y-direction of the model.
- *
- * \return The raster height of the model.
- */
 unsigned int RasteredModel::height() const
 {
 	return m_size->value().y();
 }
 
-/**
- * Set the raster resolution in y-direction of the model to a new height.
- *
- * \param new_h The new raster height of the model.
- */
 void RasteredModel::setHeight(unsigned int new_h)
 {
     if(locked())
@@ -830,10 +559,6 @@ void RasteredModel::setHeight(unsigned int new_h)
     updateModel();
 }
 
-/**
- * Validity of models
- * Only valid models may be visualized!
- */
 bool RasteredModel::isEmpty() const
 {
     return m_size->value().isNull();
@@ -849,11 +574,6 @@ bool RasteredModel::isGeoViewable() const
     return !isEmpty() && Model::isGeoViewable();
 }
 
-/**
- * Convenience function to get the local transformation in Qt style.
- *
- * \return The local translation matrix of the model scaled by the resolution.
- */
 QTransform RasteredModel::localTransformation() const
 {
 	double scale_x = std::abs(right()  - left())/width();
@@ -861,11 +581,7 @@ QTransform RasteredModel::localTransformation() const
 	
 	return QTransform::fromScale(scale_x,scale_y) * Model::localTransformation();
 }
-/**
- * Convenience function to get the global transformation in Qt style.
- *
- * \return The global translation matrix of the model scaled by the resolution.
- */
+
 QTransform RasteredModel::globalTransformation() const
 {
 	double scale_x = std::abs(globalRight() - globalLeft())/width();
@@ -874,11 +590,6 @@ QTransform RasteredModel::globalTransformation() const
 	return QTransform::fromScale(scale_x,scale_y) * Model::globalTransformation();
 }
 
-/**
- * Const copy model's geometry information to another model.
- *
- * \param other The other model.
- */
 void RasteredModel::copyGeometry(Model& other) const
 {
     Model::copyGeometry(other);
@@ -892,18 +603,10 @@ void RasteredModel::copyGeometry(Model& other) const
         raster_model.setHeight(height());
 	}
 }
-/**
- * Const copy model's complete data (and metadata) to another model.
- *
- * \param other The other model.
- */
+
 void RasteredModel::copyData(Model& other) const
 {
     Model::copyData(other);
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

@@ -106,7 +106,6 @@ class GRAIPE_CORE_EXPORT Module
 /**
  * @}
  */
-
 } //end of namespace graipe
 
 #endif //GRAIPE_CORE_MODULE_HXX

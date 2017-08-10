@@ -43,16 +43,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the QLegend class
+ *     @file
+ *     @brief Implementation file for the QLegend class
+ * @}
  */
 
-/**
- * Default constructor of the QLegend class.
- *
- * \param parent The parent item of this graphics item.
- */
 QLegend::QLegend(QGraphicsItem* parent)
 :	QGraphicsResizableItem(QRectF(0,0,10,10)),
 	m_lower_val(0.0),
@@ -71,16 +66,6 @@ QLegend::QLegend(QGraphicsItem* parent)
     setValueRange(m_lower_val,m_upper_val);
 }
 
-/**
- * Second constructor of the QLegend class.
- * 
- * \param rect        The size of the Legend (= its bounding rect).
- * \param lower_val   The lowest value on the scale.
- * \param upper_val   The highest value on the scale.
- * \param ticks       The count of ticks between lower and upper value on the scale.
- * \param fixed_scale If true, the legend behaves as true to scale (see above).
- * \param parent      The parent item of QLegend item.
- */
 QLegend::QLegend(QRectF rect, float lower_val, float upper_val, int ticks, bool fixed_scale, QGraphicsItem* parent)
 :	QGraphicsResizableItem(rect),
 	m_lower_val(lower_val),
@@ -99,19 +84,6 @@ QLegend::QLegend(QRectF rect, float lower_val, float upper_val, int ticks, bool 
     setValueRange(lower_val,upper_val);
 }
 
-/**
- * Third constructor of the QLegend class.
- * 
- * \param rect_left    The left position of the QLegend's rect.
- * \param rect_top     The top position of the QLegend's rect.
- * \param rect_width   The width of the QLegend's rect.
- * \param recht_height The height of the new rect.
- * \param lower_val    The lowest value on the scale.
- * \param upper_val    The highest value on the scale.
- * \param ticks        The count of ticks between lower and upper value on the scale.
- * \param fixed_scale  If true, the legend behaves as true to scale (see above).
- * \param parent       The parent item of QLegend item.
- */
 QLegend::QLegend(float rect_left, float rect_top, float rect_width, float rect_height, float lower_val, float upper_val, int ticks, bool fixed_scale, QGraphicsItem* parent)
 :   QGraphicsResizableItem(QRectF(rect_left,rect_top,rect_width,rect_height)),
 	m_lower_val(lower_val),
@@ -130,14 +102,6 @@ QLegend::QLegend(float rect_left, float rect_top, float rect_width, float rect_h
     setValueRange(lower_val,upper_val);
 }
 
-/**
- * The paint procedure of the QLagend prints the scale and a caption below.
- * If the item is selected, the handles and outline are painted, too.
- *
- * \param painter The painter, which is used for drawing.
- * \param option  The style options used for drawing.
- * \param widget  The widget, where we paint on.
- */
 void QLegend::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	painter->save();
@@ -194,101 +158,51 @@ void QLegend::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 	QGraphicsResizableItem::paint(painter, option, widget);
 }
 
-/**
- * Const accessor to the caption of the legend.
- *
- * \return The caption of this QLegend.
- */
 QString QLegend::caption() const
 {
 	return m_caption;
 }
 
-/**
- * Sets the caption of the legend to a new QString.
- *
- * \param caption The new caption of this QLegend.
- */
 void QLegend::setCaption(const QString& caption)
 {
 	m_caption = caption;
 }
-	
-/**
- * Const accessor to the digits of the scale labels of the legend.
- *
- * \return The digits precision of the scale labels of this QLegend.
- */
+
 unsigned int QLegend::digits() const
 {
     return m_digits;
 }
 
-/**
- * Sets the digits of the scale labels of the legend to a certain precision.
- *
- * \param digits The digits precision of the scale labels of this QLegend.
- */
 void QLegend::setDigits(unsigned int digits)
 {
     m_digits = digits;
 }
 
-/**
- * Const accessor to the count of ticks of the scale.
- *
- * \return The count of ticks of the scale.
- */
 unsigned int QLegend::ticks() const
 {
     return m_ticks;
 }
 
-/**
- * Sets the ticks of the scale to a given count.
- *
- * \param ticks The new tick division of the scale.
- */
 void QLegend::setTicks(unsigned int ticks)
 {
     m_ticks = ticks;
 }
-    
-/**
- * Const accessor to find out if the "true to scale" mode is enabled.
- *
- * \return True, if the "true to scale" mode is enabled.
- */
+
 bool QLegend::fixedScale() const
 {
 	return m_fixed_scale;
 }
 
-/**
- * Fixes the scale, such that it behaves like true to scale when resized.
- *
- * \param fix If true, the "true to scale" mode will we enabled.
- */
 void QLegend::fixScale(bool fix)
 {
 	m_fixed_scale = fix;
 }
 
-/**
- * Const accessor to the minimum value of the scale.
- *
- * \return The minimum value of the scale.
- */
 float QLegend::minValue() const
 {
 	return m_lower_val;
 }
 
-/**
- * Sets the minimum value of the scale.
- *
- * \param val The new minimum value of the scale.
- */
 void QLegend::setMinValue(float val)
 {
 	m_lower_val = val;
@@ -296,21 +210,11 @@ void QLegend::setMinValue(float val)
     updateRect(rect());
 }
 
-/**
- * Const accessor to the maximum value of the scale.
- *
- * \return The maximum value of the scale.
- */
 float QLegend::maxValue() const
 {
 	return m_upper_val;
 }
 
-/**
- * Sets the maximum value of the scale.
- *
- * \param val The new maximum value of the scale.
- */
 void QLegend::setMaxValue(float val)
 {
     m_upper_val = val;
@@ -318,33 +222,17 @@ void QLegend::setMaxValue(float val)
     updateRect(rect());    
 }
 
-/**
- * Sets the range(minimum and maximum value) of the scale.
- *
- * \param min_val The new minimum value of the scale.
- * \param max_val The new maximum value of the scale.
- */
 void QLegend::setValueRange(float min_val, float max_val)
 {
 	setMinValue(min_val);
 	setMaxValue(max_val);
 }
 
-/**
- * Const accessor to the color table of the scale.
- *
- * \return The color table of the scale.
- */
 QVector<QRgb> QLegend::colorTable() const
 {
     return m_ct;
 }
 
-/**
- * Sets the color table (colors of minimum and maximum value) of the scale
- *
- * \param colorTable The new color table of the scale.
- */
 void QLegend::setColorTable(QVector<QRgb> colorTable)
 {
     m_ct = colorTable;
@@ -373,14 +261,6 @@ void QLegend::setColorTable(QVector<QRgb> colorTable)
 
 }
 
-/**
- * Overloaded function from QGraphicsResizableItem:
- * This function should be called after every computed change of the
- * rectangle, e.g. due to rescaling events. It checks against the 
- * scaling settings and rescales the rect if allowed.
- *
- * \param new_rect The new rect to be set.
- */
 void QLegend::updateRect(const QRectF& new_rect)
 {
     QGraphicsResizableItem::updateRect(new_rect);
@@ -414,19 +294,9 @@ void QLegend::updateRect(const QRectF& new_rect)
     
 }
 
-/**
- * Returns the width (in pixels), which is available for the labels of the
- * scale in between or under each tick.
- *
- * \return The maximum width for each scale label in pixels.
- */
 inline float QLegend::text_interval_width() const
 {
 	return m_scale_rect.width()/m_ticks*0.8;
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe

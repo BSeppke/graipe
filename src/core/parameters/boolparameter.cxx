@@ -44,21 +44,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the BoolParameter class
+ *     @file
+ *     @brief Implementation file for the BoolParameter class
+ * @}
  */
 
-/**
- * Default constructor of the BoolParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 BoolParameter::BoolParameter(const QString& name, bool value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_value(value),
@@ -66,30 +56,17 @@ BoolParameter::BoolParameter(const QString& name, bool value, Parameter* parent,
 {    
 }
 
-/**
- * The destructor of the BoolParameter class.
- */
 BoolParameter::~BoolParameter()
 {
     if(m_delegate!=NULL)
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type
- *
- * \return The value of this parameter.
- */
 bool BoolParameter::value()  const
 {
 	return m_value;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void BoolParameter::setValue(bool value)
 {
     m_value = value;
@@ -100,22 +77,11 @@ void BoolParameter::setValue(bool value)
     Parameter::updateValue();
 }
 
-/**
- * The value converted to a QString. Either true or false.
- *
- * \return The value of the parameter converted to an QString
- */
 QString BoolParameter::toString() const
 {
     return (value()?"true":"false");
 }
 
-/**
- * Deserialization of a parameter's state from a string.
- *
- * \param str The input QString.
- * \return True, if the deserialization was successful, else false.
- */
 bool BoolParameter::fromString(QString& str)
 {
     if (str == "true" || str == "false")
@@ -129,25 +95,12 @@ bool BoolParameter::fromString(QString& str)
     }
     return false;
 }
-    
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
+
 bool BoolParameter::isValid() const
 {
     return true;
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  BoolParameter::delegate()
 {
     if (m_delegate == NULL)
@@ -162,10 +115,6 @@ QWidget*  BoolParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void BoolParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -175,9 +124,5 @@ void BoolParameter::updateValue()
         Parameter::updateValue();
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

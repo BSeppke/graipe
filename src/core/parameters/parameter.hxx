@@ -157,10 +157,12 @@ class GRAIPE_CORE_EXPORT Parameter
          * Serialization of the parameter's state to a xml stream.
          * Writes the following XML code by default:
          * 
-         * <TYPENAME>
-         *     <Name>NAME</Name>
-         *     <Value>VALUETEXT</Value>
-         * </TYPENAME>
+         * \verbatim
+           <TYPENAME>
+               <Name>NAME</Name>
+               <Value>VALUETEXT</Value>
+           </TYPENAME>
+           \endverbatim
          *
          * with TYPENAME = typeName(),
          *         NAME = name(), and

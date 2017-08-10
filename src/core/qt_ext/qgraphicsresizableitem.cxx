@@ -45,26 +45,19 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the QGraphicsResizableItem class
+ *     @file
+ *     @brief Implementation file for the QGraphicsResizableItem class
+ * @}
  */
     
-//codes for the handles of the Resizable items
+/** codes for the handles of the Resizable items **/
 static const unsigned short top_c = 1, 
 							right_c = 2, 
 							bottom_c = 4, 
 							left_c = 8, 
 							forbidden_c = 16;
-/**
- * Constructor of the resizable GraphicsItem class.
- * 
- * \param rect              The size of the resizable item (= its bounding rect).
- * \param handle_size       The size of the handles (in pixels)
- * \param protect_h_scaling If true, scaling the Item horizontally is forbidden.
- * \param protect_v_scaling If true, scaling the Item vertically is forbidden.
- * \param parent            The parent item of this graphics item.
- */
+
+
 QGraphicsResizableItem::QGraphicsResizableItem(const QRectF& rect, unsigned int handle_size, bool protect_h_scaling, bool protect_v_scaling, QGraphicsItem * parent)
 :	QGraphicsRectItem(rect, parent),
 	m_handle_size(handle_size),
@@ -77,15 +70,6 @@ QGraphicsResizableItem::QGraphicsResizableItem(const QRectF& rect, unsigned int 
 	setAcceptHoverEvents(true);
 }
 
-/**
- * The paint procedure of the resizable item prints the item's boundary by means of
- * a outlined rect with black line color and than paints the handles at each of the
- * eight positions.
- *
- * \param painter The painter, which is used for drawing.
- * \param option  The style options used for drawing.
- * \param widget  The widget, where we paint on.
- */
 void QGraphicsResizableItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     painter->save();
@@ -110,43 +94,22 @@ void QGraphicsResizableItem::paint(QPainter *painter, const QStyleOptionGraphics
 	painter->restore();
 }
 
-/**
- * Modifier to protect the horizontal scaling.
- *
- * \param protect Shall the horizontal scaling be protected?
- */
 void QGraphicsResizableItem::protectHScaling(bool protect)
 {
 	m_protect_h_scaling = protect; 
 }
 
-/**
- * Modifier to protect the vertical scaling.
- *
- * \param protect Shall the vertical scaling be protected?
- */
 void QGraphicsResizableItem::protectVScaling(bool protect)
 {
 	m_protect_v_scaling = protect; 
 }
 
-/**
- * Modifier to protect the horizontal and vertical scaling at once.
- *
- * \param protect_h Shall the horizontal scaling be protected?
- * \param protect_v Shall the vertical scaling be protected?
- */
 void QGraphicsResizableItem::protectScaling(bool protect_h, bool protect_v)
 {
 	protectHScaling(protect_h);
 	protectVScaling(protect_v);
 }
 
-/**
- * Change the Rect of the graphics item to a new one.
- *
- * \param rect The new rect.
- */
 void QGraphicsResizableItem::setRect(const QRectF& rect)
 {
     if(    rect.width()>=m_handle_size*2
@@ -156,14 +119,6 @@ void QGraphicsResizableItem::setRect(const QRectF& rect)
     }
 }
 
-/**
- * Change the Rect of the graphics item to a new one.
- *
- * \param l The left position of the new rect.
- * \param t The top position of the new rect.
- * \param w The width of the new rect.
- * \param h The height of the new rect.
- */
 void QGraphicsResizableItem::setRect(qreal l, qreal t, qreal w, qreal h)
 {
     if(    w>=m_handle_size*2
@@ -173,13 +128,6 @@ void QGraphicsResizableItem::setRect(qreal l, qreal t, qreal w, qreal h)
     }
 }
 
-/**
- * This function should be called after every computed change of the 
- * rectangle, e.g. due to rescaling events. It checks against the 
- * scaling settings and rescales the rect if allowed.
- *
- * \param new_rect The new rect to be set.
- */
 void QGraphicsResizableItem::updateRect(const QRectF & new_rect)
 {
 	if(m_protect_h_scaling && new_rect.width()!=rect().width())
@@ -198,11 +146,6 @@ void QGraphicsResizableItem::updateRect(const QRectF & new_rect)
 	}
 }
 
-/**
- * This function is called whenever the mouse is pressed on this item.
- *
- * \param event The event, with more information about mouse position etc.
- */
 void QGraphicsResizableItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     m_dragStart=event->pos();
@@ -303,22 +246,12 @@ void QGraphicsResizableItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 	QGraphicsItem::mousePressEvent(event);	
 }
 
-/**
- * This function is called whenever the mouse is released on this item.
- *
- * \param event The event, with more information about mouse position etc.
- */
 void QGraphicsResizableItem::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
 	setCursor(Qt::ArrowCursor);
 	QGraphicsItem::mouseReleaseEvent(event);
 }
 
-/**
- * This function is called whenever the mouse is moved on this item.
- *
- * \param event The event, with more information about mouse position etc.
- */
 void QGraphicsResizableItem::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 {		
 	if (m_handle != forbidden_c)
@@ -358,9 +291,5 @@ void QGraphicsResizableItem::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
 		QGraphicsItem::mouseMoveEvent(event);
 	}
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe

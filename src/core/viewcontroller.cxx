@@ -47,17 +47,12 @@ namespace graipe {
 
 /**
  * @addtogroup graipe_core
- * @{
- *
- * @file
- * @brief Implementation file for the ViewController class
+ * @{ 
+ *     @file
+ *     @brief Implementation file for the ViewController class
+ * @}
  */
 
-/**
- * Default constructor of the ViewController class.
- *
- * \param model  The model, which shall be displayed by means of this view
- */
 ViewController::ViewController(Model * model)
 :	m_model(model),
     m_name(new StringParameter("Name", "")),
@@ -104,9 +99,6 @@ ViewController::ViewController(Model * model)
     model->workspace()->viewControllers.push_back(this);
 }
 
-/**
- * The default destructor of the view
- */
 ViewController::~ViewController()
 {
     //TODO: Check if neccessary..
@@ -125,71 +117,38 @@ ViewController::~ViewController()
         model()->workspace()->viewControllers.end());
 }
 
-/**
- * Const accessor for the view's name. This returns the complete name.
- *
- * \return The name of the view.
- */
 QString ViewController::name() const
 {
     return m_name->value();
 }
 
-/**
- * Set the view name to a new QString.
- *
- * \param new_name The new name of the view.
- */
 void ViewController::setName(const QString& new_name)
 {
     m_name->setValue(new_name);
     updateView();
 }
-/**
- * Const accessor for the view description QString.
- *
- * \return The description of the view.
- */
+
 QString ViewController::description() const
 {
 	return m_description->value();
 }
 
-/**
- * Set the view description to a new QString.
- *
- * \param new_description The new description of the view.
- */
 void ViewController::setDescription(const QString & new_description)
 {
     m_description->setValue(new_description);
     updateView();
 }
 
-/**
- * Potentially non-const accessor to the model of this view
- *
- * \return Pointer to the model of this view
- */
 Model * ViewController::model()
 {
     return m_model;
 }
 
-/**
- * Potentially non-const accessor to the parameters of this view
- */
 ParameterGroup * ViewController::parameters()
 {
     return m_parameters;
 }
-    
-/**
- * Reimplemented computation of the bounding rect of a view
- * in local coordinates.
- *
- * \return The bounding rectangle of this view.
- */
+
 QRectF ViewController::boundingRect() const
 { 
 	float offset = std::max(m_ticks_height*10, (float)m_axis_pen.widthF());
@@ -214,44 +173,17 @@ QRectF ViewController::boundingRect() const
 	return rect;
 }
 
-/**
- * Each ViewController is 2D and thus has its assigned "inner rectangle, where it may 
- * present the data under some scales etc. This inner rectangle is defined
- * here. Don't confuse with boundingRect, which is the overall area of all 
- * drawing contents.
- *
- * \return The inner (data) rectangle of this view.
- */
 QRectF ViewController::rect() const
 { 
 	return QRectF(0, 0, m_model->width(), m_model->height());
 }
 
-/**
- * This (reimplemented) method is called whenever the view has to be redrawn.
- * Since this base class does not provide any fancy data visualisation, it simply
- * calls two auxilary functions, namely paintBefore and paintAfter so draw the 
- * background and the scale of this view.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void ViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 { 
 	paintBefore(painter, option, widget);
 	paintAfter(painter, option, widget);
 }
 
-/**
- * This auxilary method needs to be called before the data drawing is employed
- * by means of deriving sub-classes. It ensures that the background is drawn as
- * indicated by the parameters.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void ViewController::paintBefore(QPainter *painter, const QStyleOptionGraphicsItem * , QWidget * )
 { 
 	if(m_showAxis->value())
@@ -267,15 +199,6 @@ void ViewController::paintBefore(QPainter *painter, const QStyleOptionGraphicsIt
 	}
 }
 
-/**
- * This auxilary method needs to be called after the data drawing is employed
- * by means of deriving sub-classes. It ensures that the axis is drawn as
- * indicated by the parameters.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void ViewController::paintAfter(QPainter *painter, const QStyleOptionGraphicsItem * , QWidget * )
 { 
 	if(m_showAxis->value())
@@ -339,16 +262,6 @@ void ViewController::paintAfter(QPainter *painter, const QStyleOptionGraphicsIte
 	}
 }
 
-/**
- * This (reimplemented) method is called everytime the mouse is moved over the ViewController,
- * since the ViewController accepts hoverEvents. If you derive classes for specialized views, please
- * make sure to implement a specialized version of this function, too. 
- * The function shall emit two signals:
- *  - updateStatusText(QString) for a brief status, and
- *  - updateStatusDescription(QString) for a detailed description.
- *
- * \param event The QGraphicsSceneHoverEvent, which is raised due to the mouse move.
- */
 void ViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -362,9 +275,6 @@ void ViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
     event->accept();
 }
 
-/**
- * Update the view according to the current parameter settings
- */
 void ViewController::updateView()
 {
     //Update view parameters to the newly changed model
@@ -391,24 +301,10 @@ void ViewController::updateView()
 	m_axis_grid_pen = QPen(m_axisLineColor->value(), m_axisLineWidth->value(),(Qt::PenStyle)m_axisGridStyle->value());
 }
 
-/**
- * Update the parameters of this view according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void ViewController::updateParameters(bool /*force_update*/)
 {
 }
 
-/**
- * This function serializes a complete ViewController to an output device.
- * To do so, it serializes the typeName(), then the model denoted by the model's
- * filename and eventually the parameter set.
- *
- * \param out The output device, where we serialize to.
- */
 void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
@@ -439,14 +335,6 @@ void ViewController::serialize(QXmlStreamWriter& xmlWriter) const
      }
 }
 
-/**
- * This function deserializes the ViewController by means of its parameter settings.
- * The model needs to be reconstructed elsewhere, espacially before the construction of
- * a ViewController. This will be handled inside the GUI of GRAIPE
- *
- * \param  in The input device, where we read the serialization of this ViewController class from.
- * \return True, if the parameters could be restored,
- */
 bool ViewController::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -502,9 +390,6 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
     }
     return  false;
 }
-/**
- * @}
- */
 
 } //end of namespace graipe
 

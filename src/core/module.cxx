@@ -41,27 +41,17 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the Module class
+ *     @file
+ *     @brief Implementation file for the Module class
+ * @}
  */
 
-/**
- * Default constructor of the Module class
- */
 Module::Module()
 {
 }
- 
-/**
- * Default destructor of the Module class
- */
+
 Module::~Module()
 {
 }
 
 } //end of namespace graipe
-
-/**
- * @}
- */

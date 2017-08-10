@@ -41,21 +41,12 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief This file implements the needed serialization procedures.
+ *     @file
+ *     @brief This file implements the needed serialization procedures.
+ * @}
  */
  
-/**
- * Splits a string using a given separator on the first occurence only.
- *
- * \param str the QString to be splitted
- * \param sep the separator, where we want to split once
- *
- * \return If sep is found, a QStringList with two items, the QString before the
- *         separator and the QString after the separator. If not found, the list 
- *         just contains one element, namely the given string.
- */
+
 QStringList split_string_once(const QString & str, const QString & sep)
 {
     QStringList result;
@@ -75,14 +66,6 @@ QStringList split_string_once(const QString & str, const QString & sep)
     return result;
 }
 
-/**
- * Generate a qDateTime from a satellite_format QString.
- * The string has to be of format:  DD-MON-YEAR hh:mm:ss.micsec
- *
- * \param str The formatted DateTime QString
- * 
- * \return QDateTime representation of this string. May be invalid, if conversion fails.
- */
 QDateTime qDateTimeFromISODateTime(const QString& str)
 {
     //Format is: DD-MON-YEAR hh:mm:ss.micsec
@@ -92,14 +75,6 @@ QDateTime qDateTimeFromISODateTime(const QString& str)
     return result;
 }
 
-/**
- * Generate a qDateTime from a numerically listed QString.
- * The string has to be  of format: yyyyMMddhhmmssmicsec
- *
- * \param str The formatted DateTime QString
- * 
- * \return QDateTime representation of this string. May be invalid, if conversion fails.
- */
 QDateTime qDateTimeFromNumberDateTime(const QString& str)
 {
     //Format is: yyyyMMddhhmmssmicsec
@@ -109,17 +84,6 @@ QDateTime qDateTimeFromNumberDateTime(const QString& str)
     return result;
 }
 
-/**
- * Generate a qDateTime from a satellite_format or a numerically listed QString.
- * The string has to be either of format:
- *    DD-MON-YEAR hh:mm:ss.micsec 
- * or:
- *    yyyyMMddhhmmssmicsec
- *
- * \param str The formatted DateTime QString
- * 
- * \return QDateTime representation of this string. May be invalid, if conversion fails.
- */
 QDateTime qDateTimeFromSatelliteDateTime(const QString& str)
 {
     QDateTime result = qDateTimeFromISODateTime(str);
@@ -129,29 +93,15 @@ QDateTime qDateTimeFromSatelliteDateTime(const QString& str)
         return qDateTimeFromNumberDateTime(str);
 }
 
-/**
- * Getter for the id of a serializable
- *
- * \return the id or an empty QString if none is assigned
- */
 QString Serializable::id() const
 {
     return m_id;
 }
 
-/**
- * Setter for the id of a serializable
- *
- * \param new_id  the new id of this serializable
- */
 void Serializable::setID(const QString& new_id)
 {
     m_id = new_id;
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe
 

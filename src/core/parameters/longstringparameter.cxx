@@ -43,23 +43,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implemenation file for the LongStringParameter class
+ *     @file
+ *     @brief Implemenation file for the LongStringParameter class
+ * @}
  */
 
-/**
- * Default constructor of the LongStringParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param value         The initial value of this parameter.
- * \param columns       The width of the textfield (in chars).
- * \param lines         The height of the textfield (in lines).
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 LongStringParameter::LongStringParameter(const QString& name, const QString& value, unsigned int columns, unsigned int lines, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_value(value),
@@ -69,30 +57,17 @@ LongStringParameter::LongStringParameter(const QString& name, const QString& val
 {
 }
 
-/**
- * Destructor of the LongString parameter class.
- */
 LongStringParameter::~LongStringParameter()
 {
     if(m_delegate != NULL)
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 QString LongStringParameter::value()  const
 {
     return m_value;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void LongStringParameter::setValue(const QString & value)
 {
     m_value = value;
@@ -103,48 +78,22 @@ void LongStringParameter::setValue(const QString & value)
     }
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString  LongStringParameter::toString() const
 {
     return value();
 }
 
-/**
- * Sets the value using a QString. This is the default method, used by the desearialize .
- *
- * \param str The value of the parameter converted to an QString
- */
 bool LongStringParameter::fromString(QString& str)
 {
     setValue(str);
     return true;
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 bool LongStringParameter::isValid() const
 {
     return true;
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  LongStringParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -161,10 +110,6 @@ QWidget*  LongStringParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void LongStringParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -174,9 +119,5 @@ void LongStringParameter::updateValue()
         Parameter::updateValue();
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

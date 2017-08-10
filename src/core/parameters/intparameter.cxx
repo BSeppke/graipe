@@ -42,23 +42,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the IntParameter class
+ *     @file
+ *     @brief Implementation file for the IntParameter class
+ * @}
  */
 
-/**
- * Default constructor of the IntParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param low           The lowest allowed value of this parameter.
- * \param upp           The highest allowed value of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 IntParameter::IntParameter(const QString& name, int low, int upp, int value, Parameter* parent, bool invert_parent)
 :	Parameter(name, parent, invert_parent),
     m_value(value),
@@ -68,30 +56,17 @@ IntParameter::IntParameter(const QString& name, int low, int upp, int value, Par
 {
 }
 
-/**
- * Destructor of the IntParameter class.
- */
 IntParameter::~IntParameter()
 {
     if(m_delegate != NULL)
         delete m_delegate;
 }
 
-/**
- * The lowest possible value of this parameter.
- *
- * \return The minimal value of this parameter.
- */
 int IntParameter::lowerBound() const
 {
     return m_min_value;
 }
 
-/**
- * Writing accessor of the minimum value of this parameter.
- *
- * \param value The new minimum value of this parameter.
- */
 void IntParameter::setLowerBound(int value)
 {
     m_min_value = value;
@@ -100,21 +75,11 @@ void IntParameter::setLowerBound(int value)
         m_delegate->setMinimum(value);
 }
 
-/**
- * The highest possible value of this parameter.
- *
- * \return The maximal value of this parameter.
- */
 int IntParameter::upperBound() const
 {
     return m_max_value;
 }
 
-/**
- * Writing accessor of the maximum value of this parameter.
- *
- * \param value The new maximum value of this parameter.
- */
 void IntParameter::setUpperBound(int value)
 {
     m_max_value = value;
@@ -123,33 +88,17 @@ void IntParameter::setUpperBound(int value)
         m_delegate->setMaximum(value);
 }
 
-/**
- * Writing accessor of the minimum and maximum value of this parameter.
- *
- * \param min_value The new minimum value of this parameter.
- * \param max_value The new maximum value of this parameter.
- */
 void IntParameter::setRange(int min_value, int max_value)
 {
     setLowerBound(min_value);
     setUpperBound(max_value);
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 int IntParameter::value() const
 {
     return m_value;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void IntParameter::setValue(int value)
 {
     m_value = value;
@@ -158,25 +107,11 @@ void IntParameter::setValue(int value)
         m_delegate->setValue(value);
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString  IntParameter::toString() const
 {
 	return QString("%1").arg(value());
 }
 
-/**
- * Deserialization of a parameter's state from a string.
- *
- * \param str the input QString.
- * \return True, if the deserialization was successful, else false.
- */
 bool IntParameter::fromString(QString& str)
 {
     try
@@ -193,24 +128,11 @@ bool IntParameter::fromString(QString& str)
     return false;
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 bool IntParameter::isValid() const
 {
     return value() >= lowerBound() && value() <= upperBound();
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  IntParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -226,10 +148,6 @@ QWidget*  IntParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void IntParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -239,9 +157,5 @@ void IntParameter::updateValue()
         Parameter::updateValue();
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

@@ -108,20 +108,22 @@ class GRAIPE_CORE_EXPORT TransformParameter
          * Serialization of the parameter's state to an output device.
          * Writes the following XML on the device:
          * 
-         * <TYPENAME>
-         *     <Name>NAME</Name>
-         *     <Transform Type="Affine">
-         *       <m11>value().m11()</m11>
-         *       <m12>value().m12()</m12>
-         *       <m13>value().m13()</m13>
-         *       <m21>value().m21()</m21>
-         *       <m22>value().m22()</m22>
-         *       <m23>value().m23()</m23>
-         *       <m31>value().m31()</m31>
-         *       <m32>value().m32()</m32>
-         *       <m33>value().m33()</m33>
-         *     </Transform>
-         * </TYPENAME>
+         * \verbatim
+           <TYPENAME>
+               <Name>NAME</Name>
+               <Transform Type="Affine">
+                 <m11>value().m11()</m11>
+                 <m12>value().m12()</m12>
+                 <m13>value().m13()</m13>
+                 <m21>value().m21()</m21>
+                 <m22>value().m22()</m22>
+                 <m23>value().m23()</m23>
+                 <m31>value().m31()</m31>
+                 <m32>value().m32()</m32>
+                 <m33>value().m33()</m33>
+               </Transform>
+           </TYPENAME>
+           \endverbatim
          *
          * with TYPENAME = typeName(),
          *         NAME = name().

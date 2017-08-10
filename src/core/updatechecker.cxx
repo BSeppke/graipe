@@ -47,20 +47,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the UpdateChecker class
+ *     @file
+ *     @brief Implementation file for the UpdateChecker class
+ * @}
  */
  
-/**
- * This method/slot checks for updates up to 1.0 (=10) higher than the currently
- * installed version. In addition, a minimal filesize need to be given (defaults to
- * 10 MB) If both is found, it presents a MsgBox, where the user  can either click
- * on the <Download> link or simply ignore it.
- *
- * \param max_version_jump Maximum version jump to search for: major_jump*10+minor_jump.
- * \param min_filesize Minimum size of the installer package, if found at search url.
- */
 void UpdateChecker::checkForUpdates(unsigned int max_version_jump, unsigned int min_filesize)
 {
     //Binaries are only provided for Mac OS X and Windows (64bit)
@@ -108,10 +99,6 @@ void UpdateChecker::checkForUpdates(unsigned int max_version_jump, unsigned int 
     }
     emit finished();
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe
 

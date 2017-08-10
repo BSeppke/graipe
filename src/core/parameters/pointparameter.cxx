@@ -43,23 +43,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the PointParameter class
+ *     @file
+ *     @brief Implementation file for the PointParameter class
+ * @}
  */
 
-/**
- * Default constructor of the PointParameter class with a setting of the
- * most important values directly.
- *
- * \param name          The name (label) of this parameter.
- * \param low           The lowest allowed value of this parameter.
- * \param upp           The highest allowed value of this parameter.
- * \param value         The initial value of this parameter.
- * \param parent        If given (!= NULL), this parameter has a parent and will
- *                      be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent If true, the enables/disabled dependency to the parent will be swapped.
- */
 PointParameter::PointParameter(const QString& name, QPoint low, QPoint upp, QPoint value, Parameter* parent, bool invert_parent)
 :   Parameter(name, parent, invert_parent),
     m_value(value),
@@ -71,9 +59,6 @@ PointParameter::PointParameter(const QString& name, QPoint low, QPoint upp, QPoi
 {
 }
 
-/**
- * Destructor of the PointParameter class.
- */
 PointParameter::~PointParameter()
 {
     //Also deletes other widget, since they are owned
@@ -82,21 +67,11 @@ PointParameter::~PointParameter()
         delete m_delegate;
 }
 
-/**
- * The lowest possible value of this parameter.
- *
- * \return The minimal value of this parameter.
- */
 QPoint PointParameter::lowerBound() const
 {
     return m_min_value;//QPoint(m_spbXDelegate->minimum(), m_spbYDelegate->minimum());
 }
 
-/**
- * Writing accessor of the minimum value of this parameter.
- *
- * \param value The new minimum value of this parameter.
- */
 void PointParameter::setLowerBound(const QPoint& value)
 {
     m_min_value = value;
@@ -108,21 +83,11 @@ void PointParameter::setLowerBound(const QPoint& value)
     }
 }
 
-/**
- * The highest possible value of this parameter.
- *
- * \return The maximal value of this parameter.
- */
 QPoint PointParameter::upperBound() const
 {
     return m_max_value;//QPoint(m_spbXDelegate->maximum(), m_spbYDelegate->maximum());
 }
 
-/**
- * Writing accessor of the maximum value of this parameter.
- *
- * \param value The new maximum value of this parameter.
- */
 void PointParameter::setUpperBound(const QPoint& value)
 {
     m_max_value = value;
@@ -134,33 +99,17 @@ void PointParameter::setUpperBound(const QPoint& value)
     }
 }
 
-/**
- * Writing accessor of the minimum and maximum value of this parameter.
- *
- * \param min_value The new minimum value of this parameter.
- * \param max_value The new maximum value of this parameter.
- */
 void PointParameter::setRange(const QPoint& min_value, const QPoint& max_value)
 {
     setLowerBound(min_value);
     setUpperBound(max_value);
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 QPoint PointParameter::value() const
 {
     return m_value;//QPoint(m_spbXDelegate->value(), m_spbYDelegate->value());
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void PointParameter::setValue(const QPoint& value)
 {
     m_value = value;
@@ -173,36 +122,11 @@ void PointParameter::setValue(const QPoint& value)
     }
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString  PointParameter::toString() const
 {
     return QString("(%1x%2)").arg(value().x()).arg(value().y());
 }
 
-/**
- * Serialization of the parameter's state to an output device.
- * Writes the following XML on the device:
- * 
- * <TYPENAME>
- *     <Name>NAME</Name>
- *     <x>X</x>
- *     <y>Y</y>
- * </TYPENAME>
- *
- * with TYPENAME = typeName(),
- *         NAME = name(),
- *            X = value().x(), and
- *            Y = value().y().
- *
- * \param xmlWriter The QXmlStreamWriter on which we serialize the parameter's state.
- */
 void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.setAutoFormatting(true);
@@ -213,15 +137,8 @@ void PointParameter::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeTextElement("x", QString::number(value().x()));
     xmlWriter.writeTextElement("y", QString::number(value().y()));
     xmlWriter.writeEndElement();
-
 }
 
-/**
- * Deserialization of a parameter's state from an xml file.
- *
- * \param xmlReader The QXmlStreamReader, where we read from.
- * \return True, if the deserialization was successful, else false.
- */
 bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
 {
     try
@@ -280,25 +197,12 @@ bool PointParameter::deserialize(QXmlStreamReader& xmlReader)
     }
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 bool PointParameter::isValid() const
 {
     return m_value.x() >= m_min_value.x() && m_value.y() >= m_min_value.y()
         && m_value.x() <= m_max_value.x() && m_value.y() <= m_max_value.y();
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget*  PointParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -332,10 +236,6 @@ QWidget*  PointParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void PointParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -346,9 +246,5 @@ void PointParameter::updateValue()
         Parameter::updateValue();
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

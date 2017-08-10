@@ -118,15 +118,16 @@ class GRAIPE_CORE_EXPORT EnumParameter
         /**
          * Serialization of the parameter's state to a xml stream.
          * Writes the following XML code by default:
-         * 
-         * <TYPENAME>
-         *     <Name>NAME</Name>
-         *     <Value>VALUETEXT</Value>
-         * </TYPENAME>
          *
-         * with TYPENAME = typeName(),
-         *         NAME = name(), and
-         *    VALUETEXT = QString::number(value()).
+         * \verbatim
+           <TYPENAME>
+               <Name>NAME</Name>
+               <Value>VALUETEXT</Value>
+           </TYPENAME>
+          \endverbatim
+         *  with TYPENAME = typeName(),
+         *            NAME = name(), and
+         * VALUETEXT = QString::number( value() ).
          *
          * \param xmlWriter The QXMLStreamWriter, which we use serialize the 
          *                  parameter's type, name and value.

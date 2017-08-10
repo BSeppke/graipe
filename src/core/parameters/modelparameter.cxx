@@ -44,22 +44,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the ModelParameter class
+ *     @file
+ *     @brief Implementation file for the ModelParameter class
+ * @}
  */
- 
-/**
- * Default constructor of the ModelParameter class with a setting of the
- * most important values directly.
- *
- * \param name           The name (label) of this parameter.
- * \param allowed_models A vector containing all currently available models.
- * \param type_filter    A QString to restrict the model list to certain model types.
- * \param parent         If given (!= NULL), this parameter has a parent and will
- *                       be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
- */
+
 ModelParameter::ModelParameter(const QString &name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp)
 :   Parameter(name, parent, invert_parent, wsp),
     m_delegate(NULL),
@@ -83,20 +72,12 @@ ModelParameter::ModelParameter(const QString &name, QString type_filter, Paramet
     }
 }
 
-/**
- * The destructor of the ModelParameter class
- */
 ModelParameter::~ModelParameter()
 {
     if(m_delegate != NULL)
         delete m_delegate;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 Model* ModelParameter::value() const
 {
     if(isValid())
@@ -109,11 +90,6 @@ Model* ModelParameter::value() const
     }
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 void ModelParameter::setValue(Model* value)
 {
     bool found = false;
@@ -140,25 +116,11 @@ void ModelParameter::setValue(Model* value)
     }
 }
 
-/**
- * The value converted to a QString. Please note, that this can vary from the 
- * serialize() result, which also returns a QString. This is due to the fact,
- * that serialize also may perform encoding of QStrings to avoid special chars
- * inside the QString.
- *
- * \return The value of the parameter converted to an QString.
- */
 QString ModelParameter::toString() const
 { 
 	return value()->id();
 }
 
-/**
- * Deserialization of a parameter's state from a string.
- *
- * \param str the input QString.
- * \return True, if the deserialization was successful, else false.
- */
 bool ModelParameter::fromString(QString& str)
 {
     for(Model* allowed: m_allowed_values)
@@ -174,14 +136,6 @@ bool ModelParameter::fromString(QString& str)
     return false;
 }
 
-/**
- * This function locks the parameters value. 
- * This means, that after a lock() call, only const acess to the parameter is 
- * possible until someone unlocks it. 
- * To work properly, the inner parameter class has to be designed accordingly.
- * As an example, you may look at the Model class, which supports locking and
- * unlocking - so do the parameter classes based on models!
- */
 void ModelParameter::lock()
 {
     if(value())
@@ -190,14 +144,6 @@ void ModelParameter::lock()
     }
 }
 
-/**
- * This function unlocks the parameters value.
- * This means, that after a lock() call, only const acess to the parameter is 
- * possible until someone unlocks it. 
- * To work properly, the inner parameter class has to be designed accordingly.
- * As an example, you may look at the Model class, which supports locking and
- * unlocking - so do the parameter classes based on models!
- */
 void ModelParameter::unlock()
 {
     if(value())
@@ -206,24 +152,11 @@ void ModelParameter::unlock()
     }
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 bool ModelParameter::isValid() const
 {
     return (m_model_idx >= 0 && m_model_idx < m_allowed_values.size());
 }
 
-/**
- * This function indicates whether the value of a parameter is a Model* or 
- * many of them or needs one at least. These parameters need to access the
- * global 'models' variable, too!
- *
- * \return A filled vector, if the parameter's value is related to a Model*.
- *         An empty vector by default.
- */
 std::vector<Model*> ModelParameter::needsModels() const
 {
     std::vector<Model*> modelList;
@@ -234,14 +167,7 @@ std::vector<Model*> ModelParameter::needsModels() const
     }
     return modelList;
 }
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
+
 QWidget*  ModelParameter::delegate()
 {
     if(m_delegate == NULL)
@@ -263,10 +189,6 @@ QWidget*  ModelParameter::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void ModelParameter::updateValue()
 {
     //Should not happen - otherwise, better safe than sorry:
@@ -276,9 +198,5 @@ void ModelParameter::updateValue()
         Parameter::updateValue();
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

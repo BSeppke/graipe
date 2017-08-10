@@ -88,9 +88,9 @@ namespace graipe {
 /**
  * @addtogroup graipe_core
  * @{
- *
- * @file
- * @brief Implementation file for the QIOCompressor class, see license terms above
+ *     @file
+ *     @brief Implementation file for the QIOCompressor class, see license terms above
+ * @}
  */
     
 typedef Bytef ZlibByte;
@@ -233,80 +233,20 @@ void QIOCompressorPrivate::setZlibError(const QString &errorMessage, int zlibErr
     q->setErrorString(errorString);
 }
 
-/*! \class QIOCompressor
-    \brief The QIOCompressor class is a QIODevice&that compresses data streams.
 
-    A QIOCompressor object is constructed with a pointer to an
-    underlying QIODevice.  Data written to the QIOCompressor object
-    will be compressed before it is written to the underlying
-    QIODevice. Similary, if you read from the QIOCompressor object,
-    the data will be read from the underlying device and then
-    decompressed.
 
-    QIOCompressor is a sequential device, which means that it does
-    not support seeks or random access. Internally, QIOCompressor
-    uses the zlib library to compress and uncompress data.
 
-    Usage examples:
-    Writing compressed data to a file:
-    \code
-        QFile file("foo");
-        QIOCompressor compressor(&file);
-        compressor.open(QIODevice::WriteOnly);
-        compressor.write(QByteArray() << "The quick brown fox");
-        compressor.close();
-    \endcode
 
-    Reading compressed data from a file:
-    \code
-        QFile file("foo");
-        QIOCompressor compressor(&file);
-        compressor.open(QIODevice::ReadOnly);
-        const QByteArray text = compressor.readAll();
-        compressor.close();
-    \endcode
 
-    QIOCompressor can also read and write compressed data in
-    different compressed formats, ref. StreamFormat. Use
-    setStreamFormat() before open() to select format.
-*/
 
-/*!
-    \enum QIOCompressor::StreamFormat
-    This enum specifies which stream format to use.
 
-    \value ZlibFormat: This is the default and has the smallest overhead.
 
-    \value GzipFormat: This format is compatible with the gzip file
-    format, but has more overhead than ZlibFormat. Note: requires zlib
-    version 1.2.x or higher at runtime.
 
-    \value RawZipFormat: This is compatible with the most common
-    compression method of the data blocks contained in ZIP
-    archives. Note: ZIP file headers are not read or generated, so
-    setting this format, by itself, does not let QIOCompressor read
-    or write ZIP files. Ref. the ziplist example program.
-
-    \sa setStreamFormat()
-*/
-
-/*!
-    Constructs a QIOCompressor using the given \a device as the underlying device.
-
-    The allowed value range for \a compressionLevel is 0 to 9, where 0 means no compression
-    and 9 means maximum compression. The default value is 6.
-
-    \a bufferSize specifies the size of the internal buffer used when reading from and writing to the
-    underlying device. The default value is 65KB. Using a larger value allows for faster compression and
-    deompression at the expense of memory usage.
-*/
 QIOCompressor::QIOCompressor(QIODevice* device, int compressionLevel, int bufferSize)
 :d_ptr(new QIOCompressorPrivate(this, device, compressionLevel, bufferSize))
 {}
 
-/*!
-    Destroys the QIOCompressor, closing it if neccesary.
-*/
+
 QIOCompressor::~QIOCompressor()
 {
     Q_D(QIOCompressor);
@@ -314,11 +254,6 @@ QIOCompressor::~QIOCompressor()
     delete d;
 }
 
-/*!
-    Sets the format on the compressed stream to \a format.
-
-    \sa QIOCompressor::StreamFormat
-*/
 void QIOCompressor::setStreamFormat(StreamFormat format)
 {
     Q_D(QIOCompressor);
@@ -332,45 +267,23 @@ void QIOCompressor::setStreamFormat(StreamFormat format)
     d->streamFormat = format;
 }
 
-/*!
-    Returns the format set on the compressed stream.
-    \sa QIOCompressor::StreamFormat
-*/
 QIOCompressor::StreamFormat QIOCompressor::streamFormat() const
 {
     Q_D(const QIOCompressor);
     return d->streamFormat;
 }
 
-/*!
-    Returns true if the zlib library in use supports the gzip format, false otherwise.
-*/
 bool QIOCompressor::isGzipSupported()
 {
     return checkGzipSupport(zlibVersion());
 }
 
-/*!
-    \reimp
-*/
+
 bool QIOCompressor::isSequential() const
 {
     return true;
 }
 
-/*!
-    Opens the QIOCompressor in \a mode. Only ReadOnly and WriteOnly is supported.
-    This functon will return false if you try to open in other modes.
-
-    If the underlying device is not opened, this function will open it in a suitable mode. If this happens
-    the device will also be closed when close() is called.
-
-    If the underlying device is already opened, its openmode must be compatable with \a mode.
-
-    Returns true on success, false on error.
-
-    \sa close()
-*/
 bool QIOCompressor::open(OpenMode mode)
 {
     Q_D(QIOCompressor);
@@ -461,10 +374,6 @@ bool QIOCompressor::open(OpenMode mode)
     return QIODevice::open(mode);
 }
 
-/*!
-     Closes the QIOCompressor, and also the underlying device if it was opened by QIOCompressor.
-    \sa open()
-*/
 void QIOCompressor::close()
 {
     Q_D(QIOCompressor);
@@ -490,15 +399,7 @@ void QIOCompressor::close()
     QIODevice::close();
 }
 
-/*!
-    Flushes the internal buffer.
 
-    Each time you call flush, all data written to the QIOCompressor is compressed and written to the
-    underlying device. Calling this function can reduce the compression ratio. The underlying device
-    is not flushed.
-
-    Calling this function when QIOCompressor is in ReadOnly mode has no effect.
-*/
 void QIOCompressor::flush()
 {
     Q_D(QIOCompressor);
@@ -508,14 +409,6 @@ void QIOCompressor::flush()
     d->flushZlib(Z_SYNC_FLUSH);
 }
 
-/*!
-    Returns 1 if there might be data available for reading, or 0 if there is no data available.
-
-    There is unfortunately no way of knowing how much data there is available when dealing with compressed streams.
-
-    Also, since the remaining compressed data might be a part of the meta-data that ends the compressed stream (and
-    therefore will yield no uncompressed data), you cannot assume that a read after getting a 1 from this function will return data.
-*/
 qint64 QIOCompressor::bytesAvailable() const
 {
     Q_D(const QIOCompressor);
@@ -546,10 +439,6 @@ qint64 QIOCompressor::bytesAvailable() const
         return 0;
 }
 
-/*!
-    \internal
-    Reads and decompresses data from the underlying device.
-*/
 qint64 QIOCompressor::readData(char *data, qint64 maxSize)
 {
     Q_D(QIOCompressor);
@@ -616,11 +505,6 @@ qint64 QIOCompressor::readData(char *data, qint64 maxSize)
     return outputSize;
 }
 
-
-/*!
-    \internal
-    Compresses and writes data to the underlying device.
-*/
 qint64 QIOCompressor::writeData(const char *data, qint64 maxSize)
 {
     if (maxSize < 1)
@@ -654,10 +538,6 @@ qint64 QIOCompressor::writeData(const char *data, qint64 maxSize)
     return maxSize;
 }
 
-/*
-    \internal
-    Checks if the run-time zlib version is 1.2.x or higher.
-*/
 bool QIOCompressor::checkGzipSupport(const char * const versionString)
 {
     if (strlen(versionString) < 3)
@@ -668,7 +548,7 @@ bool QIOCompressor::checkGzipSupport(const char * const versionString)
 
     return true;
 }
-qint64 QIOCompressor::pos() const //0 on the beginning, else: 1
+qint64 QIOCompressor::pos() const
 {
     Q_D(const QIOCompressor);
     if(d->state == QIOCompressorPrivate::NoBytesWritten)
@@ -680,9 +560,5 @@ qint64 QIOCompressor::pos() const //0 on the beginning, else: 1
         return 1;
     }
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe
