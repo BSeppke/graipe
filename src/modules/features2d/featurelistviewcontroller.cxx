@@ -45,6 +45,14 @@
 namespace graipe {
 
 /**
+ * @file
+ * @brief Implementation file for views of 2d feature lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Implementation/specialization of the ViewController's
  * constructor.
  *
@@ -979,5 +987,10 @@ void SIFTFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * 
         }
     }
 }
-    
+
 } //End of namespace graipe
+    
+/**
+ * @}
+ */
+ 

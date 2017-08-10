@@ -43,8 +43,16 @@
 #include "features2d/cubicsplineliststatistics.hxx"
 #include "features2d/config.hxx"
 
+/**
+ * @file
+ * @brief Header file for views of 2d cubic spline lists
+ *
+ * @addtogroup features2d
+ * @{
+ */ 
+
 namespace graipe {
-    
+
 /**
  * A class for viewing a 2D cubic spline list on a QGraphicsScene/View and 
  * controlling the view using different parameters.
@@ -237,7 +245,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
         QLegend* m_weight_legend;
 };
     
-    
 } //end of namespace graipe
+    
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINELISTVIEWCONTROLLER_HXX

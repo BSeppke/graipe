@@ -34,11 +34,18 @@
 /************************************************************************/
 
 #include "features2d/cubicsplineliststatistics.hxx"
-
 #include <vigra/numerictraits.hxx>
 
 namespace graipe {
 
+/**
+ * @file
+ * @brief Implementation file for statistics for 2d cubic spline lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
 /**
  * Default constructor. Initializes the member with a NULL pointer.
  */
@@ -120,5 +127,9 @@ BasicStatistics<float> WeightedCubicSplineList2DStatistics::weightStats() const
 {
 	return m_weights;
 }
-    
+
 } //End of namespace graipe
+    
+/**
+ * @}
+ */

@@ -41,8 +41,16 @@
 #include "features2d/cubicsplinelist.hxx"
 #include "features2d/config.hxx"
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for statistics for 2d cubic spline lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * Empty statistics mother class for 2D Cubic spline list.
  * Note, that the bounding box of each spline is kept directly by
@@ -106,7 +114,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DStatistics
         //Weight statistics
         BasicStatistics<float> m_weights;
 };
-    
+
 } //end of namespace graipe
+  
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINELISTSTATISTICS_HXX

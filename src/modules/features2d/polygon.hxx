@@ -39,8 +39,16 @@
 #include "features2d/featurelist.hxx"
 #include "features2d/config.hxx"
 
+/**
+ * @file
+ * @brief Header file for 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
+
 namespace graipe {
-    
+
 /**
  * Extension of the QPolygonF class with respect to 
  * some additional features and measures
@@ -97,7 +105,11 @@ class GRAIPE_FEATURES2D_EXPORT Polygon2D
          */
 		virtual void addPoint(const PointType& p);
 };
-    
+ 
 } //end of namespace graipe
+   
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_POLYGON_HXX

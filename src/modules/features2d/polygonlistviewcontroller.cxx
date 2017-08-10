@@ -11,8 +11,17 @@
 #include <QMessageBox>
 
 namespace graipe {
-    
+
 /**
+ * @file
+ * @brief Implementation file for views of 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
+
  * Implementation/specialization of the ViewController's
  * constructor.
  *
@@ -367,5 +376,9 @@ void WeightedPolygonList2DViewController::updateView()
     m_weight_legend->setTicks(m_legendTicks->value());
     m_weight_legend->setDigits(m_legendDigits->value());
 }
-    
+
 } //End of namespace graipe
+
+/**
+ * @}
+ */

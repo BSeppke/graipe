@@ -36,8 +36,16 @@
 #include "core/core.h"
 #include "features2d/features2d.h"
 
-namespace graipe {
+/**
+ * @file
+ * @brief Implementation file for the 2d feature's module
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * This class encapsulates all the functionality of this module in a 
  * way that it can be used within graipe. To achieve this, it extends
@@ -423,6 +431,6 @@ extern "C"{
 	}
 }
 
-
-
-
+/**
+ * @}
+ */

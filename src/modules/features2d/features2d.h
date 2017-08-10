@@ -40,7 +40,7 @@
  * @file
  * @brief Header file for the outer API of GRAIPE's features2d module
  *
- * @defgroup features2d 2D features (without algorithms) for GRAIPE
+ * @defgroup features2d Two-dimensional feature classes for GRAIPE
  * @{
  */
 

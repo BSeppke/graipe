@@ -42,8 +42,16 @@
 
 #include <QVector>
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for lists of 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * This class represents a list of polygons. It conformes to a
  * graipe::Model and may thus be widely used.
@@ -52,8 +60,10 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
 :	public Model
 {
 	public:
-		//The used point type
-		typedef Polygon2D PolygonType;
+		/**
+         * The used point type
+		 */
+        typedef Polygon2D PolygonType;
     
         /**
          * Default constructor. Constructs an empty list of polygons.
@@ -317,7 +327,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
         //The weights
         QVector<float> m_weights;
 };
-    
+ 
 } //end of namespace graipe
+   
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_POLYGONLIST_HXX

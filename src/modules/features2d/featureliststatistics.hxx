@@ -41,8 +41,16 @@
 #include "features2d/featurelist.hxx"
 #include "features2d/config.hxx"
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for statistics of 2d feature lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * Statistics mother class for 2D feature lists.
  * It keeps the basic statistics over all features in the lists.
@@ -190,8 +198,11 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DStatistics
         //Statistics of the scales
         BasicStatistics<float> m_scales;
 };
-
     
 } //end of namespace graipe
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_FEATURELISTSTATISTICS_HXX

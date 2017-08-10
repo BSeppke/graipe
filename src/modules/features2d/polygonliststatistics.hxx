@@ -41,8 +41,16 @@
 #include "features2d/polygonlist.hxx"
 #include "features2d/config.hxx"
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for statistics of 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * Empty statistics mother class for polygon lists.
  * Note, that the bounding box of each polygon is kept directly by
@@ -105,7 +113,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DStatistics
         //Weight statistics
         BasicStatistics<float> m_weights;
 };
-    
+
 } //end of namespace graipe
+    
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_POLYGONLISTSTATISTICS_HXX

@@ -42,10 +42,18 @@
 
 #include <QVector>
 
-namespace graipe {
-
 /**
- * This class represents a list of 2D cubic splines. It conformes to a
+ * @file
+ * @brief Header file for 2d cubic spline lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
+
+namespace graipe {
+ 
+/**
+ * This class represents a list of 2D cubic splines. It conforms to a
  * graipe::Model and may thus be widely used.
  */
 class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D 
@@ -320,7 +328,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
         //The list of weights:
         QVector<float> m_weights;
 };
-    
+ 
 } //end of namespace graipe
+   
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINELIST_HXX

@@ -38,6 +38,14 @@
 namespace graipe {
 
 /**
+ * @file
+ * @brief Implementation file for lists of 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Default constructor. Constructs an empty list of polygons.
  */
 PolygonList2D::PolygonList2D(Workspace* wsp)
@@ -525,5 +533,9 @@ bool WeightedPolygonList2D::deserialize_item(QXmlStreamReader& xmlReader)
     }
     return false;
 }
-    
+
 } //End of namespace graipe
+  
+/**
+ * @}
+ */

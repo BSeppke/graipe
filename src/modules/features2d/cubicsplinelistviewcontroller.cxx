@@ -15,6 +15,13 @@
 
 namespace graipe {
     
+/**
+ * @file
+ * @brief Implementation file for views of 2d cubic spline lists
+ *
+ * @addtogroup features2d
+ * @{
+ */ 
 
 /**
  * Implementation/specialization of the ViewController's
@@ -526,3 +533,8 @@ void WeightedCubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMous
 }
 
 } //End of namespace graipe
+
+/**
+ * @}
+ */
+ 

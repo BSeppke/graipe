@@ -41,6 +41,14 @@
 namespace graipe {
 
 /**
+ * @file
+ * @brief Implementation file for 2d feature lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Default constructor. Creates an empty point feature list.
  */
 PointFeatureList2D::PointFeatureList2D(Workspace* wsp)
@@ -1059,3 +1067,7 @@ bool SIFTFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 }
 
 } //End of namespace graipe
+
+/**
+ * @}
+ */

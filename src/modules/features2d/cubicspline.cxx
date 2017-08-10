@@ -38,6 +38,14 @@
 namespace graipe {
 
 /**
+ * @file
+ * @brief Implementation file for cubic splines (1d and 2d)
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Default constructor. Constructs an empty 1D cubic spline.
  */
 CubicSpline1D::CubicSpline1D()
@@ -579,5 +587,10 @@ void CubicSpline2D::updateFromPoints()
     m_splineX = CubicSpline1D(points_x, m_first_derivative.x(), m_last_derivative.x());
     m_splineY = CubicSpline1D(points_y, m_first_derivative.x(), m_last_derivative.y());
 }
-    
+
 } //End of namespace graipe
+    
+/**
+ * @}
+ */
+ 

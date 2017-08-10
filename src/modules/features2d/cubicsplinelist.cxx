@@ -35,9 +35,16 @@
 
 #include "features2d/cubicsplinelist.hxx"
 
-
 namespace graipe {
 
+/**
+ * @file
+ * @brief Implementation file for 2d cubic spline lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
 /**
  * Default constructor. Constructs an empty list of 2D cubic splines.
  */
@@ -600,5 +607,10 @@ bool WeightedCubicSplineList2D::deserialize_item(QXmlStreamReader& xmlReader)
     }
     return false;
 }
-    
+
 } //End of namespace graipe
+    
+/**
+ * @}
+ */
+ 

@@ -39,8 +39,16 @@
 #include "features2d/config.hxx"
 #include "features2d/featurelist.hxx"
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for cubic splines (1d and 2d)
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * This class represents a CubicSpline by means of a 1D interpolation
  * function over an arbitrary number of supporting (x,y)-values.
@@ -336,7 +344,11 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
         //Cached bounding rect of this Cubic spline
         QRectF m_boundingRect;    
 };
-    
+
 } //end of namespace graipe
+    
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINE_HXX

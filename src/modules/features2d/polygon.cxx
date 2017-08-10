@@ -38,6 +38,14 @@
 namespace graipe {
    
 /**
+ * @file
+ * @brief Implementation file for 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Virtual destructor of this class, needed due to non-final QVector class.
  */
 Polygon2D::~Polygon2D()
@@ -97,5 +105,9 @@ void Polygon2D::addPoint(const PointType& new_p)
 {
 	*this << new_p;
 }
-    
+
 } //End of namespace graipe
+  
+/**
+ * @}
+ */

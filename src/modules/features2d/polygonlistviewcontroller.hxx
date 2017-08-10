@@ -43,8 +43,15 @@
 #include "features2d/polygonliststatistics.hxx"
 #include "features2d/config.hxx"
 
+/**
+ * @file
+ * @brief Header file for views of 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
 namespace graipe {
-    
 
 /**
  * A class for viewing a 2D polygon list on a QGraphicsScene/View and
@@ -209,7 +216,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
         //Weight legend
         QLegend * m_weight_legend;
 };
-    
+
 } //end of namespace graipe
+    
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_POLYGONLISTVIEW_HXX

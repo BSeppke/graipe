@@ -40,6 +40,14 @@
 namespace graipe {
 
 /**
+ * @file
+ * @brief Implementation file for statistics of 2d feature lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Default constructor. Constructs an empty point statistic with
  * a NULL pointer to the features.
  */
@@ -299,5 +307,9 @@ const BasicStatistics<float>& SIFTFeatureList2DStatistics::scaleStats() const
 {
 	return m_scales;
 }
-    
+ 
 } //End of namespace graipe
+    
+/**
+ * @}
+ */

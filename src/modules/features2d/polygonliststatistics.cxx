@@ -40,6 +40,14 @@
 namespace graipe {
     
 /**
+ * @file
+ * @brief Implementation file for statistics of 2d polygons
+ *
+ * @addtogroup features2d
+ * @{
+ */
+ 
+/**
  * Default constructor. Initializes the member with a NULL pointer.
  */
 PolygonList2DStatistics::PolygonList2DStatistics()
@@ -118,5 +126,9 @@ const BasicStatistics<float>& WeightedPolygonList2DStatistics::weightStats() con
 {
 	return m_weights;
 }
-    
+
 } //End of namespace graipe
+
+/**
+ * @}
+ */

@@ -43,8 +43,16 @@
 #include "features2d/featureliststatistics.hxx"
 #include "features2d/config.hxx"
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for views of 2d feature lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * A class for viewing a 2D point feature list on a QGraphicsScene/View and
  * controlling the view using different parameters.
@@ -340,7 +348,11 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
         //Statistics
         SIFTFeatureList2DStatistics * m_stats;
 };
-    
+
 } //end of namespace graipe
+    
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_FEATURELISTVIEWCONTROLLER_HXX

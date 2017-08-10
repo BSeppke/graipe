@@ -43,8 +43,16 @@
 
 #include <QVector>
 
-namespace graipe {
+/**
+ * @file
+ * @brief Header file for 2d feature lists
+ *
+ * @addtogroup features2d
+ * @{
+ */
 
+namespace graipe {
+ 
 /**
  * Base class for collections for the different feature types.
  * This class provides the storage of an x,y tuple for each feature.
@@ -53,8 +61,10 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
 :	public Model
 {
 	public:
-		//The used point type
-		typedef QPointFX PointType;
+		/**
+         * The used point type
+		 */
+        typedef QPointFX PointType;
     
         /**
          * Default constructor. Creates an empty point feature list.
@@ -653,7 +663,11 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
 		QVector<float> m_scales;
 		QVector<QVector<float> > m_descriptors;
 };
-    
+  
 } //end of namespace graipe
+  
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_FEATURELIST_HXX
