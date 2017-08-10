@@ -40,6 +40,13 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for dense vectorfield import and export
+ */
 
 /**
  * Imports a dense vectorfield from the .flo-Format into the graipe format.
@@ -302,5 +309,9 @@ void DenseVectorfieldExporter::run()
         emit errorMessage(QString("Non-explainable error occured"));		
     }
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe

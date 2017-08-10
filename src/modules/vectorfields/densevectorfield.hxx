@@ -44,6 +44,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for dense vectorfield classes
+ */
+ 
+/**
  * This class represents a dense vectorfield. Instead of keeping
  * each single vector by means of position and direction, we use two 2D
  * arrays here and store the motion component in x direction (m_u) and in
@@ -646,6 +654,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
         //Storage for the weights
         ArrayType m_w;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

@@ -46,6 +46,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for sparse vectorfield viewing
+ */
+ 
+/**
  * A class for viewing of a sparse vectorfield on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
@@ -408,6 +416,11 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
 		QLegend * m_weight_legend;
     
 };
+
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_VECTORFIELDS_SPARSEVECTORFIELDVIEWCONTROLLER_HXX

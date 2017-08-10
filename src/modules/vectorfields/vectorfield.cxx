@@ -38,6 +38,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for generic 2d vectorfield base classes
+ */
+
+/**
  * Default constructor. Creates an empty vectorfield.
  */
 Vectorfield2D::Vectorfield2D(Workspace* wsp)
@@ -211,5 +219,9 @@ void Vectorfield2D::setTarget(unsigned int index, const PointType& new_t)
 	setDirection(index, new_t - origin(index));
     //SetDirection needs to call updateModel()!
 }
+
+/**
+ * @}
+ */
     
 } //end of namespace graipe

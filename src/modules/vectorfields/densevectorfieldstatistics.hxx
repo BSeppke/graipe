@@ -43,7 +43,14 @@
 #include "vectorfields/config.hxx"
 
 namespace graipe {
-
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for statistics of dense vectorfields
+ */
+ 
 /**
  * This class holds basic statistics for any class,
  * which fulfilles the Vectorfield2D interface
@@ -130,6 +137,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DStatistics
         BasicStatistics<double> m_weights;
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_VECTORFIELDS_DENSEVECTORFIELDSTATISTICS_HXX

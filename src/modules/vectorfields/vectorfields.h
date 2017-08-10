@@ -36,6 +36,16 @@
 #ifndef GRAIPE_VECTORFIELDS_H
 #define GRAIPE_VECTORFIELDS_H
 
+/**
+ * @defgroup graipe_vectorfields Vectorfields classes module
+ *
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's vectorfields module
+ */
+
 #include "vectorfields/vectordrawer.hxx"
 #include "vectorfields/vectorfield.hxx"
 #include "vectorfields/sparsevectorfield.hxx"
@@ -45,5 +55,9 @@
 #include "vectorfields/densevectorfieldstatistics.hxx"
 #include "vectorfields/densevectorfieldviewcontroller.hxx"
 #include "vectorfields/densevectorfieldimpex.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_VECTORFIELDS_H

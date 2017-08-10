@@ -44,6 +44,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for dense vectorfield viewing
+ */
+ 
+/**
  * Implementation/specialization of the ViewController's
  * constructor.
  *
@@ -1344,5 +1352,9 @@ void DenseWeightedVectorfield2DParticleViewController::hoverMoveEvent ( QGraphic
         event->accept();
 	}
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe

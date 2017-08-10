@@ -36,7 +36,23 @@
 #include "vectorfields/vectordrawer.hxx"
 
 namespace graipe {
-    
+
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for drawing single vectors
+ */
+ 
+/**
+ * Creates a new vector drawer, which can be used draw vectors by means of arrows 
+ * on arbitrary positions (see the paint function).
+ *
+ * \param line_width line width of the arrows (in pixels)
+ * \param head_size  size of the arrow head (in pixels)
+ * \param colorTable the color table used for the color selection of drawing (needs to have 256 entries)
+ */
 VectorDrawer::VectorDrawer(float line_width, float head_size, QVector<QRgb> colorTable)
 : m_arrow_brush(colorTable[0])
 {
@@ -45,36 +61,76 @@ VectorDrawer::VectorDrawer(float line_width, float head_size, QVector<QRgb> colo
     setColorTable(colorTable);
 }
 
+/**
+ * Re-sets the line width of the vectors to be drawn
+ *
+ * \param new_line_width the new line width
+ */
 void VectorDrawer::setLineWidth(float new_line_width)
 {
     m_line_pen.setWidthF(new_line_width);
 }
 
+/**
+ * Returns the currently set line width of the drawer.
+ *
+ * \return the current line width
+ */
 float VectorDrawer::lineWidth() const
 {
     return m_line_pen.widthF();
 }
 
+/**
+ * Re-sets the head size of the vectors to be drawn
+ *
+ * \param new_head_size the new head size
+ */
 void VectorDrawer::setHeadSize(float new_head_size)
 {
     m_head_size = new_head_size;
     updateHeadTriangle();
 }
 
+/**
+ * Returns the currently set head size of the drawer.
+ *
+ * \return the current head size
+ */
 float VectorDrawer::headSize() const
 {
     return m_head_size;
 }
 
-QVector<QRgb> VectorDrawer::colorTable() const
-{
-    return m_colorTable;
-}
+/**
+ * Re-sets the color table of the vectors to be drawn
+ *
+ * \param colorTable the new color table (needs to have 256 entries)
+ */
 void VectorDrawer::setColorTable(QVector<QRgb> colorTable)
 {
     m_colorTable = colorTable;
 }
 
+/**
+ * Returns the currently setcolor table of the drawer.
+ *
+ * \return the current color table
+ */
+QVector<QRgb> VectorDrawer::colorTable() const
+{
+    return m_colorTable;
+}
+
+/**
+ * Paints a vector using a painter from given position to a target using a normalized weight
+ * in the range of {0.0, ..., 1.0}.
+ *
+ * \param painter the painter which carries out the drawing
+ * \param origin the starting position of the vector
+ * \param target the final point of the vector
+ * \param normalized_weight a normalized weight in the range of {0.0, ..., 1.0}
+ */
 void VectorDrawer::paint(QPainter * painter, const QPointFX& origin, const QPointFX& target, float normalized_weight)
 {
     QColor current_color =  QColor(m_colorTable[normalized_weight*255]);
@@ -104,6 +160,10 @@ void VectorDrawer::paint(QPainter * painter, const QPointFX& origin, const QPoin
     painter->drawConvexPolygon(t.map(m_triangle));
 }
 
+/**
+ * Updates the unrotated variant of the arrow head. This will be neccessary, if
+ * the head size is changed.
+ */
 void VectorDrawer::updateHeadTriangle()
 {
    QPolygonF new_polygon;
@@ -115,5 +175,9 @@ void VectorDrawer::updateHeadTriangle()
     
     m_triangle = new_polygon;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe

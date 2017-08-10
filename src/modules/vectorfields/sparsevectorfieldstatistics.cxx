@@ -36,7 +36,15 @@
 #include "vectorfields/sparsevectorfieldstatistics.hxx"
 
 namespace graipe {
-    
+
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for statistics of sparse vectorfields
+ */
+ 
 /**
  * Default constructor. Constructs an empty sparse vectorfield statistic with
  * a NULL pointer to the vectorfield.
@@ -513,5 +521,9 @@ const BasicStatistics<double>& SparseWeightedMultiVectorfield2DStatistics::combi
 {
     return m_combined_weight;
 }
+
+/**
+ * @}
+ */
 
 }//end of namespace graipe

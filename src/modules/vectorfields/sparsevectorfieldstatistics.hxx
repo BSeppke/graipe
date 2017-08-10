@@ -45,6 +45,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for statistics of sparse vectorfields
+ */
+ 
+/**
  * This class holds basic statistics for any class,
  * which fulfilles the Vectorfield2D interface
  * Statistics are kept for the origins, the directions ans the lengths
@@ -244,6 +252,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DStatistics
         std::vector<BasicStatistics<double> > m_alt_weights;
         BasicStatistics<double> m_combined_weight;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

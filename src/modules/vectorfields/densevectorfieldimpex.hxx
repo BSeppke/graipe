@@ -42,6 +42,14 @@
 namespace graipe {
     
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for dense vectorfield import and export
+ */
+
+/**
  * The ImageImpex class is just a frame for two static template functions, which
  * are using GDAL/OGR to import or export images into the graipe-format.
  */
@@ -118,6 +126,10 @@ class DenseVectorfieldExporter
          */
         void run();
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

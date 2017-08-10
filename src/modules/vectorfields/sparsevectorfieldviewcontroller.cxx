@@ -41,6 +41,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for sparse vectorfield viewing
+ */
+ 
+/**
  * Implementation/specialization of the ViewController's
  * constructor.
  *
@@ -1483,5 +1491,9 @@ void SparseWeightedMultiVectorfield2DViewController::mousePressEvent (QGraphicsS
         }
 	}
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe

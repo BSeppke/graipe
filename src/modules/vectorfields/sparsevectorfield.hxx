@@ -44,6 +44,15 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for sparse vectorfield classes
+ */
+
+
+/**
  * The base class of all sparse 2D vectorfields.
  * These vectorfields can be considered as lists of 2 points for each vector.
  * One point describing the origin, the other one the direction of the vector
@@ -846,6 +855,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
 		std::vector<float> m_weights;
 		std::vector<std::vector<float> > m_alt_weights;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

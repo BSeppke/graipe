@@ -40,6 +40,14 @@ namespace graipe {
 
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the vectorfields module
+ */
+
+/**
  * This class encapsulates all the functionality of this module in a 
  * way that it can be used within graipe. To achieve this, it extends
  * graipe's Module class by introducing new Models and new ViewControllers.
@@ -405,10 +413,18 @@ class VectorfieldsModule
         }
 };
 
+/**
+ * @}
+ */
+
 } //end of namespace graipe
 
+
 /**
- *Interface to the ModuleHandler
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * Interface to the ModuleHandler
  */
 
 /**
@@ -426,6 +442,6 @@ extern "C"{
 	}	
 }
 
-
-
-
+/**
+ * @}
+ */

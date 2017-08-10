@@ -39,6 +39,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for sparse vectorfield classes
+ */
+ 
+/**
  * Default constructor. Creates an empty sparse vectorfield.
  */
 SparseVectorfield2D::SparseVectorfield2D(Workspace* wsp)
@@ -1542,6 +1550,7 @@ bool SparseWeightedMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlRea
         return false;
     }
 }
+
 /**
  * This slot is called, whenever some parameter is changed.
  * It rearranges the size of the weight alternatives' vector.
@@ -1560,5 +1569,9 @@ void SparseWeightedMultiVectorfield2D::updateModel()
     }
     SparseMultiVectorfield2D::updateModel();
 }
+
+/**
+ * @}
+ */
     
 } //end of namespace graipe

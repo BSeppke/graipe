@@ -46,6 +46,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for dense vectorfield viewing
+ */
+ 
+/**
  * A class for viewing of a dense vectorfield on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
@@ -425,6 +433,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DParticleViewControlle
         //To avoid casting
         DenseWeightedVectorfield2D* m_dense_weighted_model;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

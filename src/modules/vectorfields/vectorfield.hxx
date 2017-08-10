@@ -42,6 +42,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Header file for generic 2d vectorfield base classes
+ */
+ 
+/**
  * The base class of all 2D vectorfields. This can also be considered as an interface,
  * since all other vectorfields, either sparse or dense ones inherit from this class.
  */
@@ -232,6 +240,10 @@ class GRAIPE_VECTORFIELDS_EXPORT Vectorfield2D
         TransformParameter * m_global_motion;
         DoubleParameter    * m_scale;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

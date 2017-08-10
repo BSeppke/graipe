@@ -38,6 +38,14 @@
 
 #include <QtCore/QtGlobal>
 
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Configuration file to the vectorfields module
+ */
+
 enum Vectorfield2DMotionDisplayMode
 {
 	CompleteMotion = 0, //show real directions
@@ -54,5 +62,9 @@ enum Vectorfield2DMotionDisplayMode
 #else
 	#define GRAIPE_VECTORFIELDS_EXPORT Q_DECL_IMPORT
 #endif
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_VECTORFIELDS_CONFIG_HXX

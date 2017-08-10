@@ -39,6 +39,13 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for statistics of dense vectorfields
+ */
 
 DenseVectorfield2DStatistics::DenseVectorfield2DStatistics()
 {
@@ -163,6 +170,9 @@ const BasicStatistics<double>& DenseWeightedVectorfield2DStatistics::weightStats
 {
 	return m_weights;
 }
-    
+
+/**
+ * @}
+ */    
 
 }//end of namespace graipe

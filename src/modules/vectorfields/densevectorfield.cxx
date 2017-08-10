@@ -37,6 +37,14 @@
 #include "core/basicstatistics.hxx"
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_vectorfields
+ * @{
+ *
+ * @file
+ * @brief Implementation file for dense vectorfield classes
+ */
    
 /**
  * Default constructor. Creates an empty dense vectorfield.
@@ -1026,5 +1034,9 @@ void DenseWeightedVectorfield2D::updateModel()
     
     DenseVectorfield2D::updateModel();
 }
+
+/**
+ * @}
+ */
     
 } //end of namespace graipe
