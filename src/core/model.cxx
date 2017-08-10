@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -44,15 +44,15 @@
 #include <QtDebug>
 #include <QXmlStreamWriter>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the base types of all data: The Model, ModelList and RasteredModel classes.
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Default/empty contructor of the Model class
@@ -902,8 +902,8 @@ void RasteredModel::copyData(Model& other) const
     Model::copyData(other);
 }
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe

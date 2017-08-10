@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -86,16 +86,16 @@
 
 #include <QtCore/QIODevice>
 
-/**
- * @file
- * @brief Header file for the QIOCompressor class, see license terms above
- *
- * @addtogroup core
- * @{
- */
-
 namespace graipe {
 
+/**
+ * @addtogroup graipe_core
+ * @{
+ *
+ * @file
+ * @brief Header file for the QIOCompressor class, see license terms above
+ */
+ 
 class QIOCompressorPrivate;
 
 class GRAIPE_CORE_EXPORT QIOCompressor
@@ -132,11 +132,11 @@ private:
     Q_DECLARE_PRIVATE(QIOCompressor)
     Q_DISABLE_COPY(QIOCompressor)
 };
-    
-}//end of namespace graipe
 
 /**
  * @}
  */
+    
+}//end of namespace graipe
 
 #endif

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -36,6 +36,14 @@
 #ifndef GRAIPE_FEATURES2D_CONFIG_HXX
 #define GRAIPE_FEATURES2D_CONFIG_HXX
 
+/**
+ * @addtogroup graipe_features2d
+ * @{
+ *
+ * @file
+ * @brief Configuration file to the features2d module
+ */
+
 #include <QtCore/QtGlobal>
 
 #ifdef GRAIPE_FEATURES2D_BUILD
@@ -47,5 +55,9 @@
 #else
 	#define GRAIPE_FEATURES2D_EXPORT Q_DECL_IMPORT
 #endif
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_FEATURES2D_CONFIG_HXX

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,15 +42,15 @@
 
 #include <QVector>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for 2d cubic spline lists
- *
- * @addtogroup features2d
- * @{
  */
-
-namespace graipe {
  
 /**
  * This class represents a list of 2D cubic splines. It conforms to a
@@ -98,7 +98,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          */
 		virtual void clear();
 		
-		/*
+		/**
          * Constant access a 2D cubic spline inside this list at a given index. May throw
          * an error, if the index is out of range.
          *
@@ -106,7 +106,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          */
 		virtual const CubicSplineType & spline(unsigned int index) const;
     
-		/*
+		/**
          * Reset/replace a 2D cubic spline inside this list at a given index. If the index is
          * out of range or the model is locked, this function will do nothing.
          *
@@ -115,7 +115,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          */
 		virtual void setSpline(unsigned int index, const CubicSplineType& new_spline);
     
-        /*
+        /**
          * Add a 2D cubic spline at the end of this list. 
          * If the model is locked, this function will do nothing.
          *
@@ -242,7 +242,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          */
         void setWeight(unsigned int index, float new_w);
     
-        /*
+        /**
          * Reset/replace a 2D cubic spline inside this list at a given index. 
          * The resetted spline will get a weight of zero. If the index is
          * out of range or the model is locked, this function will do nothing.
@@ -252,7 +252,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          */
         void setSpline(unsigned int index, const CubicSplineType& new_spline);
     
-        /*
+        /**
          * Reset/replace a 2D cubic spline inside this list at a given index and a given weight.
          * If the index is out of range or the model is locked, this function will do nothing.
          *
@@ -262,7 +262,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          */
         virtual void setSpline(unsigned int index, const CubicSplineType& new_spline, float new_w);
         
-        /*
+        /**
          * Add a 2D cubic spline at the end of this list. 
          * The new spline will have a weight of zero.
          * If the model is locked, this function will do nothing.
@@ -271,7 +271,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          */
         void addSpline(const CubicSplineType& new_spline);
     
-        /*
+        /**
          * Add a 2D cubic spline with a given weight at the end of this list.
          * If the model is locked, this function will do nothing.
          *
@@ -328,11 +328,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
         //The list of weights:
         QVector<float> m_weights;
 };
- 
-} //end of namespace graipe
    
 /**
  * @}
  */
+ 
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINELIST_HXX

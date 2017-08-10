@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -44,8 +44,13 @@
 #include <algorithm>
 
 #include <QString>
+ 
+namespace graipe {
 
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief This file holds all data structures, which are needed for the building
  * block system of GRAIPE to work. GRAIPE can be defined/extended by the
@@ -60,12 +65,7 @@
  * defined (all specializing the std::vector).
  *
  * Since this a header only file, we need no export definitions here!
- *
- * @addtogroup core
- * @{
  */
- 
-namespace graipe {
 
 /**
  * Structure for new Models (with respective parameters).
@@ -151,10 +151,10 @@ typedef Factory<ViewControllerFactoryItem>      ViewControllerFactory;
 /** A Factory for Algorithms **/
 typedef Factory<AlgorithmFactoryItem> AlgorithmFactory;
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe
 
 #endif //GRAIPE_CORE_FACTORIES_HXX

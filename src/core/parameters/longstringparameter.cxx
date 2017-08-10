@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -38,15 +38,15 @@
 #include <QFontMetrics>
 #include <QtDebug>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implemenation file for the LongStringParameter class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Default constructor of the LongStringParameter class with a setting of the
@@ -175,8 +175,8 @@ void LongStringParameter::updateValue()
     }
 }
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe

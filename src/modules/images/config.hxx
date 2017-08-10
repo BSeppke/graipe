@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -35,6 +35,14 @@
 
 #include <QtCore/QtGlobal>
 
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Configuration file to the images module
+ */
+ 
 #define MAX_IMAGE_WIDTH  20000
 #define MAX_IMAGE_HEIGHT 20000
 
@@ -47,3 +55,7 @@
 #else
 	#define GRAIPE_IMAGES_EXPORT Q_DECL_IMPORT
 #endif
+
+/**
+ * @}
+ */

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -41,15 +41,15 @@
 #include "features2d/polygonlist.hxx"
 #include "features2d/config.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for statistics of 2d polygons
- *
- * @addtogroup features2d
- * @{
  */
-
-namespace graipe {
  
 /**
  * Empty statistics mother class for polygon lists.
@@ -113,11 +113,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DStatistics
         //Weight statistics
         BasicStatistics<float> m_weights;
 };
-
-} //end of namespace graipe
     
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_POLYGONLISTSTATISTICS_HXX

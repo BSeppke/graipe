@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -45,15 +45,15 @@
 #include <QFormLayout>
 #include <QSizePolicy>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the general Parameter class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 //Forward declaration of Model class to resolve circular dependency
 class Model;
@@ -261,10 +261,10 @@ class GRAIPE_CORE_EXPORT Parameter
         Workspace* m_workspace;
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_PARAMETERS_PARAMETER_HXX

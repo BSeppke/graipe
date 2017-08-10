@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,15 +39,15 @@
 #include <QXmlStreamWriter>
 #include <QObject>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the ColorParameter class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Default constructor of the ColorParameter class with a setting of the
@@ -192,8 +192,8 @@ void ColorParameter::updateValue()
     }
 }
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe

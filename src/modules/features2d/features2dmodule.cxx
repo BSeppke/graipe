@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -36,15 +36,15 @@
 #include "core/core.h"
 #include "features2d/features2d.h"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for the 2d feature's module
- *
- * @addtogroup features2d
- * @{
  */
-
-namespace graipe {
  
 /**
  * This class encapsulates all the functionality of this module in a 
@@ -410,10 +410,17 @@ class Features2DModule
         }
 };
 
+/**
+ * @}
+ */
+ 
 } //End of namespace graipe
 
 /**
- *Interface to the ModuleHandler
+ * @addtogroup graipe_features2d
+ * @{
+ *
+ * Interface to the ModuleHandler
  */
 
 /**
@@ -431,6 +438,8 @@ extern "C"{
 	}
 }
 
+
 /**
  * @}
  */
+

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -40,15 +40,16 @@
 #include <QCoreApplication>
 #include <QLibrary>
 
-/**
+namespace graipe {
+
+/*
+ *
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the global vars
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Constructor: Creates an empty Workspace and calls the function
@@ -834,8 +835,8 @@ void Workspace::loadModule(QString file)
     }
 }
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe

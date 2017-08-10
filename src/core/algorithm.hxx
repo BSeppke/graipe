@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,15 +42,15 @@
 
 #include <vector>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the Algorithm class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * This class defines the concept of an algorithm within the GRAIPE
@@ -223,10 +223,10 @@ class GRAIPE_CORE_EXPORT Algorithm
         Workspace* m_workspace;
 };
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+ 
+}//end of namespace graipe
 
 #endif //GRAIPE_CORE_ALGORITHM_HXX

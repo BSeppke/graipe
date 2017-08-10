@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -38,14 +38,20 @@
 #include <functional>
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the viewing of images
+ */
     
 /**
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param img The image, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 template <class T>
 ImageSingleBandViewController<T>::ImageSingleBandViewController(Image<T>* img)
@@ -236,9 +242,7 @@ void ImageSingleBandViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent *
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param img The image, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 template <class T>
 ImageRGBViewController<T>::ImageRGBViewController(Image<T>* img)
@@ -393,5 +397,9 @@ template class ImageSingleBandViewController<unsigned char>;
 template class ImageRGBViewController<float>;
 template class ImageRGBViewController<int>;
 template class ImageRGBViewController<unsigned char>;
+
+/**
+ * @}
+ */
     
 } //end of namespace graipe

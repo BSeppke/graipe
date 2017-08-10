@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,11 +37,13 @@
 #define GRAIPE_FEATURES2D_H
 
 /**
+ * @defgroup graipe_features2d Two-dimensional feature classes module
+ * 
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for the outer API of GRAIPE's features2d module
- *
- * @defgroup features2d Two-dimensional feature classes for GRAIPE
- * @{
  */
 
 #include "features2d/featurelist.hxx"

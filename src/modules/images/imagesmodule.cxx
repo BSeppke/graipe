@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,6 +37,14 @@
 #include "images/images.h"
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the images' module
+ */
 
 /**
  * This class encapsulates all the functionality of this module in a 
@@ -324,10 +332,18 @@ class ImagesModule
         }
 };
 
+/**
+ * @}
+ */
+
 } //end of namespace graipe
 
+
 /**
- *Interface to the ModuleHandler
+ * @addtogroup graipe_images
+ * @{
+ *
+ * Interface to the ModuleHandler
  */
 
 /**
@@ -345,7 +361,6 @@ extern "C"{
 	}
 }
 
-
-
-
-
+/**
+ * @}
+ */

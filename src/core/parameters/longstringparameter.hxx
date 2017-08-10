@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -41,15 +41,15 @@
 #include <QPointer>
 #include <QPlainTextEdit>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the LongStringParameter class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * This is the LongStringParameter class.
@@ -162,13 +162,12 @@ class GRAIPE_CORE_EXPORT LongStringParameter
     
         /** The text editing delegate **/
         QPointer<QPlainTextEdit> m_delegate;
-    
 };
-
-} //end of namespace graipe
 
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_PARAMETERS_LONGSTRINGPARAMETER_HXX

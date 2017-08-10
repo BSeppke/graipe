@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -40,15 +40,15 @@
 
 #include <QtDebug>
 
+namespace graipe  {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the BasicStatistics class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe  {
 
 /**
  * This file just contains a very basic data structure for the storage
@@ -93,11 +93,11 @@ void printStats(const BasicStatistics<T>& stats)
 {
 	qDebug().nospace() << "min: " << stats.min << ", max: " << stats.max << ", mean" <<  stats.mean << ", std.dev.: " << stats.stddev << "\n";
 }
-    
-}//end of namespace graipe
 
 /**
  * @}
  */
+    
+}//end of namespace graipe
 
 #endif //GRAIPE_CORE_BASICSTATISTICS_HXX

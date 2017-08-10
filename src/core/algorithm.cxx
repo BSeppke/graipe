@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -35,15 +35,15 @@
 
 #include "core/algorithm.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the Algorithm class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Default Constructor of the Algorithm class.
@@ -255,8 +255,8 @@ std::vector<Model *>  Algorithm::results()
 	return m_results;
 }
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe

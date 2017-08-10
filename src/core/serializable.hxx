@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,7 +42,12 @@
 #include <QDateTime>
 #include <QXmlStreamWriter>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ * 
  * @file
  * @brief This file holds all data interfaces, which are needed for serialization
  * and deserialization of whatever kind of object. It also defines some 
@@ -57,13 +62,7 @@
  * If you implement your models and ViewControllers this way, GRAIPE gives 
  * you model import/export for free. Additionally, it offers you a complete
  * workspace store/restore!
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
-
 
 /**
  * Splits a string using a given separator on the first occurence only.
@@ -171,11 +170,11 @@ class GRAIPE_CORE_EXPORT Serializable
         /** The id (sometimes used as a filename) of this serializable instance **/
         QString m_id;
 };
-    
-}//end of namespace
 
 /**
  * @}
  */
+    
+}//end of namespace
 
 #endif //GRAIPE_CORE_SERIALIZABLE_HXX

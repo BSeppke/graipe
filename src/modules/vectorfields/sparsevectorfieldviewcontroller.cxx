@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -44,9 +44,7 @@ namespace graipe {
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param vf The sparse vectorfield, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 SparseVectorfield2DViewController::SparseVectorfield2DViewController(SparseVectorfield2D * vf)
 :	ViewController(vf),
@@ -456,9 +454,7 @@ void SparseVectorfield2DViewController::mousePressEvent (QGraphicsSceneMouseEven
  * specialization of the SparseVectorfield2DViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param vf The sparse weighted vectorfield, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewController(SparseWeightedVectorfield2D * vf)
  :	SparseVectorfield2DViewController(vf),
@@ -821,9 +817,7 @@ void SparseWeightedVectorfield2DViewController::mousePressEvent (QGraphicsSceneM
  * Specialization of the SparseVectorfield2DViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param vf The sparse multi vectorfield, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 SparseMultiVectorfield2DViewController::SparseMultiVectorfield2DViewController(SparseMultiVectorfield2D * vf)
 :	SparseVectorfield2DViewController(vf),
@@ -1145,9 +1139,7 @@ void SparseMultiVectorfield2DViewController::mousePressEvent(QGraphicsSceneMouse
  * Specialization of the SparseMultiVectorfield2DViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param vf The sparse weighted multi vectorfield, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2DViewController(SparseWeightedMultiVectorfield2D * vf)
  :	SparseMultiVectorfield2DViewController(vf),

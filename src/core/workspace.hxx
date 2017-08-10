@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -48,15 +48,16 @@
 
 #include <vector>
 
-/**
- * @file
- * @brief This file holds all Workspace information
- * @addtogroup core
- * @{
- */
- 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_core
+ * @{
+ *
+ * @file
+ * @brief This file holds all Workspace information
+ */
+ 
 /**
  * This is the Workspace class.
  * Before you start working with Graipe, you should always create a workspace.
@@ -343,10 +344,10 @@ class GRAIPE_CORE_EXPORT Workspace
         ViewController* m_currentViewController;
 };
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe
 
 #endif //GRAIPE_CORE_WORKSPACE_HXX

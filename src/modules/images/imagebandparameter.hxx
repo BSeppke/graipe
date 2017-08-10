@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -41,6 +41,14 @@
 #include "core/parameters.hxx"
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Header file for image band selection parameter class
+ */
 
 /**
  * This class defines the ImageBandParameterBase class.
@@ -299,5 +307,10 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
         vigra::MultiArray<2,T> m_empty_image;
 };
 
+/**
+ * @}
+ */
+
 } //end of namespace graipe
+
 #endif

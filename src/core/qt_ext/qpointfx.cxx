@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -40,15 +40,15 @@
 
 #include <QtDebug>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the QPointFX class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Default constructor - Creates empty QPointF
@@ -198,8 +198,8 @@ float QPointFX::cross(const QPointF& other) const
     return this->x()*other.y() - this->y()*other.x();
 }
 
-} //End of namespace graipe
-
 /**
  * @}
  */
+
+} //End of namespace graipe

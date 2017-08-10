@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -44,6 +44,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Header file for the viewing of images
+ */
+
+/**
  * A class for viewing one band of an image on a QGraphicsScene/View and
  * controlling the view using different parameters.
  */
@@ -56,9 +64,7 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param img The image, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
         ImageSingleBandViewController(Image<T>* img);
     
@@ -212,6 +218,10 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
         //Qt image representation
         QImage m_image;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

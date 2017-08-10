@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,15 +43,15 @@
 #include "features2d/polygonliststatistics.hxx"
 #include "features2d/config.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for views of 2d polygons
- *
- * @addtogroup features2d
- * @{
  */
- 
-namespace graipe {
 
 /**
  * A class for viewing a 2D polygon list on a QGraphicsScene/View and
@@ -65,9 +65,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param polygons The polygon list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
         PolygonList2DViewController(PolygonList2D* polygons);
     
@@ -140,9 +138,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param polygons The weighted polygon list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
         WeightedPolygonList2DViewController(WeightedPolygonList2D* polygons);
     
@@ -216,11 +212,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
         //Weight legend
         QLegend * m_weight_legend;
 };
-
-} //end of namespace graipe
     
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_POLYGONLISTVIEW_HXX

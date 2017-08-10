@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,11 +37,13 @@
 #define GRAIPE_CORE_H
 
 /**
+ * @defgroup graipe_core The core module
+ *
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the outer API of GRAIPE's core module
- *
- * @defgroup core Core functionality for GRAIPE
- * @{
  */
 
 #include "core/algorithm.hxx"

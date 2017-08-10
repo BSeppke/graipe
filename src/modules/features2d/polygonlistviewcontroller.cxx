@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /************************************************************************/
@@ -13,21 +13,18 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for views of 2d polygons
- *
- * @addtogroup features2d
- * @{
  */
  
 /**
-
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param polygons The polygon list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 PolygonList2DViewController::PolygonList2DViewController(PolygonList2D* polygons)
 :	ViewController(polygons),
@@ -377,8 +374,8 @@ void WeightedPolygonList2DViewController::updateView()
     m_weight_legend->setDigits(m_legendDigits->value());
 }
 
-} //End of namespace graipe
-
 /**
  * @}
  */
+
+} //End of namespace graipe

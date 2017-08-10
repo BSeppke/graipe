@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,15 +39,15 @@
 #include "core/config.hxx"
 #include "core/qt_ext/qgraphicsresizableitem.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the QLegend class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Based upon the QGraphicsResizableItem, this class defines a legend for
@@ -267,11 +267,11 @@ class GRAIPE_CORE_EXPORT QLegend
         //The background image of the scale
 		QPixmap* m_bg_pixmap;
 };
-    
-}//end of namespace graipe
 
 /**
  * @}
  */
+    
+}//end of namespace graipe
 
 #endif //GRAIPE_CORE_QLEGEND_HXX

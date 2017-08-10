@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -38,13 +38,13 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for 2d cubic spline lists
- *
- * @addtogroup features2d
- * @{
  */
- 
+
 /**
  * Default constructor. Constructs an empty list of 2D cubic splines.
  */
@@ -607,10 +607,10 @@ bool WeightedCubicSplineList2D::deserialize_item(QXmlStreamReader& xmlReader)
     }
     return false;
 }
-
-} //End of namespace graipe
     
 /**
  * @}
  */
+
+} //End of namespace graipe
  

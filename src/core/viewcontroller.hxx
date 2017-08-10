@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,15 +43,16 @@
 #include <QGraphicsObject>
 #include <QGraphicsScene>
 
-/**
- * @file
- * @brief Header file for the ViewController class
- *
- * @addtogroup core
- * @{
- */
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_core
+ * @{
+ *
+ * @file
+ * @brief Header file for the ViewController class
+ */
 
 /**
  * This class defines the view of a (data) object, to which we refer as
@@ -276,10 +277,10 @@ class GRAIPE_CORE_EXPORT ViewController
 		float m_ticks_height;
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_SERIALIZABLE_HXX

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,12 +37,12 @@
 #define GRAIPE_CORE_QT_EXT_HXX
 
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief This file bundles a collection of different enhancements to the
  * already great Qt library
- *
- * @addtogroup core
- * @{
  */
 
 #include "core/qt_ext/qgraphicsresizableitem.hxx"

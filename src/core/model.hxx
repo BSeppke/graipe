@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -46,15 +46,16 @@
 #include <QtDebug>
 #include <QXmlStreamWriter>
 
+namespace graipe {
+
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the base types of all data: The Model, ModelList and RasteredModel classes.
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 //Forward declaration of used parameter types:
 class Parameter;
@@ -591,10 +592,10 @@ class GRAIPE_CORE_EXPORT RasteredModel
         PointParameter * m_size;
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_MODEL_HXX

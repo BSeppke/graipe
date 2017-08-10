@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -44,15 +44,15 @@
 #include <QFile>
 #include <QTextStream>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the logging facilities
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * This class defines everything, that is needed to add basic logging
@@ -129,10 +129,10 @@ class GRAIPE_CORE_EXPORT Logging
         static Logging* m_this;
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_LOGGING_HXX

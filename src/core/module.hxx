@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,15 +39,15 @@
 #include "core/config.hxx"
 #include "core/factories.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the Module class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * This defines a module - the general extension structure of the
@@ -103,10 +103,10 @@ class GRAIPE_CORE_EXPORT Module
         virtual QString name() const = 0;
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
 
-#endif //MODULE_HXX
+} //end of namespace graipe
+
+#endif //GRAIPE_CORE_MODULE_HXX

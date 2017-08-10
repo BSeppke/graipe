@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -47,20 +47,20 @@
 #include <QCheckBox>
 #include <QScrollArea>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief This file defines the ParameterSelection classes, which are QDialog
  * wrappers for the most commonly used class.
  *
  * This is e.g. used to determine the actual parameters' values for each
  * algorithm run, for a new model creation or for single parameters.
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
-
+ 
 /**
  * Class to select a value for a single parameter, which may also be a
  * parameter group of course!
@@ -202,10 +202,10 @@ protected:
     Algorithm * m_algorithm;
 };
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe
 
 #endif //GRAIPE_CORE_PARAMETERSELECTION_HXX

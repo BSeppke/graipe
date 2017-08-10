@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -48,15 +48,15 @@
 #include <QString>
 #include <QXmlStreamWriter>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the import and export of data
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * This defines a complete static class for import/export of all
@@ -101,10 +101,10 @@ class GRAIPE_CORE_EXPORT Impex
 		static bool save(Serializable * object, const QString & filename, bool compress=true);
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_IMPEX_HXX

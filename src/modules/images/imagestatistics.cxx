@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,6 +37,14 @@
 #include <vigra/accumulator.hxx>
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the statstics of images
+ */
     
 /**
  * Default constructor. Initializes the member with a NULL pointer.
@@ -87,5 +95,9 @@ std::vector<BasicStatistics<double> > ImageStatistics<T>::intensityStats() const
 template class ImageStatistics<float>;
 template class ImageStatistics<int>;
 template class ImageStatistics<unsigned char>;
+
+/**
+ * @}
+ */
 
 } //End of namespace graipe

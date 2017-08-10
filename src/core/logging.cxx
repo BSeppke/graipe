@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,15 +37,16 @@
 
 #include <QDateTime>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implmentation file for the logging facilities
- *
- * @addtogroup core
- * @{
  */
 
-namespace graipe {
 
 /**
  * The "this" pointer's space (static)
@@ -202,8 +203,8 @@ void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, cons
     m_textStream->flush();
 }
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe

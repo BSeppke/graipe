@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,15 +43,15 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the QGraphicsResizableItem class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * This is a 2D QGraphicsItem, which may be reseized
@@ -179,11 +179,11 @@ class GRAIPE_CORE_EXPORT QGraphicsResizableItem
         /** The protection settings for vertical scaling **/
         bool m_protect_v_scaling;
 };
-    
-}//end of namespace graipe
 
 /**
  * @}
  */
+    
+}//end of namespace graipe
 
 #endif

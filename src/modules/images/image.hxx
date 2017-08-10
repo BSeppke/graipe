@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,8 +43,15 @@
 
 #include <QDateTime>
 
-
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Header file for image classes
+ */
 
 /** 
  * Implementation of the standard image format for (remote sensing) images.
@@ -279,8 +286,12 @@ class GRAIPE_IMAGES_EXPORT Image
         DoubleParameter     * m_scale;
         LongStringParameter * m_comment;
         StringParameter     * m_units;
-	
 };
 
+/**
+ * @}
+ */
+
 } //end of namespace graipe
+
 #endif

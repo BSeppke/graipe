@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,15 +42,15 @@
 #include <QString>
 #include <QVector>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the QPointFX class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
   
 /** 
  * This class extends the floating point precise QPointF by means of comparison,
@@ -159,10 +159,10 @@ public:
     float cross(const QPointF& other) const;
 };
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif

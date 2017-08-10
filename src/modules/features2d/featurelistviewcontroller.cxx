@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -38,27 +38,24 @@
 
 #include "features2d/featurelistviewcontroller.hxx"
 
-
 #include <QMessageBox>
 #include <QInputDialog>
 
 namespace graipe {
 
-/**
+/** 
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for views of 2d feature lists
- *
- * @addtogroup features2d
- * @{
  */
  
 /**
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param features The point feature list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 PointFeatureList2DViewController::PointFeatureList2DViewController(PointFeatureList2D* features)
 :	ViewController(features),
@@ -287,9 +284,7 @@ void PointFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param features The weighted point feature list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewController(WeightedPointFeatureList2D * features)
 : ViewController(features),
@@ -613,9 +608,7 @@ void WeightedPointFeatureList2DViewController::mousePressEvent(QGraphicsSceneMou
  * Implementation/specialization of the WeightedPointFeatureList2DViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param features The edgel feature list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 EdgelFeatureList2DViewController::EdgelFeatureList2DViewController(EdgelFeatureList2D* features)
 :	WeightedPointFeatureList2DViewController(features),
@@ -825,9 +818,7 @@ void EdgelFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent
  * Implementation/specialization of the EdgelFeatureList2DViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param features The SIFT feature list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 SIFTFeatureList2DViewController::SIFTFeatureList2DViewController(SIFTFeatureList2D* features)
 :	EdgelFeatureList2DViewController(features),
@@ -987,10 +978,10 @@ void SIFTFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * 
         }
     }
 }
-
-} //End of namespace graipe
     
 /**
  * @}
  */
+
+} //End of namespace graipe
  

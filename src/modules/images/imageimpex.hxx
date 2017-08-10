@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -40,6 +40,14 @@
 #include "images/config.hxx"
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Header file for image import and export functionality
+ */
     
 /**
  * The ImageImpex class is just a frame for two static template functions, which
@@ -139,6 +147,10 @@ class ImageExporter
         void run();
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
-
+ 
 #endif //GRAIPE_IMAGES_IMAGEIMPEX_HXX

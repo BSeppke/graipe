@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,15 +43,15 @@
 #include "features2d/featureliststatistics.hxx"
 #include "features2d/config.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for views of 2d feature lists
- *
- * @addtogroup features2d
- * @{
  */
-
-namespace graipe {
  
 /**
  * A class for viewing a 2D point feature list on a QGraphicsScene/View and
@@ -65,9 +65,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param features The point feature list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
         PointFeatureList2DViewController(PointFeatureList2D* features);
         
@@ -142,9 +140,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param features The weighted point feature list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		WeightedPointFeatureList2DViewController(WeightedPointFeatureList2D * features);
 		
@@ -242,9 +238,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController
          * Implementation/specialization of the WeightedPointFeatureList2DViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param features The edgel feature list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		EdgelFeatureList2DViewController(EdgelFeatureList2D* features);
 		
@@ -305,9 +299,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
          * Implementation/specialization of the EdgelFeatureList2DViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param features The SIFT feature list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		SIFTFeatureList2DViewController(SIFTFeatureList2D* features);
 		
@@ -348,11 +340,11 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
         //Statistics
         SIFTFeatureList2DStatistics * m_stats;
 };
-
-} //end of namespace graipe
     
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_FEATURELISTVIEWCONTROLLER_HXX

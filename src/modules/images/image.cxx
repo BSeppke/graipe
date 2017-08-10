@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -38,6 +38,14 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Implementation file for image classes
+ */
+ 
 /**
  * Default constructor. Constructs an empty Image
  * with zero size and no bands at all.
@@ -214,25 +222,6 @@ void Image<T>::setBand(unsigned int band_id, const vigra::MultiArrayView<2,T>& b
     
     m_imagebands[band_id] = band;
 }
-
-/**
- * Non-constant/reading&writing access to a band of the image at a given band_id.
- * If no band_id is given, the first band (band_id=0) will be returned.
- * This function may throw an error, if the band_id is out of bounds.
- * This function returns an invalid view if the model is locked!
- *
- * \param band_id The id of the band.
- * \return The band, as a vigra::MultiArrayView. If the model is locked, an invalid one.
- *
-template<class T>
-vigra::MultiArrayView<2,T> Image<T>::band(unsigned int band_id)
-{
-    if(locked())
-        return vigra::MultiArrayView<2,T>();
-    
-    return m_imagebands[band_id];
-}
-*/
 
 /**
  * Getter for the number of bands of an Image.
@@ -616,5 +605,9 @@ void Image<T>::appendParameters()
 template class Image<float>;
 template class Image<int>;
 template class Image<unsigned char>;
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe

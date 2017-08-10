@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -35,7 +35,11 @@
 
 #ifndef GRAIPE_CORE_PARAMETERS_HXX
 #define GRAIPE_CORE_PARAMETERS_HXX
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief This file contains a collection of different parameters. The general use of a
  * parameter to encapsulate a value of various types and to provide an
@@ -77,9 +81,6 @@
  * You are, of course, able to extend these Parameters by your own
  * specialized class, as it is done inside the image-Module to select just
  * one band of an image.
- *
- * @addtogroup core
- * @{
  */
 
 #include "core/parameters/boolparameter.hxx"

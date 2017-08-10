@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,15 +39,15 @@
 #include <QString>
 #include <QtGlobal>
 
+namespace  graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the config of GRAIPE's core module
- *
- * @addtogroup core
- * @{
  */
-
-namespace  graipe {
 
 #ifdef GRAIPE_VERSION_MAJOR
     static const unsigned int version_major = GRAIPE_VERSION_MAJOR;
@@ -101,10 +101,10 @@ static const QString full_version_name = QString("%1.%2.%3").arg(version_major).
 	#define GRAIPE_CORE_EXPORT Q_DECL_IMPORT
 #endif //GRAIPE_CORE_BUILD
 
-} //end of namepace graipe
-
 /**
  * @}
  */
+
+} //end of namepace graipe
 
 #endif //GRAIPE_CORE_CONFIG_HXX

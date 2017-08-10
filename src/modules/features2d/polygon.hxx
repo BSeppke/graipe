@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,15 +39,15 @@
 #include "features2d/featurelist.hxx"
 #include "features2d/config.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for 2d polygons
- *
- * @addtogroup features2d
- * @{
  */
-
-namespace graipe {
 
 /**
  * Extension of the QPolygonF class with respect to 
@@ -105,11 +105,11 @@ class GRAIPE_FEATURES2D_EXPORT Polygon2D
          */
 		virtual void addPoint(const PointType& p);
 };
- 
-} //end of namespace graipe
    
 /**
  * @}
  */
+ 
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_POLYGON_HXX

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -57,9 +57,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The sparse vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		SparseVectorfield2DViewController(SparseVectorfield2D* vf);
                 
@@ -165,9 +163,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
          * specialization of the SparseVectorfield2DViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The sparse weighted vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		SparseWeightedVectorfield2DViewController(SparseWeightedVectorfield2D* vf);
                 
@@ -255,9 +251,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
          * Specialization of the SparseVectorfield2DViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The sparse multi vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		SparseMultiVectorfield2DViewController(SparseMultiVectorfield2D* vf);
                 
@@ -339,9 +333,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          * Specialization of the SparseMultiVectorfield2DViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The sparse weighted multi vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		SparseWeightedMultiVectorfield2DViewController(SparseWeightedMultiVectorfield2D* vf);
                 

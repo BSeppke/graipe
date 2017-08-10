@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -37,11 +37,13 @@
 #define GRAIPE_IMAGES_H
 
 /**
+ * @defgroup graipe_images Image classes module
+ *
+ * @addtogroup graipe_images 
+ * @{
+ *
  * @file
  * @brief Header file for the outer API of GRAIPE's images module
- *
- * @defgroup images Images (without algorithms) for GRAIPE
- * @{
  */
 
 #include "images/image.hxx"

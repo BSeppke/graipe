@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,22 +43,20 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the ViewController class
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Default constructor of the ViewController class.
  *
- * \param scene  The QGraphicsScene, in which the view shall be placed at
  * \param model  The model, which shall be displayed by means of this view
- * \param z_oder The z-order of the new view
  */
 ViewController::ViewController(Model * model)
 :	m_model(model),
@@ -504,10 +502,9 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
     }
     return  false;
 }
-
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 

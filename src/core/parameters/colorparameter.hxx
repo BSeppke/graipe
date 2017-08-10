@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,16 +42,16 @@
 #include <QPushButton>
 #include <QColorDialog>
 
-/**
- * @file
- * @brief Header file for the ColorParameter class
- *
- * @addtogroup core
- * @{
- */
-
 namespace graipe {
 
+/**
+ * @addtogroup graipe_core
+ * @{
+ *
+ * @file
+ * @brief Header file for the ColorParameter class
+ */
+ 
 /**
  * This is the ColorParameter class.
  * It inherits from the Parameter base class to:
@@ -152,13 +152,12 @@ class GRAIPE_CORE_EXPORT ColorParameter
         
         /** The delegate **/
         QPointer<QPushButton> m_delegate;
-    
 };
-
-} //end of namespace graipe
 
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_PARAMETERS_COLORPARAMETER_HXX

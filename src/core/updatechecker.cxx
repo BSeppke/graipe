@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,16 +42,16 @@
 #include <QEventLoop>
 #include <QMessageBox>
 
-/**
- * @file
- * @brief Implementation file for the UpdateChecker class
- *
- * @addtogroup core
- * @{
- */
-
 namespace graipe {
 
+/**
+ * @addtogroup graipe_core
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the UpdateChecker class
+ */
+ 
 /**
  * This method/slot checks for updates up to 1.0 (=10) higher than the currently
  * installed version. In addition, a minimal filesize need to be given (defaults to
@@ -109,8 +109,9 @@ void UpdateChecker::checkForUpdates(unsigned int max_version_jump, unsigned int 
     emit finished();
 }
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
+

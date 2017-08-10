@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,15 +42,15 @@
 #include <QRgb>
 #include <QColor>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Header file for the color table classes
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 namespace detail
 {
@@ -74,10 +74,10 @@ GRAIPE_CORE_EXPORT QVector<QRgb> createColorTableFrom3Colors(const QColor & col1
  */
 GRAIPE_CORE_EXPORT QVector<QVector<QRgb> > colorTables();
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_CORE_COLORTABLES_HXX

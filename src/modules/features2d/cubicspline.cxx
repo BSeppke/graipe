@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -38,11 +38,12 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for cubic splines (1d and 2d)
  *
- * @addtogroup features2d
- * @{
  */
  
 /**
@@ -587,10 +588,9 @@ void CubicSpline2D::updateFromPoints()
     m_splineX = CubicSpline1D(points_x, m_first_derivative.x(), m_last_derivative.x());
     m_splineY = CubicSpline1D(points_y, m_first_derivative.x(), m_last_derivative.y());
 }
-
-} //End of namespace graipe
     
 /**
  * @}
  */
- 
+
+} //End of namespace graipe

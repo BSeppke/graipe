@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -45,6 +45,14 @@
 #include "ogr_spatialref.h"
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Implementation file for image import and export functionality
+ */
 
 /** 
  * Type traits for converting standard C++ types
@@ -719,5 +727,9 @@ void ImageExporter::run()
         emit errorMessage(QString("Non-explainable error occured"));		
     }
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe

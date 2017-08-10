@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /************************************************************************/
@@ -16,20 +16,18 @@
 namespace graipe {
     
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for views of 2d cubic spline lists
- *
- * @addtogroup features2d
- * @{
- */ 
+ */
 
 /**
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param splines The spline list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 CubicSplineList2DViewController::CubicSplineList2DViewController(CubicSplineList2D* splines)
 :	ViewController(splines),
@@ -243,9 +241,7 @@ void CubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent *
  * Implementation/specialization of the ViewController's
  * constructor.
  *
- * \param scene The scene, where this View shall be carried out.
  * \param splines The weighted spline list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
  */
 WeightedCubicSplineList2DViewController::WeightedCubicSplineList2DViewController(WeightedCubicSplineList2D * splines)
 :	ViewController(splines),
@@ -532,9 +528,9 @@ void WeightedCubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMous
     }
 }
 
-} //End of namespace graipe
-
 /**
  * @}
  */
+
+} //End of namespace graipe
  

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,15 +39,15 @@
 #include "features2d/config.hxx"
 #include "features2d/featurelist.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for cubic splines (1d and 2d)
- *
- * @addtogroup features2d
- * @{
  */
-
-namespace graipe {
  
 /**
  * This class represents a CubicSpline by means of a 1D interpolation
@@ -344,11 +344,11 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
         //Cached bounding rect of this Cubic spline
         QRectF m_boundingRect;    
 };
-
-} //end of namespace graipe
     
 /**
  * @}
  */
+
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINE_HXX

@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -39,13 +39,13 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for statistics for 2d cubic spline lists
- *
- * @addtogroup features2d
- * @{
  */
- 
+
 /**
  * Default constructor. Initializes the member with a NULL pointer.
  */
@@ -127,9 +127,9 @@ BasicStatistics<float> WeightedCubicSplineList2DStatistics::weightStats() const
 {
 	return m_weights;
 }
-
-} //End of namespace graipe
     
 /**
  * @}
  */
+
+} //End of namespace graipe

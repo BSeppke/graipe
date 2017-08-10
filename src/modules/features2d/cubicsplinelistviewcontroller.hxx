@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -43,15 +43,15 @@
 #include "features2d/cubicsplineliststatistics.hxx"
 #include "features2d/config.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Header file for views of 2d cubic spline lists
- *
- * @addtogroup features2d
- * @{
- */ 
-
-namespace graipe {
+ */
 
 /**
  * A class for viewing a 2D cubic spline list on a QGraphicsScene/View and 
@@ -65,9 +65,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param splines The spline list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
         CubicSplineList2DViewController(CubicSplineList2D* splines);
     
@@ -152,9 +150,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param splines The weighted spline list, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
         WeightedCubicSplineList2DViewController(WeightedCubicSplineList2D* splines);
         
@@ -245,10 +241,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
         QLegend* m_weight_legend;
 };
     
-} //end of namespace graipe
-    
 /**
  * @}
  */
+    
+} //end of namespace graipe
 
 #endif //GRAIPE_FEATURES2D_CUBICSPLINELISTVIEWCONTROLLER_HXX

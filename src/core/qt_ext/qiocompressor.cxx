@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -83,15 +83,15 @@
 #include "zlib.h"
 #include <QtCore/QDebug>
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the QIOCompressor class, see license terms above
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
     
 typedef Bytef ZlibByte;
 typedef uInt ZlibSize;
@@ -681,8 +681,8 @@ qint64 QIOCompressor::pos() const //0 on the beginning, else: 1
     }
 }
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe

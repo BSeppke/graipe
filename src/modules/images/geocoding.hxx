@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -46,6 +46,13 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_images
+ * @{
+ *
+ * @file
+ * @brief Header file for geocoding functionality
+ */
 
 /**
  * Templated class (template argument is precision) for the 
@@ -254,6 +261,10 @@ class GCP
 		QString m_description;
 		T m_img_x, m_img_y, m_map_x, m_map_y, m_map_z;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

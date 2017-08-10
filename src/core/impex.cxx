@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -42,15 +42,15 @@
 
 #include "core/parameters/longstringparameter.hxx"
 
+namespace graipe {
+
 /**
+ * @addtogroup graipe_core
+ * @{
+ *
  * @file
  * @brief Implementation file for the import and export of data
- *
- * @addtogroup core
- * @{
  */
-
-namespace graipe {
 
 /**
  * Basic open procedure for compressed and uncompressed files.
@@ -112,8 +112,9 @@ bool Impex::save(Serializable * object, const QString & filename, bool compress)
 	return false;
 }
 
-}//end of namespace graipe
-
 /**
  * @}
  */
+
+}//end of namespace graipe
+

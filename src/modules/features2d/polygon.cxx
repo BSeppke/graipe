@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -34,17 +34,17 @@
 /************************************************************************/
 
 #include "features2d/polygon.hxx"
-
+ 
 namespace graipe {
-   
+
 /**
+ * @addtogroup graipe_features2d
+ * @{
+ *
  * @file
  * @brief Implementation file for 2d polygons
- *
- * @addtogroup features2d
- * @{
  */
- 
+   
 /**
  * Virtual destructor of this class, needed due to non-final QVector class.
  */
@@ -105,9 +105,9 @@ void Polygon2D::addPoint(const PointType& new_p)
 {
 	*this << new_p;
 }
-
-} //End of namespace graipe
   
 /**
  * @}
  */
+
+} //End of namespace graipe

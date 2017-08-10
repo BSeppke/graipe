@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -57,9 +57,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The dense vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		DenseVectorfield2DViewController(DenseVectorfield2D* vf);
                 
@@ -160,9 +158,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DParticleViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The dense vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		DenseVectorfield2DParticleViewController(DenseVectorfield2D* vf);
                 
@@ -273,9 +269,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DViewController
          * specialization of the DenseVectorfield2DViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The dense weighted vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		DenseWeightedVectorfield2DViewController(DenseWeightedVectorfield2D* vf);
                 
@@ -357,9 +351,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DParticleViewControlle
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
          * \param vf The dense weighted vectorfield, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
          */
 		DenseWeightedVectorfield2DParticleViewController(DenseWeightedVectorfield2D* vf);
                 

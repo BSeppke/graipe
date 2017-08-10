@@ -1,6 +1,6 @@
 /************************************************************************/
 /*                                                                      */
-/*               Copyright 2008-2016 by Benjamin Seppke                 */
+/*               Copyright 2008-2017 by Benjamin Seppke                 */
 /*       Cognitive Systems Group, University of Hamburg, Germany        */
 /*                                                                      */
 /*    This file is part of the GrAphical Image Processing Enviroment.   */
@@ -36,16 +36,16 @@
 #include "core/serializable.hxx"
 #include "core/impex.hxx"
 
-/**
- * @file
- * @brief This file implements the needed serialization procedures.
- *
- * @addtogroup core
- * @{
- */
- 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_core
+ * @{
+ *
+ * @file
+ * @brief This file implements the needed serialization procedures.
+ */
+ 
 /**
  * Splits a string using a given separator on the first occurence only.
  *
@@ -149,8 +149,9 @@ void Serializable::setID(const QString& new_id)
     m_id = new_id;
 }
 
-} //end of namespace graipe
-
 /**
  * @}
  */
+
+} //end of namespace graipe
+
