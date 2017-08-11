@@ -42,8 +42,10 @@
  * @file
  * @brief Configuration file to the images module
  */
- 
+
+/** Global maximum image width **/
 #define MAX_IMAGE_WIDTH  20000
+/** Global maximum image height **/
 #define MAX_IMAGE_HEIGHT 20000
 
 #ifdef GRAIPE_IMAGES_BUILD

@@ -55,6 +55,7 @@ namespace graipe {
  */
 
 /** 
+ * @{
  * Type traits for converting standard C++ types
  * to GDAL type identifier using templates only.
  * The template parameter T is denotes the C++ type here.
@@ -63,7 +64,9 @@ template <class T> struct GDALTraits                { static GDALDataType gdalTy
 template <>        struct GDALTraits<float>         { static GDALDataType gdalTypeID() { return GDT_Float32; } };
 template <>        struct GDALTraits<int>           { static GDALDataType gdalTypeID() { return GDT_Int32;   } };
 template <>        struct GDALTraits<unsigned char> { static GDALDataType gdalTypeID() { return GDT_Byte;    } };
-    
+/**
+ * @}
+ */
 
 /**
  * Template function for the filling of image contents using the data that are

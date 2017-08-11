@@ -41,24 +41,16 @@ namespace graipe {
 /**
  * @addtogroup graipe_images
  * @{
- *
- * @file
- * @brief Implementation file for the statstics of images
+ *     @file
+ *     @brief Implementation file for the statstics of images
+ * @}
  */
-    
-/**
- * Default constructor. Initializes the member with a NULL pointer.
- */
+ 
 template< class T>
 ImageStatistics<T>::ImageStatistics()
 {
 }
 
-/**
- * A more useful constructor.
- * 
- * \param img The image, for which we want to generate the statistics.
- */
 template< class T>
 ImageStatistics<T>::ImageStatistics(const Image<T>* img)
  : m_image(img)
@@ -80,11 +72,6 @@ ImageStatistics<T>::ImageStatistics(const Image<T>* img)
     }
 }
 
-/**
- * Returns basic statistics of the intensity of all bands inside the image.
- *
- * \return Basic statistics of the intensity of all bands inside the image..
- */
 template< class T>
 std::vector<BasicStatistics<double> > ImageStatistics<T>::intensityStats() const
 {
@@ -95,9 +82,5 @@ std::vector<BasicStatistics<double> > ImageStatistics<T>::intensityStats() const
 template class ImageStatistics<float>;
 template class ImageStatistics<int>;
 template class ImageStatistics<unsigned char>;
-
-/**
- * @}
- */
 
 } //End of namespace graipe

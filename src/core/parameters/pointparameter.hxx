@@ -210,8 +210,7 @@ class GRAIPE_CORE_EXPORT PointParameter
         QPoint m_value;
     
         /** The minimum value for this parameter **/
-        QPoint m_min_value;
-        
+        QPoint m_min_value;        
         /** The maximum value for this parameter **/
         QPoint m_max_value;
     

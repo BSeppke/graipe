@@ -41,19 +41,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_images
  * @{
- *
- * @file
- * @brief Implementation file for image band selection parameter class
+ *     @file
+ *     @brief Implementation file for image band selection parameter class
+ * @}
  */
 
-/**
- * Default constructor of the ImageBandParameter class:
- *
- * \param name           The name (label) of this parameter.
- * \param parent         If given (!= NULL), this parameter has a parent and will
- *                       be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
- */
 ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Workspace* wsp)
 :	Parameter(name, parent, invert_parent),
     m_delegate(NULL),
@@ -62,9 +54,6 @@ ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, 
 {
 }
 
-/**
- * The destructor of the ImageBandParameterBase class
- */
 ImageBandParameterBase::~ImageBandParameterBase()
 {
     if(m_delegate != NULL)
@@ -76,14 +65,6 @@ ImageBandParameterBase::~ImageBandParameterBase()
     }
 }
 
-/**
- * The delegate widget of this parameter. 
- * Each parameter generates such a widget on demand, which refers to the
- * first call of this function. This is needed due to the executability of
- * classes using parameters (like the Algorithm class) in different threads.
- *
- * \return The delegate widget to control the values of this parameter.
- */
 QWidget* ImageBandParameterBase::delegate()
 {
     if( m_delegate == NULL)
@@ -103,29 +84,16 @@ QWidget* ImageBandParameterBase::delegate()
     return m_delegate;
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 void ImageBandParameterBase::updateImage()
 {
     handleUpdateImage();
 }
-    
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
+
 void ImageBandParameterBase::updateBandId()
 {
     handleUpdateBandId();
 }
 
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
 void ImageBandParameterBase::initConnections()
 {
     connect(m_cmbImage, SIGNAL(currentIndexChanged(int)), this, SLOT(updateImage()));
@@ -137,14 +105,13 @@ void ImageBandParameterBase::initConnections()
 
 
 
-/**
- * Default constructor of the ImageBandParameter class:
- *
- * \param name           The name (label) of this parameter.
- * \param parent         If given (!= NULL), this parameter has a parent and will
- *                       be enabled/disabled, if the parent is a BoolParameter.
- * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
- */
+
+
+
+
+
+
+
 template <class T>
 ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Workspace* wsp)
 :	ImageBandParameterBase(name, parent, invert_parent,wsp),
@@ -175,42 +142,24 @@ ImageBandParameter<T>::ImageBandParameter(QString name, Parameter* parent, bool 
     }
 }
 
-/**
- * The destructor of the ImageBandParameter class
- */
 template <class T>
 ImageBandParameter<T>::~ImageBandParameter()
 {
     //Widgets will be destroyed in parent (base) class
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 template <class T>
 Image<T>* ImageBandParameter<T>::image() const
 {
     return m_image;
 }
 
-/**
- * The current value of this parameter in the correct, most special type.
- *
- * \return The value of this parameter.
- */
 template <class T>
 unsigned int ImageBandParameter<T>::bandId() const
 {
     return m_bandId;
 }
-    
-/**
- * The current const value of this parameter in the correct, most special type.
- *
- * \return The const value of this parameter.
- */
+
 template <class T>
 const vigra::MultiArrayView<2,T>& ImageBandParameter<T>::value() const
 {
@@ -221,11 +170,6 @@ const vigra::MultiArrayView<2,T>& ImageBandParameter<T>::value() const
     return m_empty_image;
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 template <class T>
 void ImageBandParameter<T>::setImage(Image<T> * image)
 {
@@ -243,11 +187,6 @@ void ImageBandParameter<T>::setImage(Image<T> * image)
     }
 }
 
-/**
- * Writing accessor of the current value of this parameter.
- *
- * \param value The new value of this parameter.
- */
 template <class T>
 void ImageBandParameter<T>::setBandId(unsigned int bandid)
 {
@@ -257,15 +196,6 @@ void ImageBandParameter<T>::setBandId(unsigned int bandid)
     }
 }
 
-
-/**
- * The value converted to a string. Please note, that this can vary from the 
- * serialize() result, which also returns a string. This is due to the fact,
- * that serialize also may perform encoding of strings to avoid special chars
- * inside the string.
- *
- * \return The value of the parameter converted to an QString.
- */
 template <class T>
 QString ImageBandParameter<T>::toString() const
 {
@@ -279,13 +209,6 @@ QString ImageBandParameter<T>::toString() const
 	}
 }
 
-/**
- * Serialization of the parameter's state to a string. Please note, that this can 
- * vary from the toString() result, which also returns a string. This is due to the fact,
- * that serialize also may perform encoding of strings to avoid special chars.
- *
- * \return The serialization of the parameter's state.
- */
 template <class T>
 void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
 {    
@@ -299,12 +222,6 @@ void ImageBandParameter<T>::serialize(QXmlStreamWriter& xmlWriter) const
     xmlWriter.writeEndElement();
 }
 
-/**
- * Deserialization of a parameter's state from a string.
- *
- * \param str The serialization of this parameter's state.
- * \return True, if the deserialization was successful, else false.
- */
 template <class T>
 bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
 {
@@ -368,14 +285,6 @@ bool ImageBandParameter<T>::deserialize(QXmlStreamReader& xmlReader)
     }
 }
 
-/**
- * This function locks the parameters value. 
- * This means, that after a lock() call, only const acess to the parameter is 
- * possible until someone unlocks it. 
- * To work properly, the inner parameter class has to be designed accordingly.
- * As an example, you may look at the Model class, which supports locking and
- * unlocking - so do the parameter classes based on models!
- */
 template <class T>
 void ImageBandParameter<T>::lock()
 {	
@@ -385,14 +294,6 @@ void ImageBandParameter<T>::lock()
     }
 }
 
-/**
- * This function unlocks the parameters value.
- * This means, that after a lock() call, only const acess to the parameter is 
- * possible until someone unlocks it. 
- * To work properly, the inner parameter class has to be designed accordingly.
- * As an example, you may look at the Model class, which supports locking and
- * unlocking - so do the parameter classes based on models!
- */
 template <class T>
 void ImageBandParameter<T>::unlock()
 {
@@ -402,26 +303,12 @@ void ImageBandParameter<T>::unlock()
     }
 }
 
-/**
- * This function indicates whether the value of a parameter is valid or not.
- *
- * \return True, if the parameter's value is valid.
- */
 template <class T>
 bool ImageBandParameter<T>::isValid() const
 {
 	return	(m_image != NULL) && (m_bandId < m_image->numBands());
 }
 
-    
-/**
- * This function indicates whether the value of a parameter is a Model* or 
- * many of them or needs one at least. These parameters need to access the
- * global 'models' variable, too!
- *
- * \return A filled vector, if the parameter's value is related to a Model*.
- *         An empty vector by default.
- */
 template <class T>
 std::vector<Model*> ImageBandParameter<T>::needsModels() const
 {
@@ -433,12 +320,7 @@ std::vector<Model*> ImageBandParameter<T>::needsModels() const
     }
     return modelList;
 }
-    
-/**
- * Initializes the connections (signal<->slot) between the parameter class and
- * the delegate widget. This will be done after the first call of the delegate()
- * function, since the delegate is NULL until then.
- */
+
 template <class T>
 void ImageBandParameter<T>::initConnections()
 {
@@ -458,10 +340,6 @@ void ImageBandParameter<T>::initConnections()
     }
 }
 
-/**
- * This slot is called everytime, the delegate has changed. It has to synchronize
- * the internal value of the parameter with the current delegate's value
- */
 template <class T>
 void ImageBandParameter<T>::handleUpdateImage()
 {
@@ -493,10 +371,6 @@ void ImageBandParameter<T>::handleUpdateImage()
     }
 }
 
-/**
- * This slot is called everytime, the bandID delegate has changed. 
- * It has to synchronize the internal value of the parameter with the current delegate's value
- */
 template <class T>
 void ImageBandParameter<T>::handleUpdateBandId()
 {

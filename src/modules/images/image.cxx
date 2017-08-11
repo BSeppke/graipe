@@ -41,15 +41,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_images
  * @{
- *
- * @file
- * @brief Implementation file for image classes
+ *     @file
+ *     @brief Implementation file for image classes
+ * @}
  */
  
-/**
- * Default constructor. Constructs an empty Image
- * with zero size and no bands at all.
- */
 template<class T>
 Image<T>::Image(Workspace* wsp)
  :  RasteredModel(wsp),
@@ -65,11 +61,6 @@ Image<T>::Image(Workspace* wsp)
     appendParameters();
 }
 
-/**
- * Copy constructor. Constructs a new Image from another Image.
- *
- * \param img The other image.
- */
 template<class T>
 Image<T>::Image(const Image<T> & img)
  :	RasteredModel(img),
@@ -92,19 +83,6 @@ Image<T>::Image(const Image<T> & img)
     }
 }
 
-/**
- * A more flexible contructor.
- * Constructs an image of a given size. Also allows to set the other
- * parameter's values, too.
- *
- * \param size The image's shape.
- * \param numBand The image's band count.
- * \param timestamp The image's timestamp.
- * \param filename The image's filename (where it was loaded from).
- * \param comment The image's comment contents.
- * \param units The image's units (where it can be scaled to using the scale).
- * \param scale The image's scale (use it to get from pixels to units).
- */
 template<class T>
 Image<T>::Image(Size_Type size, 
                 unsigned int numBands,
@@ -123,9 +101,6 @@ Image<T>::Image(Size_Type size,
     setNumBands(numBands);
 }
 
-/**
- * Specialization of the virtual destructor of RasteredModel
- */
 template<class T>
 Image<T>::~Image()
 {
@@ -133,87 +108,43 @@ Image<T>::~Image()
     //will also delete all other (newly introduced) parameters
     //No need to do anything here!
 }
-    
-/**
- * Returns unique typeNames for each Image type. Currently, we define 
- * three different typeNames.
- *
- * \return Always "Image".
- */
+
 template<>
 QString Image<float>::typeName() const
 {
     return "Image";
 }
 
-/**
- * Returns unique typeNames for each Image type. Currently, we define 
- * three different typeNames.
- *
- * \return Always "IntImage".
- */
 template<>
 QString Image<int>::typeName() const
 {
     return "IntImage";
 }
 
-/**
- * Returns unique typeNames for each Image type. Currently, we define 
- * three different typeNames.
- *
- * \return Always "ByteImage".
- */
 template<>
 QString Image<unsigned char>::typeName() const
 {
     return "ByteImage";
 }
 
-/**
- * Check if an Image has  > 0 pixels
- *
- * \return true, if numBands() and size() are non-zero
- */
 template<class T>
 bool Image<T>::isEmpty() const
 {
     return RasteredModel::isEmpty() || numBands()==0;
 }
 
-/**
- * Access the shape of one band of this image.
- *
- * \return The shape of one band of this image.
- */
 template<class T>
 typename Image<T>::Size_Type Image<T>::size() const
 {
     return typename Image<T>::Size_Type(width(), height());
 }
 
-/**
- * Constant/reading access to a band of the image at a given band_id.
- * If no band_id is given, the first band (band_id=0) will be returned.
- * This function may throw an error, if the band_id is out of bounds.
- *
- * \param band_id The id of the band.
- * \return The band, as a const vigra::MultiArrayView.
- */
 template<class T>
 const vigra::MultiArrayView<2,T> & Image<T>::band(unsigned int band_id) const
 {
     return m_imagebands[band_id];
 }
 
-/**
- * Setting access to a band of the image at a given band_id.
- * If no band_id is given, the first band (band_id=0) will be returned.
- * This function may throw an error, if the band_id is out of bounds.
- *
- * \param band_id The id of the band.
- * \param band The band, as a const vigra::MultiArrayView.
- */
 template<class T>
 void Image<T>::setBand(unsigned int band_id, const vigra::MultiArrayView<2,T>& band)
 {
@@ -223,22 +154,12 @@ void Image<T>::setBand(unsigned int band_id, const vigra::MultiArrayView<2,T>& b
     m_imagebands[band_id] = band;
 }
 
-/**
- * Getter for the number of bands of an Image.
- *
- * \return The number of bands of the Image.
- */
 template <class T>
 unsigned int Image<T>::numBands() const
 {
 	return m_numBands->value();
 }
 
-/**
- * Setter for the number of bands of an Image.
- *
- * \param badnds The new number of bands of the Image.
- */
 template <class T>
 void Image<T>::setNumBands( unsigned int bands)
 {
@@ -249,55 +170,30 @@ void Image<T>::setNumBands( unsigned int bands)
     updateModel();
 }
 
-/**
- * Getter for the timestamp of an Image.
- *
- * \return The timestamp of the Image.
- */
 template<class T>
 typename Image<T>::DateTime_Type Image<T>::timestamp() const
 {
 	return m_timestamp->value();
 }
-    
-/**
- * Getter for the comment of an Image.
- *
- * \return The comment of the Image.
- */
+
 template<class T>
 typename Image<T>::Comment_Type Image<T>::comment() const
 {
 	return m_comment->value();
 }
 
-/**
- * Getter for the units of an Image.
- *
- * \return The units of the Image.
- */
 template<class T>
 typename Image<T>::Units_Type Image<T>::units() const
 {
 	return m_units->value();
 }
 
-/**
- * Getter for the scale of an Image.
- *
- * \return The scale of the Image.
- */
 template<class T>
 typename Image<T>::Scale_Type Image<T>::scale() const
 {
 	return m_scale->value();
 }
 
-/**
- * Setter for the timestamp of an Image.
- *
- * \param timestamp The new timestamp of the Image.
- */
 template<class T>
 void Image<T>::setTimestamp(const DateTime_Type& timestamp)
 {
@@ -308,11 +204,6 @@ void Image<T>::setTimestamp(const DateTime_Type& timestamp)
     updateModel();
 }
 
-/**
- * Setter for the comment of an Image.
- *
- * \param timestamp The new comment of the Image.
- */
 template<class T>
 void Image<T>::setComment(const Comment_Type& comment)
 {
@@ -323,11 +214,6 @@ void Image<T>::setComment(const Comment_Type& comment)
     updateModel();
 }
 
-/**
- * Setter for the units of an Image.
- *
- * \param timestamp The new units of the Image.
- */
 template<class T>
 void Image<T>::setUnits(const Units_Type& units)
 {
@@ -338,11 +224,6 @@ void Image<T>::setUnits(const Units_Type& units)
         updateModel();
 }
 
-/**
- * Setter for the scale of an Image.
- *
- * \param timestamp The new scale of the Image.
- */
 template<class T>
 void Image<T>::setScale(Scale_Type scale)
 {
@@ -353,11 +234,6 @@ void Image<T>::setScale(Scale_Type scale)
     updateModel();
 }
 
-/**
- * Copies the complete metadata (defined by the parameters) from another Model.
- *
- * \other The other model.
- */
 template<class T>
 void Image<T>::copyMetadata(Model & other) const
 {
@@ -375,11 +251,6 @@ void Image<T>::copyMetadata(Model & other) const
 	}
 }
 
-/**
- * Const copy model's complete data (and metadata) to another model.
- *
- * \param other The other model.
- */
 template<class T>
 void Image<T>::copyData(Model& other) const
 {
@@ -398,12 +269,6 @@ void Image<T>::copyData(Model& other) const
     }    
 }
 
-/**
- * Serialization of the Image to an xml file.
- * The serialization is just a binary stream of all bands, one after the other.
- *
- * \param xmlWriter The QXmlStreamWriter where we will put our output on.
- */
 template<class T>
 void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
@@ -434,13 +299,6 @@ void Image<T>::serialize_content(QXmlStreamWriter& xmlWriter) const
     }
 }
 
-/**
- * Deserialization of a list of polygons from an xml file.
- * Since the serialization is just a binary stream of all bands, one after the other
- * and we already know the size and count of bands, it is quite easy the deserialize.
- *
- * \param xmlReader The QXmlStreamReader, where we will read from.
- */
 template<class T>
 bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
 {
@@ -538,10 +396,6 @@ bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
     return true;
 }
 
-/**
- * Specialization of RasterModel's updateModel procedure. 
- * Is called everytime, the model changes.
- */
 template <class T>
 void Image<T>::updateModel()
 {
@@ -588,9 +442,6 @@ void Image<T>::updateModel()
     }
 }
 
-/**
- * Add the other parameters to the ones of the RasteredModel
- */
 template <class T>
 void Image<T>::appendParameters()
 {
@@ -606,8 +457,5 @@ template class Image<float>;
 template class Image<int>;
 template class Image<unsigned char>;
 
-/**
- * @}
- */
 
 } //end of namespace graipe

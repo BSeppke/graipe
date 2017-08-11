@@ -42,17 +42,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_images
  * @{
- *
- * @file
- * @brief Implementation file for the viewing of images
+ *     @file
+ *     @brief Implementation file for the viewing of images
+ * @}
  */
-    
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param img The image, which we want to show.
- */
+
 template <class T>
 ImageSingleBandViewController<T>::ImageSingleBandViewController(Image<T>* img)
 : ViewController(img),
@@ -99,10 +93,6 @@ ImageSingleBandViewController<T>::ImageSingleBandViewController(Image<T>* img)
 	
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 template <class T>
 ImageSingleBandViewController<T>::~ImageSingleBandViewController()
 {
@@ -111,14 +101,6 @@ ImageSingleBandViewController<T>::~ImageSingleBandViewController()
     //No need to do anything here
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 template <class T>
 void ImageSingleBandViewController<T>::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
@@ -132,9 +114,6 @@ void ImageSingleBandViewController<T>::paint(QPainter *painter, const QStyleOpti
 	ViewController::paintAfter(painter,option, widget);
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 template <class T>
 void ImageSingleBandViewController<T>::updateView()
 {
@@ -200,12 +179,6 @@ void ImageSingleBandViewController<T>::updateView()
     update();
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-hover event.
- * Will send pixel info using signals while hovering over the image.
- *
- * \param event The mouse event which triggered this function.
- */
 template <class T>
 void ImageSingleBandViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
@@ -238,12 +211,12 @@ void ImageSingleBandViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent *
 
 
 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param img The image, which we want to show.
- */
+
+
+
+
+
+
 template <class T>
 ImageRGBViewController<T>::ImageRGBViewController(Image<T>* img)
 :   ViewController(img),
@@ -268,10 +241,6 @@ ImageRGBViewController<T>::ImageRGBViewController(Image<T>* img)
     updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 template <class T>
 ImageRGBViewController<T>::~ImageRGBViewController()
 {
@@ -280,14 +249,6 @@ ImageRGBViewController<T>::~ImageRGBViewController()
     //No need to do anything here
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 template <class T>
 void ImageRGBViewController<T>::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
@@ -302,9 +263,6 @@ void ImageRGBViewController<T>::paint(QPainter *painter, const QStyleOptionGraph
 	ViewController::paintAfter(painter,option, widget);
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 template <class T>
 void ImageRGBViewController<T>::updateView()
 {
@@ -352,13 +310,7 @@ void ImageRGBViewController<T>::updateView()
     }
     update();
 }
-    
-/**
- * Implementation/specialization of the handling of a mouse-hover event.
- * Will send pixel info using signals while hovering over the image.
- *
- * \param event The mouse event which triggered this function.
- */
+
 template <class T>
 void ImageRGBViewController<T>::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
@@ -397,9 +349,5 @@ template class ImageSingleBandViewController<unsigned char>;
 template class ImageRGBViewController<float>;
 template class ImageRGBViewController<int>;
 template class ImageRGBViewController<unsigned char>;
-
-/**
- * @}
- */
     
 } //end of namespace graipe

@@ -66,14 +66,20 @@ class GRAIPE_IMAGES_EXPORT Image
 :   public RasteredModel
 {
 	public:
-        //Some convenient TypeDefs
+        /** 
+         * @{
+         * Some convenient TypeDefs
+         */
 		typedef QDateTime       DateTime_Type;
 		typedef QString         String_Type;
 		typedef String_Type     Comment_Type;
 		typedef String_Type     Units_Type;
 		typedef float           Scale_Type;
 		typedef vigra::Shape2	Size_Type;
-		
+		/**
+         * @}
+         */
+    
 		/**
          * Default constructor. Constructs an empty Image
          * with zero size and no bands at all.
@@ -94,7 +100,7 @@ class GRAIPE_IMAGES_EXPORT Image
          *
          * \param size The image's shape.
          * \param numBands The image's band count.
-         
+         * \param wsp The image's workspace
          */
 		Image(Size_Type size, unsigned int numBands, Workspace* wsp);
     
@@ -147,19 +153,7 @@ class GRAIPE_IMAGES_EXPORT Image
          * \param band The band, as a const vigra::MultiArrayView.
          */
 		void setBand(unsigned int band_id, const vigra::MultiArrayView<2,T>& band);
-        
-        /**
-         * Non-constant/reading&writing access to a band of the image at a given band_id.
-         * If no band_id is given, the first band (band_id=0) will be returned.
-         * This function may throw an error, if the band_id is out of bounds.
-         * This function returns an invalid view if the model is locked!
-         *
-         * \param band_id The id of the band.
-         * \return The band, as a vigra::MultiArrayView. If the model is locked, an invalid one.
-         *
-		vigra::MultiArrayView<2,T> band(unsigned int band_id = 0);
-        */
-    
+            
         /**
          * Getter for the number of bands of an Image.
          *
@@ -170,7 +164,7 @@ class GRAIPE_IMAGES_EXPORT Image
         /**
          * Setter for the number of bands of an Image.
          *
-         * \param badnds The new number of bands of the Image.
+         * \param bands The new number of bands of the Image.
          */
         void setNumBands(unsigned int bands);
 
@@ -212,28 +206,28 @@ class GRAIPE_IMAGES_EXPORT Image
         /**
          * Setter for the comment of an Image.
          *
-         * \param timestamp The new comment of the Image.
+         * \param comment The new comment of the Image.
          */
 		void setComment(const Comment_Type& comment);
         
         /**
          * Setter for the units of an Image.
          *
-         * \param timestamp The new units of the Image.
+         * \param units The new units of the Image.
          */
 		void setUnits(const Units_Type& units);
         
         /**
          * Setter for the scale of an Image.
          *
-         * \param timestamp The new scale of the Image.
+         * \param scale The new scale of the Image.
          */
 		void setScale(Scale_Type scale);
 	
         /**
          * Copies the complete metadata (defined by the parameters) from another Model.
          *
-         * \other The other model.
+         * \param other The other model.
          */
 		void copyMetadata(Model& other) const;
     
@@ -274,18 +268,21 @@ class GRAIPE_IMAGES_EXPORT Image
          */
         void appendParameters();
     
-        //Storage of the image bands
+        /** Storage of the image bands **/
 		std::vector<vigra::MultiArray<2,T> > m_imagebands;
-		
-        //Filename (without parameter/hidden)
-		String_Type			m_filename;
     
-        //Additional parameters
+        /**
+         * @{
+         * Additional parameters
+         */
         IntParameter        * m_numBands;
         DateTimeParameter   * m_timestamp;
         DoubleParameter     * m_scale;
         LongStringParameter * m_comment;
         StringParameter     * m_units;
+        /**
+         * @}
+         */
 };
 
 /**
