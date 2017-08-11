@@ -56,8 +56,10 @@ namespace graipe {
 class GRAIPE_FEATURES2D_EXPORT CubicSpline1D
 {
     public:
-        //Internally used types
+        /** The internally used point type **/
         typedef PointFeatureList2D::PointType PointType;
+        
+        /** The internally used point list type **/
         typedef QVector<PointType> PointListType;
         
         /**
@@ -105,7 +107,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline1D
         /**
          * Resets the last derivative (just after the last point).
          *
-         * \param first_derivative The first order derivative of the 1D cubic spline just after the last point.
+         * \param last_derivative The first order derivative of the 1D cubic spline just after the last point.
          */
         inline void setLastDerivative(float last_derivative);
     
@@ -165,14 +167,16 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline1D
          */
         inline void updateSecondDerivatives();
         
-        //Point (x,y) list
+        /** Point (x,y) list **/
         PointListType m_points;
         
-        //Gradients before and after the given points
+        /** Derivative before  the first point **/
         float m_first_derivative;
+    
+        /** Derivative after the last point **/
         float m_last_derivative;
         
-        //Second order derivatives at each point
+        /** Second order derivatives at each point **/
         QVector<float> m_y2;
 };
     
@@ -189,8 +193,10 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline1D
 class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
 {
     public:
-        //Internally used types
+        /** The internally used point type **/
         typedef CubicSpline1D::PointType PointType;
+    
+        /** The internally used point list type **/
         typedef CubicSpline1D::PointListType PointListType;
         
         /**
@@ -238,7 +244,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
         /**
          * Resets the last derivative (just after the last point).
          *
-         * \param first_derivative The first order derivative of the 2D cubic spline just after the last point.
+         * \param last_derivative The first order derivative of the 2D cubic spline just after the last point.
          */
         inline void setLastDerivative(const PointType& last_derivative);
     
@@ -296,8 +302,8 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
          * Update/replace a point in the point list with/by a new one. Does nothing
          * if the index is out of range w.r.t. the list of points.
          *
-         * \param index The index, for which we want to replace the point.
-         * \param point The new point, which will replace the old one
+         * \param idx   The index, for which we want to replace the point.
+         * \param new_p The new point, which will replace the old one
          */
 		virtual void setPoint(unsigned int idx, const PointType& new_p);
 		
@@ -330,18 +336,20 @@ class GRAIPE_FEATURES2D_EXPORT CubicSpline2D
          */
         void updateFromPoints();
     
-        //One cubic spline for each dimension
+        /** One cubic spline for the x-dimension **/
         CubicSpline1D m_splineX;
+        /** One cubic spline for the x-dimension **/
         CubicSpline1D m_splineY;
    
-        //Point (x,y) list
+        /** Point (x,y) list **/
         PointListType m_points;
     
-        //Gradients before and after the given points
+        /** Gradient before the first point **/
         PointType m_first_derivative;
+        /** Gradient after the last point **/
         PointType m_last_derivative;
     
-        //Cached bounding rect of this Cubic spline
+        /** Cached bounding rect of this Cubic spline **/
         QRectF m_boundingRect;    
 };
     

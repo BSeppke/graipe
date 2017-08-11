@@ -117,21 +117,27 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2DViewController
         void mousePressEvent(QGraphicsSceneMouseEvent * event);
     
     
-        //Polygons/Polylines are used to draw the splines
+        /** Polygons/Polylines are used to draw the splines **/
         QVector<QPolygonF> m_lines;
     
-        //...overlaid with supporting points.
+        /** Polygons will be overlaid with supporting points. **/
         QVector<QList<QPointF> > m_points;
     
-        //Spline list statistics.
+        /** Spline list statistics. **/
         CubicSplineList2DStatistics * m_stats;
     
-        //Additional parameters:
+        /** 
+         * @{
+         * Additional parameters
+         */
         BoolParameter*  m_showLabels;
         FloatParameter* m_fontSize;
         EnumParameter*  m_mode;
         FloatParameter* m_lineWidth;
         ColorParameter* m_color;
+        /**
+         * @}
+         */
 };
     
     
@@ -215,16 +221,19 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
          */
         void mousePressEvent(QGraphicsSceneMouseEvent * event);
         
-        //Polygons/Polylines are used to draw the splines
+        /** Polygons/Polylines are used to draw the splines **/
         QVector<QPolygonF> m_lines;
     
-        //...overlaid with supporting points.
+        /** Polygons will be overlaid with supporting points. **/
         QVector<QList<QPointF> > m_points;
     
-        //Statistics mainly for the weight of the splines
+        /** Statistics mainly for the weight of the splines **/
         WeightedCubicSplineList2DStatistics* m_stats;
     
-        //Additional parameters
+        /**
+         * @{
+         * Additional parameters
+         */
         BoolParameter*   m_showLabels;
         FloatParameter*  m_fontSize;
         EnumParameter*   m_mode;
@@ -236,8 +245,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DViewController
         StringParameter* m_legendCaption;
         IntParameter*    m_legendTicks;
         IntParameter*    m_legendDigits;
+        /**
+         * @}
+         */
     
-        //Weight legend
+        /** The weight legend **/
         QLegend* m_weight_legend;
 };
     

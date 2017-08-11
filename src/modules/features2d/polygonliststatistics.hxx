@@ -72,7 +72,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2DStatistics
         PolygonList2DStatistics(const PolygonList2D* pl);
     
     protected:
-        //The polygon list
+        /** Const pointer to the polygon list **/
         const PolygonList2D* m_polygons;
 };
 
@@ -107,10 +107,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DStatistics
          const BasicStatistics<float>& weightStats() const;
 	
     protected:
-        //The weighted polygon list
+        /** Const pointer to the weighted polygon list **/
         const WeightedPolygonList2D* m_polygons;
     
-        //Weight statistics
+        /** Weight statistics **/
         BasicStatistics<float> m_weights;
 };
     

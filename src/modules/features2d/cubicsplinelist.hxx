@@ -61,7 +61,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
 {
 	
 	public:
-		//Internally used type
+		/** Internally used type **/
 		typedef CubicSpline2D CubicSplineType;
     
         /**
@@ -153,16 +153,15 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
          * throw an error if the index is out of range.
          *
          * \param index The index of the 2D cubic spline to be serialized.
-         * \return A QString containing the searialization of the 2D cubic spline.
+         * \param xmlWriter An xmlWriter, on which we want to seraialize the 2D cubic spline.
          */
         virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization/addition of a 2D cubic spline from a string to this list.
          *
-         * \param serial A QString containing the searialization of the 2D cubic spline.
+         * \param xmlReader An xmlReader from wich we want to serialize a single 2D cubic spline.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization should be given as: dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
          */
         virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
@@ -185,7 +184,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2D
 		bool deserialize_content(QXmlStreamReader& xmlReader);
 	
     protected:
-        //The list of 2D cubic splines
+        /** The list of 2D cubic splines **/
         QVector<CubicSplineType> m_splines;
 };
 
@@ -275,7 +274,6 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          * Add a 2D cubic spline with a given weight at the end of this list.
          * If the model is locked, this function will do nothing.
          *
-         * \param index The index of the replaced spline in the list.
          * \param new_spline The replacement spline.
          * \param new_w The weight of the replacement spline.
          */
@@ -311,21 +309,20 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2D
          * throw an error if the index is out of range.
          *
          * \param index The index of the 2D cubic spline to be serialized.
-         * \return A QString containing the searialization of the 2D cubic spline.
-         *         The serialization should be given as: weight, dp0/dx, dp0/dy, p0_x, p0_y, ... , pN_x, pN_y, dpN/dx, dpN/dy
+         * \param xmlWriter An xmlWriter, on which we want to seraialize the weighted 2D cubic spline.
          */
         virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization/addition of a 2D cubic spline from a string to this list.
          *
-         * \param serial A QString containing the searialization of the 2D cubic spline.
+         * \param xmlReader An xmlReader from wich we want to serialize a single weighted 2D cubic spline.
          * \return True, if the item could be deserialized and the model is not locked.
          */
         virtual bool deserialize_item(QXmlStreamReader& xmlReader);
         
     protected:
-        //The list of weights:
+        /** The list of weights (one for each spline) **/
         QVector<float> m_weights;
 };
    

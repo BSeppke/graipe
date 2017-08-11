@@ -72,7 +72,7 @@ class GRAIPE_FEATURES2D_EXPORT CubicSplineList2DStatistics
         CubicSplineList2DStatistics(const CubicSplineList2D* spl);
     
     protected:
-        //The 2D cubic spline list
+        /** The 2D cubic spline list **/
         const CubicSplineList2D* m_cubicsplines;
 };
 
@@ -108,10 +108,10 @@ class GRAIPE_FEATURES2D_EXPORT WeightedCubicSplineList2DStatistics
         BasicStatistics<float> weightStats() const;
 	
     protected:
-        //The weighted 2D cubic spline list
+        /** The weighted 2D cubic spline list **/
         const WeightedCubicSplineList2D* m_cubicsplines;
     
-        //Weight statistics
+        /** Weight statistics **/
         BasicStatistics<float> m_weights;
 };
   

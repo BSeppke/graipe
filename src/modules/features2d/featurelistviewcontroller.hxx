@@ -117,15 +117,21 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
     
-        //Statistics
+        /** Statistics **/
         PointFeatureList2DStatistics * m_stats;
     
-        //Aditional parameters
+        /**
+         * @{
+         * Additional parameters
+         */
         BoolParameter* m_showLabels;
         FloatParameter* m_fontSize;
         EnumParameter* m_mode;
         FloatParameter* m_radius;
         ColorParameter * m_color;
+        /**
+        * @}
+        */
 };
 
 /**
@@ -206,10 +212,13 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
     
-        //Statistics
+        /** Statistics **/
         WeightedPointFeatureList2DStatistics * m_stats;
     
-        //Additional parameters
+        /**
+         * @{
+         * Additional parameters
+         */
         BoolParameter* m_showLabels;
         FloatParameter* m_fontSize;
         EnumParameter* m_mode;
@@ -221,8 +230,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DViewController
         StringParameter* m_legendCaption;
         IntParameter* m_legendTicks;
         IntParameter* m_legendDigits;
+        /**
+        * @}
+        */
     
-        //Weight legend
+        /** Weight legend **/
         QLegend * m_weight_legend;
 };
 
@@ -283,7 +295,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
         
-        //Statistics
+        /** Statistics **/
         EdgelFeatureList2DStatistics * m_stats;
 };
 
@@ -337,7 +349,7 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DViewController
          */
         void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
         
-        //Statistics
+        /** Statistics **/
         SIFTFeatureList2DStatistics * m_stats;
 };
     

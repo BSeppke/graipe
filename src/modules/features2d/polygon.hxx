@@ -57,7 +57,7 @@ class GRAIPE_FEATURES2D_EXPORT Polygon2D
 :   public QPolygonF
 {
 	public:
-        //The used point type
+        /** The used point type **/
 		typedef QPointF PointType;
     
         /**

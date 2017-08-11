@@ -80,9 +80,9 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2DStatistics
         BasicStatistics<PointFeatureList2D::PointType> pointStats() const;
         
     protected:
-        //Const pointer to the assigned features
+        /** Const pointer to the assigned features **/
         const PointFeatureList2D* m_features;
-        //Statistics of the positions
+        /** Statistics of the positions **/
         BasicStatistics<PointFeatureList2D::PointType> m_points;				
 };
 
@@ -116,9 +116,9 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2DStatistics
         const BasicStatistics<float>& weightStats() const;
         
     protected:
-        //Const pointer to the assigned weighted features
+        /** Const pointer to the assigned weighted features **/
         const WeightedPointFeatureList2D* m_features;
-        //Statistics of the weights
+        /** Statistics of the weights **/
         BasicStatistics<float> m_weights;			
 };
 
@@ -154,9 +154,9 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2DStatistics
         const BasicStatistics<float>& orientationStats() const;
         
     protected:
-        //Const pointer to the assigned edgel features
+        /** Const pointer to the assigned edgel features **/
         const EdgelFeatureList2D* m_features;
-        //Statistics of the orientations
+        /** Statistics of the orientations **/
         BasicStatistics<float> m_orientations;
 };
 
@@ -193,9 +193,9 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2DStatistics
         const BasicStatistics<float>& scaleStats() const;
         
     protected:
-        //Const pointer to the assigned SIFT features
+        /** Const pointer to the assigned SIFT features **/
         const SIFTFeatureList2D* m_features;
-        //Statistics of the scales
+        /** Statistics of the scales **/
         BasicStatistics<float> m_scales;
 };
 

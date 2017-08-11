@@ -40,45 +40,25 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for 2d polygons
+ *     @file
+ *     @brief Implementation file for 2d polygons
+ * @}
  */
-   
-/**
- * Virtual destructor of this class, needed due to non-final QVector class.
- */
+ 
 Polygon2D::~Polygon2D()
 {
 }
 
-/**
- * Check if the polygon is closed.
- *
- * \return true if the polygon is closed (first == last point)
- */
 bool Polygon2D::isClosed() const
 {
 	return (front() == back());
 }
 
-/**
- * Check if a point lies inside the polygon.
- *
- * \param p The point to be checked if inside this polygon.
- * \return true if the given point is inside the polygon and the
- *         polygon is closed.
- */
 bool Polygon2D::isInside(const PointType& p) const
 {
     return contains(p);
 }
 
-/**
- * The area included by the polygon.
- *
- * \return 0, if the polygon is not closed, else the area.
- */
 float Polygon2D::area() const
 {
     double area=0.0;
@@ -96,18 +76,9 @@ float Polygon2D::area() const
     return area*.5;
 }
 
-/**
- * Add a point to the polygon
- *
- * \param p The point to be added to this polygon.
- */
 void Polygon2D::addPoint(const PointType& new_p)
 {
 	*this << new_p;
 }
-  
-/**
- * @}
- */
 
 } //End of namespace graipe

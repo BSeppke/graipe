@@ -43,32 +43,21 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for 2d feature lists
+ *     @file
+ *     @brief Implementation file for 2d feature lists
+ * @}
  */
 
-/**
- * Default constructor. Creates an empty point feature list.
- */
 PointFeatureList2D::PointFeatureList2D(Workspace* wsp)
 : Model(wsp)
 {
 }
 
-/**
- * Returns the number of features in this list.
- *
- * \return The number of features in this list.
- */
 unsigned int PointFeatureList2D::size() const
 {
 	return m_points.size();
 }
 
-/**
- * Completely erases this list of features. Does nothing if the list is locked.
- */
 void PointFeatureList2D::clear()
 {
     if(locked())
@@ -78,24 +67,11 @@ void PointFeatureList2D::clear()
 	updateModel();
 }
 
-/**
- * Getter for the position of a feature at a certain index.
- *
- * \param index The index of the feature inside the list.
- * \return The constant reference to the positon of the requested feature.
- */
 const PointFeatureList2D::PointType& PointFeatureList2D::position(unsigned int index) const
 {
 	return m_points[index];		
 }
 
-/**
- * Setter for the position of a feature at a certain index. 
- * Replaces a features position at an index.
- *
- * \param index The index of the feature inside the list.
- * \param new_p The new positon of that feature.
- */
 void PointFeatureList2D::setPosition(unsigned int index, const PointType& new_p)
 { 
     if(locked())
@@ -105,12 +81,6 @@ void PointFeatureList2D::setPosition(unsigned int index, const PointType& new_p)
 	updateModel();	
 }
 
-/**
- * Addition of a point feature to the list. This will append the given feature
- * at the end of the list of features.
- *
- * \param p The new feature.
- */
 void PointFeatureList2D::addFeature(const PointType& p)
 {
     if(locked())
@@ -120,12 +90,6 @@ void PointFeatureList2D::addFeature(const PointType& p)
 	updateModel();
 }
 
-/**
- * Removal of a feature at a certain index.
- * Does nothing if the model is locked or the index is out of range.
- *
- * \param index The index of the feature inside the list.
- */
 void PointFeatureList2D::removeFeature(unsigned int index)
 {
     if(locked())
@@ -138,36 +102,17 @@ void PointFeatureList2D::removeFeature(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the feature list serialization.
- * 
- * \return Always: "pos_x, pos_y"
- */
 QString PointFeatureList2D::csvHeader() const
 {
 	return "pos_x, pos_y";
 }
 
-/**
- * Serialization of a single feature inside the list at a given index.
- * The feature will be serialized by means of comma separated values.
- * 
- * \param index Index of the feature to be serialized.
- * \return QString of the feature, ordered as: x, y.
- */
 QString PointFeatureList2D::itemToCSV(unsigned int index) const
 {
 	return   QString::number(m_points[index].x(), 'g', 10) + ", "
            + QString::number(m_points[index].y(), 'g', 10);
 }
 
-/**
- * Deserialization/addition of a feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y
- */
 bool PointFeatureList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
@@ -190,29 +135,13 @@ bool PointFeatureList2D::itemFromCSV(const QString & serial)
 	}
 	return false;
 }
-		
 
-/**
- * Serialization of a single feature inside the list at a given index.
- * The feature will be serialized by means of comma separated values.
- * 
- * \param index Index of the feature to be serialized.
- * \return QString of the feature, namely "x, y"
- */
 void PointFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.writeTextElement("x", QString::number(m_points[index].x(), 'g', 10));
     xmlWriter.writeTextElement("y", QString::number(m_points[index].y(), 'g', 10));
 }
 
-/**
- * Deserialization/addition of a feature from a string to this list.
- * Does nothing if the model is locked.
- *
- * \param serial A QString containing the serialization of the feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: x, y
- */
 bool PointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     PointType new_p;
@@ -245,15 +174,7 @@ bool PointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
     m_points.push_back(new_p);
     return true;
 }
-/**
- * Serialize the complete content of the featurelist to an xml file.
- * Mainly prints:
- *   csvHeader
- * and for each feature:
- *   newline + serialize_item().
- *
- * \param out The output device for serialization.
- */
+
 void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
 	for(unsigned int i=0; i < size(); ++i)
@@ -265,13 +186,6 @@ void PointFeatureList2D::serialize_content(QXmlStreamWriter& xmlWriter) const
     }
 }
 
-/**
- * Deserialization of a  feature list from an xml file.
- * The first line is the header as given in csvHeader, which is ignored however.
- * Each following line has to be one valide feature serialization.
- *
- * \param xmlReader The QXmlStreamReader, where we will read from.
- */
 bool PointFeatureList2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
     if (locked())
@@ -315,17 +229,17 @@ bool PointFeatureList2D::deserialize_content(QXmlStreamReader& xmlReader)
 
 
 
-/**
- * Default constructor. Creates an empty weighted point feature list.
- */
+
+
+
+
+
+
 WeightedPointFeatureList2D::WeightedPointFeatureList2D(Workspace* wsp)
 :   PointFeatureList2D(wsp)
 {
 }
 
-/**
- * Completely erases this list of weighted features. Does nothing if the list is locked.
- */
 void WeightedPointFeatureList2D::clear()
 {
     if(locked())
@@ -336,25 +250,11 @@ void WeightedPointFeatureList2D::clear()
 	PointFeatureList2D::clear();
 }
 
-/**
- * Getter for the weight of a feature at a certain index.
- *
- * \param index The index of the feature inside the list.
- * \return The weight of the requested feature.
- */
 float WeightedPointFeatureList2D::weight(unsigned int index) const
 {
 	return m_weights[index];		
 }
 
-/**
- * Setter for the weight of a feature at a certain index.
- * Replaces a feature's weight at an index.
- * Does nothing if the model is locked.
- *
- * \param index The index of the feature inside the list.
- * \param new_w The new weight of that feature.
- */
 void WeightedPointFeatureList2D::setWeight(unsigned int index, float new_w)
 {
     if(locked())
@@ -363,27 +263,12 @@ void WeightedPointFeatureList2D::setWeight(unsigned int index, float new_w)
 	m_weights[index]= new_w;	
 	updateModel();
 }
-	
-/**
- * Addition of a point feature to the list. This will append the given feature
- * at the end of the list of features and assign it with a weight of zero.
- * Does nothing if the model is locked.
- *
- * \param p The new feature.
- */
+
 void WeightedPointFeatureList2D::addFeature(const PointType& p)
 {
     addFeature(p, 0);
 }
 
-/**
- * Addition of a weighted feature to the list. This will append the given feature
- * at the end of the list of features.
- * Does nothing if the model is locked.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- */
 void WeightedPointFeatureList2D::addFeature(const PointType& p,float weight)
 {
     if(locked())
@@ -393,12 +278,6 @@ void WeightedPointFeatureList2D::addFeature(const PointType& p,float weight)
     PointFeatureList2D::addFeature(p);
 }
 
-/**
- * Specialized removal of a feature at a certain index.
- * Does nothing if the model is locked or the index is out of range.
- *
- * \param index The index of the feature inside the list.
- */
 void WeightedPointFeatureList2D::removeFeature(unsigned int index)
 {
     if(locked())
@@ -412,35 +291,16 @@ void WeightedPointFeatureList2D::removeFeature(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the weighted feature list serialization.
- * 
- * \return Always: "pos_x, pos_y, weight"
- */
 QString WeightedPointFeatureList2D::csvHeader() const
 {
 	return PointFeatureList2D::csvHeader() + ", weight";
 }
-    
-/**
- * Serialization of a single weighted feature inside the list at a given index.
- * The weighted feature will be serialized by means of comma separated values.
- * 
- * \param index Index of the weighted feature to be serialized.
- * \return QString of the weighted feature, ordered as: x, y, weight.
- */
+
 QString WeightedPointFeatureList2D::itemToCSV(unsigned int index) const
 {
 	return PointFeatureList2D::itemToCSV(index) + ", " + QString::number(m_weights[index], 'g', 10);
 }
 
-/**
- * Deserialization/addition of a weighted feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the weighted feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y, weight
- */
 bool WeightedPointFeatureList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
@@ -464,26 +324,13 @@ bool WeightedPointFeatureList2D::itemFromCSV(const QString & serial)
 	}
 	return false;
 }
-/**
- * Serialization of a single weighted feature inside the list at a given index.
- * The weighted feature will be serialized by means of comma separated values.
- * 
- * \param index Index of the weighted feature to be serialized.
- * \return QString of the weighted feature, ordered as: x, y, weight.
- */
+
 void WeightedPointFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
 	PointFeatureList2D::serialize_item(index, xmlWriter);
     xmlWriter.writeTextElement("weight", QString::number(m_weights[index], 'g', 10));
 }
 
-/**
- * Deserialization/addition of a weighted feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the weighted feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y, weight
- */
 bool WeightedPointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     if(locked())
@@ -510,17 +357,17 @@ bool WeightedPointFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 
 
 
-/**
- * Default constructor. Creates an empty edgel feature list.
- */
+
+
+
+
+
+
 EdgelFeatureList2D::EdgelFeatureList2D(Workspace* wsp)
 : WeightedPointFeatureList2D(wsp)
 {
 }
 
-/**
- * Completely erases this list of edgel features. Does nothing if the list is locked.
- */
 void EdgelFeatureList2D::clear()
 {
     if(locked())
@@ -531,42 +378,16 @@ void EdgelFeatureList2D::clear()
 	WeightedPointFeatureList2D::clear();
 }
 
-/**
- * Getter for the angle of a feature at a certain index.
- * The angle is returned in degrees, with respect to the clock:
- *   (0 = 3h, 90 = 6h, 180=9h, 270=12h).
- *
- * \param index The index of the feature inside the list.
- * \return The angle of the requested feature.
- */
 float EdgelFeatureList2D::angle(unsigned int index) const
 {
 	return m_orientations[index]*180.0/M_PI;
 }
 
-/**
- * Getter for the orientation of a feature at a certain index.
- * The orientation is returned in radians, with respect to the clock:
- *   (0 = 3h, pi/2 = 6h, pi=9h, 3pi/2=12h).
- *
- * \param index The index of the feature inside the list.
- * \return The orientation of the requested feature.
- */
 float EdgelFeatureList2D::orientation(unsigned int index) const
 {
 	return m_orientations[index];		
 }
 
-/**
- * Setter for the orientation of a feature at a certain index.
- * Replaces a feature's orientation at an index.
- * Does nothing if the model is locked.
- * The orientation shall be given in radians, with respect to the clock:
- *   (0 = 3h, pi/2 = 6h, pi=9h, 3pi/2=12h).
- *
- * \param index The index of the feature inside the list.
- * \param new_o The new orientation of that feature.
- */
 void EdgelFeatureList2D::setOrientation(unsigned int index, float new_o)
 {
     if(locked())
@@ -575,38 +396,17 @@ void EdgelFeatureList2D::setOrientation(unsigned int index, float new_o)
 	m_orientations[index]= new_o;
 	updateModel();
 }
-	
-/**
- * Addition of a point feature to the list. This will append the given feature
- * at the end of the list of features and assign it with a weight and an
- * orientation of zero.
- *
- * \param p The new feature.
- */
+
 void EdgelFeatureList2D::addFeature(const PointType& p)
 {
     addFeature(p, 0, 0);
 }
 
-/**
- * Addition of a weighted feature to the list. This will append the given weighted feature
- * at the end of the list of features and assign it with zero orientation.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- */
 void EdgelFeatureList2D::addFeature(const PointType& p, float weight)
 {
     addFeature(p, weight, 0);
 }
-/**
- * Addition of an edgel feature to the list. This will append the given edgel feature
- * at the end of the list of features.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- * \param orientation The orientation of the new feature (0 = 3h, pi/2 = 6h, pi=9h, 3pi/2=12h).
- */
+
 void EdgelFeatureList2D::addFeature(const PointType& p,float weight, float orientation)
 {
     if(locked())
@@ -616,12 +416,6 @@ void EdgelFeatureList2D::addFeature(const PointType& p,float weight, float orien
     WeightedPointFeatureList2D::addFeature(p, weight);
 }
 
-/**
- * Specialized removal of a feature at a certain index.
- * Does nothing if the model is locked or the index is out of range.
- *
- * \param index The index of the feature inside the list.
- */
 void EdgelFeatureList2D::removeFeature(unsigned int index)
 {
     if(locked())
@@ -634,35 +428,16 @@ void EdgelFeatureList2D::removeFeature(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the edgel feature list serialization.
- * 
- * \return Always: "pos_x, pos_y, weight, orientation"
- */
 QString EdgelFeatureList2D::csvHeader() const
 {
 	return WeightedPointFeatureList2D::csvHeader() + ", orientation";
 }
 
-/**
- * Serialization of a single edgel feature inside the list at a given index.
- * The edgelfeature will be serialized by means of comma separated values.
- * 
- * \param index Index of the edgel feature to be serialized.
- * \return QString of the edgel feature, ordered  as: x, y, weight, orientation.
- */
 QString EdgelFeatureList2D::itemToCSV(unsigned int index) const
 {
 	return WeightedPointFeatureList2D::itemToCSV(index) + ", " + QString::number(m_orientations[index], 'g', 10);
 }
 
-/**
- * Deserialization/addition of a edgel feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the edgel feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y, weight, orientation
- */
 bool EdgelFeatureList2D::itemFromCSV(const QString & serial)
 {	
     if(locked())
@@ -686,26 +461,12 @@ bool EdgelFeatureList2D::itemFromCSV(const QString & serial)
 	return false;
 }
 
-/**
- * Serialization of a single edgel feature inside the list at a given index.
- * The edgelfeature will be serialized by means of comma separated values.
- * 
- * \param index Index of the edgel feature to be serialized.
- * \return QString of the edgel feature, ordered  as: x, y, weight, orientation.
- */
 void EdgelFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
 	WeightedPointFeatureList2D::serialize_item(index, xmlWriter);
     xmlWriter.writeTextElement("orientation", QString::number(m_orientations[index], 'g', 10));
 }
 
-/**
- * Deserialization/addition of a edgel feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the edgel feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y, weight, orientation
- */
 bool EdgelFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 {	
     if(locked())
@@ -733,17 +494,16 @@ bool EdgelFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 
 
 
-/**
- * Default constructor. Creates an empty SIFT feature list.
- */
+
+
+
+
+
 SIFTFeatureList2D::SIFTFeatureList2D(Workspace* wsp)
 : EdgelFeatureList2D(wsp)
 {
 }
 
-/**
- * Completely erases this list of SIFT features. Does nothing if the list is locked.
- */
 void SIFTFeatureList2D::clear()
 {
     if(locked())
@@ -755,25 +515,11 @@ void SIFTFeatureList2D::clear()
 	EdgelFeatureList2D::clear();
 }
 
-/**
- * Getter for the scale of a feature at a certain index.
- *
- * \param index The index of the feature inside the list.
- * \return The scale (in scale-space sigma) of the requested feature.
- */
 float SIFTFeatureList2D::scale(unsigned int index) const
 {
 	return m_scales[index];
 }
 
-/**
- * Setter for the scale of a feature at a certain index.
- * Replaces a feature's scale at an index.
- * Does nothing if the model is locked.
- *
- * \param index The index of the feature inside the list.
- * \param new_s The new scale (in scale-space sigma) of of that feature.
- */
 void SIFTFeatureList2D::setScale(unsigned int index, float new_s)
 {
     if(locked())
@@ -783,25 +529,11 @@ void SIFTFeatureList2D::setScale(unsigned int index, float new_s)
 	updateModel();
 }
 
-/**
- * Getter for the descriptor of a feature at a certain index.
- *
- * \param index The index of the feature inside the list.
- * \return The descriptor of the requested feature.
- */
 const QVector<float>& SIFTFeatureList2D::descriptor(unsigned int index) const
 {
 	return m_descriptors[index];
 }
 
-/**
- * Setter for the descriptor of a feature at a certain index.
- * Replaces a feature's descriptor at an index.
- * Does nothing if the model is locked.
- *
- * \param index The index of the feature inside the list.
- * \param new_d The new descriptor of that feature.
- */
 void SIFTFeatureList2D::setDescriptor(unsigned int index, const QVector<float> & new_d)
 {
     if(locked())
@@ -811,69 +543,28 @@ void SIFTFeatureList2D::setDescriptor(unsigned int index, const QVector<float> &
 	updateModel();
 }
 
-/**
- * Addition of a point feature to the list. This will append the given feature
- * at the end of the list of features and assign it with a weight, an
- * orientation and a scale of zero and with an empty descriptor.
- *
- * \param p The new feature.
- */
 void SIFTFeatureList2D::addFeature(const PointType& p)
 {
     addFeature(p, 0, 0, 0, QVector<float>());
 }
-        
-/**
- * Addition of a weighted feature to the list. This will append the given weighted feature
- * at the end of the list of features and assign it with an
- * orientation and a scale of zero and with an empty descriptor.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- */
+
 void SIFTFeatureList2D::addFeature(const PointType& p, float weight)
 {
     addFeature(p, weight, 0, 0, QVector<float>());
     
 }
-/**
- * Addition of an edgel feature to the list. This will append the given edgel feature
- * at the end of the list of features.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- * \param orientation The orientation of the new feature (0 = 3h, pi/2 = 6h, pi=9h, 3pi/2=12h).
- */
+
 void SIFTFeatureList2D::addFeature(const PointType& p, float weight, float orientation)
 {
     addFeature(p, weight, orientation, 0, QVector<float>());
 }
 
-/**
- * Addition of a SIFT feature to the list. This will append the given edgel feature
- * at the end of the list of features and assign it with an empty descriptor.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- * \param orientation The orientation of the new feature (0 = 3h, pi/2 = 6h, pi=9h, 3pi/2=12h).
- * \param scale The scale (in scale-space sigma) of the SIFT feature.
- */
 void SIFTFeatureList2D::addFeature(const PointType& p, float weight, float orientation, float scale)
 {
     addFeature(p, weight, orientation, scale, QVector<float>());
     
 }
 
-/**
- * Addition of a SIFT feature to the list. This will append the given edgel feature
- * at the end of the list of features.
- *
- * \param p The new feature.
- * \param weight The weight of the new feature.
- * \param orientation The orientation of the new feature (0 = 3h, pi/2 = 6h, pi=9h, 3pi/2=12h).
- * \param scale The scale (in scale-space sigma) of the SIFT feature.
- * \param descr The SIFT descriptor of the feature
- */
 void SIFTFeatureList2D::addFeature(const PointType& p, float weight, float orientation, float scale, const QVector<float> & desc)
 {
     if(locked())
@@ -885,12 +576,6 @@ void SIFTFeatureList2D::addFeature(const PointType& p, float weight, float orien
     EdgelFeatureList2D::addFeature(p, weight, orientation);
 }
 
-/**
- * Specialized removal of a feature at a certain index.
- * Does nothing if the model is locked or the index is out of range.
- *
- * \param index The index of the feature inside the list.
- */
 void SIFTFeatureList2D::removeFeature(unsigned int index)
 {
     if(locked())
@@ -904,23 +589,11 @@ void SIFTFeatureList2D::removeFeature(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the SIFT feature list serialization.
- * 
- * \return Always: "x, y, weight, orientation, scale, descr_0, ..., descr_N"
- */
 QString SIFTFeatureList2D::csvHeader() const
 {
 	return EdgelFeatureList2D::csvHeader() + ", scale, descr_0, ..., descr_N";
 }
 
-/**
- * Serialization of a single SIFT feature inside the list at a given index.
- * The SIFT will be serialized by means of comma separated values.
- * 
- * \param index Index of the SIFT feature to be serialized.
- * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
- */
 QString SIFTFeatureList2D::itemToCSV(unsigned int index) const
 {
 	QString result = QString("%1, %2").arg(EdgelFeatureList2D::itemToCSV(index)).arg(m_scales[index]);
@@ -932,14 +605,7 @@ QString SIFTFeatureList2D::itemToCSV(unsigned int index) const
 	return result;
 
 }
-    
-/**
- * Deserialization/addition of a SIFT feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the SIFT feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
- */
+
 bool SIFTFeatureList2D::itemFromCSV(const QString & serial)
 {
     if(locked())
@@ -979,13 +645,6 @@ bool SIFTFeatureList2D::itemFromCSV(const QString & serial)
 	return false;
 }
 
-/**
- * Serialization of a single SIFT feature inside the list at a given index.
- * The SIFT will be serialized by means of comma separated values.
- * 
- * \param index Index of the SIFT feature to be serialized.
- * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
- */
 void SIFTFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
 	EdgelFeatureList2D::serialize_item(index, xmlWriter);
@@ -1003,14 +662,7 @@ void SIFTFeatureList2D::serialize_item(unsigned int index, QXmlStreamWriter& xml
         xmlWriter.writeEndElement();
 	}
 }
-    
-/**
- * Deserialization/addition of a SIFT feature from a string to this list.
- *
- * \param serial A QString containing the serialization of the SIFT feature.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
- */
+
 bool SIFTFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     if(locked())
@@ -1065,9 +717,5 @@ bool SIFTFeatureList2D::deserialize_item(QXmlStreamReader& xmlReader)
     }
     return true;
 }
-
-/**
- * @}
- */
 
 } //End of namespace graipe

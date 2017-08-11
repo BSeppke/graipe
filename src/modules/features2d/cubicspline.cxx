@@ -40,28 +40,15 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for cubic splines (1d and 2d)
- *
+ *     @file
+ *     @brief Implementation file for cubic splines (1d and 2d)
+ * @}
  */
- 
-/**
- * Default constructor. Constructs an empty 1D cubic spline.
- */
+
 CubicSpline1D::CubicSpline1D()
 {
 }
 
-/**
- * A more convenient constructor. Constructs a 1D cubic spline by means of
- * a set of function values (x,y) and the first and last derivative at 
- * the boundaries of this spline.
- *
- * \param points The list of points (x,y) values. Need to be ordered (increasing x).
- * \param first_derivative The starting gradient.
- * \param last_derivative The finishing gradient.
- */
 CubicSpline1D::CubicSpline1D(const PointListType & points, float first_derivative, float last_derivative)
 :   m_points(points),
     m_first_derivative(first_derivative),
@@ -71,60 +58,32 @@ CubicSpline1D::CubicSpline1D(const PointListType & points, float first_derivativ
     updateSecondDerivatives();
 }
 
-/**
- * Virtual destructor of this class, needed due to non-final QVector class.
- */
 CubicSpline1D::~CubicSpline1D()
 {
 }
 
-/**
- * Return the first derivative (just before the first point).
- *
- * \return The first order derivative of the 1D cubic spline just before the first point.
- */
 float CubicSpline1D::firstDerivative() const
 {
     return m_first_derivative;
 }
 
-/**
- * Resets the first derivative (just before the first point).
- *
- * \param first_derivative The first order derivative of the 1D cubic spline just before the first point.
- */
 void CubicSpline1D::setFirstDerivative(float first_derivative)
 {
     m_first_derivative = first_derivative;
     updateSecondDerivatives();
 }
 
-/**
- * Return the last derivative (just after the last point).
- *
- * \return The first order derivative of the 1D cubic spline just after the last point.
- */
 float CubicSpline1D::lastDerivative() const
 {
     return m_last_derivative;
 }
 
-/**
- * Resets the last derivative (just after the last point).
- *
- * \param first_derivative The first order derivative of the 1D cubic spline just after the last point.
- */
 void CubicSpline1D::setLastDerivative(float last_derivative)
 {
     m_last_derivative = last_derivative;
     updateSecondDerivatives();
 }
-/**
- * Interpolation: Return the resulting (interpolated) value.
- *
- * \param x The ordinate, for which we shall interpolate.
- * \return The value of the 1D cubic spline at that given ordinate.
- */
+
 float CubicSpline1D::interpolate(float x) const
 {
     int n = m_points.size();
@@ -162,13 +121,7 @@ float CubicSpline1D::interpolate(float x) const
     
     return a*m_points[klo].y() + b*m_points[khi].y() + c*m_y2[klo] + d*m_y2[khi];
 }
-    
-/**
- * Interpolation: Return the first order derived (interpolated) value.
- *
- * \param x The ordinate, for which we shall interpolate.
- * \return The first order derivative of the 1D cubic spline at that given ordinate.
- */
+
 float CubicSpline1D::derive(float x) const
 {
     int n = m_points.size();
@@ -208,12 +161,6 @@ float CubicSpline1D::derive(float x) const
     /*      da/dx                    db/dx                 '------ db/dx -----'                '------ db/dx -----'      */
 }
 
-/**
- * Interpolation: Return the second order derived (interpolated) value.
- *
- * \param x The ordinate, for which we shall interpolate.
- * \return The second order derivative of the 1D cubic spline at that given ordinate.
- */
 float CubicSpline1D::derive2(float x) const
 {
     int n = m_points.size();
@@ -252,13 +199,6 @@ float CubicSpline1D::derive2(float x) const
     return a*m_y2[klo] + b*m_y2[khi];
 }
 
-/**
- * Update/replace a point in the point list with/by a new one. Does nothing
- * if the index is out of range w.r.t. the list of points.
- *
- * \param index The index, for which we want to replace the point.
- * \param point The new point, which will replace the old one
- */
 void CubicSpline1D::updatePoint(unsigned int index, const PointType& point)
 {
     if (index < (unsigned int)m_points.size())
@@ -268,34 +208,16 @@ void CubicSpline1D::updatePoint(unsigned int index, const PointType& point)
     }
 }
 
-/**
- * Returns the number of points in the point list.
- *
- * \return The number of points in the point list.
- */
 unsigned int CubicSpline1D::size() const
 {
     return m_points.size();
 }
 
-/**
- * Returns a constant reference access to the point list. This can be used for
- * read-access only!
- *
- * \return The const reference to the point list.
- */
 const CubicSpline1D::PointListType & CubicSpline1D::points() const
 {
     return m_points;
 }
 
-/**
- * Update/replace a point in the point list with/by a new one. Does nothing
- * if the index is out of range w.r.t. the list of points.
- *
- * \param index The index, for which we want to replace the point.
- * \param point The new point, which will replace the old one
- */
 void CubicSpline1D::updateSecondDerivatives()
 {
     int n = m_points.size();
@@ -354,22 +276,16 @@ void CubicSpline1D::updateSecondDerivatives()
 
 
 
-/**
- * Default constructor. Constructs an empty 2D cubic spline.
- */
+
+
+
+
+
+
 CubicSpline2D::CubicSpline2D()
 {
 }
 
-/**
- * A more convenient constructor. Constructs a 2D cubic spline by means of
- * a set of points (x,y) and the first and last derivative at
- * the boundaries of this 2D spline.
- *
- * \param points The list of points (x,y) values.
- * \param first_derivative The starting gradient, given as (d_x, d_y).
- * \param last_derivative The finishing gradient, given as (d_x, d_y).
- */
 CubicSpline2D::CubicSpline2D(const PointListType& points, const PointType & first_derivative, const PointType & last_derivative)
 : m_points(points),
   m_first_derivative(first_derivative),
@@ -377,50 +293,27 @@ CubicSpline2D::CubicSpline2D(const PointListType& points, const PointType & firs
 {
     updateFromPoints();
 }
-   
-/**
- * Virtual destructor of this class, needed due to non-final QVector class.
- */
+
 CubicSpline2D::~CubicSpline2D()
 {
 }
-    
-/**
- * Return the first derivative (just before the first point).
- *
- * \return The first order derivative of the 2D cubic spline just before the first point.
- */
+
 const CubicSpline2D::PointType& CubicSpline2D::firstDerivative() const
 {
     return m_first_derivative;
 }
 
-/**
- * Resets the first derivative (just before the first point).
- *
- * \param first_derivative The first order derivative of the 2D cubic spline just before the first point.
- */
 void CubicSpline2D::setFirstDerivative(const PointType& first_derivative)
 {
     m_first_derivative = first_derivative;
     updateFromPoints();
 }
 
-/**
- * Return the last derivative (just after the last point).
- *
- * \return The first order derivative of the 2D cubic spline just after the last point.
- */
 const CubicSpline2D::PointType& CubicSpline2D::lastDerivative() const
 {
     return m_last_derivative;
 }
 
-/**
- * Resets the last derivative (just after the last point).
- *
- * \param first_derivative The first order derivative of the 2D cubic spline just after the last point.
- */
 void CubicSpline2D::setLastDerivative(const PointType& last_derivative)
 {
     m_last_derivative = last_derivative;
@@ -428,82 +321,36 @@ void CubicSpline2D::setLastDerivative(const PointType& last_derivative)
     
 }
 
-/**
- * Interpolation: Return the resulting (interpolated) point.
- *
- * \param t The parametric value, for which we want to interpolate.
- *          A t of zero means the first point, a t of one the last point.
- * \return The point of the 2D cubic spline at that given parameter.
- */
 CubicSpline2D::PointType CubicSpline2D::interpolate(float t) const
 {
     return PointType(m_splineX.interpolate(t), m_splineY.interpolate(t));
 }
 
-/**
- * Interpolation: Return the first order derived (interpolated) point.
- *
- * \param t The parametric value, for which we want to interpolate.
- *          A t of zero means the first point, a t of one the last point.
- * \return The first order derivative (d_x, d_y) of 2D cubic spline at that given parameter.
- */
 CubicSpline2D::PointType CubicSpline2D::derive(float t) const
 {
     return PointType(m_splineX.derive(t), m_splineY.derive(t));
 }
 
-/**
- * Interpolation: Return the second order derived (interpolated) point.
- *
- * \param t The parametric value, for which we want to interpolate.
- *          A t of zero means the first point, a t of one the last point.
- * \return The second order derivative (d_xx, d_yy) of the 2D cubic spline at that given parameter.
- */
 CubicSpline2D::PointType CubicSpline2D::derive2(float t) const
 {
     return PointType(m_splineX.derive2(t), m_splineY.derive2(t));
 }
 
-/**
- * Returns the number of points in the point list.
- *
- * \return The number of points in the point list.
- */
 unsigned int CubicSpline2D::size() const
 {
 	return m_splineX.size();
 }
 
-/**
- * Returns a constant reference access to the point list. This can be used for
- * read-access only!
- *
- * \return The const reference to the point list.
- */
 const CubicSpline2D::PointListType & CubicSpline2D::points() const
 {
     return m_points;
 }
 
-/**
- * Returns the point of a given index in the point list. Throws an error, if the
- * index is out of range w.r.t. the list of points.
- *
- * \param index The index, for which we want to replace the point.
- * \return The point, which is listed a the given index.
- */
 CubicSpline2D::PointType CubicSpline2D::point(unsigned int index) const
 {
     return PointType((m_splineX.points()[index]).x(), (m_splineY.points()[index]).y());
 }
 
-/**
- * Update/replace a point in the point list with/by a new one. Does nothing
- * if the index is out of range w.r.t. the list of points.
- *
- * \param index The index, for which we want to replace the point.
- * \param point The new point, which will replace the old one
- */
 void CubicSpline2D::setPoint(unsigned int index, const PointType& new_p)
 {
     if(index < (unsigned int)m_points.size())
@@ -522,22 +369,11 @@ void CubicSpline2D::setPoint(unsigned int index, const PointType& new_p)
     }
 }
 
-/**
- * Add a point to the end of the point list.
- *
- * \param x The ordinate of the new point.
- * \param y The coordinate ot the new point.
- */
 void CubicSpline2D::addPoint(float x, float y)
 {
 	addPoint(PointType(x,y));
 }
 
-/**
- * Add a point to the end of the point list.
- *
- * \param p The new point.
- */
 void CubicSpline2D::addPoint(const PointType& new_p)
 {
 	if (m_splineX.size()==0) //first point
@@ -554,20 +390,11 @@ void CubicSpline2D::addPoint(const PointType& new_p)
 	m_boundingRect.setBottom( std::max(qreal(new_p.y()), m_boundingRect.bottom()) );
 }
 
-/**
- * Returns the bounding rectangle of this 2D cubic spline.
- *
- * \return The bounding rectangle of this 2D cubic spline.
- */
 const QRectF& CubicSpline2D::boundingRect() const
 {
 	return m_boundingRect;
 }
 
-/**
- * Internal update function to update the cubic spline interpolations after
- * the update/addition/removal of points
- */
 void CubicSpline2D::updateFromPoints()
 {
     int n=m_points.size();
@@ -588,9 +415,5 @@ void CubicSpline2D::updateFromPoints()
     m_splineX = CubicSpline1D(points_x, m_first_derivative.x(), m_last_derivative.x());
     m_splineY = CubicSpline1D(points_y, m_first_derivative.x(), m_last_derivative.y());
 }
-    
-/**
- * @}
- */
 
 } //End of namespace graipe

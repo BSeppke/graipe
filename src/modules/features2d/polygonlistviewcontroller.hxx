@@ -111,18 +111,24 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2DViewController
         void mousePressEvent(QGraphicsSceneMouseEvent * event);
     
     
-        //Pointer to the polygons (to avaid casts)
+        /** Pointer to the polygons (to avaid casts) **/
         PolygonList2D* m_polygons;
     
-        //Statistics
+        /** Statistics **/
         PolygonList2DStatistics * m_stats;
     
-        //Additional parameters
+        /**
+         * @{
+         * Additional parameters
+         */
         BoolParameter* m_showLabels;
         FloatParameter* m_fontSize;
         EnumParameter* m_mode;
         FloatParameter* m_lineWidth;
         ColorParameter *m_color;
+        /**
+         * @}
+         */
 };
    
 /**
@@ -190,13 +196,16 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
         void updateView();
         
     protected:
-        //Pointer to the weighted polygons (to avaid casts)
+        /** Pointer to the weighted polygons (to avaid casts) **/
         WeightedPolygonList2D* m_polygons;
     
-        //Statistics
+        /** Statistics **/
         WeightedPolygonList2DStatistics * m_stats;
     
-        //Additional parameters
+        /**
+         * @{
+         * Additional parameters
+         */
         BoolParameter* m_showLabels;
         FloatParameter* m_fontSize;
         EnumParameter* m_mode;
@@ -208,8 +217,11 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2DViewController
         StringParameter* m_legendCaption;
         IntParameter* m_legendTicks;
         IntParameter* m_legendDigits;
+        /**
+         * @}
+         */
     
-        //Weight legend
+        /** Weight legend **/
         QLegend * m_weight_legend;
 };
     

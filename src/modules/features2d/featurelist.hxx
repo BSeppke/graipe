@@ -159,7 +159,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          * The feature will be serialized by means of comma separated values.
          * 
          * \param index Index of the feature to be serialized.
-         * \return QString of the feature, namely "x, y"
+         * \param xmlWriter An xmlWriter, which will be used for the serialization of a single point.
          */
 		virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
         
@@ -167,20 +167,14 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
          * Deserialization/addition of a feature from a string to this list.
          * Does nothing if the model is locked.
          *
-         * \param serial A QString containing the serialization of the feature.
+         * \param xmlReader An xmlReader, from which the serialization of a point will be read.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization is ordered as: x, y
          */
 		virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
         /**
          * Serialize the complete content of the featurelist to an xml file.
-         * Mainly prints:
-         *   csvHeader
-         * and for each feature:
-         *   newline + serialize_item().
-         *
-         * \param out The output device for serialization.
+         * \param xmlWriter An xmlWriter, which will be used for the serialization.
          */
 		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
@@ -195,7 +189,7 @@ class GRAIPE_FEATURES2D_EXPORT PointFeatureList2D
 		bool deserialize_content(QXmlStreamReader& xmlReader);
 	
 	protected:
-		//The pointlist
+		/** The point list **/
 		QVector<PointType> m_points;
 };
 
@@ -308,7 +302,7 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          * The weighted feature will be serialized by means of comma separated values.
          * 
          * \param index Index of the weighted feature to be serialized.
-         * \return QString of the weighted feature, ordered as: x, y, weight.
+         * \param xmlWriter An xmlWriter, which will be used for the serialization of a single weighted point.
          */
 		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
@@ -316,15 +310,14 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPointFeatureList2D
          * Deserialization/addition of a weighted feature from a string to this list.
          * Does nothing if the model is locked.
          *
-         * \param serial A QString containing the serialization of the weighted feature.
+         * \param xmlReader An xmlReader, from which the serialization of a weighted point will be read.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization should be given as: x, y, weight
          */
 		bool deserialize_item(QXmlStreamReader& xmlReader);
     
 		
 	protected:
-        //Additional weights
+        /** Additional weights for each feature **/
         QVector<float> m_weights;
 };
 
@@ -463,7 +456,7 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D
          * The weighted feature will be serialized by means of comma separated values.
          * 
          * \param index Index of the weighted feature to be serialized.
-         * \return QString of the weighted feature, ordered as: x, y, weight, orientation.
+         * \param xmlWriter An xmlWriter, which will be used for the serialization of a single weighted and oriented point.
          */
 		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
@@ -471,14 +464,13 @@ class GRAIPE_FEATURES2D_EXPORT EdgelFeatureList2D
          * Deserialization/addition of a weighted feature from a string to this list.
          * Does nothing if the model is locked.
          *
-         * \param serial A QString containing the serialization of the weighted feature.
+         * \param xmlReader An xmlReader, from which the serialization of a weighted, oriented point will be read.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization should be given as: x, y, weight, orientation
          */
 		bool deserialize_item(QXmlStreamReader& xmlReader);
 		
 	protected:
-        //Aditional orientations
+        /** Aditional orientation for each feature **/
 		QVector<float> m_orientations;
 };
 
@@ -645,23 +637,24 @@ class GRAIPE_FEATURES2D_EXPORT SIFTFeatureList2D
          * The SIFT will be serialized by means of comma separated values.
          * 
          * \param index Index of the SIFT feature to be serialized.
-         * \return QString of the edgel feature, ordered  as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
+         * \param xmlWriter An xmlWriter, which will be used for the serialization of a single SIFT feature.
          */
 		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization/addition of a SIFT feature from a string to this list.
          *
-         * \param serial A QString containing the serialization of the SIFT feature.
+         * \param xmlReader An xmlReader, from which the serialization of a SIFT features will be read.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization should be given as: x, y, weight, orientation, scale, descr_0, ..., descr_N.
          */
 		bool deserialize_item(QXmlStreamReader& xmlReader);
 		
 	protected:
-        //Additional scales and feature descriptors
-		QVector<float> m_scales;
-		QVector<QVector<float> > m_descriptors;
+        /** Storage for each feature's scale **/
+        QVector<float> m_scales;
+		
+        /** Storage for each feature's descriptor **/
+        QVector<QVector<float> > m_descriptors;
 };
   
 /**

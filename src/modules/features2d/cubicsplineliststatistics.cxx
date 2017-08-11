@@ -41,24 +41,16 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for statistics for 2d cubic spline lists
+ *     @file
+ *     @brief Implementation file for statistics for 2d cubic spline lists
+ * @}
  */
 
-/**
- * Default constructor. Initializes the member with a NULL pointer.
- */
 CubicSplineList2DStatistics::CubicSplineList2DStatistics()
 :   m_cubicsplines(NULL)
 {	
 }
-	
-/**
- * A more useful constructor.
- * 
- * \param spl The spline list, for which we want to generate the statistics.
- */
+
 CubicSplineList2DStatistics::CubicSplineList2DStatistics(const CubicSplineList2D* spl)
 :   m_cubicsplines(spl)
 {
@@ -68,10 +60,11 @@ CubicSplineList2DStatistics::CubicSplineList2DStatistics(const CubicSplineList2D
 
 
 
-/**
- * Default constructor. Initializes the member with a NULL pointer and the
- * weight statistics with default values.
- */
+
+
+
+
+
 WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics()
 :   CubicSplineList2DStatistics()
 {
@@ -84,11 +77,6 @@ WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics()
     m_weights.mean   = m_weights.stddev    =  zero_val;
 }
 
-/**
- * A more useful constructor.
- * 
- * \param spl The weighted spline list, for which we want to generate the statistics.
- */
 WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics(const WeightedCubicSplineList2D* spl)
 : CubicSplineList2DStatistics(spl)
 {
@@ -118,18 +106,9 @@ WeightedCubicSplineList2DStatistics::WeightedCubicSplineList2DStatistics(const W
 	m_weights.stddev = sqrt(m_weights.stddev/spl->size());
 }
 
-/**
- * Returns basic statistics of the weights of all 2D cubic splines inside the list.
- *
- * \return Basic statistics of the weights of all 2D cubic splines inside the list.
- */
 BasicStatistics<float> WeightedCubicSplineList2DStatistics::weightStats() const
 {
 	return m_weights;
 }
-    
-/**
- * @}
- */
 
 } //End of namespace graipe

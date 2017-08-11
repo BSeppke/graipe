@@ -99,15 +99,16 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          */
         virtual void clear();
     
-        /*
+        /**
          * Constant access a polygon inside this list at a given index. May throw
          * an error, if the index is out of range.
          *
          * \param index The index of the polygon in the list.
+         * \return the Polygon at the given index.
          */
-		virtual const PolygonType & polygon(unsigned int index) const;
+		virtual const PolygonType& polygon(unsigned int index) const;
     
-        /*
+        /**
          * Reset/replace a polygon inside this list at a given index. If the index is
          * out of range or the model is locked, this function will do nothing.
          *
@@ -116,11 +117,11 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          */
 		virtual void setPolygon(unsigned int index, const PolygonType& new_p);
     
-        /*
+        /**
          * Add a polygon at the end of this list.
          * If the model is locked, this function will do nothing.
          *
-         * \param p The replacement polygon.
+         * \param poly The replacement polygon.
          */
 		virtual void addPolygon(const PolygonType& poly);
 	
@@ -154,16 +155,15 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
          * throw an error if the index is out of range.
          *
          * \param index The index of the polygon to be serialized.
-         * \return A QString containing the searialization of the polygon.
+         * \param xmlWriter An xmlWriter, which will be used for the serialization of a single polygon.
          */
         virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization/addition of a polygon from a string to this list.
          *
-         * \param serial A QString containing the searialization of the polygon.
+         * \param xmlReader An xmlReader, from which the serialization of a polygon will be read.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
          */
         virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
@@ -186,7 +186,7 @@ class GRAIPE_FEATURES2D_EXPORT PolygonList2D
 		bool deserialize_content(QXmlStreamReader& xmlReader);
     
     protected:
-        //The polygons
+        /** The polygons **/
         QVector<PolygonType> m_polys;
 };
 
@@ -275,8 +275,8 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          * Add a weighted polygon at the end of this list.
          * If the model is locked, this function will do nothing.
          *
-         * \param poly The new polygon.
-         * \param w The new weight.
+         * \param poly   The new polygon.
+         * \param weight The new weight.
          */
 		virtual void addPolygon(const PolygonType& poly, float weight);
 	
@@ -310,21 +310,20 @@ class GRAIPE_FEATURES2D_EXPORT WeightedPolygonList2D
          * throw an error if the index is out of range.
          *
          * \param index The index of the polygon to be serialized.
-         * \return A QString containing the searialization of the polygon.
+         * \param xmlWriter An xmlWriter, which will be used for the serialization of a single polygon.
          */
         virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
     
         /**
          * Deserialization/addition of a polygon from a string to this list.
          *
-         * \param serial A QString containing the searialization of the polygon.
+         * \param xmlReader An xmlReader, from which the serialization of a polygon will be read.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization should be given as: p0_x, p0_y, ... , pN_x, pN_y
          */
         virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
     protected:
-        //The weights
+        /** The weights **/
         QVector<float> m_weights;
 };
    

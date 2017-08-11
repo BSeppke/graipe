@@ -15,17 +15,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for views of 2d polygons
+ *     @file
+ *     @brief Implementation file for views of 2d polygons
+ * @}
  */
- 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param polygons The polygon list, which we want to show.
- */
+
 PolygonList2DViewController::PolygonList2DViewController(PolygonList2D* polygons)
 :	ViewController(polygons),
     m_polygons(polygons),
@@ -48,25 +42,13 @@ PolygonList2DViewController::PolygonList2DViewController(PolygonList2D* polygons
     m_parameters->addParameter("color", m_color);
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 PolygonList2DViewController::~PolygonList2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
     //will also delete all other (newly introduced) parameters
     delete m_stats;
 }
-        
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
+
 void PolygonList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     ViewController::paintBefore(painter, option, widget);
@@ -111,11 +93,6 @@ void PolygonList2DViewController::paint(QPainter *painter, const QStyleOptionGra
     ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the polygon list.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF PolygonList2DViewController::boundingRect() const
 { 
 	QRectF rect (-m_lineWidth->value(), -m_lineWidth->value(),
@@ -124,11 +101,6 @@ QRectF PolygonList2DViewController::boundingRect() const
     return ViewController::boundingRect().united(rect);
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void PolygonList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -174,14 +146,12 @@ void PolygonList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * eve
 
 
 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param scene The scene, where this View shall be carried out.
- * \param polygons The weighted polygon list, which we want to show.
- * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
- */
+
+
+
+
+
+
 WeightedPolygonList2DViewController::WeightedPolygonList2DViewController(WeightedPolygonList2D * polygons)
 :	ViewController(polygons),
     m_stats(new WeightedPolygonList2DStatistics(polygons)),
@@ -241,10 +211,6 @@ WeightedPolygonList2DViewController::WeightedPolygonList2DViewController(Weighte
     updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 WeightedPolygonList2DViewController::~WeightedPolygonList2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -253,14 +219,6 @@ WeightedPolygonList2DViewController::~WeightedPolygonList2DViewController()
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void WeightedPolygonList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
     ViewController::paintBefore(painter, option, widget);
@@ -311,11 +269,6 @@ void WeightedPolygonList2DViewController::paint(QPainter *painter, const QStyleO
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the weighted polygon list.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF WeightedPolygonList2DViewController::boundingRect() const
 { 
 	QRectF rect (-m_lineWidth->value(), -m_lineWidth->value(),
@@ -324,13 +277,6 @@ QRectF WeightedPolygonList2DViewController::boundingRect() const
     return ViewController::boundingRect().united(rect);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void WeightedPolygonList2DViewController::updateParameters(bool force_update)
 {
     ViewController::updateParameters(force_update);
@@ -358,9 +304,6 @@ void WeightedPolygonList2DViewController::updateParameters(bool force_update)
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void WeightedPolygonList2DViewController::updateView()
 {
     ViewController::updateView();
@@ -373,9 +316,5 @@ void WeightedPolygonList2DViewController::updateView()
     m_weight_legend->setTicks(m_legendTicks->value());
     m_weight_legend->setDigits(m_legendDigits->value());
 }
-
-/**
- * @}
- */
 
 } //End of namespace graipe

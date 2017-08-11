@@ -46,17 +46,11 @@ namespace graipe {
 /** 
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for views of 2d feature lists
+ *     @file
+ *     @brief Implementation file for views of 2d feature lists
+ * @}
  */
- 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param features The point feature list, which we want to show.
- */
+
 PointFeatureList2DViewController::PointFeatureList2DViewController(PointFeatureList2D* features)
 :	ViewController(features),
     m_stats(new PointFeatureList2DStatistics(features)),
@@ -78,10 +72,6 @@ PointFeatureList2DViewController::PointFeatureList2DViewController(PointFeatureL
     m_parameters->addParameter("color", m_color);
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 PointFeatureList2DViewController::~PointFeatureList2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -89,14 +79,6 @@ PointFeatureList2DViewController::~PointFeatureList2DViewController()
     delete m_stats;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void PointFeatureList2DViewController::paint(QPainter *painter,
                               const QStyleOptionGraphicsItem *option,
                               QWidget *widget)
@@ -142,11 +124,6 @@ void PointFeatureList2DViewController::paint(QPainter *painter,
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the point feature list.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF PointFeatureList2DViewController::boundingRect() const
 {
     float d  = 2*m_radius->value();
@@ -163,11 +140,6 @@ QRectF PointFeatureList2DViewController::boundingRect() const
     
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void PointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -221,11 +193,6 @@ void PointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void PointFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -280,12 +247,12 @@ void PointFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent
 
 
 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param features The weighted point feature list, which we want to show.
- */
+
+
+
+
+
+
 WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewController(WeightedPointFeatureList2D * features)
 : ViewController(features),
     m_stats(new WeightedPointFeatureList2DStatistics(features)),
@@ -345,10 +312,6 @@ WeightedPointFeatureList2DViewController::WeightedPointFeatureList2DViewControll
 	updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 WeightedPointFeatureList2DViewController::~WeightedPointFeatureList2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -357,14 +320,6 @@ WeightedPointFeatureList2DViewController::~WeightedPointFeatureList2DViewControl
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void WeightedPointFeatureList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -412,11 +367,6 @@ void WeightedPointFeatureList2DViewController::paint(QPainter *painter, const QS
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the weighted feature list.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF WeightedPointFeatureList2DViewController::boundingRect() const
 {
     float d  = 2*m_radius->value();
@@ -430,16 +380,8 @@ QRectF WeightedPointFeatureList2DViewController::boundingRect() const
                         m_model->height() + d));
     
     return rect.united(ViewController::boundingRect());
-    
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void WeightedPointFeatureList2DViewController::updateParameters(bool force_update)
 {
 	ViewController::updateParameters(force_update);
@@ -467,9 +409,6 @@ void WeightedPointFeatureList2DViewController::updateParameters(bool force_updat
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void WeightedPointFeatureList2DViewController::updateView()
 {
 	ViewController::updateView();
@@ -480,14 +419,8 @@ void WeightedPointFeatureList2DViewController::updateView()
     m_weight_legend->setCaption(m_legendCaption->value());
     m_weight_legend->setTicks(m_legendTicks->value());
     m_weight_legend->setDigits(m_legendDigits->value());
-	
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void WeightedPointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -540,11 +473,6 @@ void WeightedPointFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHove
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void WeightedPointFeatureList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -604,35 +532,25 @@ void WeightedPointFeatureList2DViewController::mousePressEvent(QGraphicsSceneMou
 
 
 
-/**
- * Implementation/specialization of the WeightedPointFeatureList2DViewController's
- * constructor.
- *
- * \param features The edgel feature list, which we want to show.
- */
+
+
+
+
+
+
+
+
 EdgelFeatureList2DViewController::EdgelFeatureList2DViewController(EdgelFeatureList2D* features)
 :	WeightedPointFeatureList2DViewController(features),
     m_stats(new EdgelFeatureList2DStatistics(features))
 {
 }
 
-/**
- * Implementation/specialization of the WeightedPointFeatureList2DViewController's virtual
- * destructor.
- */
 EdgelFeatureList2DViewController::~EdgelFeatureList2DViewController()
 {
     delete m_stats;
 }
 
-/**
- * Implementation/specialization of the WeightedPointFeatureList2DViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void EdgelFeatureList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -690,11 +608,6 @@ void EdgelFeatureList2DViewController::paint(QPainter *painter, const QStyleOpti
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void EdgelFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -747,11 +660,6 @@ void EdgelFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void EdgelFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -814,35 +722,24 @@ void EdgelFeatureList2DViewController::mousePressEvent (QGraphicsSceneMouseEvent
 
 
 
-/**
- * Implementation/specialization of the EdgelFeatureList2DViewController's
- * constructor.
- *
- * \param features The SIFT feature list, which we want to show.
- */
+
+
+
+
+
+
+
 SIFTFeatureList2DViewController::SIFTFeatureList2DViewController(SIFTFeatureList2D* features)
 :	EdgelFeatureList2DViewController(features),
     m_stats(new SIFTFeatureList2DStatistics(features))
 {
 }
 
-/**
- * Implementation/specialization of the EdgelFeatureList2DViewController's virtual
- * destructor.
- */
 SIFTFeatureList2DViewController::~SIFTFeatureList2DViewController()
 {
     delete m_stats;
 }
 
-/**
- * Implementation/specialization of the EdgelFeatureList2DViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void SIFTFeatureList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -922,11 +819,6 @@ void SIFTFeatureList2DViewController::paint(QPainter *painter, const QStyleOptio
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void SIFTFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -978,10 +870,5 @@ void SIFTFeatureList2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * 
         }
     }
 }
-    
-/**
- * @}
- */
 
 } //End of namespace graipe
- 

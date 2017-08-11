@@ -42,24 +42,16 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for statistics of 2d polygons
+ *     @file
+ *     @brief Implementation file for statistics of 2d polygons
+ * @}
  */
- 
-/**
- * Default constructor. Initializes the member with a NULL pointer.
- */
+
 PolygonList2DStatistics::PolygonList2DStatistics()
 : m_polygons(NULL)
 {	
 }
 
-/**
- * A more useful constructor.
- * 
- * \param pl The polygon list, for which we want to generate the statistics.
- */
 PolygonList2DStatistics::PolygonList2DStatistics(const PolygonList2D* pl)
 			: m_polygons(pl)
 {
@@ -68,9 +60,13 @@ PolygonList2DStatistics::PolygonList2DStatistics(const PolygonList2D* pl)
 
 
 
-/**
- * Default constructor. Initializes the member with a NULL pointer.
- */
+
+
+
+
+
+
+
 WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics()
 : PolygonList2DStatistics()
 {
@@ -83,11 +79,6 @@ WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics()
     m_weights.mean   = m_weights.stddev    =  zero_val;
 }
 
-/**
- * A more useful constructor.
- * 
- * \param pl The polygon list, for which we want to generate the statistics.
- */
 WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics(const WeightedPolygonList2D* pl)
 : PolygonList2DStatistics(pl)
 {
@@ -104,7 +95,6 @@ WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics(const WeightedP
 		m_weights.min = std::min( pl->weight(i),m_weights.min);
 		m_weights.max = std::max( pl->weight(i),m_weights.max);
 		
-		
 		m_weights.mean += pl->weight(i);
 	}
 	
@@ -117,18 +107,9 @@ WeightedPolygonList2DStatistics::WeightedPolygonList2DStatistics(const WeightedP
 	m_weights.stddev = sqrt(m_weights.stddev/pl->size());
 }
 
-/**
- * Returns basic statistics of the weights of all polygons inside the list.
- *
- * \return Basic statistics of the weights of all polygons inside the list.
- */
 const BasicStatistics<float>& WeightedPolygonList2DStatistics::weightStats() const
 {
 	return m_weights;
 }
-
-/**
- * @}
- */
 
 } //End of namespace graipe

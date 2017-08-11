@@ -42,15 +42,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for statistics of 2d feature lists
+ *     @file
+ *     @brief Implementation file for statistics of 2d feature lists
+ * @}
  */
- 
-/**
- * Default constructor. Constructs an empty point statistic with
- * a NULL pointer to the features.
- */
+
 PointFeatureList2DStatistics::PointFeatureList2DStatistics()
 : m_features(NULL)
 {
@@ -65,12 +61,6 @@ PointFeatureList2DStatistics::PointFeatureList2DStatistics()
     m_points.mean    = m_points.stddev    = PointType(zero_val, zero_val);
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * point feature list and stores the pointer, too.
- *
- * \param features The point feature list, for which we want the statistics.
- */
 PointFeatureList2DStatistics::PointFeatureList2DStatistics(const PointFeatureList2D* features)
         : m_features(features)
 {
@@ -109,11 +99,6 @@ PointFeatureList2DStatistics::PointFeatureList2DStatistics(const PointFeatureLis
     m_points.stddev.setY(sqrt(m_points.stddev.y()));
 }
 
-/**
- * Returns the basic statistics over the points of the feature list.
- *
- * \return Basic statistics over the points of the feature list.
- */
 BasicStatistics<PointFeatureList2D::PointType> PointFeatureList2DStatistics::pointStats() const
 {
 	return m_points;
@@ -122,10 +107,13 @@ BasicStatistics<PointFeatureList2D::PointType> PointFeatureList2DStatistics::poi
 
 
 
-/**
- * Default constructor. Constructs an empty weighted statistic with
- * a NULL pointer to the features.
- */
+
+
+
+
+
+
+
 WeightedPointFeatureList2DStatistics::WeightedPointFeatureList2DStatistics()
 : PointFeatureList2DStatistics()
 {
@@ -138,12 +126,6 @@ WeightedPointFeatureList2DStatistics::WeightedPointFeatureList2DStatistics()
     m_weights.mean   = m_weights.stddev    =  zero_val;
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * weighted feature list and stores the pointer, too.
- *
- * \param features The weighted feature list, for which we want the statistics.
- */
 WeightedPointFeatureList2DStatistics::WeightedPointFeatureList2DStatistics(const WeightedPointFeatureList2D* features)
 : PointFeatureList2DStatistics(features)
 {
@@ -172,11 +154,6 @@ WeightedPointFeatureList2DStatistics::WeightedPointFeatureList2DStatistics(const
 	m_weights.stddev = sqrt(m_weights.stddev/features->size());
 }
 
-/**
- * Returns the basic statistics over the weights of the feature list.
- *
- * \return Basic statistics over the weights of the feature list.
- */
 const BasicStatistics<float>& WeightedPointFeatureList2DStatistics::weightStats() const
 {
 	return m_weights;
@@ -185,10 +162,13 @@ const BasicStatistics<float>& WeightedPointFeatureList2DStatistics::weightStats(
 
 
 
-/**
- * Default constructor. Constructs an empty edgel statistic with
- * a NULL pointer to the features.
- */
+
+
+
+
+
+
+
 EdgelFeatureList2DStatistics::EdgelFeatureList2DStatistics()
 : WeightedPointFeatureList2DStatistics()
 {
@@ -201,12 +181,6 @@ EdgelFeatureList2DStatistics::EdgelFeatureList2DStatistics()
     m_orientations.mean   = m_orientations.stddev    =  zero_val;
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * edgel feature list and stores the pointer, too.
- *
- * \param features The edgel feature list, for which we want the statistics.
- */
 EdgelFeatureList2DStatistics::EdgelFeatureList2DStatistics(const EdgelFeatureList2D* features)
 : WeightedPointFeatureList2DStatistics(features)
 {
@@ -235,11 +209,6 @@ EdgelFeatureList2DStatistics::EdgelFeatureList2DStatistics(const EdgelFeatureLis
 	m_orientations.stddev = sqrt(m_orientations.stddev/features->size());
 }
 
-/**
- * Returns the basic statistics over the orientations of the feature list.
- *
- * \return Basic statistics over the orientations of the feature list.
- */
 const BasicStatistics<float>& EdgelFeatureList2DStatistics::orientationStats() const
 {
 	return m_orientations;
@@ -248,10 +217,12 @@ const BasicStatistics<float>& EdgelFeatureList2DStatistics::orientationStats() c
 
 
 
-/**
- * Default constructor. Constructs an empty SIFT/scale statistic with
- * a NULL pointer to the features.
- */
+
+
+
+
+
+
 SIFTFeatureList2DStatistics::SIFTFeatureList2DStatistics()
 : EdgelFeatureList2DStatistics()
 {
@@ -264,12 +235,6 @@ SIFTFeatureList2DStatistics::SIFTFeatureList2DStatistics()
     m_weights.mean   = m_weights.stddev    =  zero_val;
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * SIFT/scale feature list and stores the pointer, too.
- *
- * \param features The SIFT feature list, for which we want the statistics
- */
 SIFTFeatureList2DStatistics::SIFTFeatureList2DStatistics(const SIFTFeatureList2D* features)
 : EdgelFeatureList2DStatistics(features)
 {
@@ -298,18 +263,9 @@ SIFTFeatureList2DStatistics::SIFTFeatureList2DStatistics(const SIFTFeatureList2D
 	m_scales.stddev = sqrt(m_scales.stddev/features->size());
 }
 
-/**
- * Returns the basic statistics over the scales of the feature list.
- *
- * \return Basic statistics over the scales of the feature list.
- */
 const BasicStatistics<float>& SIFTFeatureList2DStatistics::scaleStats() const
 {
 	return m_scales;
 }
-    
-/**
- * @}
- */
  
 } //End of namespace graipe

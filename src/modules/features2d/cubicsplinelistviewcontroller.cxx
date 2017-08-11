@@ -18,17 +18,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_features2d
  * @{
- *
- * @file
- * @brief Implementation file for views of 2d cubic spline lists
+ *     @file
+ *     @brief Implementation file for views of 2d cubic spline lists
+ * @}
  */
-
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param splines The spline list, which we want to show.
- */
+ 
 CubicSplineList2DViewController::CubicSplineList2DViewController(CubicSplineList2D* splines)
 :	ViewController(splines),
     m_stats(new CubicSplineList2DStatistics(splines)),
@@ -52,11 +46,7 @@ CubicSplineList2DViewController::CubicSplineList2DViewController(CubicSplineList
     refreshSplines();
     updateView();
 }
-    
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
+
 CubicSplineList2DViewController::~CubicSplineList2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -64,14 +54,6 @@ CubicSplineList2DViewController::~CubicSplineList2DViewController()
     delete m_stats;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void CubicSplineList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     ViewController::paintBefore(painter, option, widget);
@@ -128,11 +110,6 @@ void CubicSplineList2DViewController::paint(QPainter *painter, const QStyleOptio
     ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the cubic spline list.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF CubicSplineList2DViewController::boundingRect() const
 { 
     QRectF rect(-m_lineWidth->value(),
@@ -142,10 +119,7 @@ QRectF CubicSplineList2DViewController::boundingRect() const
     
     return ViewController::boundingRect().united(rect);
 }
-/**
- * Snycronizes between the Model's data and the views reprsentation:
- * Re-creates the polylines and point sets defined by the model.
- */
+
 void CubicSplineList2DViewController::refreshSplines()
 {
     float m_sampling= 100.0;
@@ -182,11 +156,6 @@ void CubicSplineList2DViewController::refreshSplines()
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void CubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     if(acceptHoverEvents())
@@ -237,12 +206,12 @@ void CubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent *
 
 
 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param splines The weighted spline list, which we want to show.
- */
+
+
+
+
+
+
 WeightedCubicSplineList2DViewController::WeightedCubicSplineList2DViewController(WeightedCubicSplineList2D * splines)
 :	ViewController(splines),
     m_stats(new WeightedCubicSplineList2DStatistics(splines)),
@@ -294,10 +263,6 @@ WeightedCubicSplineList2DViewController::WeightedCubicSplineList2DViewController
     updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 WeightedCubicSplineList2DViewController::~WeightedCubicSplineList2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -306,14 +271,6 @@ WeightedCubicSplineList2DViewController::~WeightedCubicSplineList2DViewControlle
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void WeightedCubicSplineList2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	ViewController::paintBefore(painter, option, widget);
@@ -367,11 +324,6 @@ void WeightedCubicSplineList2DViewController::paint(QPainter *painter, const QSt
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the cubic spline list.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF WeightedCubicSplineList2DViewController::boundingRect() const
 { 
     QRectF rect(-m_lineWidth->value(),
@@ -382,13 +334,6 @@ QRectF WeightedCubicSplineList2DViewController::boundingRect() const
     return ViewController::boundingRect().united(rect);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void WeightedCubicSplineList2DViewController::updateParameters(bool force_update)
 {
     WeightedCubicSplineList2D * splines = static_cast<WeightedCubicSplineList2D*> (model());
@@ -414,9 +359,6 @@ void WeightedCubicSplineList2DViewController::updateParameters(bool force_update
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void WeightedCubicSplineList2DViewController::updateView()
 {
     ViewController::updateView();
@@ -430,10 +372,6 @@ void WeightedCubicSplineList2DViewController::updateView()
     m_weight_legend->setDigits(m_legendDigits->value());
 }
 
-/**
- * Snycronizes between the Model's data and the views reprsentation:
- * Re-creates the polylines and point sets defined by the model.
- */
 void WeightedCubicSplineList2DViewController::refreshSplines()
 {
     float m_sampling= 100.0;
@@ -470,11 +408,6 @@ void WeightedCubicSplineList2DViewController::refreshSplines()
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void WeightedCubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     if(acceptHoverEvents())
@@ -528,9 +461,4 @@ void WeightedCubicSplineList2DViewController::mousePressEvent(QGraphicsSceneMous
     }
 }
 
-/**
- * @}
- */
-
 } //End of namespace graipe
- 
