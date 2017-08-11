@@ -46,6 +46,7 @@
  * @brief Configuration file to the vectorfields module
  */
 
+/** Different display modes for vectors **/
 enum Vectorfield2DMotionDisplayMode
 {
 	CompleteMotion = 0, //show real directions

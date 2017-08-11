@@ -43,17 +43,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_vectorfields
  * @{
- *
- * @file
- * @brief Implementation file for sparse vectorfield viewing
+ *     @file
+ *     @brief Implementation file for sparse vectorfield viewing
+ * @}
  */
- 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param vf The sparse vectorfield, which we want to show.
- */
+
 SparseVectorfield2DViewController::SparseVectorfield2DViewController(SparseVectorfield2D * vf)
 :	ViewController(vf),
 	m_stats(new SparseVectorfield2DStatistics(vf)),
@@ -137,11 +131,7 @@ SparseVectorfield2DViewController::SparseVectorfield2DViewController(SparseVecto
 	
 	updateView();
 }
-                
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
+
 SparseVectorfield2DViewController::~SparseVectorfield2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -150,14 +140,6 @@ SparseVectorfield2DViewController::~SparseVectorfield2DViewController()
     delete m_velocity_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void SparseVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -218,11 +200,6 @@ void SparseVectorfield2DViewController::paint(QPainter *painter, const QStyleOpt
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the sparse vectorfield.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF SparseVectorfield2DViewController::boundingRect () const
 {
     qreal maxLength = m_stats->lengthStats().max;
@@ -240,14 +217,7 @@ QRectF SparseVectorfield2DViewController::boundingRect () const
 
 	return rect.united(ViewController::boundingRect());
 }
-	
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
+
 void SparseVectorfield2DViewController::updateParameters(bool force_update)
 {
     ViewController::updateParameters(force_update);
@@ -275,9 +245,6 @@ void SparseVectorfield2DViewController::updateParameters(bool force_update)
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void SparseVectorfield2DViewController::updateView()
 {
 	ViewController::updateView();
@@ -332,11 +299,6 @@ void SparseVectorfield2DViewController::updateView()
 	m_velocity_legend->setVisible(m_showVelocityLegend->value());
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -390,11 +352,6 @@ void SparseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent 
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseVectorfield2DViewController::mousePressEvent (QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -458,12 +415,14 @@ void SparseVectorfield2DViewController::mousePressEvent (QGraphicsSceneMouseEven
 
 
 
-/**
- * specialization of the SparseVectorfield2DViewController's
- * constructor.
- *
- * \param vf The sparse weighted vectorfield, which we want to show.
- */
+
+
+
+
+
+
+
+
 SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewController(SparseWeightedVectorfield2D * vf)
  :	SparseVectorfield2DViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
@@ -511,10 +470,6 @@ SparseWeightedVectorfield2DViewController::SparseWeightedVectorfield2DViewContro
 	updateView();
 }
 
-/**
- * Specialization of the SparseVectorfield2DViewController's virtual
- * destructor.
- */
 SparseWeightedVectorfield2DViewController::~SparseWeightedVectorfield2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -523,14 +478,6 @@ SparseWeightedVectorfield2DViewController::~SparseWeightedVectorfield2DViewContr
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void SparseWeightedVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 	
 	ViewController::paintBefore(painter, option, widget);
@@ -597,13 +544,6 @@ void SparseWeightedVectorfield2DViewController::paint(QPainter *painter, const Q
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void SparseWeightedVectorfield2DViewController::updateParameters(bool force_update)
 {
     SparseVectorfield2DViewController::updateParameters(force_update);
@@ -631,9 +571,6 @@ void SparseWeightedVectorfield2DViewController::updateParameters(bool force_upda
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void SparseWeightedVectorfield2DViewController::updateView()
 {
 	SparseVectorfield2DViewController::updateView();
@@ -690,11 +627,6 @@ void SparseWeightedVectorfield2DViewController::updateView()
 	}	
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -750,11 +682,6 @@ void SparseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHov
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseWeightedVectorfield2DViewController::mousePressEvent (QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -821,12 +748,13 @@ void SparseWeightedVectorfield2DViewController::mousePressEvent (QGraphicsSceneM
 
 
 
-/**
- * Specialization of the SparseVectorfield2DViewController's
- * constructor.
- *
- * \param vf The sparse multi vectorfield, which we want to show.
- */
+
+
+
+
+
+
+
 SparseMultiVectorfield2DViewController::SparseMultiVectorfield2DViewController(SparseMultiVectorfield2D * vf)
 :	SparseVectorfield2DViewController(vf),
     m_showAlternative(new IntParameter("Show alt. (0=best):",0,0,0))
@@ -848,10 +776,6 @@ SparseMultiVectorfield2DViewController::SparseMultiVectorfield2DViewController(S
 	updateView();
 }
 
-/**
- * Implementation/specialization of the SparseVectorfield2DViewController's virtual
- * destructor.
- */
 SparseMultiVectorfield2DViewController::~SparseMultiVectorfield2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -859,14 +783,6 @@ SparseMultiVectorfield2DViewController::~SparseMultiVectorfield2DViewController(
     //No need to do anything here
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void SparseMultiVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -929,13 +845,6 @@ void SparseMultiVectorfield2DViewController::paint(QPainter *painter, const QSty
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void SparseMultiVectorfield2DViewController::updateParameters(bool force_update)
 {
     ViewController::updateParameters(force_update);
@@ -963,9 +872,6 @@ void SparseMultiVectorfield2DViewController::updateParameters(bool force_update)
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void SparseMultiVectorfield2DViewController::updateView()
 {
 	ViewController::updateView();
@@ -1020,11 +926,6 @@ void SparseMultiVectorfield2DViewController::updateView()
 	m_velocity_legend->setVisible(m_showVelocityLegend->value());
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -1078,12 +979,6 @@ void SparseMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverE
     }
 }
 
-    
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseMultiVectorfield2DViewController::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -1143,12 +1038,12 @@ void SparseMultiVectorfield2DViewController::mousePressEvent(QGraphicsSceneMouse
 
 
 
-/**
- * Specialization of the SparseMultiVectorfield2DViewController's
- * constructor.
- *
- * \param vf The sparse weighted multi vectorfield, which we want to show.
- */
+
+
+
+
+
+
 SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2DViewController(SparseWeightedMultiVectorfield2D * vf)
  :	SparseMultiVectorfield2DViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
@@ -1196,10 +1091,6 @@ SparseWeightedMultiVectorfield2DViewController::SparseWeightedMultiVectorfield2D
 	updateView();
 }
 
-/**
- * Implementation/specialization of the SparseMultiVectorfield2DViewController's virtual
- * destructor.
- */
 SparseWeightedMultiVectorfield2DViewController::~SparseWeightedMultiVectorfield2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -1207,14 +1098,6 @@ SparseWeightedMultiVectorfield2DViewController::~SparseWeightedMultiVectorfield2
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void SparseWeightedMultiVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -1282,13 +1165,6 @@ void SparseWeightedMultiVectorfield2DViewController::paint(QPainter *painter, co
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void SparseWeightedMultiVectorfield2DViewController::updateParameters(bool force_update)
 {
     SparseMultiVectorfield2DViewController::updateParameters(force_update);
@@ -1316,9 +1192,6 @@ void SparseWeightedMultiVectorfield2DViewController::updateParameters(bool force
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void SparseWeightedMultiVectorfield2DViewController::updateView()
 {
 	SparseMultiVectorfield2DViewController::updateView();
@@ -1376,11 +1249,6 @@ void SparseWeightedMultiVectorfield2DViewController::updateView()
 	}	
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseWeightedMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -1436,11 +1304,6 @@ void SparseWeightedMultiVectorfield2DViewController::hoverMoveEvent(QGraphicsSce
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-pressed event
- *
- * \param event The mouse event which triggered this function.
- */
 void SparseWeightedMultiVectorfield2DViewController::mousePressEvent (QGraphicsSceneMouseEvent * event)
 {
     QGraphicsItem::mousePressEvent(event);
@@ -1492,8 +1355,5 @@ void SparseWeightedMultiVectorfield2DViewController::mousePressEvent (QGraphicsS
 	}
 }
 
-/**
- * @}
- */
 
 } //end of namespace graipe

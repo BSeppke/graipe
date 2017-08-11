@@ -43,18 +43,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_vectorfields
  * @{
- *
- * @file
- * @brief Implementation file for dense vectorfield import and export
+ *     @file
+ *     @brief Implementation file for dense vectorfield import and export
+ * @}
  */
 
-/**
- * Imports a dense vectorfield from the .flo-Format into the graipe format.
- *
- * \param filename The filename of the .flo file to be loaded.
- * \param vf the dense vectorfield, which we fill using the data on harddisk.
- * \return true, if the import was successful, else otherwise.
- */
 bool DenseVectorfieldImpex::importVectorfield(const QString & filename, DenseVectorfield2D & vf)
 {
     //The flo-format:
@@ -143,14 +136,6 @@ bool DenseVectorfieldImpex::importVectorfield(const QString & filename, DenseVec
     return false;
 }
 
-
-/**
- * Exports a dense vectorfield from the graipe format as a .flo-file onto harddisk. 
- *
- * \param vf the dense vectorfield, which we want so store as .flo-file on harddisk
- * \param filename The filename of the image.
- * \return true, if the export was successful, else otherwise.
- */
 bool DenseVectorfieldImpex::exportVectorfield(const DenseVectorfield2D & vf, const QString& filename)
 {
        //The flo-format:
@@ -223,9 +208,6 @@ bool DenseVectorfieldImpex::exportVectorfield(const DenseVectorfield2D & vf, con
 }
 
 
-/**
- * Default constructor for the dense vectorfield importer class.
- */
 DenseVectorfieldImporter::DenseVectorfieldImporter(Workspace* wsp)
 : Algorithm(wsp)
 {
@@ -233,9 +215,6 @@ DenseVectorfieldImporter::DenseVectorfieldImporter(Workspace* wsp)
     m_results.push_back(new DenseVectorfield2D(wsp));
 }
 
-/**
- * Specialization of the running phase of this algorithm.
- */
 void DenseVectorfieldImporter::run()
 {
     try 
@@ -266,9 +245,6 @@ void DenseVectorfieldImporter::run()
     }
 }
 
-/**
- * Default constructor for the dense vectorfield exporter class.
- */
 DenseVectorfieldExporter::DenseVectorfieldExporter(Workspace* wsp)
 : Algorithm(wsp)
 {
@@ -276,9 +252,6 @@ DenseVectorfieldExporter::DenseVectorfieldExporter(Workspace* wsp)
     m_parameters->addParameter("filename", new FilenameParameter(".flo filename", "", NULL));
 }
 
-/**
- * Specialization of the running phase of this algorithm.
- */
 void DenseVectorfieldExporter::run()
 {
     try 
@@ -309,9 +282,5 @@ void DenseVectorfieldExporter::run()
         emit errorMessage(QString("Non-explainable error occured"));		
     }
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

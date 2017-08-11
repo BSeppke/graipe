@@ -131,10 +131,13 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
     
-		//Statistics
+		/** Statistics **/
 		SparseVectorfield2DStatistics * m_stats;
     
-        //Additional parameters:
+        /**
+         * @{
+         * Additional parameters
+         */
         FloatParameter  * m_lineWidth,
                         * m_headSize;
         FloatParameter  * m_minLength;
@@ -148,11 +151,14 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DViewController
         IntParameter    * m_velocityLegendTicks;
         IntParameter    * m_velocityLegendDigits;
         EnumParameter   * m_mode;
+        /**
+         * @}
+         */
         
-		//Length/velocity legend
+		/** Length/velocity legend **/
 		QLegend * m_velocity_legend;	
     
-        //Drawing vectors
+        /** Drawing vectors **/
         VectorDrawer m_vector_drawer;
 };
 
@@ -230,7 +236,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
     
-        //Additional parameters:
+        /**
+         * @{
+         * Additional parameters
+         */
         FloatParameter  * m_minWeight,
                         * m_maxWeight;
         BoolParameter   * m_showWeightLegend;
@@ -238,8 +247,11 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DViewController
         IntParameter    * m_weightLegendTicks;
         IntParameter    * m_weightLegendDigits;
         BoolParameter   * m_useColorForWeight;
+        /**
+         * @}
+         */
         
-		//Legend that is displayed if necessary
+		/** Legend that is displayed if necessary **/
 		QLegend * m_weight_legend;
 };
 
@@ -319,10 +331,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
     
-		//Statistics
+		/** Statistics **/
 		SparseMultiVectorfield2DStatistics * m_stats;
     
-        //Additional parameters
+        /** Additional parameter **/
 		IntParameter* m_showAlternative;
 };
 
@@ -400,10 +412,13 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
          */
         void mousePressEvent (QGraphicsSceneMouseEvent * event);
 	
-		//Statistics
+		/** Statistics **/
 		SparseWeightedMultiVectorfield2DStatistics * m_stats;
     
-        //Additional parameters:
+        /**
+         * @{
+         * Additional parameters
+         */
         FloatParameter  * m_minWeight,
                         * m_maxWeight;
         BoolParameter   * m_showWeightLegend;
@@ -411,8 +426,11 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DViewController
         IntParameter    * m_weightLegendTicks;
         IntParameter    * m_weightLegendDigits;
         BoolParameter   * m_useColorForWeight;
+        /**
+         * @}
+         */
         
-		//Weight legend
+		/** Weight legend **/
 		QLegend * m_weight_legend;
     
 };

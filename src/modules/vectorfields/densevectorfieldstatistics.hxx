@@ -53,14 +53,14 @@ namespace graipe {
  
 /**
  * This class holds basic statistics for any class,
- * which fulfilles the Vectorfield2D interface
+ * which fulfilles the DenseVectorfield2D interface.
  * Statistics are kept for the origins, the directions ans the lengths
  * of all vectors of the vectorfield.
  */
 class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DStatistics
 {
     public:
-        //The used point type
+        /** The used point type **/
         typedef DenseVectorfield2D::PointType PointType;
     
         /**
@@ -74,9 +74,6 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DStatistics
          * sparse vectorfield and stores the pointer, too.
          *
          * \param vf The vectorfield, for which we want the statistics.
-         * \param restrict_length_to_vf If true, only vectors with a length smaller
-         *        than the diagonal of the vectorfields bounding rect are taken into
-         *        account for the statistics. Default value: true.
          */
         DenseVectorfield2DStatistics(const DenseVectorfield2D* vf);
         
@@ -95,13 +92,21 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DStatistics
         const BasicStatistics<double>& lengthStats() const;
     
     protected:
-        //Pointer to the vectorfield
+        /** Pointer to the vectorfield **/
         const DenseVectorfield2D* m_vf;
-        //Statistics storages
+    
+        /** Statistics of the vector directions **/
         BasicStatistics<PointType> m_direction;
+        /** Statistics of the vector lengths **/
         BasicStatistics<double> m_length;
 };
     
+/**
+ * This class holds basic statistics for any class,
+ * which fulfilles the DenseWeightedVectorfield2D interface.
+ * Statistics are kept for the origins, the directions ans the lengths
+ * of all vectors of the vectorfield.
+ */
 class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DStatistics
 :   public DenseVectorfield2DStatistics
 {
@@ -117,9 +122,6 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DStatistics
          * sparse wehgited vectorfield and stores the pointer, too.
          *
          * \param vf The vectorfield, for which we want the statistics.
-         * \param restrict_length_to_vf If true, only vectors with a length smaller
-         *        than the diagonal of the vectorfields bounding rect are taken into
-         *        account for the statistics. Default value: true.
          */
         DenseWeightedVectorfield2DStatistics(const DenseWeightedVectorfield2D* vf);
             
@@ -131,9 +133,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DStatistics
         const BasicStatistics<double>& weightStats() const;
     
     protected:
-        //Pointer to the vectorfield
+        /** Pointer to the vectorfield **/
         const DenseWeightedVectorfield2D* m_vf;
-        //Statistics storage
+        
+        /** Statistics of the vectors' weights **/
         BasicStatistics<double> m_weights;
 };
 

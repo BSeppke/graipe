@@ -46,17 +46,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_vectorfields
  * @{
- *
- * @file
- * @brief Implementation file for dense vectorfield viewing
+ *     @file
+ *     @brief Implementation file for dense vectorfield viewing
+ * @}
  */
- 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param vf The dense vectorfield, which we want to show.
- */
+
 DenseVectorfield2DViewController::DenseVectorfield2DViewController(DenseVectorfield2D * vf)
 :	ViewController(vf),
 	m_stats(new DenseVectorfield2DStatistics(vf)),
@@ -133,10 +127,6 @@ DenseVectorfield2DViewController::DenseVectorfield2DViewController(DenseVectorfi
 	updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 DenseVectorfield2DViewController::~DenseVectorfield2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -145,14 +135,6 @@ DenseVectorfield2DViewController::~DenseVectorfield2DViewController()
     delete m_velocity_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void DenseVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -220,11 +202,6 @@ void DenseVectorfield2DViewController::paint(QPainter *painter, const QStyleOpti
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the dense vectorfield.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF DenseVectorfield2DViewController::boundingRect() const
 {	
 
@@ -244,13 +221,6 @@ QRectF DenseVectorfield2DViewController::boundingRect() const
 	return rect.united(ViewController::boundingRect());
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void DenseVectorfield2DViewController::updateParameters(bool force_update)
 {
     ViewController::updateParameters(force_update);
@@ -277,10 +247,7 @@ void DenseVectorfield2DViewController::updateParameters(bool force_update)
         delete new_stats;
     }
 }
-    
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
+
 void DenseVectorfield2DViewController::updateView()
 {
     ViewController::updateView();
@@ -336,11 +303,6 @@ void DenseVectorfield2DViewController::updateView()
     
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void DenseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -391,12 +353,10 @@ void DenseVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent *
 
 
 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param vf The dense vectorfield, which we want to show.
- */
+
+
+
+
 DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewController(DenseVectorfield2D * vf)
 :	ViewController(vf),
 	m_stats(new DenseVectorfield2DStatistics(vf)),
@@ -479,10 +439,6 @@ DenseVectorfield2DParticleViewController::DenseVectorfield2DParticleViewControll
     updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 DenseVectorfield2DParticleViewController::~DenseVectorfield2DParticleViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -495,14 +451,6 @@ DenseVectorfield2DParticleViewController::~DenseVectorfield2DParticleViewControl
     delete m_velocity_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void DenseVectorfield2DParticleViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -535,11 +483,6 @@ void DenseVectorfield2DParticleViewController::paint(QPainter *painter, const QS
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * The bounding rect of the dense vectorfield animation.
- *
- * \return The bounding rectangle of this view.
- */
 QRectF DenseVectorfield2DParticleViewController::boundingRect() const
 { 
 	float d = 2*m_particleRadius->value();
@@ -554,13 +497,6 @@ QRectF DenseVectorfield2DParticleViewController::boundingRect() const
 	return rect.united(ViewController::boundingRect());
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void DenseVectorfield2DParticleViewController::updateParameters(bool force_update)
 {
     ViewController::updateParameters(force_update);
@@ -588,9 +524,6 @@ void DenseVectorfield2DParticleViewController::updateParameters(bool force_updat
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void DenseVectorfield2DParticleViewController::updateView()
 {
 	ViewController::updateView();
@@ -642,11 +575,6 @@ void DenseVectorfield2DParticleViewController::updateView()
     }
 }
 
-/**
- * Slot for handling the update of the timer
- *
- * \param event The timer event which triggered this function.
- */
 void DenseVectorfield2DParticleViewController::timerEvent(QTimerEvent *event)
 {
 	
@@ -703,11 +631,6 @@ void DenseVectorfield2DParticleViewController::timerEvent(QTimerEvent *event)
 	update();
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void DenseVectorfield2DParticleViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -758,12 +681,13 @@ void DenseVectorfield2DParticleViewController::hoverMoveEvent(QGraphicsSceneHove
 
 
 
-/**
- * specialization of the DenseVectorfield2DViewController's
- * constructor.
- *
- * \param vf The dense weighted vectorfield, which we want to show.
- */
+
+
+
+
+
+
+
 DenseWeightedVectorfield2DViewController::DenseWeightedVectorfield2DViewController(DenseWeightedVectorfield2D * vf)
 : DenseVectorfield2DViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
@@ -809,10 +733,6 @@ DenseWeightedVectorfield2DViewController::DenseWeightedVectorfield2DViewControll
     updateView();
 }
 
-/**
- * Specialization of the DenseVectorfield2DViewController's virtual
- * destructor.
- */
 DenseWeightedVectorfield2DViewController::~DenseWeightedVectorfield2DViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -820,14 +740,6 @@ DenseWeightedVectorfield2DViewController::~DenseWeightedVectorfield2DViewControl
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void DenseWeightedVectorfield2DViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 	
 	ViewController::paintBefore(painter, option, widget);
@@ -902,13 +814,6 @@ void DenseWeightedVectorfield2DViewController::paint(QPainter *painter, const QS
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void DenseWeightedVectorfield2DViewController::updateParameters(bool force_update)
 {
     DenseVectorfield2DViewController::updateParameters(force_update);
@@ -935,10 +840,7 @@ void DenseWeightedVectorfield2DViewController::updateParameters(bool force_updat
         delete new_stats;
     }
 }
-        
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
+
 void DenseWeightedVectorfield2DViewController::updateView()
 {
 	DenseVectorfield2DViewController::updateView();
@@ -995,11 +897,6 @@ void DenseWeightedVectorfield2DViewController::updateView()
     }
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void DenseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHoverEvent * event)
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -1049,12 +946,15 @@ void DenseWeightedVectorfield2DViewController::hoverMoveEvent(QGraphicsSceneHove
     }
 }
 
-/**
- * Implementation/specialization of the ViewController's
- * constructor.
- *
- * \param vf The dense weighted vectorfield, which we want to show.
- */
+
+
+
+
+
+
+
+
+
 DenseWeightedVectorfield2DParticleViewController::DenseWeightedVectorfield2DParticleViewController(DenseWeightedVectorfield2D * vf)
 :	DenseVectorfield2DParticleViewController(vf),
     m_minWeight(new FloatParameter("Min. weight:",-1.0e10,1.0e10,0)),
@@ -1103,10 +1003,6 @@ DenseWeightedVectorfield2DParticleViewController::DenseWeightedVectorfield2DPart
 	updateView();
 }
 
-/**
- * Implementation/specialization of the ViewController's virtual
- * destructor.
- */
 DenseWeightedVectorfield2DParticleViewController::~DenseWeightedVectorfield2DParticleViewController()
 {
     //The command "delete m_parameters;" inside the base class
@@ -1114,14 +1010,6 @@ DenseWeightedVectorfield2DParticleViewController::~DenseWeightedVectorfield2DPar
     delete m_weight_legend;
 }
 
-/**
- * Implementation/specialization of the ViewController's paint procedure. This is called
- * by the QGraphicsView on every re-draw request.
- *
- * \param painter Pointer to the painter, which is used for drawing.
- * \param option Further style options for this GraphicsItem's drawing.
- * \param widget The widget, where we will draw onto.
- */
 void DenseWeightedVectorfield2DParticleViewController::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 { 
 	ViewController::paintBefore(painter, option, widget);
@@ -1175,13 +1063,6 @@ void DenseWeightedVectorfield2DParticleViewController::paint(QPainter *painter, 
 	ViewController::paintAfter(painter, option, widget);
 }
 
-/**
- * Specialization of the update of  the parameters of this ViewController according to the current
- * model's parameters. This is necessary, if something may have changed 
- * the model in meantime.
- * 
- * \param force_update If true, force every single parameter to update.
- */
 void DenseWeightedVectorfield2DParticleViewController::updateParameters(bool force_update)
 {
     DenseVectorfield2DParticleViewController::updateParameters(force_update);
@@ -1209,9 +1090,6 @@ void DenseWeightedVectorfield2DParticleViewController::updateParameters(bool for
     }
 }
 
-/**
- * Specialization of the update of the view according to the current parameter settings.
- */
 void DenseWeightedVectorfield2DParticleViewController::updateView()
 {
 	
@@ -1240,11 +1118,6 @@ void DenseWeightedVectorfield2DParticleViewController::updateView()
 	}	
 }
 
-/**
- * Slot for handling the update of the timer
- *
- * \param event The timer event which triggered this function.
- */
 void DenseWeightedVectorfield2DParticleViewController::timerEvent(QTimerEvent *event)
 {
 	
@@ -1302,11 +1175,6 @@ void DenseWeightedVectorfield2DParticleViewController::timerEvent(QTimerEvent *e
 	update();
 }
 
-/**
- * Implementation/specialization of the handling of a mouse-move event
- *
- * \param event The mouse event which triggered this function.
- */
 void DenseWeightedVectorfield2DParticleViewController::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {	
 	QGraphicsItem::hoverMoveEvent(event);
@@ -1352,9 +1220,5 @@ void DenseWeightedVectorfield2DParticleViewController::hoverMoveEvent ( QGraphic
         event->accept();
 	}
 }
-
-/**
- * @}
- */
 
 } //end of namespace graipe

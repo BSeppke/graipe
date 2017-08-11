@@ -41,24 +41,16 @@ namespace graipe {
 /**
  * @addtogroup graipe_vectorfields
  * @{
- *
- * @file
- * @brief Implementation file for sparse vectorfield classes
+ *     @file
+ *     @brief Implementation file for sparse vectorfield classes
+ * @}
  */
- 
-/**
- * Default constructor. Creates an empty sparse vectorfield.
- */
+
 SparseVectorfield2D::SparseVectorfield2D(Workspace* wsp)
 :	Vectorfield2D(wsp)
 {
 }
 
-/**
- * Copy constructor. Creates a sparse vectorfield from another one.
- *
- * \param vf The other sparse vectorfield.
- */
 SparseVectorfield2D::SparseVectorfield2D(const SparseVectorfield2D & vf)
 :	Vectorfield2D(vf)
 {
@@ -68,22 +60,11 @@ SparseVectorfield2D::SparseVectorfield2D(const SparseVectorfield2D & vf)
 	}
 }
 
-/**
- * The size of this vectorfield. 
- * Implemented here, defined as pure virtual in base class.
- * 
- * \return The number of vectors in this vectorfield.
- */
 unsigned int SparseVectorfield2D::size() const
 {
 	return (unsigned int)m_origins.size();
 }
 
-/**
- * The removal of all vectors of this vectorfield.
- * Implemented here, defined as pure virtual in base class.
- * Does nothing if the model is locked.
- */
 void SparseVectorfield2D::clear()
 {
     if(locked())
@@ -95,26 +76,11 @@ void SparseVectorfield2D::clear()
 	updateModel();
 }
 
-/**
- * The origin/position of a vector at a given index in this vectorfield.
- * Implemented here, defined as pure virtual in base class.
- * May throw an error, if the index is out of bounds.
- * 
- * \param index The index of the vector.
- * \return The origin of the vector at the given index.
- */
 SparseVectorfield2D::PointType SparseVectorfield2D::origin(unsigned int index) const
 {	
 	return m_origins[index];			
 }
 
-/**
- * Set the origin/position of a vector at a given index in this vectorfield.
- * Does nothing if the model is locked.
- * 
- * \param index The index of the new origin.
- * \param new_o The new origin of the vector at that index.
- */
 void SparseVectorfield2D::setOrigin(unsigned int index, const PointType& new_p)
 {	
     if(locked())
@@ -124,26 +90,11 @@ void SparseVectorfield2D::setOrigin(unsigned int index, const PointType& new_p)
 	updateModel();	
 }
 
-/**
- * The direction of a vector at a given index in this vectorfield.
- * Implemented here, defined as pure virtual in base class.
- * May throw an error, if the index is out of bounds.
- * 
- * \param index The index of the vector.
- * \return The direction of the vector at the given index.
- */
 SparseVectorfield2D::PointType SparseVectorfield2D::direction(unsigned int index) const
 {	
 	return m_directions[index];	
 }
-/**
- * Set the direction of a vector at a given index in this vectorfield.
- * Implemented here, defined as pure virtual in base class.
- * Does nothing if the model is locked.
- * 
- * \param index The index of the new direction.
- * \param new_d The new direction of the vector at that index.
- */
+
 void SparseVectorfield2D::setDirection(unsigned int index, const PointType& new_p)
 {
     if(locked())
@@ -153,14 +104,6 @@ void SparseVectorfield2D::setDirection(unsigned int index, const PointType& new_
 	updateModel();
 }
 
-
-/**
- * Add a vector to the sparse vectorfield.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- */
 void SparseVectorfield2D::addVector(const PointType& orig, const PointType& dir)
 {		
     if(locked())
@@ -171,13 +114,6 @@ void SparseVectorfield2D::addVector(const PointType& orig, const PointType& dir)
 	updateModel();
 }
 
-/**
- * Removing a vector from the vector field at a given index.
- * If the index is out of bounds or the model is locked, 
- * this will not remove any vector.
- *
- * \param index. The index, where the vector shall be removed.
- */
 void SparseVectorfield2D::removeVector(unsigned int index)
 {
     if(locked())
@@ -191,23 +127,11 @@ void SparseVectorfield2D::removeVector(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the vectorfieldserialization.
- * 
- * \return Always: "pos_x, pos_y, dir_x, dir_y".
- */
 QString SparseVectorfield2D::csvHeader() const
 {
 	return "pos_x, pos_y, dir_x, dir_y";
 }
 
-/**
- * Serialization of a single vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y".
- */
 QString SparseVectorfield2D::itemToCSV(unsigned int index) const
 {
 	return   QString::number(m_origins[index].x(), 'g', 10)    + ", "
@@ -216,13 +140,6 @@ QString SparseVectorfield2D::itemToCSV(unsigned int index) const
            + QString::number(m_directions[index].y(), 'g', 10);
 }
 
-/**
- * Deserialization/addition of a vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y
- */
 bool SparseVectorfield2D::itemFromCSV(const QString & serial)
 {
     if(locked())
@@ -247,13 +164,6 @@ bool SparseVectorfield2D::itemFromCSV(const QString & serial)
 	return false;
 }
 
-/**
- * Serialization of a single vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y".
- */
 void SparseVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.writeTextElement("x", QString::number(m_origins[index].x(), 'g', 10));
@@ -262,13 +172,6 @@ void SparseVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& x
     xmlWriter.writeTextElement("v", QString::number(m_directions[index].y(), 'g', 10));
 }
 
-/**
- * Deserialization/addition of a vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y
- */
 bool SparseVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     if(locked())
@@ -309,15 +212,6 @@ bool SparseVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
     return true;
 }
 
-/**
- * Serialize the complete content of the sparse vectorfield to an xml file.
- * Mainly prints:
- *   csvHeader
- * and for each vector:
- *   newline + serialize_item().
- *
- * \param out The output device for serialization.
- */
 void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
 {
 	for(unsigned int i=0; i < size(); ++i)
@@ -329,15 +223,6 @@ void SparseVectorfield2D::serialize_content(QXmlStreamWriter& xmlWriter) const
     }
 }
 
-/**
- * Deserialization of a  sparse vectorfield from an xml file.
- * The first line is the header as given in csvHeader, which is ignored however.
- * Each following line has to be one valid vector serialization.
- * Does nothing if the model is locked.
- *
- * \param xmlReader The QXmlStreamReader, where we will read from.
- * \return True, if the content could be deserialized and the model is not locked.
- */
 bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 {
     if (locked())
@@ -382,19 +267,12 @@ bool SparseVectorfield2D::deserialize_content(QXmlStreamReader& xmlReader)
 
 
 
-/**
- * Default constructor. Creates an empty weighted sparse vectorfield.
- */
+
 SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(Workspace* wsp)
 : SparseVectorfield2D(wsp)
 {
 }
 
-/**
- * Copy constructor. Creates a weighted sparse vectorfield from another one.
- *
- * \param vf The other weighted sparse vectorfield.
- */
 SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(const SparseWeightedVectorfield2D & vf)
 :	SparseVectorfield2D(vf)
 {
@@ -404,11 +282,6 @@ SparseWeightedVectorfield2D::SparseWeightedVectorfield2D(const SparseWeightedVec
 	}
 }
 
-/**
- * The removal of all vectors of this vectorfield.
- * Specialized for this class.
- * Does nothing if the model is locked.
- */
 void SparseWeightedVectorfield2D::clear()
 {
     if (locked())
@@ -418,25 +291,11 @@ void SparseWeightedVectorfield2D::clear()
     SparseVectorfield2D::clear();
 }
 
-/**
- * Getter for the  weight of a vector at a given index. 
- * May throw an error, if the index is out of bounds.
- *
- * \param index The index of the vector, for which we want the weight.
- * \return The weight of that vector.
- */
 float SparseWeightedVectorfield2D::weight(unsigned int index) const
 {	
 	return m_weights[index];	
 }
 
-/**
- * Setter for the  weight of a vector at a given index.
- * Does nothing if the model is locked.
- *
- * \param index The index of the vector, for which we want the weight.
- * \param new_w The new weight of that vector.
- */
 void SparseWeightedVectorfield2D::setWeight(unsigned int index, float new_w)
 {
 	m_weights[index]= new_w;	
@@ -444,26 +303,11 @@ void SparseWeightedVectorfield2D::setWeight(unsigned int index, float new_w)
 	updateModel();
 }
 
-/**
- * Add a vector to the weighted sparse vectorfield.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- */
 void SparseWeightedVectorfield2D::addVector(const PointType& orig, const PointType& dir)
 {
     addVector(orig, dir, 0);
 }
 
-/**
- * Add a weighted vector to the weighted sparse vectorfield.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param w  The weight of the new vector.
- */
 void SparseWeightedVectorfield2D::addVector(const PointType& orig, const PointType& dir, float w)
 {
     if (locked())
@@ -473,12 +317,6 @@ void SparseWeightedVectorfield2D::addVector(const PointType& orig, const PointTy
     SparseVectorfield2D::addVector(orig, dir);
 }
 
-/**
- * Removing a vector from the vector field at a given index
- * Does nothing if the model is locked or the index is out of bounds.
- *
- * \param index. The index, where the vector shall be removed.
- */
 void SparseWeightedVectorfield2D::removeVector(unsigned int index)
 {
     if (locked())
@@ -491,36 +329,17 @@ void SparseWeightedVectorfield2D::removeVector(unsigned int index)
     SparseVectorfield2D::removeVector(index);
 }
 
-/**
- * The content's item header for the weighted vectorfield serialization.
- * 
- * \return Always: "pos_x, pos_y, dir_x, dir_y, weight".
- */
 QString SparseWeightedVectorfield2D::csvHeader() const
 {
 	return SparseVectorfield2D::csvHeader() + ", weight";
 }
 
-/**
- * Serialization of a single weighted vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight".
- */
 QString SparseWeightedVectorfield2D::itemToCSV(unsigned int index) const
 {
 	return SparseVectorfield2D::itemToCSV(index) + ", "
            + QString::number(m_weights[index], 'g', 10);
 }
 
-/**
- * Deserialization/addition of a weihgted vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, weight
- */
 bool SparseWeightedVectorfield2D::itemFromCSV(const QString & serial)
 {
     if (locked())
@@ -544,26 +363,12 @@ bool SparseWeightedVectorfield2D::itemFromCSV(const QString & serial)
 	}
 	return false;
 }
-/**
- * Serialization of a single weighted vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight".
- */
+
 void SparseWeightedVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
     xmlWriter.writeTextElement("w", QString::number(m_weights[index], 'g', 10));
 }
 
-
-/**
- * Deserialization/addition of a weihgted vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, weight
- */
 bool SparseWeightedVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     if (locked())
@@ -601,22 +406,15 @@ bool SparseWeightedVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
 
 		
 		
-	
-/**
- * Default constructor. Creates an empty sparse multi vectorfield.
- */
+
+
 SparseMultiVectorfield2D::SparseMultiVectorfield2D(Workspace* wsp)
 :	SparseVectorfield2D(wsp),
     m_alternatives(new IntParameter("number of alternative directions",0,1000,10))
 {
     m_parameters->addParameter("alternatives", m_alternatives);
 }
-	
- /**
- * Copy constructor. Creates a sparse multi vectorfield from another one.
- *
- * \param vf The other sparse multi vectorfield.
- */
+
 SparseMultiVectorfield2D::SparseMultiVectorfield2D(const SparseMultiVectorfield2D & vf)
 :	SparseVectorfield2D(vf),
     m_alternatives(new IntParameter("number of alternative directions",0,1000,10))
@@ -637,11 +435,6 @@ SparseMultiVectorfield2D::SparseMultiVectorfield2D(const SparseMultiVectorfield2
     }
 }
 
-/**
- * The removal of all vectors of this vectorfield.
- * Specialized for this class.
- * Does nothing if the model is locked.
- */
 void SparseMultiVectorfield2D::clear()
 {
     if (locked())
@@ -650,28 +443,12 @@ void SparseMultiVectorfield2D::clear()
     m_alt_directions.clear();
     SparseVectorfield2D::clear();
 }
-/**
- * Getter for the  number of alternative directions for a 
- * sparse multi vectorfield. Note that the overall direction count is:
- * alternatives+1, since the original direction stays untouched.
- *
- * \return The number of alternative directions of a vector.
- */
+
 unsigned int SparseMultiVectorfield2D::alternatives() const
 {
 	return m_alternatives->value();
 }
 
-/**
- * Setter for the  number of alternative directions for a
- * sparse multi vectorfield. Note that the overall direction count is:
- * alternatives+1, since the original direction stays untouched.
- * Does nothing if the model is locked.
- * Rescales all (already existing alternatives into larger data containers
- * or cuts the contents, if the number of alternatives is decreased
- *
- * \param alternatives The number of alternative directions of a vector.
- */
 void SparseMultiVectorfield2D::setAlternatives(unsigned int alternatives)
 {
     if(locked())
@@ -680,28 +457,11 @@ void SparseMultiVectorfield2D::setAlternatives(unsigned int alternatives)
     updateModel();
 }
 
-/**
- * The direction of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the altivative direction.
- * \return The alternative direction of the vector at the given indices.
- */
 SparseMultiVectorfield2D::PointType SparseMultiVectorfield2D::altDirection(unsigned int index, unsigned int alt_index) const
 {
 	return (m_alt_directions[index])[alt_index];
 }
 
-/**
- * Sets the direction of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- * Does nothing if the model is locked.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the altivative direction.
- * \param new_d The new alternative direction of the vector at the given indices.
- */
 void SparseMultiVectorfield2D::setAltDirection(unsigned int index, unsigned int alt_index, const PointType& new_d)
 {
     if(locked())
@@ -711,126 +471,49 @@ void SparseMultiVectorfield2D::setAltDirection(unsigned int index, unsigned int 
 	updateModel();
 }
 
-/**
- * The local direction of a vector at a given index in this vectorfield.
- * May throw an error, if the index is out of bounds.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the alternative local direction.
- * \return The alternative local direction of the vector at the given indices.
- */
 SparseMultiVectorfield2D::PointType SparseMultiVectorfield2D::altLocalDirection(unsigned int index, unsigned int alt_index) const
 {	
 	return altDirection(index, alt_index) - altGlobalDirection(index, alt_index);
 }
 
-/**
- * The global direction of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the alternative global direction.
- * \return The alternative global direction of the vector at the given indices.
- */
 SparseMultiVectorfield2D::PointType SparseMultiVectorfield2D::altGlobalDirection(unsigned int index, unsigned int alt_index) const
 {	
 	return globalMotion().map(origin(index)) - origin(index);
 }
 
-/**
- * The squared length of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the alternative squared length.
- * \return The alternative squared length of the vector at the given indeices.
- */
 float SparseMultiVectorfield2D::altSquaredLength(unsigned int index, unsigned int alt_index) const
 {
     return altDirection(index, alt_index).squaredLength();
 }
 
-/**
- * The length of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the alternative length.
- * \return The alternative length of the vector at the given indices.
- */
 float SparseMultiVectorfield2D::altLength(unsigned int index, unsigned int alt_index) const
 {
     return altDirection(index, alt_index).length();
 }
 
-/**
- * The angle of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- *
- * \param index The index of the vector.
- * \param alt_index The index of the alternative angle.
- * \return The alternative angle of the vector at the given indices.
- */
 float SparseMultiVectorfield2D::altAngle(unsigned int index, unsigned int alt_index) const
 {
 	return altDirection(index, alt_index).angle();
 }
 
-/**
- * The target of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- *
- * \param index The index of the vector.
- * \param alt_index The index of the alternative target.
- * \return The alternative target of the vector at the given incides.
- */
 SparseMultiVectorfield2D::PointType SparseMultiVectorfield2D::altTarget(unsigned int index, unsigned int alt_index) const
 {	
 	return origin(index) + altDirection(index, alt_index);
 }
-/**
- * Sets the target of a vector at a given index in this vectorfield.
- * May throw an error, if the index or the alt_index is out of bounds.
- * Does nothing if the model is locked.
- * 
- * \param index The index of the vector.
- * \param alt_index The index of the altivative target.
- * \param new_t The new alternative target of the vector at the given indices.
- */
+
 void SparseMultiVectorfield2D::setAltTarget(unsigned int index, unsigned int alt_index, const PointType& new_t)
 {	
 	setAltDirection(index, alt_index, new_t - origin(index));
 }
 
-/**
- * Add a vector to the sparse multi vectorfield. This method adds empty alternative
- * directions, given by (0,0) to the alternative list.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- */
 void SparseMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir)
 {
 	if(locked())
         return;
     
     addVector(orig, dir, std::vector<PointType>(alternatives()));
-}	
-   
-/**
- * Add a vector to the sparse multi vectorfield. This method adds a main direction
- * and given alternative directions to the alternative list.
- * If the list of alternatives is smaller than alternatives(), the first n entries
- * will be filled. 
- * If the list of alternatives is larger than alternatives(), the first alternative()
- * entries will be copied and the rest will be dismissed.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param alt_dirs  The alternative directions of the new vector.
- */
+}
+
 void SparseMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, const std::vector<SparseMultiVectorfield2D::PointType>& dirs)
 {
 	if(locked())
@@ -847,21 +530,8 @@ void SparseMultiVectorfield2D::addVector(const PointType& orig, const PointType&
     m_alt_directions.push_back(new_vec);
     
     SparseVectorfield2D::addVector(orig,dir);
-}	
+}
 
-/**
- * Add a vector to the sparse multi vectorfield. This method adds a list of directions
- * (first) main direction, (others) alternative directions to the vectorfield.
- * If the list of directions is smaller than alternatives()+1, the first n entries
- * will be filled. 
- * If the list of alternatives is larger than alternatives()+1, the first alternative()
- * entries will be copied and the rest will be dismissed.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param alt_dirs  The alternative directions of the new vector.
- */
 void SparseMultiVectorfield2D::addVector(const PointType& orig, const std::vector<PointType>& all_dirs)
 {
 	if(locked())
@@ -875,12 +545,6 @@ void SparseMultiVectorfield2D::addVector(const PointType& orig, const std::vecto
     addVector(orig, all_dirs.front(), alt_dirs);
 }
 
-/**
- * Removing a vector from the vector field at a given index
- * Does nothing if the model is locked or the index is out of bounds.
- *
- * \param index. The index, where the vector shall be removed.
- */
 void SparseMultiVectorfield2D::removeVector(unsigned int index)
 {		
 	if(locked())
@@ -893,11 +557,6 @@ void SparseMultiVectorfield2D::removeVector(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the multi vectorfield serialization.
- * 
- * \return Always: "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
- */
 QString SparseMultiVectorfield2D::csvHeader() const
 {
     QString result =  SparseVectorfield2D::csvHeader();
@@ -910,13 +569,6 @@ QString SparseMultiVectorfield2D::csvHeader() const
     return result;
 }
 
-/**
- * Serialization of a single multi vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
- */
 QString SparseMultiVectorfield2D::itemToCSV(unsigned int index) const
 {
 	QString result = SparseVectorfield2D::itemToCSV(index);
@@ -928,14 +580,7 @@ QString SparseMultiVectorfield2D::itemToCSV(unsigned int index) const
 	}
 	return result;
 }
-		
-/**
- * Deserialization/addition of a multi vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y
- */
+
 bool SparseMultiVectorfield2D::itemFromCSV(const QString & serial)
 {
     //try to split content into data entries
@@ -967,13 +612,6 @@ bool SparseMultiVectorfield2D::itemFromCSV(const QString & serial)
 	return false;
 }
 
-/**
- * Serialization of a single multi vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
- */
 void SparseMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
     SparseVectorfield2D::serialize_item(index, xmlWriter);
@@ -993,13 +631,6 @@ void SparseMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWrit
 	}
 }
 
-/**
- * Deserialization/addition of a multi vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y
- */
 bool SparseMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     if (locked())
@@ -1061,10 +692,6 @@ bool SparseMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
     }
 }
 
-/**
- * This slot is called, whenever some parameter is changed.
- * It rearranges the size of the direction alternatives' vector.
- */
 void SparseMultiVectorfield2D::updateModel()
 {
     for( std::vector<PointType>& vec : m_alt_directions)
@@ -1091,19 +718,13 @@ void SparseMultiVectorfield2D::updateModel()
 
 
 		
-/**
- * Default constructor. Creates an empty sparse weighted multi vectorfield.
- */
+
+
 SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D(Workspace* wsp)
 : SparseMultiVectorfield2D(wsp)
 {
 }
 
-/**
- * Copy constructor. Creates a sparse multi weighted vectorfield from another one.
- *
- * \param vf The other sparse multi weighted vectorfield.
- */
 SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D(const SparseWeightedMultiVectorfield2D & vf)
 :	SparseMultiVectorfield2D(vf)
 {
@@ -1114,11 +735,6 @@ SparseWeightedMultiVectorfield2D::SparseWeightedMultiVectorfield2D(const SparseW
 	}
 }
 
-/**
- * The removal of all vectors of this vectorfield.
- * Specialized for this class.
- * Does nothing if the model is locked.
- */
 void SparseWeightedMultiVectorfield2D::clear()
 {
     if (locked())
@@ -1129,38 +745,16 @@ void SparseWeightedMultiVectorfield2D::clear()
     SparseMultiVectorfield2D::clear();
 }
 
-/**
- * Getter for the weight of a vector at a given index.
- * May throw an error, if the index is out of bounds.
- *
- * \param index The index of the vector, for which we want the weight.
- * \return The weight of that vector.
- */
 float SparseWeightedMultiVectorfield2D::weight(unsigned int index) const
 {
 	return m_weights[index];
 }
 
-/**
- * Getter for the alternate weight of a vector at a given index and alt_index.
- * May throw an error, if the indices are out of bounds.
- *
- * \param index The index of the vector, for which we want the weight.
- * \param alt_index The index of the vector, for which we want the weight.
- * \return The weight of that (alternate) direction.
- */
 float SparseWeightedMultiVectorfield2D::altWeight(unsigned int index, unsigned int alt_index) const
 {
 	return (m_alt_weights[index])[alt_index];
 }
 
-/**
- * Setter for the  weight of a vector at a given index.
- * Does nothing if the model is locked.
- *
- * \param index The index of the vector, for which we want the weight.
- * \param weight The new weight of that direction.
- */
 void SparseWeightedMultiVectorfield2D::setWeight(unsigned int index,  float weight)
 {
     if(locked())
@@ -1170,14 +764,6 @@ void SparseWeightedMultiVectorfield2D::setWeight(unsigned int index,  float weig
 	updateModel();
 }
 
-/**
- * Setter for the alternate weight of a vector at a given index and alt_index.
- * Does nothing if the model is locked.
- *
- * \param index The index of the vector, for which we want the weight.
- * \param alt_index The index of the vector, for which we want the weight.
- * \param weight The new weight of that (alternate) direction.
- */
 void SparseWeightedMultiVectorfield2D::setAltWeight(unsigned int index,  unsigned int alt_index, float weight)
 {
     if(locked())
@@ -1187,16 +773,6 @@ void SparseWeightedMultiVectorfield2D::setAltWeight(unsigned int index,  unsigne
 	updateModel();
 }
 
-/**
- * Add a vector to the sparse weighted multi vectorfield. This method adds a main direction
- * and given alternative directions to the alternative list.
- * All alternative directions will be set to (0,0).
- * The weight and the alternative weights will be set to zero.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- */
 void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir)
 {
     if(locked())
@@ -1205,17 +781,6 @@ void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const Po
     addVector(orig, dir, 0.0, std::vector<PointType>(alternatives()), std::vector<float>(alternatives()));
 }
 
-/**
- * Add a vector to the sparse weighted multi vectorfield. This method adds a main direction
- * and given alternative directions to the alternative list.
- * All alternative directions will be set to (0,0).
- * The alternative weights will be set to zero.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param weight  The weight of the new vector.
- */
 void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, float weight)
 {
     if(locked())
@@ -1224,20 +789,6 @@ void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const Po
     addVector(orig, dir, weight, std::vector<PointType>(alternatives()), std::vector<float>(alternatives()));
 }
 
-/**
- * Add a vector to the sparse weighted multi vectorfield. This method adds a main direction
- * and given alternative directions to the alternative list.
- * If the list of alternatives is smaller than alternatives(), the first n entries
- * will be filled. 
- * If the list of alternatives is larger than alternatives(), the first alternative()
- * entries will be copied and the rest will be dismissed.
- * The weight and the alternative weights will be set to zero.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param alt_dirs  The alternative directions of the new vector.
- */
 void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, const std::vector<PointType>& alt_dirs)
 {
     if(locked())
@@ -1247,21 +798,6 @@ void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const Po
 
 }
 
-/**
- * Add a vector to the sparse weighted multi vectorfield. This method adds a main direction
- * and given alternative directions to the alternative list.
- * If the list of alternatives is smaller than alternatives(), the first n entries
- * will be filled. 
- * If the list of alternatives is larger than alternatives(), the first alternative()
- * entries will be copied and the rest will be dismissed.
- * The alternative weights will be set to zero.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param weight The weight of the given direction.
- * \param alt_dirs  The alternative directions of the new vector.
- */
 void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, float weight, const std::vector<PointType>& alt_dirs)
 {
     if(locked())
@@ -1270,22 +806,6 @@ void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const Po
     addVector(orig, dir, weight, alt_dirs, std::vector<float>(alternatives()));
 }
 
-/**
- * Add a vector to the sparse weighted multi vectorfield. This method adds a main direction
- * and given alternative directions to the alternative list.
- * If the list of alternatives is smaller than alternatives(), the first n entries
- * will be filled. 
- * If the list of alternatives is larger than alternatives(), the first alternative()
- * entries will be copied and the rest will be dismissed.
- * The same holds for the alternative weights.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param dir  The direction of the new vector.
- * \param weight The weight of the given direction.
- * \param alt_dirs  The alternative directions of the new vector.
- * \param alt_weights The alternative direction weights of the new vector.
- */
 void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, float weight, const std::vector<PointType>& alt_dirs, const std::vector<float>& alt_weights)
 {
     if(locked())
@@ -1306,20 +826,6 @@ void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const Po
     SparseMultiVectorfield2D::addVector(orig, dir, alt_dirs);
 }
 
-/**
- * Add a vector to the sparse weighted multi vectorfield. This method adds a all directions
- * (first) as main (other) as alternatives
- * If the list of alternatives is smaller than alternatives(), the first n entries
- * will be filled. 
- * If the list of alternatives is larger than alternatives(), the first alternative()
- * entries will be copied and the rest will be dismissed.
- * The same holds for the alternative weights.
- * Does nothing if the model is locked.
- *
- * \param orig The origin of the new vector.
- * \param all_dirs  The alternative directions of the new vector.
- * \param all_weights The alternative direction weights of the new vector.
- */
 void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const std::vector<PointType>& all_dirs, const std::vector<float>& all_weights)
 {
 	if(locked())
@@ -1336,13 +842,6 @@ void SparseWeightedMultiVectorfield2D::addVector(const PointType& orig, const st
     addVector(orig, all_dirs.front(),all_weights.front(), alt_dirs, alt_weights);
 }
 
-
-/**
- * Removing a vector from the vector field at a given index
- * Does nothing if the model is locked or the index is out of bounds.
- *
- * \param index. The index, where the vector shall be removed.
- */
 void SparseWeightedMultiVectorfield2D::removeVector(unsigned int index)
 {
     if(locked())
@@ -1356,11 +855,6 @@ void SparseWeightedMultiVectorfield2D::removeVector(unsigned int index)
     }
 }
 
-/**
- * The content's item header for the weighted multi vectorfield serialization.
- * 
- * \return Always: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
- */
 QString SparseWeightedMultiVectorfield2D::csvHeader() const
 {
     QString result =  SparseVectorfield2D::csvHeader() + ", weight";
@@ -1373,13 +867,6 @@ QString SparseWeightedMultiVectorfield2D::csvHeader() const
     return result;
 }
 
-/**
- * Serialization of a single weighted multi vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
- */
 QString SparseWeightedMultiVectorfield2D::itemToCSV(unsigned int index) const
 {
 	QString result = SparseVectorfield2D::itemToCSV(index) + ", " + QString::number(weight(index), 'g', 10);
@@ -1393,13 +880,6 @@ QString SparseWeightedMultiVectorfield2D::itemToCSV(unsigned int index) const
 	return result;
 }
 
-/**
- * Deserialization/addition of a weighted multi vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
- */
 bool SparseWeightedMultiVectorfield2D::itemFromCSV(const QString & serial)
 {
     //try to split content into data entries
@@ -1437,13 +917,6 @@ bool SparseWeightedMultiVectorfield2D::itemFromCSV(const QString & serial)
 	return false;
 }
 
-/**
- * Serialization of a single weighted multi vector inside the list at a given index.
- * The vector will be serialized by means of comma separated values.
- * 
- * \param index Index of the vector to be serialized.
- * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
- */
 void SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const
 {
     SparseVectorfield2D::serialize_item(index, xmlWriter);
@@ -1465,13 +938,6 @@ void SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index, QXmlSt
 	}
 }
 
-/**
- * Deserialization/addition of a weighted multi vector from a string to this list.
- *
- * \param serial A QString containing the serialization of the vector.
- * \return True, if the item could be deserialized and the model is not locked.
- *         The serialization is ordered as: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
- */
 bool SparseWeightedMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlReader)
 {
     if (locked())
@@ -1551,10 +1017,6 @@ bool SparseWeightedMultiVectorfield2D::deserialize_item(QXmlStreamReader& xmlRea
     }
 }
 
-/**
- * This slot is called, whenever some parameter is changed.
- * It rearranges the size of the weight alternatives' vector.
- */
 void SparseWeightedMultiVectorfield2D::updateModel()
 {
     for( std::vector<float>& vec : m_alt_weights)
@@ -1569,9 +1031,5 @@ void SparseWeightedMultiVectorfield2D::updateModel()
     }
     SparseMultiVectorfield2D::updateModel();
 }
-
-/**
- * @}
- */
     
 } //end of namespace graipe

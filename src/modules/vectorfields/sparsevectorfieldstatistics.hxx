@@ -54,14 +54,14 @@ namespace graipe {
  
 /**
  * This class holds basic statistics for any class,
- * which fulfilles the Vectorfield2D interface
- * Statistics are kept for the origins, the directions ans the lengths
+ * which fulfilles the SparseVectorfield2D interface
+ * Statistics are kept for the origins, the directions and the lengths
  * of all vectors of the vectorfield.
  */
 class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DStatistics
 {
     public:
-        //The used point type
+        /** The used point type **/
         typedef SparseVectorfield2D::PointType PointType;
     
         /**
@@ -100,14 +100,26 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2DStatistics
         const BasicStatistics<double>& lengthStats() const;
     
     protected:
-        //Pointer to the vectorfield
+        /** Pointer to the vectorfield **/
         const SparseVectorfield2D* m_vf;
     
-        //Statistics storages
+        /**
+         * @{
+         * Statistics storages
+         */
         BasicStatistics<PointType> m_origin, m_direction;
         BasicStatistics<double> m_length;
+        /** 
+         * @}
+         */
 };
-    
+     
+/**
+ * This class holds basic statistics for any class,
+ * which fulfilles the SparseWeightedVectorfield2D interface
+ * Statistics are kept for the origins, the directions, the lengths and weights
+ * of all vectors of the vectorfield.
+ */
 class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DStatistics
 :   public SparseVectorfield2DStatistics
 {
@@ -135,14 +147,20 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2DStatistics
     
     
     protected:
-        //Pointer to the vectorfield
+        /** Pointer to the vectorfield **/
         const SparseWeightedVectorfield2D* m_vf;
     
-        //Statistics storage
+        /** Statistics storage **/
         BasicStatistics<double> m_weight;
 };
 
     
+/**
+ * This class holds basic statistics for any class,
+ * which fulfilles the SparseMultiVectorfield2D interface
+ * Statistics are kept for the origins, the multiple directions and the multiple lengths
+ * of all vectors of the vectorfield.
+ */
 class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DStatistics
 :   public SparseVectorfield2DStatistics
 {
@@ -192,17 +210,29 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2DStatistics
         const BasicStatistics<double>& combinedLengthStats() const;
     
     protected:
-        //Pointer to the vectorfield
+        /** Pointer to the vectorfield **/
         const SparseMultiVectorfield2D* m_vf;
     
-        //Statistics storage
+        /**
+         * @{
+         * Statistics storage
+         */
         std::vector<BasicStatistics<PointType> > m_alt_directions;
         std::vector<BasicStatistics<double> > m_alt_lengths;
         BasicStatistics<PointType> m_combined_direction;
         BasicStatistics<double> m_combined_length;
+        /** 
+         * @}
+         */
 };
 
     
+/**
+ * This class holds basic statistics for any class,
+ * which fulfilles the SparseMultiVectorfield2D interface
+ * Statistics are kept for the origins, the multiple directions, the multiple weights, 
+ * and the multiple lengths of all vectors of the vectorfield.
+ */
 class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DStatistics
 :   public SparseMultiVectorfield2DStatistics
 {
@@ -244,13 +274,19 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2DStatistics
         const BasicStatistics<double>& combinedWeightStats() const;
     
     protected:
-        //Pointer to the vectorfield
+        /** Pointer to the vectorfield **/
         const SparseWeightedMultiVectorfield2D* m_vf;
     
-        //Statistics storage
+        /**
+         * @{
+         * Statistics storage
+         */
         BasicStatistics<double> m_weight;
         std::vector<BasicStatistics<double> > m_alt_weights;
         BasicStatistics<double> m_combined_weight;
+        /** 
+         * @}
+         */
 };
 
 /**

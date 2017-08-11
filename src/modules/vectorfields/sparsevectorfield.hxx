@@ -133,7 +133,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          * Does nothing if the model is locked.
          * 
          * \param index The index of the new direction.
-         * \param new_d The new direction of the vector at that index.
+         * \param new_p The new direction of the vector at that index.
          */
         void setDirection(unsigned int index, const PointType& new_p);
 
@@ -150,7 +150,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          * Removing a vector from the vector field at a given index
          * Does nothing if the model is locked.
          *
-         * \param index. The index, where the vector shall be removed.
+         * \param index The index, where the vector shall be removed.
          */
         void removeVector(unsigned int index);
     
@@ -184,27 +184,22 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
          * The vector will be serialized by means of comma separated values.
          * 
          * \param index Index of the vector to be serialized.
-         * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y".
+         * \param xmlWriter The xmlWriter on which we serialize the vector.
          */
 		virtual void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
         
         /**
          * Deserialization/addition of a vector from a string to this list.
          *
-         * \param serial A QString containing the serialization of the vector.
+         * \param xmlReader An xmlReader from which we read the vector.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y
          */
 		virtual bool deserialize_item(QXmlStreamReader& xmlReader);
     
         /**
          * Serialize the complete content of the sparse vectorfield to an xml file.
-         * Mainly prints:
-         *   csvHeader
-         * and for each vector:
-         *   newline + serialize_item().
          *
-         * \param out The output device for serialization.
+         * \param xmlWriter The xmlWriter for serialization.
          */
 		virtual void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
@@ -219,8 +214,9 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseVectorfield2D
 		virtual bool deserialize_content(QXmlStreamReader& xmlReader);
 		
 	protected:
-        //Data containers for the origins and directions
+        /** Data container for the origins **/
         std::vector<PointType> m_origins;
+        /** Data container for the directions **/
 		std::vector<PointType> m_directions;
 };
 
@@ -301,7 +297,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
          * Removing a vector from the vector field at a given index
          * Does nothing if the model is locked or the index is out of bounds.
          *
-         * \param index. The index, where the vector shall be removed.
+         * \param index The index, where the vector shall be removed.
          */
         void removeVector(unsigned int index);
     
@@ -335,21 +331,20 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedVectorfield2D : public SparseVect
          * The vector will be serialized by means of comma separated values.
          * 
          * \param index Index of the vector to be serialized.
-         * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight".
+         * \param xmlWriter An xmlWriter for the serialization of a weighted vector
          */
 		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
         
         /**
          * Deserialization/addition of a weighted vector from a string to this list.
          *
-         * \param serial A QString containing the serialization of the vector.
+        * \param xmlReader An xmlReader from which we read the weighted vector.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, weight
          */
-		bool deserialize_item(QXmlStreamReader& xmlWriter);
+		bool deserialize_item(QXmlStreamReader& xmlReader);
 		
 	protected:
-        //Storage of the weights
+        /** Storage of the weights **/
 		std::vector<float> m_weights;
 };
 
@@ -558,8 +553,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          * Does nothing if the model is locked.
          *
          * \param orig The origin of the new vector.
-         * \param dir  The direction of the new vector.
-         * \param alt_dirs  The alternative directions of the new vector.
+         * \param all_dirs The dir + the alternative directions of the new vector.
          */
 		void addVector(const PointType& orig, const std::vector<PointType>& all_dirs);
 	
@@ -567,7 +561,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          * Removing a vector from the vector field at a given index
          * Does nothing if the model is locked or the index is out of bounds.
          *
-         * \param index. The index, where the vector shall be removed.
+         * \param index The index, where the vector shall be removed.
          */
         void removeVector(unsigned int index);
     
@@ -601,18 +595,17 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
          * The vector will be serialized by means of comma separated values.
          * 
          * \param index Index of the vector to be serialized.
-         * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y".
+         * \param xmlWriter The xmlWriter, which will be used for serialization of a multi vector.
          */
 		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
         
         /**
          * Deserialization/addition of a multi vector from a string to this list.
          *
-         * \param serial A QString containing the serialization of the vector.
+         * \param xmlReader An xmlReader used for the deserialization of a multi vector
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization is ordered as: pos_x, pos_y, dir_x, dir_y, alt0_dir_x, alt0_dir_y, ... , altN_dir_x, altN_dir_y
          */
-		bool deserialize_item(QXmlStreamReader& xmlWriter);
+		bool deserialize_item(QXmlStreamReader& xmlReader);
     
     protected slots:
         /**
@@ -622,15 +615,18 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseMultiVectorfield2D
         void updateModel();
     
 	protected:
-        //Container for the alternative directions
+        /** Container for the alternative directions **/
 		std::vector<std::vector<PointType> > m_alt_directions;
     
-        //Additional parameters:
+        /** Number of alternative directions **/
         IntParameter * m_alternatives;
 };
 
-//A sparse vectorfield with multiple weighted targets for each vector
-class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public SparseMultiVectorfield2D
+/**
+ * A sparse vectorfield with multiple weighted targets for each vector
+ */
+class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D
+:   public SparseMultiVectorfield2D
 {
 	public:
         /**
@@ -796,7 +792,7 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
          * Removing a vector from the vector field at a given index
          * Does nothing if the model is locked or the index is out of bounds.
          *
-         * \param index. The index, where the vector shall be removed.
+         * \param index The index, where the vector shall be removed.
          */
         void removeVector(unsigned int index);
     
@@ -830,18 +826,17 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
          * The vector will be serialized by means of comma separated values.
          * 
          * \param index Index of the vector to be serialized.
-         * \return QString of the vector, namely "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
+         * \param xmlWriter The xmlWriter, which will be used for serialization of a weighted multi vector.
          */
 		void serialize_item(unsigned int index, QXmlStreamWriter& xmlWriter) const;
         
         /**
          * Deserialization/addition of a weighted multi vector from a string to this list.
          *
-         * \param serial A QString containing the serialization of the vector.
+         * \param xmlReader The xmlReader, which will be used for deserialization of a weighted multi vector.
          * \return True, if the item could be deserialized and the model is not locked.
-         *         The serialization is ordered as: "pos_x, pos_y, dir_x, dir_y, weight, alt0_dir_x, alt0_dir_y, alt0_weight, ... , altN_dir_x, altN_dir_y, altN_weight".
          */
-		bool deserialize_item(QXmlStreamReader& xmlWriter);
+		bool deserialize_item(QXmlStreamReader& xmlReader);
    
     protected slots:
         /**
@@ -851,9 +846,10 @@ class GRAIPE_VECTORFIELDS_EXPORT SparseWeightedMultiVectorfield2D : public Spars
         void updateModel();
         		
 	protected:
-        //Storage for the weights and the alternative weights of the vectorfield
-		std::vector<float> m_weights;
-		std::vector<std::vector<float> > m_alt_weights;
+        /** Storage for the weights of the initial direction **/
+        std::vector<float> m_weights;
+		/** Storage for the weights of the alternative directions **/
+        std::vector<std::vector<float> > m_alt_weights;
 };
 
 /**

@@ -61,9 +61,13 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
 :   public Vectorfield2D
 {	
 	public:
-        //Some convenient typedefs:
+        /** The internally used array type **/
         typedef vigra::MultiArray<2,float> ArrayType;
+        
+        /** The internally used array view type **/
         typedef vigra::MultiArrayView<2,float> ArrayViewType;
+        
+        /** The internally used array diff type **/
         typedef ArrayType::difference_type DiffType;
         
         /**
@@ -82,14 +86,16 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * Create an empty dense vectorfield of a given 2D shape .
          *
          * \param shape The 2D shape, which, contains (width, height).
+         * \param wsp   The workspace of this model.
          */
 		DenseVectorfield2D(const DiffType& shape, Workspace* wsp);
     
         /**
          * Create an empty dense vectorfield of a given 2D shape.
          *
-         * \param width The width of the new dense vectorfield.
+         * \param width  The width of the new dense vectorfield.
          * \param height The height of the new dense vectorfield.
+         * \param wsp    The workspace of this model.
          */
 		DenseVectorfield2D(int width, int height, Workspace* wsp);
     
@@ -98,8 +104,9 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * the vectors direction in x- (u) and y- (v) direction. All data will
          * be copied.
          *
-         * \param u The x-directions of the vectors.
-         * \param v The y-directions of the vectors.
+         * \param u   The x-directions of the vectors.
+         * \param v   The y-directions of the vectors.
+         * \param wsp The workspace of this model.
          */
 		DenseVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, Workspace* wsp);
 		
@@ -300,8 +307,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * The result will be in degrees. 
          * (0 = 3h, 90 = 6h, 180=9h, 270=12h).
          * 
-         * \param x The x position of the vector.
-         * \param y The y position of the vector.
+         * \param index The index of the vector.
          * \return The angle of the vector.
          */
         float angle(unsigned int index) const;
@@ -421,7 +427,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          * Serialize the complete content of the dense vectorfield to an xml file.
          * The serialization is just a binary stream of m_u followed by m_v.
          *
-         * \param out The output device for serialization.
+         * \param xmlWriter The xmlWriter for serialization.
          */
 		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
@@ -468,8 +474,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2D
          */
 		unsigned int indexToY(unsigned int index) const;
 		
-        //Data storage
-		ArrayType m_u, m_v;
+        /** storage for the x-part of each vector **/
+		ArrayType m_u;
+        /** storage for the y-part of each vector **/
+		ArrayType m_v;
 };
 
 /**
@@ -503,14 +511,16 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * Create an empty dense weighted vectorfield of a given 2D shape .
          *
          * \param shape The 2D shape, which, contains (width, height).
+         * \param wsp   The workspace of this model.
          */
 		DenseWeightedVectorfield2D(const DiffType& shape, Workspace* wsp);
     
         /**
          * Create an empty dense weighted vectorfield of a given 2D shape.
          *
-         * \param width The width of the new dense weighted vectorfield.
+         * \param width  The width of the new dense weighted vectorfield.
          * \param height The height of the new dense weighted vectorfield.
+         * \param wsp    The workspace of this model.
          */
 		DenseWeightedVectorfield2D(int width, int height, Workspace* wsp);
     
@@ -519,8 +529,9 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * the vectors direction in x- (u) and y- (v) direction. All data will
          * be copied. The weights will be zero initialized.
          *
-         * \param u The x-directions of the vectors.
-         * \param v The y-directions of the vectors.
+         * \param u   The x-directions of the vectors.
+         * \param v   The y-directions of the vectors.
+         * \param wsp The workspace of this model.
          */
 		DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, Workspace* wsp);
     
@@ -529,9 +540,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * the vectors direction in x- (u) and y- (v) direction. All data will
          * be copied.
          *
-         * \param u The x-directions of the vectors.
-         * \param v The y-directions of the vectors.
-         * \param w The weights of the vectors.
+         * \param u   The x-directions of the vectors.
+         * \param v   The y-directions of the vectors.
+         * \param w   The weights of the vectors.
+         * \param wsp The workspace of this model.
          */
 		DenseWeightedVectorfield2D(const ArrayViewType& u, const ArrayViewType& v, const ArrayViewType& w, Workspace* wsp);
     
@@ -612,7 +624,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
          * Serialize the complete content of the dense weighted vectorfield to an xml file.
          * The serialization is just a binary stream of m_u followed by m_v and m_w.
          *
-         * \param out The output device for serialization.
+         * \param xmlWriter The xmlWriter for serialization.
          */
 		void serialize_content(QXmlStreamWriter& xmlWriter) const;
     
@@ -651,7 +663,7 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2D : public DenseVector
         void updateModel();
 
     protected:
-        //Storage for the weights
+        /** Storage for the weights of each vector **/
         ArrayType m_w;
 };
 

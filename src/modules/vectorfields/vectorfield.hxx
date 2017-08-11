@@ -58,7 +58,7 @@ class GRAIPE_VECTORFIELDS_EXPORT Vectorfield2D
 {
 	
     public:
-		//The used point type
+		/** The internally used point type **/
         typedef QPointFX PointType;
     
         /**
@@ -236,9 +236,15 @@ class GRAIPE_VECTORFIELDS_EXPORT Vectorfield2D
         virtual void setTarget(unsigned int index, const PointType& new_t);
     
     protected:
-        //Additional parameters:
+        /**
+         * @{
+         * Additional parameters
+         */
         TransformParameter * m_global_motion;
         DoubleParameter    * m_scale;
+        /**
+         * @}
+         */
 };
 
 /**

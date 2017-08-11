@@ -40,15 +40,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_vectorfields
  * @{
- *
- * @file
- * @brief Implementation file for statistics of sparse vectorfields
+ *     @file
+ *     @brief Implementation file for statistics of sparse vectorfields
+ * @}
  */
- 
-/**
- * Default constructor. Constructs an empty sparse vectorfield statistic with
- * a NULL pointer to the vectorfield.
- */
+
 SparseVectorfield2DStatistics::SparseVectorfield2DStatistics()
 : m_vf(NULL)
 {
@@ -69,12 +65,6 @@ SparseVectorfield2DStatistics::SparseVectorfield2DStatistics()
     m_length.mean    = m_length.stddev    = zero_val;
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * sparse vectorfield and stores the pointer, too.
- *
- * \param vf The vectorfield, for which we want the statistics.
- */
 SparseVectorfield2DStatistics::SparseVectorfield2DStatistics(const SparseVectorfield2D* vf)
 : m_vf(vf)
 {
@@ -139,31 +129,16 @@ SparseVectorfield2DStatistics::SparseVectorfield2DStatistics(const SparseVectorf
     m_length.stddev = sqrt(m_length.stddev/vf->size());
 }
 
-/**
- * Returns statistics of the origins of this vectorfield.
- *
- * \return Statistics of the origins of this vectorfield.
- */
 const BasicStatistics<Vectorfield2D::PointType>& SparseVectorfield2DStatistics::originStats() const
 {
 	return m_origin;
 }
 
-/**
- * Returns statistics of the directions of this vectorfield.
- *
- * \return Statistics of the directions of this vectorfield.
- */
 const BasicStatistics<Vectorfield2D::PointType>& SparseVectorfield2DStatistics::directionStats() const
 {
 	return m_direction;
 }
 
-/**
- * Returns statistics of the lengths of this vectorfield.
- *
- * \return Statistics of the lengths of this vectorfield.
- */
 const BasicStatistics<double>& SparseVectorfield2DStatistics::lengthStats() const
 {	
 	return m_length;
@@ -172,10 +147,10 @@ const BasicStatistics<double>& SparseVectorfield2DStatistics::lengthStats() cons
 
 
 
-/**
- * Default constructor. Constructs an empty sparse weighted vectorfield statistic with
- * a NULL pointer to the vectorfield.
- */
+
+
+
+
 SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics()
 : SparseVectorfield2DStatistics()
 {
@@ -188,12 +163,7 @@ SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics()
     m_weight.mean   = m_weight.stddev    =  zero_val;
 }
     
-/**
- * A more useful constructor. Collects the statistics of a given 
- * sparse weighted vectorfield and stores the pointer, too.
- *
- * \param vf The vectorfield, for which we want the statistics.
- */
+
 SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics(const SparseWeightedVectorfield2D* vf)
 : SparseVectorfield2DStatistics(vf)
 {
@@ -224,11 +194,6 @@ SparseWeightedVectorfield2DStatistics::SparseWeightedVectorfield2DStatistics(con
     m_weight.stddev = sqrt(m_weight.stddev/vf->size());
 }
 
-/**
- * Returns statistics of the weights of this vectorfield.
- *
- * \return Statistics of the weights of this vectorfield.
- */
 const BasicStatistics<double>& SparseWeightedVectorfield2DStatistics::weightStats() const
 {
 	return m_weight;
@@ -236,21 +201,17 @@ const BasicStatistics<double>& SparseWeightedVectorfield2DStatistics::weightStat
 
 
 
-/**
- * Default constructor. Constructs an empty sparse multi vectorfield statistic with
- * a NULL pointer to the vectorfield.
- */
+
+
+
+
+
+
 SparseMultiVectorfield2DStatistics::SparseMultiVectorfield2DStatistics()
 : SparseVectorfield2DStatistics()
 {
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * sparse multi vectorfield and stores the pointer, too.
- *
- * \param vf The vectorfield, for which we want the statistics.
- */
 SparseMultiVectorfield2DStatistics::SparseMultiVectorfield2DStatistics(const SparseMultiVectorfield2D* vf)
 : SparseVectorfield2DStatistics(vf)
 {
@@ -358,43 +319,21 @@ SparseMultiVectorfield2DStatistics::SparseMultiVectorfield2DStatistics(const Spa
     }
 }
 
-/**
- * Returns statistics of each alternative direction of this vectorfield.
- *
- * \return Statistics of each alternative direction of this vectorfield.
- */
 const std::vector<BasicStatistics<SparseMultiVectorfield2DStatistics::PointType> >& SparseMultiVectorfield2DStatistics::altDirectionStats() const
 {
 	return m_alt_directions;
 }
 
-/**
- * Returns statistics of each alternative length of this vectorfield.
- *
- * \return Statistics of each alternative length of this vectorfield.
- */
 const std::vector<BasicStatistics<double> >& SparseMultiVectorfield2DStatistics::altLengthStats() const
 {	
 	return m_alt_lengths;
 }
 
-/**
- * Returns a combined statistic of the directions and alternative
- * directions of this vectorfield.
- *
- * \return Combined statistics of the directions of this vectorfield.
- */
 const BasicStatistics<Vectorfield2D::PointType>& SparseMultiVectorfield2DStatistics::combinedDirectionStats() const
 {
 	return m_combined_direction;
 }
 
-/**
- * Returns a combined statistic of the directions and alternative
- * directions of this vectorfield.
- *
- * \return Combined statistics of the directions of this vectorfield.
- */
 const BasicStatistics<double>& SparseMultiVectorfield2DStatistics::combinedLengthStats() const
 {	
 	return m_combined_length;
@@ -402,21 +341,18 @@ const BasicStatistics<double>& SparseMultiVectorfield2DStatistics::combinedLengt
 
 
 
-/**
- * Default constructor. Constructs an empty sparse weighted multi vectorfield statistic with
- * a NULL pointer to the vectorfield.
- */
+
+
+
+
+
+
+
 SparseWeightedMultiVectorfield2DStatistics::SparseWeightedMultiVectorfield2DStatistics()
 : SparseMultiVectorfield2DStatistics()
 {
 }
 
-/**
- * A more useful constructor. Collects the statistics of a given 
- * sparse multi vectorfield and stores the pointer, too.
- *
- * \param vf The vectorfield, for which we want the statistics.
- */
 SparseWeightedMultiVectorfield2DStatistics::SparseWeightedMultiVectorfield2DStatistics(const SparseWeightedMultiVectorfield2D* vf)
 : SparseMultiVectorfield2DStatistics(vf)
 {
@@ -491,39 +427,20 @@ SparseWeightedMultiVectorfield2DStatistics::SparseWeightedMultiVectorfield2DStat
         m_alt_weights[alt_i].stddev = sqrt(m_alt_weights[alt_i].stddev/vf->size());
     }
 }
-/**
- * Returns statistics of the weights of this vectorfield.
- *
- * \return Statistics of the weights of this vectorfield.
- */
+
 const BasicStatistics<double>& SparseWeightedMultiVectorfield2DStatistics::weightStats() const
 {
     return m_weight;
 }
 
-/**
- * Returns statistics of each alternative weight of this vectorfield.
- *
- * \return Statistics of each alternative weight of this vectorfield.
- */
 const std::vector<BasicStatistics<double> >&  SparseWeightedMultiVectorfield2DStatistics::altWeightStats() const
 {
 	return m_alt_weights;
 }
- 
-/**
- * Returns a combined statistic of the weights and alternative
- * weights of this vectorfield.
- *
- * \return Combined statistics of the weights of this vectorfield.
- */
+
 const BasicStatistics<double>& SparseWeightedMultiVectorfield2DStatistics::combinedWeightStats() const
 {
     return m_combined_weight;
 }
-
-/**
- * @}
- */
 
 }//end of namespace graipe

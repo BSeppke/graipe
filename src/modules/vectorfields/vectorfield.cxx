@@ -40,14 +40,11 @@ namespace graipe {
 /**
  * @addtogroup graipe_vectorfields
  * @{
- *
- * @file
- * @brief Implementation file for generic 2d vectorfield base classes
+ *     @file
+ *     @brief Implementation file for generic 2d vectorfield base classes
+ * @}
  */
 
-/**
- * Default constructor. Creates an empty vectorfield.
- */
 Vectorfield2D::Vectorfield2D(Workspace* wsp)
 :   Model(wsp),
     m_global_motion(new TransformParameter("Global motion matrix:")),
@@ -57,11 +54,6 @@ Vectorfield2D::Vectorfield2D(Workspace* wsp)
     m_parameters->addParameter("scale", m_scale);
 }
 
-/**
- * Copy constructor. Creates a vectorfield from another one.
- *
- * \param vf The other vectorfield.
- */
 Vectorfield2D::Vectorfield2D(const Vectorfield2D & vf)
 : Model(vf),
   m_global_motion(new TransformParameter("Global motion matrix:")),
@@ -71,24 +63,11 @@ Vectorfield2D::Vectorfield2D(const Vectorfield2D & vf)
     m_parameters->addParameter("scale", m_scale);
 }
 
-/**
- * Getter for the scaling function of the vector length
- * from units/pixels to cm/s.
- *
- * \return The scaling value from pixels to cm/s.
- */
 double Vectorfield2D::scale() const
 {
 	return m_scale->value();
 }
 
-/**
- * Setter for the scaling function of the vector length
- * from units/pixels to cm/s.
- * Does nothing if the model is locked.
- *
- * \param scale The scaling value from pixels to cm/s.
- */
 void Vectorfield2D::setScale(double scale)
 {
     if(locked())
@@ -98,29 +77,11 @@ void Vectorfield2D::setScale(double scale)
     updateModel();
 }
 
-/**
- * Getter for the global motion of a vectorfield. Note that the
- * vectors are still containing the *complete* motion. So if you 
- * want to get the local motion only, you need to substract the
- * global motion from each vector.
- *
- * \return The global motion by means of an affine matrix.
- */
 QTransform Vectorfield2D::globalMotion() const
 {
 	return m_global_motion->value();
 }
 
-/**
- * Setter for the global motion of a vectorfield. Note that the
- * vectors are still containing the *complete* motion after setting
- * the global motion using this function. If you
- * want to get the local motion only, you need to substract the
- * global motion from each vector.
- * Does nothing if the model is locked.
- *
- * \param trans The global motion by means of an affine matrix.
- */
 void Vectorfield2D::setGlobalMotion(const QTransform &  trans)
 {
     if (locked())
@@ -130,87 +91,36 @@ void Vectorfield2D::setGlobalMotion(const QTransform &  trans)
     updateModel();
 }
 
-/**
- * The local direction of a vector at a given index w.r.t. the global
- * transformation matrix given in globalMotion().
- * 
- * \param index The index of the vector.
- * \return The local direction of the vector at the given index.
- */
 Vectorfield2D::PointType Vectorfield2D::localDirection(unsigned int index) const
 {
 	return direction(index) - globalDirection(index);
 }
 
-/**
- * The local direction of a vector at a given index w.r.t. the global
- * transformation matrix given in globalMotion().
- * 
- * \param index The index of the vector.
- * \return The local direction of the vector at the given index.
- */
 Vectorfield2D::PointType Vectorfield2D::globalDirection(unsigned int index) const
 {
 	return globalMotion().map(origin(index)) - origin(index);
 }
 
-/**
- * The squared length of a vector at a given index in this vectorfield.
- * 
- * \param index The index of the vector.
- * \return The squared length of the vector at the given index.
- */
 float Vectorfield2D::squaredLength(unsigned int index) const
 {
     return direction(index).squaredLength();
 }
 
-/**
- * The length of a vector at a given index in this vectorfield.
- * 
- * \param index The index of the vector.
- * \return The length of the vector at the given index.
- */
 float Vectorfield2D::length(unsigned int index) const
 {
     return direction(index).length();
 }
 
-/**
- * The angle of a vector at a given index in this vectorfield.
- * The result will be in degrees. 
- * (0 = 3h, 90 = 6h, 180=9h, 270=12h).
- * 
- * \param index The index of the vector.
- * \return The angle of the vector at the given index.
- */
 float Vectorfield2D::angle(unsigned int index) const
 {
     return direction(index).angle();
 }
 
-/**
- * The target of a vector at a given index in this vectorfield.
- * Mainly origin(index) + direction(index).
- * 
- * \param index The index of the vector.
- * \return The direction of the vector at the given index.
- */
 Vectorfield2D::PointType Vectorfield2D::target(unsigned int index) const
 {	
 	return origin(index) + direction(index);	
 }
 
-/**
- * Sets the target of a vector at a given index in this vectorfield.
- * to a point. Since this is just an interface without an actual strorage,
- * we leave the implementation open but mandatory for subclasses.
- * Does nothing if the model is locked.
- * 
- * \param index The index of the vector.
- * \param new_t The new target of the vector.
- * \return The direction of the vector at the given index.
- */
 void Vectorfield2D::setTarget(unsigned int index, const PointType& new_t)
 {
     if(locked())
@@ -219,9 +129,5 @@ void Vectorfield2D::setTarget(unsigned int index, const PointType& new_t)
 	setDirection(index, new_t - origin(index));
     //SetDirection needs to call updateModel()!
 }
-
-/**
- * @}
- */
     
 } //end of namespace graipe

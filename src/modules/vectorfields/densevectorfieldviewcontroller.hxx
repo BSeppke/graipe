@@ -125,10 +125,13 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DViewController
         void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
 
 	
-		//Statistics
+		/** Statistics **/
 		DenseVectorfield2DStatistics* m_stats;
     
-        //Additional parameters:
+        /** 
+         * @{
+         * Additional parameters:
+         */
         PointParameter  * m_resolution;
         FloatParameter  * m_lineWidth,
                         * m_headSize;
@@ -142,11 +145,14 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DViewController
         StringParameter * m_velocityLegendCaption;
         IntParameter    * m_velocityLegendTicks;
         IntParameter    * m_velocityLegendDigits;
-        
-		//Length/velocity legend
+        /**
+         * @}
+         */
+    
+		/** Length/velocity legend **/
 		QLegend * m_velocity_legend;
 	
-        //Drawing vectors
+        /** Drawing vectors **/
         VectorDrawer m_vector_drawer;
 };
 
@@ -232,10 +238,13 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DParticleViewController
          */
         void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
 	
-        //Statistics
+        /** Statistics **/
         DenseVectorfield2DStatistics* m_stats;
 
-        //Controller's additional parameters:
+        /** 
+         * @{
+         * Controller's additional parameters:
+         */
         IntParameter    * m_particles;
         FloatParameter  * m_particleRadius;
         IntParameter    * m_particleLifetime,
@@ -250,14 +259,25 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseVectorfield2DParticleViewController
         IntParameter    * m_velocityLegendTicks;
         IntParameter    * m_velocityLegendDigits;
 
-        //Legend that is displayed if necessary
+        /** Legend that is displayed if necessary **/
         QLegend * m_velocity_legend;
     
+        /** Pointer to the vectorfield **/
         DenseVectorfield2D* m_dense_model;
-        
+    
+        /** 
+         * @{
+         * Internal timing settings
+         */
 		int m_timing, m_timer_id;
-	
+        /**
+         * @} 
+         */
+    
+        /** Cached particle positions **/
 		QVector<QPointF>      m_positions;
+    
+        /** Cached particle lifetimes **/
 		QVector<unsigned int> m_lifetimes;
 	
 };
@@ -329,7 +349,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DViewController
          */
         void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
     
-        //Controller's additional parameters:
+        /**
+         * @{
+         * Controller's additional parameters
+         */
         FloatParameter  * m_minWeight,
                         * m_maxWeight;
         BoolParameter   * m_showWeightLegend;
@@ -337,10 +360,12 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DViewController
         IntParameter    * m_weightLegendTicks;
         IntParameter    * m_weightLegendDigits;
         BoolParameter   * m_useColorForWeight;
+        /**
+         * @}
+         */
     
-		//Legend that is displayed if necessary
+		/** Legend that is displayed if necessary **/
 		QLegend * m_weight_legend;
-    
 };
 
 
@@ -418,7 +443,10 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DParticleViewControlle
          */
         void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
     
-        //Controller's additional parameters:
+        /** 
+         * @{
+         * Controller's additional parameters:
+         */
         FloatParameter  * m_minWeight,
                         * m_maxWeight;
         BoolParameter   * m_showWeightLegend;
@@ -426,11 +454,14 @@ class GRAIPE_VECTORFIELDS_EXPORT DenseWeightedVectorfield2DParticleViewControlle
         IntParameter    * m_weightLegendTicks;
         IntParameter    * m_weightLegendDigits;
         BoolParameter   * m_useColorForWeight;
+        /**
+         * @}
+         */
     
-		//Legend that is displayed if necessary
+		/** Legend that is displayed if necessary **/
 		QLegend * m_weight_legend;
     
-        //To avoid casting
+        /** To avoid casting **/
         DenseWeightedVectorfield2D* m_dense_weighted_model;
 };
 
