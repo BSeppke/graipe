@@ -188,8 +188,10 @@ class GRAIPE_CORE_EXPORT IntParameter
         /** The storage for the value of this parameter **/
         int m_value;
     
-        /** The value range for this parameter **/
-        int m_min_value, m_max_value;
+        /** The minimum value for this parameter **/
+        int m_min_value;
+        /** The maximum value for this parameter **/
+        int m_max_value;
     
         /** The delegate widget **/
         QPointer<QSpinBox> m_delegate;

@@ -172,7 +172,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * \param option Further style options for this GraphicsItem's drawing.
          * \param widget The widget, where we will draw onto.
          */
-        void paintBefore(QPainter *painter, const QStyleOptionGraphicsItem * , QWidget * );
+        void paintBefore(QPainter *painter, const QStyleOptionGraphicsItem * option, QWidget * widget);
  
         /**
          * This auxilary method needs to be called after the data drawing is employed
@@ -183,7 +183,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * \param option Further style options for this GraphicsItem's drawing.
          * \param widget The widget, where we will draw onto.
          */
- 		void paintAfter(QPainter *painter, const QStyleOptionGraphicsItem * , QWidget * );
+ 		void paintAfter(QPainter *painter, const QStyleOptionGraphicsItem * option, QWidget * widget);
 
         /**
          * This (reimplemented) method is called everytime the mouse is moved over the ViewController,
@@ -221,7 +221,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * To do so, it serializes the typeName(), then the model denoted by the model's
          * filename and eventually the parameter set.
          *
-         * \param out The output device, where we serialize to.
+         * \param xmlWriter The xmlWriter, where we serialize to.
          */
         void serialize(QXmlStreamWriter& xmlWriter) const;
     
@@ -230,7 +230,7 @@ class GRAIPE_CORE_EXPORT ViewController
          * The model needs to be reconstructed elsewhere, espacially before the construction of
          * a ViewController. This will be handled inside the GUI of GRAIPE
          *
-         * \param  in The input device, where we read the serialization of this ViewController class from.
+         * \param  xmlReader The xmlReader, where we read the serialization of this ViewController class from.
          * \return True, if the parameters could be restored,
          */
         bool deserialize(QXmlStreamReader& xmlReader);
@@ -242,17 +242,20 @@ class GRAIPE_CORE_EXPORT ViewController
         virtual void updateView();
     
 	signals:
-        //Brief status (usually send on hoverMouseEvents)
+        /** Brief status (usually send on hoverMouseEvents) **/
 		void updateStatusText(QString);
         
-        //Detailled status (usually send on hoverMouseEvents)
+        /** Detailled status (usually send on hoverMouseEvents) **/
 		void updateStatusDescription(QString);
 		
 	protected:
-        //The model (not owned by the ViewController)
+        /** The model (not owned by the ViewController) **/
         Model * m_model;
         
-        //The view's parameter
+        /**
+         * @{
+         * The view's parameters 
+         */
         StringParameter *m_name;
         LongStringParameter *m_description;
     
@@ -265,15 +268,24 @@ class GRAIPE_CORE_EXPORT ViewController
                         *m_axisLabelSpacing;
         FloatParameter	*m_axisFontSize;
         EnumParameter	*m_axisGridStyle;
+        /**
+         * @}
+         */
     
-        //A group to collect all the parameters
+        /** A group to collect all the parameters **/
         ParameterGroup* m_parameters;
     
-        //pens and brushes
+        /**
+         * @{
+         * Pens and Brushes for the axis
+         */
 		QPen   m_axis_pen, m_axis_grid_pen;
 		QBrush m_axis_brush;
+        /**
+         * @}
+         */
     
-        //height of the scale ticks
+        /** The height of the scale ticks*/
 		float m_ticks_height;
 };
 

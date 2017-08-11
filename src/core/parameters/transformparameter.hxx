@@ -171,10 +171,15 @@ class GRAIPE_CORE_EXPORT TransformParameter
         /** parent delegate **/
         QPointer<QWidget> m_delegate;
     
-        /** the child delegates (3x3) for matrix **/
+        /**
+         * @{
+         * the child delegates (3x3) for matrix **/
         QPointer<QLineEdit> m_lne11, m_lne12, m_lne13,
-                    m_lne21, m_lne22, m_lne23,
-                    m_lne31, m_lne32, m_lne33;
+                            m_lne21, m_lne22, m_lne23,
+                            m_lne31, m_lne32, m_lne33;
+        /**
+         * @}
+         */
 };
 
 /**

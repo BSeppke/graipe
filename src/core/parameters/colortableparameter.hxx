@@ -141,13 +141,15 @@ class GRAIPE_CORE_EXPORT ColorTableParameter
          * Serialization of the parameter's state to a xml stream.
          * Writes the following XML code by default:
          * 
-         * <ColorTableParameter>
-         *     <Name>NAME</Name>
-         *     <Colors>COLORCOUNT</Colors>
-         *     <Color ID="0">#AARRGGBB</Color>
-         *     ...
-         *     <Color ID="COLORCOUNT-1">#AARRGGBB</Color>
-         * </ColorTableParameter>
+         * \verbatim
+           <ColorTableParameter>
+               <Name>NAME</Name>
+               <Colors>COLORCOUNT</Colors>
+               <Color ID="0">#AARRGGBB</Color>
+               ...
+               <Color ID="COLORCOUNT-1">#AARRGGBB</Color>
+           </ColorTableParameter>
+         * \endverbatim
          *
          * with TYPENAME = typeName() and
          *    COLORCOUNT = ct.size().

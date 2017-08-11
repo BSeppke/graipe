@@ -92,15 +92,22 @@ namespace graipe {
  *     @brief Implementation file for the QIOCompressor class, see license terms above
  * @}
  */
-    
+
+/** internal type for buffered reading: Bytef **/
 typedef Bytef ZlibByte;
+/** internal type for sizes: uInt **/
 typedef uInt ZlibSize;
 
 
-class QIOCompressorPrivate {
+/**
+ * Pirvate/Hidden implementation of the QIOCompressor's internal magic
+ */
+class QIOCompressorPrivate
+{
     QIOCompressor *q_ptr;
     Q_DECLARE_PUBLIC(QIOCompressor)
 public:
+    /** internal states **/
     enum State {
         // Read state
         NotReadFirstByte,
@@ -114,12 +121,49 @@ public:
         Error
     };
 
+    /**
+     * Constructor of the QIOCompressorPrivate class.
+     *
+     * \param q_ptr Pointer to the QIOCompressor
+     * \param device Pointer to the input/output device
+     * \param compressionLevel the compression level
+     * \param bufferSize the size of the buffer
+     */
     QIOCompressorPrivate(QIOCompressor *q_ptr, QIODevice *device, int compressionLevel, int bufferSize);
+    
+    /**
+     * Destructor of the QIOCompressorPrivate class.
+     */
     ~QIOCompressorPrivate();
+    
+    /**
+     * Flushing the stream using the underlying zlib library
+     *
+     * \param flushMode The mode for the flush.
+     */
     void flushZlib(int flushMode);
+    
+    /**
+     * Write bytes on the stream using the underlying zlib library
+     *
+     * \param buffer The buffer, which will be written (compressed)
+     * \param outputSize The size before writing
+     * \return True, if successful, else false.
+     */
     bool writeBytes(ZlibByte *buffer, ZlibSize outputSize);
-    void setZlibError(const QString &erroMessage, int zlibErrorCode);
+    
+    /**
+     * Sets the error QString to errorMessage + zlib error QString for zlibErrorCode
+     *
+     * \param errorMessage The error message
+     * \param zlibErrorCode The zlib Error Code
+     */
+    void setZlibError(const QString &errorMessage, int zlibErrorCode);
 
+    /**
+     * @{ 
+     * Member variables for the internal class
+     */
     QIODevice* device;
     bool manageDevice;
     z_stream zlibStream;
@@ -128,11 +172,11 @@ public:
     ZlibByte *buffer;
     State state;
     QIOCompressor::StreamFormat streamFormat;
+    /**
+     * @}
+     */
 };
 
-/*!
-    \internal
-*/
 QIOCompressorPrivate::QIOCompressorPrivate(QIOCompressor *q_ptr, QIODevice *device, int compressionLevel, int bufferSize)
 :q_ptr(q_ptr)
 ,device(device)
@@ -148,18 +192,11 @@ QIOCompressorPrivate::QIOCompressorPrivate(QIOCompressor *q_ptr, QIODevice *devi
     zlibStream.opaque = Z_NULL;
 }
 
-/*!
-    \internal
-*/
 QIOCompressorPrivate::~QIOCompressorPrivate()
 {
     delete[] buffer;
 }
 
-/*!
-    \internal
-    Flushes the zlib stream.
-*/
 void QIOCompressorPrivate::flushZlib(int flushMode)
 {
     // No input.
@@ -192,10 +229,6 @@ void QIOCompressorPrivate::flushZlib(int flushMode)
         Q_ASSERT(status == Z_OK);
 }
 
-/*!
-    \internal
-    Writes outputSize bytes from buffer to the inderlying device.
-*/
 bool QIOCompressorPrivate::writeBytes(ZlibByte *buffer, ZlibSize outputSize)
 {
     Q_Q(QIOCompressor);
@@ -215,10 +248,6 @@ bool QIOCompressorPrivate::writeBytes(ZlibByte *buffer, ZlibSize outputSize)
     return true;
 }
 
-/*!
-    \internal
-    Sets the error QString to errorMessage + zlib error QString for zlibErrorCode
-*/
 void QIOCompressorPrivate::setZlibError(const QString &errorMessage, int zlibErrorCode)
 {
     Q_Q(QIOCompressor);

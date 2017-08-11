@@ -50,7 +50,7 @@ namespace graipe {
  */
 
 ModelParameter::ModelParameter(const QString &name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp)
-:   Parameter(name, parent, invert_parent, wsp),
+:   Parameter(name, parent, invert_parent),
     m_delegate(NULL),
     m_type_filter(type_filter)
 {

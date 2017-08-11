@@ -70,10 +70,11 @@ class GRAIPE_CORE_EXPORT ParameterGroup
 {
     Q_OBJECT
     
-    public:
-    
-        //public typedefs for convenience
+    public:    
+        /** The internally used storage type **/
         typedef std::map<QString, Parameter*> storage_type;
+        
+        /** The internally used item type **/
         typedef std::pair<QString,Parameter*> item_type;
         
         /**

@@ -372,7 +372,7 @@ class GRAIPE_CORE_EXPORT Model
         /**
          * This function deserializes the model by means of its header and content
          *
-         * \param  in The input device.
+         * \param  xmlReader The xmlReader, from which we read.
          * \return True, if the Model could be restored,
          */
         bool deserialize(QXmlStreamReader& xmlReader);
@@ -388,7 +388,7 @@ class GRAIPE_CORE_EXPORT Model
         /**
          * This function deserializes the Model's header.
          *
-         * \param  in The input device.
+         * \param  xmlReader The xmlReader, from which we read.
          * \return True, if the Model's header could be restored,
          */
         virtual bool deserialize_header(QXmlStreamReader& xmlReader);
@@ -404,7 +404,7 @@ class GRAIPE_CORE_EXPORT Model
         /**
          * This function deserializes the Model's content.
          *
-         * \param  in The input device.
+         * \param  xmlReader The xmlReader, from which we read.
          * \return True, if the Model's content could be restored,
          */
         virtual bool deserialize_content(QXmlStreamReader& xmlReader);
@@ -460,20 +460,26 @@ class GRAIPE_CORE_EXPORT Model
 		void modelChanged();
     
     protected:
-        //The parameters of this model:
+        /**
+         * @{
+         * The single parameters of this model
+         */
         StringParameter	    * m_name;
         LongStringParameter	* m_description;
         PointParameter	    * m_ul, * m_lr;
         PointFParameter	    * m_global_ul, * m_global_lr;
+         /**
+          * @}
+          */
     
-        //A group for collecting all
+        /** A group for collecting all parameters **/
         ParameterGroup      * m_parameters;
     
-        //The models workspace
+        /** The model's workspace **/
         Workspace * m_workspace;
 
     private:
-        //keeping track of the locks
+        /** keeping track of the locks **/
         QVector<unsigned int> m_locks;
 };
 

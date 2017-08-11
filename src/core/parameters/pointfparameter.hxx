@@ -209,15 +209,18 @@ class GRAIPE_CORE_EXPORT PointFParameter
         /** The value of this parameter **/
         QPointF m_value;
     
-        /** The value range for this parameter **/
-        QPointF m_min_value, m_max_value;
+        /** The minimum value for this parameter **/
+        QPointF m_min_value;
+        /** The maximum value for this parameter **/
+        QPointF m_max_value;
     
         /** The parent delegate widget **/
         QPointer<QWidget> m_delegate;
     
-        /** The child widgets for x,y control **/
-        QPointer<QDoubleSpinBox> m_dsbXDelegate,
-                                 m_dsbYDelegate;
+        /** The child widget for x-control **/
+        QPointer<QDoubleSpinBox> m_dsbXDelegate;        
+        /** The child widget for y-control **/
+        QPointer<QDoubleSpinBox> m_dsbYDelegate;
 };
 
 /**

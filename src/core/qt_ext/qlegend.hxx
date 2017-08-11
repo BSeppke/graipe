@@ -91,7 +91,7 @@ class GRAIPE_CORE_EXPORT QLegend
          * \param rect_left    The left position of the QLegend's rect.
          * \param rect_top     The top position of the QLegend's rect.
          * \param rect_width   The width of the QLegend's rect.
-         * \param recht_height The height of the new rect.
+         * \param rect_height The height of the new rect.
          * \param lower_val    The lowest value on the scale.
          * \param upper_val    The highest value on the scale.
          * \param ticks        The count of ticks between lower and upper value on the scale.
@@ -235,36 +235,37 @@ class GRAIPE_CORE_EXPORT QLegend
          * \return The maximum width for each scale label in pixels.
          */
 		inline float text_interval_width() const;
-		
     
-        //The value range of the legend
-		float m_lower_val, m_upper_val;
+        /** The minium value of the legend **/
+		float m_lower_val;
+        /** The maxium value of the legend **/
+		float m_upper_val;
     
-        //The caption of the legend
+        /** The caption of the legend **/
 		QString m_caption;
     
-        //The count of ticks between min and max value
+        /** The count of ticks between min and max value **/
 		unsigned int m_ticks;
 	
-        //The accuracy in digits after "." for the scale labels
+        /** The accuracy in digits after "." for the scale labels **/
 		unsigned int m_digits;
     
-        //Holds the "true to scale" mode
+        /** Holds the "true to scale" mode **/
 		bool m_fixed_scale;
 
-        //The rect of the scale
+        /** The rect of the scale **/
         QRectF m_scale_rect;
     
-        //The font for the scale labels
+        /** The font for the scale labels **/
         QFont m_scale_font;
     
-        //The font for the caption
+        /** The font for the caption **/
 		QFont m_caption_font;
 		
-        //Min and max color
-		QVector<QRgb> m_ct;
+        /** Used color table **/
+        QVector<QRgb> m_ct;
     
-        //The background image of the scale
+        /** The background image of the scale **/
 		QPixmap* m_bg_pixmap;
 };
 

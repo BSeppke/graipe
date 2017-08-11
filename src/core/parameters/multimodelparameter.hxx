@@ -70,11 +70,11 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          * most important values directly.
          *
          * \param name           The name (label) of this parameter.
-         * \param allowed_models A vector containing all currently available models.
          * \param type_filter    A QString to restrict the model list to certain model types.
          * \param parent         If given (!= NULL), this parameter has a parent and will
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
+         * \param wsp            The workspace, in which the models must be present.
          */
         MultiModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp);
     
@@ -121,14 +121,16 @@ class GRAIPE_CORE_EXPORT MultiModelParameter
          * Serialization of the parameter's state to a xml stream.
          * Writes the following XML code by default:
          * 
-         * <MultiModelParameter>
-         *     <Name>NAME</Name>
-         *     <Values>N</Value>
-         *     <Value ID="0">VALUE_0_ID</Value>
-         *     ...
-         *     <Value ID="N-1">VALUE_N-1_ID</Value>
-         * </MultiModelParameter>
-         *
+         * \verbatim
+           <MultiModelParameter>
+               <Name>NAME</Name>
+               <Values>N</Value>
+               <Value ID="0">VALUE_0_ID</Value>
+               ...
+               <Value ID="N-1">VALUE_N-1_ID</Value>
+           </MultiModelParameter>
+           \endverbatim
+         * 
          * with     NAME = name(),
          *             N = QString::number(value().size()), and
          *    VALUE_0_ID = values()[0]->id().

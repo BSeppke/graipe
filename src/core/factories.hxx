@@ -75,7 +75,10 @@ namespace graipe {
  */
 struct ModelFactoryItem
 {
+    /** A unique QString to identify the model, which is produced by this factory **/
 	QString model_type;
+    
+    /** The production function for the model **/
 	Model* (*model_fptr)(Workspace*);
 };
 
@@ -91,8 +94,13 @@ struct ModelFactoryItem
  */
 struct ViewControllerFactoryItem
 {
+    /** A unique QString to identify the model, which can be showed by this factory **/
 	QString model_type;
+    
+    /** A unique QString to identify the viewController, which is produced by this factory **/
 	QString viewController_name;
+    
+    /** The production function for the viewController **/
 	ViewController* (*viewController_fptr)(Model *);
 };
 
@@ -105,9 +113,16 @@ struct ViewControllerFactoryItem
  */
 struct AlgorithmFactoryItem
 {
+    /** The topic of the algorithm **/
 	QString  topic_name;
+    
+    /** The (long) name of the algorithm **/
 	QString  algorithm_name;
+    
+    /** The unique type name of the algorithm **/
     QString algorithm_type;
+    
+    /** The production function for the algorithm **/
 	Algorithm* (*algorithm_fptr)(Workspace*);
 };
 

@@ -50,7 +50,7 @@ namespace graipe {
  */
 
 MultiModelParameter::MultiModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp)
-:	Parameter(name, parent, invert_parent, wsp),
+:	Parameter(name, parent, invert_parent),
     m_delegate(NULL),
     m_allowed_values(wsp->models),
 	m_type_filter(type_filter)

@@ -55,7 +55,7 @@ namespace graipe {
  * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
  */
 ImageBandParameterBase::ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Workspace* wsp)
-:	Parameter(name, parent, invert_parent, wsp),
+:	Parameter(name, parent, invert_parent),
     m_delegate(NULL),
 	m_cmbImage(NULL),
 	m_spbBand(NULL)

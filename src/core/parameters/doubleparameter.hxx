@@ -188,8 +188,10 @@ class GRAIPE_CORE_EXPORT DoubleParameter
         /** The storage for the value of this parameter **/
         double m_value;
     
-        /** The value range for this parameter **/
-        double m_min_value, m_max_value;
+        /** The minimum  value for this parameter **/
+        double m_min_value;
+        /** The maximum  value for this parameter **/
+        double m_max_value;
     
         /** The delegate widget **/
         QPointer<QDoubleSpinBox> m_delegate;

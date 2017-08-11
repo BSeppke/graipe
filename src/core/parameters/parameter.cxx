@@ -48,19 +48,17 @@ namespace graipe {
  * @}
  */
 
-Parameter::Parameter( Workspace* wsp)
+Parameter::Parameter()
 :	m_name(""),
     m_parent(NULL),
-    m_invert_parent(false),
-    m_workspace(wsp)
+    m_invert_parent(false)
 {
 }
 
-Parameter::Parameter(const QString&  name, Parameter* parent, bool invert_parent, Workspace* wsp)
+Parameter::Parameter(const QString&  name, Parameter* parent, bool invert_parent)
 :	m_name(name), 
     m_parent(parent),
-    m_invert_parent(invert_parent),
-    m_workspace(wsp)
+    m_invert_parent(invert_parent)
 {
 }
 

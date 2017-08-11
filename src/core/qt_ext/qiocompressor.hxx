@@ -142,16 +142,16 @@ class GRAIPE_CORE_EXPORT QIOCompressor
     
 public:
     /*!
-        \enum QIOCompressor::StreamFormat
+        \enum StreamFormat
         This enum specifies which stream format to use.
 
-        \value ZlibFormat: This is the default and has the smallest overhead.
+        ZlibFormat: This is the default and has the smallest overhead.
 
-        \value GzipFormat: This format is compatible with the gzip file
+        GzipFormat: This format is compatible with the gzip file
         format, but has more overhead than ZlibFormat. Note: requires zlib
         version 1.2.x or higher at runtime.
 
-        \value RawZipFormat: This is compatible with the most common
+        RawZipFormat: This is compatible with the most common
         compression method of the data blocks contained in ZIP
         archives. Note: ZIP file headers are not read or generated, so
         setting this format, by itself, does not let QIOCompressor read
@@ -201,7 +201,7 @@ public:
     static bool isGzipSupported();
     
     /*!
-        \reimp
+        Is always true, since we compress linearly.
     */
     bool isSequential() const;
     
@@ -256,14 +256,18 @@ public:
     
 protected:
     /*!
-        \internal
         Reads and decompresses data from the underlying device.
+        \param data    Byte pointer to the data.
+        \param maxSize The max length to be read from data.
+        \return the length of successfully read data.
     */
     qint64 readData(char * data, qint64 maxSize);
 
     /*!
-        \internal
         Compresses and writes data to the underlying device.
+        \param data    Byte pointer to the data.
+        \param maxSize The max length to be written from data.
+        \return the length of successfully written data.
     */
     qint64 writeData(const char * data, qint64 maxSize);
     

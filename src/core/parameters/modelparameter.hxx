@@ -70,11 +70,11 @@ class GRAIPE_CORE_EXPORT ModelParameter
          * most important values directly.
          *
          * \param name           The name (label) of this parameter.
-         * \param allowed_models A vector containing all currently available models.
          * \param type_filter    A QString to restrict the model list to certain model types.
          * \param parent         If given (!= NULL), this parameter has a parent and will
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
+         * \param wsp            The workspace, in which the models must be present.
          */
         ModelParameter(const QString& name, QString type_filter, Parameter* parent, bool invert_parent, Workspace* wsp);
     
