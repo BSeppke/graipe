@@ -43,6 +43,14 @@
 namespace graipe {
     
 /**
+ * @addtogroup graipe_featurematching
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the 2d featurematching module
+ */
+ 
+/**
  * This templated matching class represents the hull for blockwise points to image
  * matching approach. It does select a set of rect-aligned x,y-samples from the first 
  * image and searches (using the functor) for the best N matches of each point in 
@@ -70,7 +78,11 @@ class BlockWiseImageMatcher
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
     
-    
+        /**
+         * Returns the name of this algorihm.
+         * 
+         * \return Unless partially specialized: "BlockWiseImageMatcher"
+         */
         QString typeName() const
         {
             return "BlockWiseImageMatcher";
@@ -195,6 +207,11 @@ class BlockWiseImageMatcher
         }
 };
     
+/**
+ * Returns the name of this algorihm.
+ * 
+ * \return Always: "BWMatcherFastCC"
+ */
 template<>
 QString BlockWiseImageMatcher<FastCCFunctor>::typeName() const
 {
@@ -212,6 +229,11 @@ Algorithm* createBWMatcherFastCC(Workspace* wsp)
 	return new BlockWiseImageMatcher<FastCCFunctor>(wsp);
 }
 
+/**
+ * Returns the name of this algorihm.
+ * 
+ * \return Always: "BWMatcherFastNCC"
+ */
 template<>
 QString BlockWiseImageMatcher<FastNCCFunctor>::typeName() const
 {
@@ -259,6 +281,11 @@ class FeatureToFeatureMatcher
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
     
+        /**
+         * Returns the name of this algorihm.
+         * 
+         * \return Unless partially specialized: "FeatureToFeatureMatcher"
+         */
         QString typeName() const
         {
             return "FeatureToFeatureMatcher";
@@ -378,6 +405,12 @@ class FeatureToFeatureMatcher
         }
 };
 
+
+/**
+ * Returns the name of this algorihm.
+ * 
+ * \return Always: "FFMatcherC"
+ */
 template<>
 QString FeatureToFeatureMatcher<CorrelationFunctor>::typeName() const
 {
@@ -395,6 +428,12 @@ Algorithm* createFFMatcherC(Workspace* wsp)
 	return new FeatureToFeatureMatcher<CorrelationFunctor>(wsp);
 }
 
+
+/**
+ * Returns the name of this algorihm.
+ * 
+ * \return Always: "FFMatcherNC"
+ */
 template<>
 QString FeatureToFeatureMatcher<NormalizedCorrelationFunctor>::typeName() const
 {
@@ -442,6 +481,11 @@ class FeatureToImageMatcher
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
     
+        /**
+         * Returns the name of this algorihm.
+         * 
+         * \return Unless partially specialized: "FeatureToImageMatcher"
+         */
         QString typeName() const
         {
             return "FeatureToImageMatcher";
@@ -558,6 +602,11 @@ class FeatureToImageMatcher
         }
 };
 
+/**
+ * Returns the name of this algorihm.
+ * 
+ * \return Always: "FIMatcherFastCC"
+ */
 template<>
 QString FeatureToImageMatcher<FastCCFunctor>::typeName() const
 {
@@ -577,6 +626,11 @@ Algorithm* createFIMatcherFastCC(Workspace* wsp)
 
 
 
+/**
+ * Returns the name of this algorihm.
+ * 
+ * \return Always: "FIMatcherFastNCC"
+ */
 template<>
 QString FeatureToImageMatcher<FastNCCFunctor>::typeName() const
 {
@@ -622,6 +676,11 @@ class ShapeContextMatcher
             m_parameters->addParameter("best_n",    new IntParameter("Find N best candidates", 1, 50));
             m_parameters->addParameter("gme?",      new BoolParameter("use global motion estimation"));
         }
+        /**
+         * Returns the name of this algorihm.
+         * 
+         * \return Always: "ShapeContextMatcher"
+         */
     
         QString typeName() const
         {
@@ -774,7 +833,12 @@ class SIFTMatcher
             m_parameters->addParameter("best_n", new IntParameter("Find N best candidates", 1, 50,10));
             m_parameters->addParameter("gme?", new BoolParameter("use global motion estimation"));
         }
-    
+		
+        /**
+         * Returns the name of this algorihm.
+         * 
+         * \return Always: "SIFTMatcher"
+         */
         QString typeName() const
         {
             return "SIFTMatcher";
@@ -1033,23 +1097,33 @@ class FeatureMatchingModule
         }
 };
     
+/**
+ * @}
+ */
+
 } //end of namespace graipe
 
+    
 /**
- *Interface to the ModuleHandler
+ * @addtogroup graipe_featurematching
+ * @{
  */
 
-/**
- *  The initialization procedure returns a pointer to the
- *  FeatureMatchingModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
- */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     *  The initialization procedure returns a pointer to the
+     *  FeatureMatchingModule (which inherits from Module) acutal
+     *  implementation of the class above
+     *
+     *	\return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::FeatureMatchingModule;
 	}
-}
+} //extern "C"
+
+/**
+ * @}
+ */

@@ -51,16 +51,34 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_featurematching
+ * @{
+ *
+ * @file
+ * @brief Header file for the matching of two-dimensional features (without SIFT)
+ */
+
+/**
  * A very basic matching functor for (sub)images.
  * Uses the Fast Normalized Cross-correlation
  */
 class FastNCCFunctor
 {
 public:
+    /**
+     * Fast normalized cross correlation functor creation
+     */
     FastNCCFunctor()
     {
     }
     
+    /**
+     * Functor appplication:
+     *
+     * \param[in]  src  The source image (where to search)
+     * \param[in]  mask The template (what to search)
+     * \param[out] dest The resulting normalized correlations.
+     */
     template <class SrcArray, class MaskArray, class DestArray>
     void operator()(SrcArray src, MaskArray mask, DestArray dest)
     {
@@ -75,10 +93,20 @@ public:
 class FastCCFunctor
 {
 public:
+    /**
+     * Fast NON-normalized cross correlation functor creation
+     */
     FastCCFunctor()
     {
     }
     
+    /**
+     * Functor appplication:
+     *
+     * \param[in]  src  The source image (where to search)
+     * \param[in]  mask The template (what to search)
+     * \param[out] dest The resulting NON-normalized correlations.
+     */
     template <class SrcArray, class MaskArray, class DestArray>
     void operator()(SrcArray src, MaskArray mask, DestArray dest)
     {
@@ -282,8 +310,11 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToImage(const vigra::MultiArrayVi
 class WeightedTarget2D
 {
 	public:
-        //Parameters
-		int x, y;
+        /** x-position **/
+        int x;
+        /** y-position **/
+        int y;
+        /** the weight **/
 		double weight;
     
         /**
@@ -306,10 +337,21 @@ class WeightedTarget2D
 class NormalizedCorrelationFunctor
 {
     public:
+        /**
+         * Creates a functor for single normalized correlation computation
+         */
         NormalizedCorrelationFunctor()
         {
         }
-        
+    
+        /**
+         * Computes a single normalized correlation coefficient for two images
+         * of same size.
+         *
+         * \param src1 The first image
+         * \param src2 The second image
+         * \return The normalized correlation coefficient.
+         */
         template <class T1, class T2>
         double operator()(const vigra::MultiArrayView<2,T1> & src1,
                           const vigra::MultiArrayView<2,T2> & src2)
@@ -352,10 +394,21 @@ class NormalizedCorrelationFunctor
 class CorrelationFunctor
 {
     public:
+        /**
+         * Creates a functor for single NON-normalized correlation computation
+         */
         CorrelationFunctor()
         {
         }
-        
+    
+        /**
+         * Computes a single NON-normalized correlation coefficient for two images
+         * of same size.
+         *
+         * \param src1 The first image
+         * \param src2 The second image
+         * \return The NON-normalized correlation coefficient.
+         */
         template <class T1, class T2>
         double operator()(const vigra::MultiArrayView<2,T1> & src1,
                           const vigra::MultiArrayView<2,T2> & src2)
@@ -615,7 +668,6 @@ double shapecontext_cc(const vigra::MultiArray<2, T1> & src1, const vigra::Multi
  * \param src2 The second image.
  * \param s1_features The features of the first image.
  * \param s2_features The features of the second image.
- * \param func The matching functor, which shall be used for comparison.
  * \param mask_width The width of the subimage, which will be compared for each feature.
  * \param mask_height The height of the subimage, which will be compared for each feature.
  * \param max_distance The maximal distance between the features of image 1 and image 2.
@@ -743,6 +795,10 @@ SparseWeightedMultiVectorfield2D* matchFeaturesToFeaturesUsingShapeContext(const
     
 	return result_vf;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

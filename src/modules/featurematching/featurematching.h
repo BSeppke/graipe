@@ -36,7 +36,21 @@
 #ifndef GRAIPE_FEATUREMATCHING_H
 #define GRAIPE_FEATUREMATCHING_H
 
+/**
+ * @defgroup graipe_featurematching Two-dimensional feature matching module
+ *
+ * @addtogroup graipe_featurematching
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's 2d feature matching module
+ */
+
 #include "featurematching/matchpointfeatures.hxx"
 #include "featurematching/matchsiftfeatures.hxx"
+
+/**
+ * @}
+ */
 
 #endif

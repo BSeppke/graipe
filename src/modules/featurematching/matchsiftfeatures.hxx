@@ -48,6 +48,14 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_featurematching
+ * @{
+ *
+ * @file
+ * @brief Header file for the matching of  SIFT features.
+ */
+
 /** 
  * Feature matching using sift features of the first image and sift features of the second image to search for
  * the N most likely features of the second image.
@@ -57,8 +65,8 @@ namespace graipe {
  *
  * \param src1 The first image.
  * \param src2 The second image.
- * \param s1_features The features of the first image.
- * \param s2_features The features of the second image.
+ * \param points1 The features of the first image.
+ * \param points2 The features of the second image.
  * \param max_descr_dist The maximal distance between the sift feature descriptors.
  * \param max_geo_dist The maximal geometric distance between the sift features.
  * \param n_candidates The number of candidate matches, which shall be collected.
@@ -185,6 +193,10 @@ SparseWeightedMultiVectorfield2D* matchSIFTFeaturesUsingDistance(const vigra::Mu
     
     return result_vf;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 
