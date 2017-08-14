@@ -43,6 +43,14 @@
 namespace graipe {
     
 /**
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Header file for internally used multispectral Optical Flow algorithms.
+ */
+ 
+/**
  * This class implements the base for all 2band / multispectral Optical
  * Flow estimation algorithms. Common parameters are already introduced.
  * This class inherits from graipe::Algorithm.
@@ -341,7 +349,11 @@ class OpticalFlowAlgorithm2Bands
         }
 
     protected:
-        //Additional parameters
+        /**
+         * @{
+         *
+         * Additional parameters
+         */
         ModelParameter * m_param_image1;
         IntParameter *   m_param_image1Band1;
         IntParameter *   m_param_image1Band2;
@@ -365,8 +377,15 @@ class OpticalFlowAlgorithm2Bands
 
         BoolParameter	* m_param_saveIntermediateImages;
         BoolParameter	* m_param_saveIntermediateFlow;
+        /**
+         * @}
+         */
 };
   
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_MULTISPECTRAL_MULTISPECTRALOPTICALFLOWALGORITHMS_HXX

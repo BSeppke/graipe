@@ -42,6 +42,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Header file for multispectral classification algorithms.
+ */
+
+/**
  * This function implements the Normalized Diffence Vegetation Index (NDVI)
  * from two different image bands. If an algorithm pointer is provided, the 
  * status is updated to show progress.
@@ -182,6 +190,10 @@ void computeEVI(const vigra::MultiArrayView<2,T1> & s_nir, const vigra::MultiArr
 	}
 }
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_MULTISPECTRAL_MULTISPECTRALCLASSIFICATION_HXX

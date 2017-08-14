@@ -49,6 +49,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_imageprocessing
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the image processing module
+ */
+ 
+/**
  * This algorithm allows the summation of any count of images.
  * It uses a multi-selection Model parameter to get the images.
  */
@@ -58,6 +66,8 @@ class AddImages
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         AddImages(Workspace* wsp)
         : Algorithm(wsp)
@@ -65,11 +75,15 @@ class AddImages
             m_parameters->addParameter("images", new MultiModelParameter("Images",	"Image", NULL, false, wsp));
         }
     
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "AddImages"
+         */
         QString typeName() const
         {
             return "AddImages";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -152,6 +166,12 @@ class AddImages
         }
 };
 
+/**
+ * Creates a new image adding algorithm
+ *
+ * \param wsp The workspace to be used.
+ * \return A new instance of the AddImages algorithm.
+ */
 Algorithm* createAddImages(Workspace* wsp)
 {
 	return new AddImages(wsp);
@@ -170,6 +190,8 @@ class GaussianGradientCalculator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         GaussianGradientCalculator(Workspace* wsp)
         : Algorithm(wsp)
@@ -178,11 +200,15 @@ class GaussianGradientCalculator
             m_parameters->addParameter("sigma", new FloatParameter("Gaussian gradient Scale", 0,9999999, 1.0));
         }
     
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "GaussianGradientCalculator"
+         */
         QString typeName() const
         {
             return "GaussianGradientCalculator";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -248,6 +274,7 @@ class GaussianGradientCalculator
  * Creates a new Gaussian gradient estimation algorithm to derive
  * first order derivatives of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the GaussianGradientCalculator.
  */
 Algorithm* createGaussianGradientCalculator(Workspace* wsp)
@@ -266,6 +293,8 @@ class RecursiveSmoothingFilter : public Algorithm
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         RecursiveSmoothingFilter(Workspace* wsp)
         : Algorithm(wsp)
@@ -275,11 +304,16 @@ class RecursiveSmoothingFilter : public Algorithm
             //m_parameters.push_back( new EnumParameter("Border treatment", border_treatment_modes(), 2));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "RecursiveSmoothingFilter"
+         */
         QString typeName() const
         {
             return "RecursiveSmoothingFilter";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -349,6 +383,7 @@ class RecursiveSmoothingFilter : public Algorithm
  * Creates a new recursive smoothing filter to low-pass
  * the intensities of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the RecursiveSmoothingFilter.
  */
 Algorithm* createRecursiveSmoothingFilter(Workspace* wsp)
@@ -367,6 +402,8 @@ class GaussianSmoothingFilter : public Algorithm
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         GaussianSmoothingFilter(Workspace* wsp)
         : Algorithm(wsp)
@@ -374,11 +411,16 @@ class GaussianSmoothingFilter : public Algorithm
             m_parameters->addParameter("image", new ModelParameter("Image",	"Image", NULL, false, wsp));
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "GaussianSmoothingFilter"
+         */
         QString typeName() const
         {
             return "GaussianSmoothingFilter";
         }
-    
         
         /**
          * Specialization of the running phase of this algorithm.
@@ -449,6 +491,7 @@ class GaussianSmoothingFilter : public Algorithm
  * Creates a new Gaussian smoothing filter to low-pass
  * the intensities of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the GaussianSmoothingFilter.
  */
 Algorithm* createGaussianSmoothingFilter(Workspace* wsp)
@@ -470,6 +513,8 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         NormalizedGaussianSmoothingFilter(Workspace* wsp)
         : Algorithm(wsp)
@@ -478,11 +523,16 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
             m_parameters->addParameter("sigma", new FloatParameter("Scale sigma", 0.0, 50.0, 1.0));
             m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, wsp));
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "NormalizedGaussianSmoothingFilter"
+         */
         QString typeName() const
         {
             return "NormalizedGaussianSmoothingFilter";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -562,6 +612,7 @@ class NormalizedGaussianSmoothingFilter : public Algorithm
  * Creates a new normalized Gaussian smoothing filter to low-pass
  * the intensities of an image w.r.t. a mask of valid pixels.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the NormalizedGaussianSmoothingFilter.
  */
 Algorithm* createNormalizedGaussianSmoothingFilter(Workspace* wsp)
@@ -582,6 +633,8 @@ class ApplyMaskToImage
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         ApplyMaskToImage(Workspace* wsp)
         : Algorithm(wsp)
@@ -590,11 +643,16 @@ class ApplyMaskToImage
             m_parameters->addParameter("mask",  new ImageBandParameter<float>("Mask image Band", NULL, false, wsp));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ApplyMaskToImage"
+         */
         QString typeName() const
         {
             return "ApplyMaskToImage";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -667,6 +725,7 @@ class ApplyMaskToImage
 /**
  * Creates a new algorithm for cutting out image areas using a mask.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the ApplyMaskToImage.
  */
 Algorithm* createApplyMaskToImage(Workspace* wsp)
@@ -687,6 +746,8 @@ class MaskErosion
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MaskErosion(Workspace* wsp)
         : Algorithm(wsp)
@@ -695,11 +756,16 @@ class MaskErosion
             m_parameters->addParameter("radius", new IntParameter("Erosion radius", 1, 50, 1) );
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "MaskErosion"
+         */
         QString typeName() const
         {
             return "MaskErosion";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -766,6 +832,7 @@ class MaskErosion
 /**
  * Creates a new algorithm for eroding a binary mask.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MaskErosion.
  */
 Algorithm* createMaskErosion(Workspace* wsp)
@@ -786,6 +853,8 @@ class MaskDilation
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MaskDilation(Workspace* wsp)
         : Algorithm(wsp)
@@ -794,11 +863,16 @@ class MaskDilation
             m_parameters->addParameter("radius", new IntParameter("Dilation radius", 1, 50, 1) );
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "MaskDilation"
+         */
         QString typeName() const
         {
             return "MaskDilation";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -865,6 +939,7 @@ class MaskDilation
 /**
  * Creates a new algorithm for dilating a binary mask.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MaskDilation.
  */
 Algorithm* createMaskDilation(Workspace* wsp)
@@ -885,6 +960,8 @@ class MaskUnion
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MaskUnion(Workspace* wsp)
         : Algorithm(wsp)
@@ -893,11 +970,16 @@ class MaskUnion
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, wsp));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "MaskUnion"
+         */
         QString typeName() const
         {
             return "MaskUnion";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -967,6 +1049,7 @@ class MaskUnion
 /**
  * Creates a new algorithm for the union of two binary masks.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MaskUnion.
  */
 Algorithm* createMaskUnion(Workspace* wsp)
@@ -983,6 +1066,8 @@ class MaskIntersection: public Algorithm
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MaskIntersection(Workspace* wsp)
         : Algorithm(wsp)
@@ -991,11 +1076,16 @@ class MaskIntersection: public Algorithm
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_workspace));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "MaskIntersection"
+         */
         QString typeName() const
         {
             return "MaskIntersection";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1065,6 +1155,7 @@ class MaskIntersection: public Algorithm
 /**
  * Creates a new algorithm for the intesection of two binary masks.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MaskIntersection.
  */
 Algorithm* createMaskIntersection(Workspace* wsp)
@@ -1083,6 +1174,8 @@ class MaskDifference: public Algorithm
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MaskDifference(Workspace* wsp)
         : Algorithm(wsp)
@@ -1091,11 +1184,16 @@ class MaskDifference: public Algorithm
             m_parameters->addParameter("mask2", new ImageBandParameter<float>("Second mask image band",NULL, false, m_workspace));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "MaskDifference"
+         */
         QString typeName() const
         {
             return "MaskDifference";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1165,6 +1263,7 @@ class MaskDifference: public Algorithm
 /**
  * Creates a new algorithm for the difference of two binary masks.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MaskDifference.
  */
 Algorithm* createMaskDifference(Workspace* wsp)
@@ -1185,6 +1284,8 @@ class ImageCropper
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         ImageCropper(Workspace* wsp)
         : Algorithm(wsp)
@@ -1196,11 +1297,16 @@ class ImageCropper
             m_parameters->addParameter("lr_y", new IntParameter("Lower Right y", 0,999999, 1000));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ImageCropper"
+         */
         QString typeName() const
         {
             return "ImageCropper";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1293,6 +1399,7 @@ class ImageCropper
 /**
  * Creates a new algorithm for the cropping of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the ImageCropper.
  */
 Algorithm* createImageCropper(Workspace* wsp)
@@ -1312,6 +1419,8 @@ class ImageResizer : public Algorithm
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         ImageResizer(Workspace* wsp)
         : Algorithm(wsp)
@@ -1322,11 +1431,16 @@ class ImageResizer : public Algorithm
             m_parameters->addParameter("degree", new IntParameter("Spline-Interpolation degree ", 0,5, 1));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ImageResizer"
+         */
         QString typeName() const
         {
             return "ImageResizer";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1429,6 +1543,7 @@ class ImageResizer : public Algorithm
 /**
  * Creates a new algorithm for the resizing of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the ImageResizer.
  */
 Algorithm* createImageResizer(Workspace* wsp)
@@ -1445,6 +1560,8 @@ class ImageInverter
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         ImageInverter(Workspace* wsp)
         : Algorithm(wsp)
@@ -1454,6 +1571,12 @@ class ImageInverter
             m_parameters->addParameter("invert_offset", new IntParameter("Global inverting offset", 0,999999, 255, (*m_parameters)["invert"]));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ImageInverter"
+         */
         QString typeName() const
         {
             return "ImageInverter";
@@ -1538,6 +1661,7 @@ class ImageInverter
 /**
  * Creates a new algorithm for the inverting of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the ImageInverter.
  */
 Algorithm* createImageInverter(Workspace* wsp)
@@ -1559,6 +1683,8 @@ class ImageThresholder
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         ImageThresholder(Workspace* wsp)
         : Algorithm(wsp)
@@ -1570,11 +1696,16 @@ class ImageThresholder
             m_parameters->addParameter("yes",   new FloatParameter("Value Mark", 0,999999, 1));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ImageThresholder"
+         */
         QString typeName() const
         {
             return "ImageThresholder";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1647,6 +1778,7 @@ class ImageThresholder
 /**
  * Creates a new algorithm for the thresholding of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the ImageThresholder.
  */
 Algorithm* createImageThresholder(Workspace* wsp)
@@ -1668,6 +1800,8 @@ class FloatingImageThresholder
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         FloatingImageThresholder(Workspace* wsp)
         : Algorithm(wsp)
@@ -1682,11 +1816,16 @@ class FloatingImageThresholder
             m_parameters->addParameter("horizontal", new BoolParameter("Float horizontally", true));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "FloatingImageThresholder"
+         */
         QString typeName() const
         {
             return "FloatingImageThresholder";
         }
-    
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -1788,6 +1927,7 @@ class FloatingImageThresholder
 /**
  * Creates a new algorithm for the floating thresholding of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the FloatingImageThresholder.
  */
 Algorithm* createFloatingImageThresholder(Workspace* wsp)
@@ -1809,6 +1949,8 @@ class ThinLineExtractor
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         ThinLineExtractor(Workspace* wsp)
         : Algorithm(wsp)
@@ -1827,6 +1969,12 @@ class ThinLineExtractor
             m_parameters->addParameter("save",        new BoolParameter("Save region statistics image", true));
             
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ThinLineExtractor"
+         */
         QString typeName() const
         {
             return "ThinLineExtractor";
@@ -1976,6 +2124,7 @@ class ThinLineExtractor
 /**
  * Creates a new algorithm for the extraction of thin (line) regions of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the ThinLineExtractor.
  */
 Algorithm* createThinLineExtractor(Workspace* wsp)
@@ -1996,6 +2145,8 @@ class DistanceTransformator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         DistanceTransformator(Workspace* wsp)
         : Algorithm(wsp)
@@ -2004,6 +2155,11 @@ class DistanceTransformator
             
         }
     
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "DistanceTransformator"
+         */
         QString typeName() const
         {
             return "DistanceTransformator";
@@ -2066,6 +2222,7 @@ class DistanceTransformator
 /**
  * Creates a new algorithm for the distance transform of an image.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the DistanceTransformator.
  */
 Algorithm* createDistanceTransformator(Workspace* wsp)
@@ -2256,27 +2413,31 @@ class ImageProcessingModule
         }
 };
     
+/**
+ * @}
+ */
+    
 } //end of namespace graipe
 
 /**
- *Interface to the ModuleHandler
- */
-
-/**
- *  The initialization procedure returns a pointer to the
- *  ImageProcessingModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
+ * @addtogroup graipe_imageprocessing
+ * @{
  */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     *  The initialization procedure returns a pointer to the
+     *  ImageProcessingModule (which inherits from Module) acutal
+     *  implementation of the class above
+     *
+     *	\return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::ImageProcessingModule;
 	}
 }
 
-
-
-
+/**
+ * @}
+ */

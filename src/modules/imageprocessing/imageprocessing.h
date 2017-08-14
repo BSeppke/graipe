@@ -36,7 +36,21 @@
 #ifndef GRAIPE_IMAGEPROCESSING_H
 #define GRAIPE_IMAGEPROCESSING_H
 
+/**
+ * @defgroup graipe_imageprocessing Image processing module
+ *
+ * @addtogroup graipe_imageprocessing
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's image processing module
+ */
+
 //All internally used algorithms are provided by VIGRA,
 //thus we do not need to export anything here.
 
+/**
+ * @}
+ */
+ 
 #endif

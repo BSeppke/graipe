@@ -43,6 +43,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Header file for multispectral Optical Flow algorithms.
+ */
+ 
+/**
  * The classical (unweighted) Lucas & Kanade algorithm as described by them in 1982,
  * pimped by better gradient computations using vigra's gaussian convolution kernels
  * and extended to two consecutive image bands for each image.
@@ -50,8 +58,9 @@ namespace graipe {
 class OpticalFlow2BandsFunctor
 {
     public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 3 Eleents: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
@@ -322,8 +331,9 @@ class OpticalFlow2BandsFunctor
 class OpticalFlowHS2BandsFunctor
 {
     public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 3 Eleents: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
@@ -331,7 +341,7 @@ class OpticalFlowHS2BandsFunctor
          * to two bands.
          *
          * \param sigma The sigma is currently ignored.
-         * \param threshold The gradient threshold.
+         * \param alpha The weighting between smoothness and gradients.
          * \param iterations The count of iterations.
          */
         OpticalFlowHS2BandsFunctor(double sigma, double alpha, int iterations)
@@ -578,6 +588,10 @@ class OpticalFlowHS2BandsFunctor
         int		m_level;
 };
     
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_MULTISPECTRAL_MULTISPECTRALOPTICALFLOW_HXX

@@ -43,10 +43,16 @@
 //vigra components needed
 #include "vigra/edgedetection.hxx"
 
-//Compute Multispectral Gradients
-
 namespace graipe {
     
+/**
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Header file for multispectral gradient algorithms.
+ */
+ 
 /**
  * A helper function to compute the jacobian matrix of an image.
  * The Jacobi matrix holds the first order partial derivatives for each
@@ -329,6 +335,10 @@ EdgelFeatureList2D* msCannyFeatures(Image<float>* img, float scale, float thresh
 	return  edgels;
 }
     
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_MULTISPECTRAL_MULTISPECTRALGRADIENTS_HXX

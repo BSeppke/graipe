@@ -36,10 +36,24 @@
 #ifndef GRAIPE_MULTISPECTRAL_H
 #define GRAIPE_MULTISPECTRAL_H
 
+/**
+ * @defgroup graipe_multispectral Multispectral image processing module
+ *
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's  multispectral image processing module
+ */
+ 
 #include "multispectral/multispectralgradients.hxx"
 #include "multispectral/multispectralclassification.hxx"
 #include "multispectral/multispectralopticalflow.hxx"
 #include "multispectral/multispectralopticalflowalgorithms.hxx"
 #include "multispectral/multispectralopticalflowframework.hxx"
+
+/**
+ * @}
+ */
 
 #endif

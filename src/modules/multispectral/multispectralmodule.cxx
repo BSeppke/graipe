@@ -42,6 +42,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the multispectral image processing module
+ */
+ 
+/**
  * Static definition of all implemented multispectral gradient
  * modes.
  *
@@ -70,6 +78,8 @@ class MSCannyFeatureDetector
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MSCannyFeatureDetector(Workspace* wsp)
         : Algorithm(wsp)
@@ -80,6 +90,11 @@ class MSCannyFeatureDetector
             m_parameters->addParameter("mode", new EnumParameter("MS gradient mode:", ms_gradient_modes(),0));
         }
     
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Always: "DistanceTransformator"
+         */
         QString typeName() const
         {
             return "DistanceTransformator";
@@ -165,6 +180,7 @@ class MSCannyFeatureDetector
  * Creates one instance of the multspectral Canny Edge detection
  * algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MSCannyFeatureDetector.
  */
 Algorithm* createMSCannyFeatureDetector(Workspace* wsp)
@@ -187,6 +203,8 @@ class MSGradientCalculator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         MSGradientCalculator(Workspace* wsp)
         : Algorithm(wsp)
@@ -195,6 +213,11 @@ class MSGradientCalculator
             m_parameters->addParameter("sigma", new FloatParameter("Gradient Scale", 0,9999999, 0));
         }
     
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Unless partially specialized: "MSGradientCalculator"
+         */
         QString typeName() const
         {
             return "MSGradientCalculator";
@@ -261,6 +284,11 @@ class MSGradientCalculator
 };
 
 
+/**
+ * Returns the name of this algorithm
+ *
+ * \return Always: "MSMeanGradientCalculator"
+ */
 template<>
 QString MSGradientCalculator<MSMeanGradientFunctor>::typeName() const
 {
@@ -271,6 +299,7 @@ QString MSGradientCalculator<MSMeanGradientFunctor>::typeName() const
  * Creates one instance of the multspectral mean gradient
  * estimation algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MSGradientCalculator<MSMeanGradientFunctor>.
  */
 Algorithm* createMSMeanGradientCalculator(Workspace* wsp)
@@ -278,6 +307,12 @@ Algorithm* createMSMeanGradientCalculator(Workspace* wsp)
 	return new MSGradientCalculator<MSMeanGradientFunctor>(wsp);
 }
 
+    
+/**
+ * Returns the name of this algorithm
+ *
+ * \return Always: "MSMaxGradientCalculator"
+ */
 template<>
 QString MSGradientCalculator<MSMaxGradientFunctor>::typeName() const
 {
@@ -288,6 +323,7 @@ QString MSGradientCalculator<MSMaxGradientFunctor>::typeName() const
  * Creates one instance of the multspectral maximal gradient
  * estimation algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MSGradientCalculator<MSMaxGradientFunctor>.
  */
 Algorithm* createMSMaxGradientCalculator(Workspace* wsp)
@@ -295,6 +331,12 @@ Algorithm* createMSMaxGradientCalculator(Workspace* wsp)
 	return new MSGradientCalculator<MSMaxGradientFunctor>(wsp);
 }
 
+    
+/**
+ * Returns the name of this algorithm
+ *
+ * \return Always: "MSMVGradientCalculator"
+ */
 template<>
 QString MSGradientCalculator<MSMVGradientFunctor>::typeName() const
 {
@@ -305,6 +347,7 @@ QString MSGradientCalculator<MSMVGradientFunctor>::typeName() const
  * Creates one instance of the multspectral eigenvector gradient
  * estimation algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the MSGradientCalculator<MSMVGradientFunctor>.
  */
 Algorithm* createMSMVGradientCalculator(Workspace* wsp)
@@ -325,6 +368,8 @@ class NDVIEstimator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         NDVIEstimator(Workspace* wsp)
         : Algorithm(wsp)
@@ -334,6 +379,11 @@ class NDVIEstimator
             m_parameters->addParameter("nir-id", new IntParameter("NIR band-id", 0,9999999, 3));
         }
     
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Always: "NDVIEstimator"
+         */
         QString typeName() const
         {
             return "NDVIEstimator";
@@ -409,6 +459,7 @@ class NDVIEstimator
  * Creates one instance of the NDVI
  * algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the NDVIEstimator.
  */
 Algorithm* createNDVIEstimator(Workspace* wsp)
@@ -429,6 +480,8 @@ class EVIEstimator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         EVIEstimator(Workspace* wsp)
         : Algorithm(wsp)
@@ -444,6 +497,11 @@ class EVIEstimator
             m_parameters->addParameter("Gain", new FloatParameter("Gain", 0,9999999, 2.5));
         }
     
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Always: "EVIEstimator"
+         */
         QString typeName() const
         {
             return "EVIEstimator";
@@ -526,6 +584,7 @@ class EVIEstimator
  * Creates one instance of the EVI
  * algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the EVIEstimator.
  */
 Algorithm* createEVIEstimator(Workspace* wsp)
@@ -549,6 +608,8 @@ class EVI2BandsEstimator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         EVI2BandsEstimator(Workspace* wsp)
         : Algorithm(wsp)
@@ -562,6 +623,11 @@ class EVI2BandsEstimator
             m_parameters->addParameter("Gain", new FloatParameter("Gain", 0,9999999, 2.5f));
         }
     
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Always: "EVI2BandsEstimator"
+         */
         QString typeName() const
         {
             return "EVI2BandsEstimator";
@@ -640,6 +706,7 @@ class EVI2BandsEstimator
  * Creates one instance of the EVI 2 Bands
  * algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the EVI2BandsEstimator.
  */
 Algorithm* createEVI2BandsEstimator(Workspace* wsp)
@@ -662,6 +729,8 @@ class OpticalFlow2BandsEstimator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         OpticalFlow2BandsEstimator(Workspace* wsp)
         : OpticalFlowAlgorithm2Bands(wsp)
@@ -678,6 +747,16 @@ class OpticalFlow2BandsEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Always: "OpticalFlow2BandsEstimator"
+         */
+         QString typeName() const
+         {
+            return "OpticalFlow2BandsEstimator";
+         }
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -737,6 +816,7 @@ class OpticalFlow2BandsEstimator
  * Creates one instance of the 2 bands Optical Flow
  * algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the OpticalFlow2BandsEstimator.
  */
 Algorithm* createOpticalFlow2BandsEstimator(Workspace* wsp)
@@ -760,6 +840,8 @@ class OpticalFlowHS2BandsEstimator
     public:
         /**
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
+         *
+         * \param wsp The workspace to be used.
          */
         OpticalFlowHS2BandsEstimator(Workspace* wsp)
         : OpticalFlowAlgorithm2Bands(wsp)
@@ -776,6 +858,16 @@ class OpticalFlowHS2BandsEstimator
             
             addFrameworkProcessingParameters();
         }
+    
+        /**
+         * Returns the name of this algorithm
+         *
+         * \return Always: "OpticalFlowHS2BandsEstimator"
+         */
+         QString typeName() const
+         {
+            return "OpticalFlowHS2BandsEstimator";
+         }
     
         /**
          * Specialization of the running phase of this algorithm.
@@ -835,6 +927,7 @@ class OpticalFlowHS2BandsEstimator
  * Creates one instance of the 2 bands Horn & Schunck Optical Flow
  * algorithm defined above.
  *
+ * \param wsp The workspace to be used.
  * \return A new instance of the OpticalFlowHS2BandsEstimator.
  */
 Algorithm* createOpticalFlowHS2BandsEstimator(Workspace* wsp)
@@ -967,26 +1060,35 @@ class MultispectralModule
         }
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 /**
- *Interface to the ModuleHandler
+ * @addtogroup graipe_multispectral
+ * @{
  */
 
-/**
- *  The initialization procedure returns a pointer to the
- *  MultispectralModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
- */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     * The initialization procedure returns a pointer to the
+     * MultispectralModule (which inherits from Module) acutal
+     * implementation of the class above
+     *
+     * \return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::MultispectralModule;
 	}
-}
+} //extern "C"
+
+/** 
+* @}
+*/
 
 
 

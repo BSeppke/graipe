@@ -51,7 +51,15 @@
 
 
 namespace graipe {
-    
+
+/**
+ * @addtogroup graipe_multispectral
+ * @{
+ *
+ * @file
+ * @brief Header file for multispectral Optical Flow framework.
+ */
+ 
 /**
  * The most basic case of a 2bands Optical Flow computation:
  * Just call the functor without any masks or hierarchical processing scheme, but
@@ -192,20 +200,19 @@ int calculateOFCE2Bands(const vigra::MultiArrayView<2, T1> & src11,
  *     at level (n+1)
  * For each (a) the functor is called without a mask, but if selected with global motion estimation.
  *
- * \param[in] src11 First band of the first image of the series.
- * \param[in] src12 Second band of the first image of the series.
- * \param[in] src21 First band of the secong image of the series.
- * \param[in] src22 Second band of the second image of the series.
- * \param[in] mask THe mask, where pixel values are assumed to be valid.
+ * \param[in]  src11 First band of the first image of the series.
+ * \param[in]  src12 Second band of the first image of the series.
+ * \param[in]  src21 First band of the secong image of the series.
+ * \param[in]  src22 Second band of the second image of the series.
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in]  flow_func The used functor to compute the Optical Flow.
+ * \param[in]  use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
- * \param[in] steps Step count.
- * \param[in] break_level On wich level shall we finish/break the traversal.
- * \param[in] hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
+ * \param[in]  steps Step count.
+ * \param[in]  break_level On wich level shall we finish/break the traversal.
+ * \param[in]  hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
  */
 template <class T1, class T2, class MatrixType, class OpticalFlowFunctor>
 void calculateOFCEHierarchicallyInitialiser2Bands(const vigra::MultiArrayView<2,T1> & src11,
@@ -304,20 +311,20 @@ void calculateOFCEHierarchicallyInitialiser2Bands(const vigra::MultiArrayView<2,
  *    at level (n+1)
  * For each (a) the functor is called with a mask and if selected with global motion estimation.
  *
- * \param[in] src11 First band of the first image of the series.
- * \param[in] src12 Second band of the first image of the series.
- * \param[in] src21 First band of the secong image of the series.
- * \param[in] src22 Second band of the second image of the series.
- * \param[in] mask THe mask, where pixel values are assumed to be valid.
+ * \param[in]  src11 First band of the first image of the series.
+ * \param[in]  src12 Second band of the first image of the series.
+ * \param[in]  src21 First band of the secong image of the series.
+ * \param[in]  src22 Second band of the second image of the series.
+ * \param[in]  mask THe mask, where pixel values are assumed to be valid.
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in]  flow_func The used functor to compute the Optical Flow.
+ * \param[in]  use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
- * \param steps Step count.
- * \param[in] break_level On wich level shall we finish/break the traversal.
- * \param[in] hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
+ * \param      steps Step count.
+ * \param[in]  break_level On wich level shall we finish/break the traversal.
+ * \param[in]  hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
  */
 template <class T1, class T2, class T3, class MatrixType, class OpticalFlowFunctor>
 void calculateOFCEHierarchicallyInitialiser2Bands(const vigra::MultiArrayView<2,T1> & src11,
@@ -433,19 +440,20 @@ void calculateOFCEHierarchicallyInitialiser2Bands(const vigra::MultiArrayView<2,
  * \param[in] src12 Second band of the first image of the series.
  * \param[in] src21 First band of the secong image of the series.
  * \param[in] src22 Second band of the second image of the series.
- * \param[in] mask THe mask, where pixel values are assumed to be valid.
+ * \param[out] img11_list List of the first band of the first image of the series (warped).
+ * \param[out] img12_list List of the second band of the first image of the series (warped).
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in]  flow_func The used functor to compute the Optical Flow.
+ * \param[in]  use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
- * \param[in] steps Step count.
- * \param[in] break_level On wich level shall we finish/break the traversal.
- * \param[in] hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
- * \param[in] warp The functor, which is used for warping
- * \param[in] warp_subsampling The subsampling, wich is used for warping
- * \param[in] warp_sigma The sigma, which is used for smoothing the result before subsampling.
+ * \param[in]  steps Step count.
+ * \param[in]  break_level On wich level shall we finish/break the traversal.
+ * \param[in]  hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
+ * \param[in]  warp The functor, which is used for warping
+ * \param[in]  warp_subsampling The subsampling, wich is used for warping
+ * \param[in]  warp_sigma The sigma, which is used for smoothing the result before subsampling.
  */
 template <class T1, class T2, class MatrixType, class OpticalFlowFunctor, class WarpingFunctor>
 void calculateOFCEHierarchicallyWarping2Bands(const vigra::MultiArrayView<2,T1> & src11,
@@ -597,23 +605,25 @@ void calculateOFCEHierarchicallyWarping2Bands(const vigra::MultiArrayView<2,T1> 
  *
  * For each (a) the functor is called with a mask and if selected with global motion estimation.
  *
- * \param[in] src11 First band of the first image of the series.
- * \param[in] src12 Second band of the first image of the series.
- * \param[in] src21 First band of the secong image of the series.
- * \param[in] src22 Second band of the second image of the series.
- * \param[in] mask THe mask, where pixel values are assumed to be valid.
+ * \param[in]  src11 First band of the first image of the series.
+ * \param[in]  src12 Second band of the first image of the series.
+ * \param[in]  src21 First band of the secong image of the series.
+ * \param[in]  src22 Second band of the second image of the series.
+ * \param[in]  mask THe mask, where pixel values are assumed to be valid.
+ * \param[out] img11_list List of the first band of the first image of the series (warped).
+ * \param[out] img12_list List of the second band of the first image of the series (warped).
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in]  flow_func The used functor to compute the Optical Flow.
+ * \param[in]  use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
- * \param steps Step count.
- * \param[in] break_level On wich level shall we finish/break the traversal.
- * \param[in] hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
- * \param[in] warp The functor, which is used for warping
- * \param[in] warp_subsampling The subsampling, wich is used for warping
- * \param[in] warp_sigma The sigma, which is used for smoothing the result before subsampling.
+ * \param      steps Step count.
+ * \param[in]  break_level On wich level shall we finish/break the traversal.
+ * \param[in]  hmode The hierarchical traversal mode: (0: V, 1: Single W, 2: Full W)
+ * \param[in]  warp The functor, which is used for warping
+ * \param[in]  warp_subsampling The subsampling, wich is used for warping
+ * \param[in]  warp_sigma The sigma, which is used for smoothing the result before subsampling.
  */
 template <class T1, class T2, class T3, class MatrixType, class OpticalFlowFunctor, class WarpingFunctor>
 void calculateOFCEHierarchicallyWarping2Bands(const vigra::MultiArrayView<2,T1> & src11,
@@ -759,6 +769,10 @@ void calculateOFCEHierarchicallyWarping2Bands(const vigra::MultiArrayView<2,T1> 
 	flow_list[0] = flow_res;
 }
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_MULTISPECTRAL_MULTISPECTRALOPTICALFLOWFRAMEWORK_HXX
