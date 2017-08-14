@@ -45,7 +45,15 @@
 
 namespace graipe {
 
-
+/**
+ * @addtogroup graipe_registration
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the image registration module
+ */
+ 
+ 
 /**
  * This class implements the global motion estimation image->image algorithm 
  * as specialization of the graipe::Algorithm class
@@ -66,7 +74,12 @@ class GlobalMotionCorrector
             m_parameters->addParameter("image1", m_param_imageBand1 );
             m_parameters->addParameter("image2", m_param_imageBand2 );
         }
-    
+		
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "GlobalMotionCorrector"
+         */
         QString typeName() const
         {
             return "GlobalMotionCorrector";
@@ -208,7 +221,12 @@ class GenericRegistration
 			m_parameters->addParameter("image2", new ModelParameter("Reference Image",  "Image", NULL, false, wsp));
 			m_parameters->addParameter("vf", new ModelParameter("Correspondence Map",  "SparseVectorfield2D", NULL, false, wsp));
 		}
-    
+		
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Unless partially specialized: "GenericRegistration"
+         */
         QString typeName() const
         {
             return "GenericRegistration";
@@ -294,6 +312,12 @@ class GenericRegistration
         }
 };
 
+		
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "AffineRegistration"
+ */
 template<>
 QString GenericRegistration<WarpAffineFunctor>::typeName() const
 {
@@ -311,6 +335,12 @@ Algorithm* createAffineRegistration(Workspace* wsp)
 	return new GenericRegistration<WarpAffineFunctor>(wsp);
 }
 
+		
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "ProjectiveRegistration"
+ */
 template<>
 QString GenericRegistration<WarpProjectiveFunctor>::typeName() const
 {
@@ -328,6 +358,12 @@ Algorithm* createProjectiveRegistration(Workspace* wsp)
 	return new GenericRegistration<WarpProjectiveFunctor>(wsp);
 }
 
+
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "BilinearRegistration"
+ */
 template<>
 QString GenericRegistration<WarpBilinearFunctor>::typeName() const
 {
@@ -345,6 +381,12 @@ Algorithm* createBilinearRegistration(Workspace* wsp)
 	return new GenericRegistration<WarpBilinearFunctor>(wsp);
 }
 
+
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "BiquadraticRegistration"
+ */
 template<>
 QString GenericRegistration<WarpBiquadraticFunctor>::typeName() const
 {
@@ -362,10 +404,16 @@ Algorithm* createBiquadraticRegistration(Workspace* wsp)
 	return new GenericRegistration<WarpBiquadraticFunctor>(wsp);
 }
 
+		
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "BicubicRegistration"
+ */
 template<>
 QString GenericRegistration<WarpBicubicFunctor>::typeName() const
 {
-    return "GBicubicRegistration";
+    return "BicubicRegistration";
 }
 
 /** 
@@ -379,6 +427,12 @@ Algorithm* createBicubicRegistration(Workspace* wsp)
 	return new GenericRegistration<WarpBicubicFunctor>(wsp);
 }
 
+		
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "PiecewiseAffineRegistration"
+ */
 template<>
 QString GenericRegistration<WarpPiecewiseAffineFunctor>::typeName() const
 {
@@ -395,6 +449,12 @@ Algorithm* createPiecewiseAffineRegistration(Workspace* wsp)
 	return new GenericRegistration<WarpPiecewiseAffineFunctor>(wsp);
 }
 
+
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "RBF1Registration"
+ */
 template<>
 QString GenericRegistration<WarpRBF1Functor>::typeName() const
 {
@@ -412,6 +472,12 @@ Algorithm* createRBF1Registration(Workspace* wsp)
 	return new GenericRegistration<WarpRBF1Functor>(wsp);
 }
 
+		
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "RBF2Registration"
+ */
 template<>
 QString GenericRegistration<WarpRBF2Functor>::typeName() const
 {
@@ -428,6 +494,12 @@ Algorithm* createRBF2Registration(Workspace* wsp)
 {
 	return new GenericRegistration<WarpRBF2Functor>(wsp);
 }
+		
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "RBF3Registration"
+ */
 template<>
 QString GenericRegistration<WarpRBF3Functor>::typeName() const
 {
@@ -444,6 +516,12 @@ Algorithm* createRBF3Registration(Workspace* wsp)
 	return new GenericRegistration<WarpRBF3Functor>(wsp);
 }
 
+
+/**
+ * Returns the name of this algorithm.
+ * 
+ * \return Always: "TPSRegistration"
+ */
 template<>
 QString GenericRegistration<WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor> >::typeName() const
 {
@@ -601,28 +679,35 @@ class RegistrationModule
 		}
 };
 
+/**
+ * @}
+ */
+
 } //end of namespace graipe
 
 /**
- *Interface to the ModuleHandler
- */
-
-/**
- *  The initialization procedure returns a pointer to the
- *  RegistrationModule (which inherits from Module) acutal
- *  implementation of the class above
+ * @addtogroup graipe_registration
+ * @{
  *
- *	\return The pointer to a new instance of this module.
  */
-
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     *  The initialization procedure returns a pointer to the
+     *  RegistrationModule (which inherits from Module) acutal
+     *  implementation of the class above
+     *
+     *	\return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::RegistrationModule;
 	}
-}
+} //extern "C"
 
+/**
+ * @}
+ */
 
 
 

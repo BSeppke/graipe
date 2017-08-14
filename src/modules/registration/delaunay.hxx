@@ -71,6 +71,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_registration
+ * @{
+ *
+ * @file
+ * @brief Header file for the delaunay triangluation
+ */
+
+/**
  * A templated Triangle class. The template argument defines the precision
  * of the points/vertices, which form the triangle. Default is double.
  */
@@ -78,7 +86,7 @@ template<typename T = double>
 class Triangle
 {
     public:
-        //The used vertex type
+        /** The used vertex type **/
         typedef vigra::TinyVector<T,2> VertexType;
     
         /**
@@ -319,18 +327,32 @@ class Triangle
         double m_r2;                     // radius of circumcircle, squared
 };
 
-
+/** The used vertex type **/
 typedef Triangle<double>::VertexType Vertex;
+
+/** The used vertex vector type **/
 typedef std::vector<Vertex> VertexVector;
+
+/** Iterator over the used vertex vector type **/
 typedef std::vector<Vertex>::iterator VIterator;
+
+/** Const iterator over the used vertex vector type **/
 typedef std::vector<Vertex>::const_iterator CVIterator;
+
+
 
 // Changed in verion 1.1: collect triangles in a multiset.
 // In version 1.0, I used a set, preventing the creation of multiple
 // triangles with identical center points. Therefore, more than three
 // co-circular vertices yielded incorrect results. Thanks to Roger Labbe.
+
+/** The used triangle set type **/
 typedef std::multiset<Triangle<double>> TriangleSet;
+
+/** Iterator over the used triangle set type **/
 typedef std::multiset<Triangle<double>>::iterator TIterator;
+
+/** Const iterator over the used triangle set type **/
 typedef std::multiset<Triangle<double>>::const_iterator CTIterator;
 
 
@@ -398,12 +420,19 @@ class Edge
         }
     
     private:
+        /** first vertex **/
         const Vertex * m_pV0;
+        /** second vertex **/
         const Vertex * m_pV1;
 };
 
+/** The used edge set type **/
 typedef std::set<Edge> EdgeSet;
+
+/** Iterator over the used edge type **/
 typedef std::set<Edge>::iterator EdgeIterator;
+
+/** Const iterator over the used edge type **/
 typedef std::set<Edge>::const_iterator CEdgeIterator;
 
 /**
@@ -413,11 +442,22 @@ typedef std::set<Edge>::const_iterator CEdgeIterator;
 class TriangleHasVertex
 {
     public:
+        /**
+         * Creates a function object to check whether a triangle has one of the vertices in SuperTriangle.
+         * 
+         * \param superTriangle The 'super triangle'.
+         */
         TriangleHasVertex(const Vertex superTriangle[3])
         : m_pSuperTriangle(superTriangle)
         {
         }
     
+        /**
+         * Application of the function object on a triangle
+         *
+         * \param tri The triangle.
+         * \return true, if the triangle has one of the vertices in SuperTriangle.
+         */
         bool operator()(const Triangle<double>& tri) const
         {
             for (int i = 0; i < 3; i++)
@@ -446,13 +486,26 @@ class TriangleHasVertex
 class TriangleIsCompleted
 {
     public:
-        TriangleIsCompleted(CVIterator itVertex, TriangleSet& output, const Vertex SuperTriangle[3])
+        /**
+         * Create a function object to check whether a triangle is 'completed'.
+         *
+         * \param itVertex      Vertex iterator
+         * \param output        The Triangle set
+         * \param superTriangle The 'super triangle'
+         */
+        TriangleIsCompleted(CVIterator itVertex, TriangleSet& output, const Vertex superTriangle[3])
         : m_itVertex(itVertex),
           m_output(output),
-          m_pSuperTriangle(SuperTriangle)
+          m_pSuperTriangle(superTriangle)
         {
         }
     
+        /**
+         * Application of the function object on a triangle
+         *
+         * \param tri The triangle.
+         * \return true, if the triangle is completed.
+         */
         bool operator()(const Triangle<double>& tri) const
         {
             bool b = tri.isLeftOf(*m_itVertex);
@@ -469,8 +522,11 @@ class TriangleIsCompleted
         }
 
     private:
+        /** The iterator of a vertex **/
         CVIterator m_itVertex;
+        /** The triangle set **/
         TriangleSet& m_output;
+        /** The super triangle **/
         const Vertex * m_pSuperTriangle;
 };
 
@@ -482,11 +538,23 @@ class TriangleIsCompleted
 class VertexIsInCircumCircle
 {
     public:
+        /**
+         * Create a function object to check whether vertex is in circumcircle of triangle.
+         *
+         * \param itVertex Vertex iterator
+         * \param edges    A Set of edges
+         */
         VertexIsInCircumCircle(CVIterator itVertex, EdgeSet& edges) 
         : m_itVertex(itVertex),
           m_edges(edges)
         {}
         
+        /**
+         * Application of the function object on a triangle
+         *
+         * \param tri The triangle.
+         * \return true, if the  vertex is in circumcircle of triangle.
+         */
         bool operator()(const Triangle<double>& tri) const
         {
             bool b = tri.cCEncompasses(*m_itVertex);
@@ -500,6 +568,12 @@ class VertexIsInCircumCircle
             return b;
         }
     protected:
+        /**
+         * Endge handling: Creates new edges if neccessary.
+         *
+         * \param p0 Pointer to a vertex.
+         * \param p1 Pointer to another vertex.
+         */
         void handleEdge(const Vertex * p0, const Vertex * p1) const
         {
             const Vertex * pVertex0(NULL);
@@ -533,7 +607,9 @@ class VertexIsInCircumCircle
         }
 
     private:
+        /** The iterator of a vertex **/
         CVIterator m_itVertex;
+        /** The edge set **/
         EdgeSet& m_edges;
 };
 
@@ -638,6 +714,9 @@ void delaunay_triangulation(const VertexVector& vertices, TriangleSet& output)
 	remove_copy_if(workset.begin(), workset.end(), std::inserter(output, where), TriangleHasVertex(vSuper));
 }
 
+/**
+ * @}
+ */
 
 } //namespace graipe
 

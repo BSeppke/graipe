@@ -51,6 +51,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_registration
+ * @{
+ *
+ * @file
+ * @brief Header file for the different warping functions for image registration.
+ */
+ 
+/**
  * This class represents the affine registration functor.
  * It will create a functor with a affine registration matrix, that can be used for registration purpose
  * by means of the affineWarpImage function.
@@ -227,13 +235,15 @@ class WarpPolynomialFunctor
 
 
 
-/**
- * Name traits for Radial Basis Functors:
- */
+/**  Gneral name traits for Radial Basis Functors: **/
 template<class T> QString rbfName()                                 { return "Unknown RBF functor"; }
+/**  Name trait for the Thin Plate Spline functor: **/
 template<>        QString rbfName<vigra::ThinPlateSplineFunctor>()  { return "Thin Plate Splines";  }
+/**  Name trait for the Distance Power functor (Degree 1): **/
 template<>        QString rbfName<vigra::DistancePowerFunctor<1> >(){ return "Distance Power<1>";   }
+/**  Name trait for the Distance Power functor (Degree 2): **/
 template<>        QString rbfName<vigra::DistancePowerFunctor<2> >(){ return "Distance Power<2>";   }
+/**  Name trait for the Distance Power functor (Degree 3): **/
 template<>        QString rbfName<vigra::DistancePowerFunctor<3> >(){ return "Distance Power<3>";   }
 
 
@@ -283,7 +293,11 @@ class WarpRadialBasisFunctor
         }
 };
 
-//Some more typedefs for convenience
+/**
+ * @{
+ *
+ * Some more typedefs for convenience
+ */
 typedef WarpPolynomialFunctor<1> WarpBilinearFunctor;
 typedef WarpPolynomialFunctor<2> WarpBiquadraticFunctor;
 typedef WarpPolynomialFunctor<3> WarpBicubicFunctor;
@@ -291,8 +305,15 @@ typedef WarpRadialBasisFunctor<vigra::ThinPlateSplineFunctor  > WarpTPSFunctor;
 typedef WarpRadialBasisFunctor<vigra::DistancePowerFunctor<1> > WarpRBF1Functor;
 typedef WarpRadialBasisFunctor<vigra::DistancePowerFunctor<2> > WarpRBF2Functor;
 typedef WarpRadialBasisFunctor<vigra::DistancePowerFunctor<3> > WarpRBF3Functor;
+/**
+ * @}
+ */
 
-    
+
+/**
+ * @}
+ */
+
 } //end of namespace graipe
 
 #endif //GRAIPE_REGISTRATION_WARPINGFUNCTORS_HXX

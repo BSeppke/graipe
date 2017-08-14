@@ -40,6 +40,8 @@
 #include <QDesktopWidget>
 
 /**
+ * @defgroup graipe_gui The main GUI for the Graipe framework
+ *
  * @addtogroup graipe_gui
  * @{
  *

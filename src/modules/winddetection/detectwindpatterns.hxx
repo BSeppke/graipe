@@ -50,6 +50,13 @@
 #include "vectorfields/vectorfields.h"
 
 namespace graipe {
+/**
+ * @addtogroup graipe_winddetection
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's wind detection from SAR image algorithms
+ */
 
 /**
  * This class implements a functor for the Wind Detection from SAR images
@@ -375,6 +382,7 @@ class GradientHistogramWindDetectionFunctor
  * \param mask_width Width of the local analysis window.
  * \param mask_height Height of the local analysis window.
  * \param wind_knowledge Prior knowledge of the half space of the wind.
+ * \param wsp The workspace of this algorithm.
  * \return A sparse weighted vectorfield containing the wind directions, without speed.
  */
 template <class T, class WindDetectionFunctor>
@@ -440,6 +448,7 @@ SparseWeightedVectorfield2D* estimateWindDirectionFromSARImage(const vigra::Mult
  * \param inner_scale The inner scale of the Structure Tensor.
  * \param outer_scale The outer scale of the Structure Tensor.
  * \param wind_knowledge Prior knowledge of the half space of the wind.
+ * \param wsp The workspace of this algorithm.
  * \return A dense vectorfield containing the wind directions, without speed.
  */
 template <class T>
@@ -482,6 +491,10 @@ DenseVectorfield2D* estimateWindDirectionFromSARImageUsingStructureTensor(const 
 	}
 	return result_vf;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

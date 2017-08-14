@@ -6,6 +6,7 @@ set(SOURCES
 	registrationmodule.cxx)
 
 set(HEADERS
+	registration.h
 	warpingfunctors.hxx
     piecewiseaffine_registration.hxx
     delaunay.hxx)

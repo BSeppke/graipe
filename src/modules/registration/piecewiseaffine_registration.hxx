@@ -52,9 +52,21 @@
 
 namespace graipe {
 
-//used vigra types for points and triangles
+/**
+ * @addtogroup graipe_registration
+ * @{
+ *
+ * @file
+ * @brief Header file for the piecewise affine registration approach
+ */
+ 
+/** The used type for points **/
 typedef Vertex PointType;
+
+/** The used type for triangles **/
 typedef Triangle<double> TriangleType;
+
+/** The used triangle transformation type **/
 typedef std::pair<TriangleType, vigra::Matrix<double> > TriangleTransformationType;
 
 
@@ -137,6 +149,10 @@ void piecewiseAffineWarpImage(vigra::SplineImageView<ORDER, T1> const & src, vig
         }
     }
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

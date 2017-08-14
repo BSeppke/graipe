@@ -720,10 +720,17 @@ class OpticalFlow2BandsEstimator
         }
         
     protected:
-        //Additional Parameters
+        /**
+         * @{
+         *
+         * Additional Parameters
+         */
         FloatParameter* m_param_sigma;
         FloatParameter* m_param_threshold;
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
  
 /** 
@@ -811,10 +818,17 @@ class OpticalFlowHS2BandsEstimator
         }
         
     protected:
-        //Additional Parameters
+        /**
+         * @{
+         *
+         * Additional Parameters
+         */
         FloatParameter* m_param_sigma;
         FloatParameter* m_param_alpha;
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
 /** 

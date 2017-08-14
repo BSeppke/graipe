@@ -36,6 +36,20 @@
 #ifndef GRAIPE_WINDDETECTION_H
 #define GRAIPE_WINDDETECTION_H
 
+/**
+ * @defgroup graipe_winddetection wind detection from SAR image module
+ *
+ * @addtogroup graipe_winddetection
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's wind detection from SAR image module
+ */
+
 #include "winddetection/detectwindpatterns.hxx"
+
+/**
+ * @}
+ */
 
 #endif

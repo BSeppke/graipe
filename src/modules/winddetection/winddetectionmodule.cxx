@@ -42,6 +42,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_winddetection
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the  wind detection from SAR image module
+ */
+ 
+/**
  * We are dealing with direction (according to the compass) here, so we have to define their
  * prototypical directions first.
  * Note that these are just steps to the corresonding pixels and not normalized vectors. All directions
@@ -102,6 +110,12 @@ class WindDetector
             m_parameters->addParameter("mask_w", new IntParameter("Mask width", 3, 999));
             m_parameters->addParameter("mask_h", new IntParameter("Mask height", 3, 999));
         }
+		
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "WindDetector"
+         */
         QString typeName() const
         {
             return "WindDetector";
@@ -165,6 +179,16 @@ class FourierSpectrumWindDetector
             m_parameters->addParameter("sigma", new FloatParameter("energy smoothing", 0.0, 10.0, 1));
             m_parameters->addParameter("T", new FloatParameter("energy threshold [%]", 0.0, 1, 0.8f));
             m_parameters->addParameter("hp", new FloatParameter("high-pass cut-off [%]", 0.0, 1, 0.2f));
+        }
+		
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "FourierSpectrumWindDetector"
+         */
+        QString typeName() const
+        {
+            return "FourierSpectrumWindDetector";
         }
         
         /**
@@ -248,6 +272,16 @@ class GradientHistogramWindDetector
         {	
             m_parameters->addParameter("sigma", new FloatParameter("gadient scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("T",     new FloatParameter("gradient-threshold", 0.0, 10.0, 1.0));
+        }
+		
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "GradientHistogramWindDetector"
+         */
+        QString typeName() const
+        {
+            return "GradientHistogramWindDetector";
         }
         
         /**
@@ -334,6 +368,12 @@ class StructureTensorWindDetector
             m_parameters->addParameter("sigma1", new FloatParameter("innner scale", 0.0, 10.0, 1.0));
             m_parameters->addParameter("sigma2", new FloatParameter("outer scale", 0.0, 10.0, 1.0));
         }
+		
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "StructureTensorWindDetector"
+         */
         QString typeName() const
         {
             return "StructureTensorWindDetector";
@@ -495,12 +535,20 @@ class WindDetectionModule: public Module
         }
 };
 
-} //end of namespace graipe
-
 /**
- *Interface to the ModuleHandler
+ * @}
  */
 
+} //end of namespace graipe
+
+
+/**
+ * @addtogroup graipe_winddetection
+ * @{
+ */
+
+#include <QtCore/QtGlobal>
+extern "C"{
 /**
  *  The initialization procedure returns a pointer to the
  *  FeatureDetectionModule (which inherits from Module) acutal
@@ -508,14 +556,15 @@ class WindDetectionModule: public Module
  *
  *	\return The pointer to a new instance of this module.
  */
-
-#include <QtCore/QtGlobal>
-extern "C"{
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::WindDetectionModule;
 	}
-}
+} //extern "C"
+
+/**
+ * @}
+ */
 
 
 
