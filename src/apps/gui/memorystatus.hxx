@@ -70,7 +70,15 @@
 #error "Cannot define getPeakRSS( ) or getCurrentRSS( ) for an unknown OS."
 #endif
 
+namespace graipe {
 
+/**
+ * @addtogroup graipe_gui
+ * @{
+ *
+ * @file
+ * @brief Header file for memory measurements of the graipe gui
+ */
 
 
 
@@ -161,3 +169,9 @@ size_t getCurrentRSS( )
 	return (size_t)0L;			/* Unsupported. */
 #endif
 }
+
+/**
+ * @}
+ */
+
+} //end of namespace graipe

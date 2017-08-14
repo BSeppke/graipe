@@ -162,9 +162,16 @@ class GlobalMotionCorrector
         }
 
     protected:
-        //Additional parameters
+        /** 
+         * @{
+         * 
+         * Additional parameters
+         */
         ImageBandParameter<float> * m_param_imageBand1;
         ImageBandParameter<float> * m_param_imageBand2;
+        /**
+         * @}
+         */
 };
 
 /** 

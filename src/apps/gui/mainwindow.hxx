@@ -55,6 +55,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_gui
+ * @{
+ *
+ * @file
+ * @brief Header file to the graipe gui mainwindow.
+ */
+ 
+/**
  * This is the MainWindow, the overall GUI controller. Here, nearly
  * everything is handled on the larger scale.
  *
@@ -69,9 +77,9 @@ public:
     /**
      * Constructor of main window.
      *
-     * \param parent The parent of this window. None by default.
-     * \param name The name of this window. None by default.
-     * \param flags Additional flags of this window. None by default.
+     * \param parent The parent of this window. NULL by default.
+     * \param name The name of this window. NULL by default.
+     * \param f Additional flags of this window. 0 by default.
      */
     MainWindow(QWidget* parent=NULL, const char* name=NULL, Qt::WindowFlags f=0);
 
@@ -153,7 +161,7 @@ protected slots:
     /**
      * This slot is called every time a new data item / Model shall be created.
      * 
-     * \param inxed The model's index in the modelFactory.
+     * \param index The model's index in the modelFactory.
      */
     void newModel(int index);
     
@@ -386,30 +394,25 @@ protected:
      bool eventFilter(QObject *, QEvent * evt);
 
 private:
-    /* 
-     *  Member variables
-     *****************************************************
-     */
-
-    //all GUI elements of this window (auto-created by Qtdesigner)
+    /** All GUI elements of this window (auto-created by Qtdesigner) **/
     Ui::MainWindowBase m_ui;
 
-    //the scene where the visual elements are placed at
+    /** The scene where the visual elements are placed at **/
     QGraphicsScene*	m_scene;
     
-    //a view to the scene above
+    /** A view to the scene above **/
     QGraphicsView* m_view;
 
-    //a printer (of the view)
+    /** a printer (of the view) **/
     QPrinter* m_printer;
 
-    //signal mapping for dynamically created models
+    /** Signal mapping for dynamically created models **/
     QSignalMapper* m_modSignalMapper;
     
-    //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
+    /** Signal mapping for dynamically loaded algorithms (and their dynamically created actions) **/
     QSignalMapper* m_algSignalMapper;
 
-    //Enum for easy handling of current view type:
+    /** Enum for easy handling of current view type: **/
     enum DisplayMode
     {
         ImageMode,
@@ -417,19 +420,32 @@ private:
     }
     m_displayMode;
     
+    /** Status and log window **/
     StatusWindow* m_status_window;
 
+    /** The directory with the settings **/
     QString m_settings_dir;
+    
+    /** The cdefault data directory **/
     QString m_default_dir;
     
+    /** Label for the memory usage **/
     QLabel * m_lblMemoryUsage;
     
+    /** List of recently opened file actions **/
     QList<QAction*> m_recentFileActions;
+    
+    /** The number of recently opened files **/
     const int       m_recentFileCount;
     
+    /** The currently used workspace **/
     Workspace* m_workspace;
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_GUI_MAINWINDOW_HXX

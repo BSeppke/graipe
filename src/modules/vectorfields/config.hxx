@@ -56,11 +56,14 @@ enum Vectorfield2DMotionDisplayMode
 
 #ifdef GRAIPE_VECTORFIELDS_BUILD
 	#if (defined(QT_DLL) || defined(QT_SHARED)) && !defined(QT_PLUGIN)
+        /** Set GRAIPE_VECTORFIELDS_EXPORT to export functions **/
 		#define GRAIPE_VECTORFIELDS_EXPORT Q_DECL_EXPORT
 	#else
+        /** Unset GRAIPE_VECTORFIELDS_EXPORT **/
 		#define GRAIPE_VECTORFIELDS_EXPORT
 	#endif
 #else
+    /** Set GRAIPE_VECTORFIELDS_EXPORT to import functions **/
 	#define GRAIPE_VECTORFIELDS_EXPORT Q_DECL_IMPORT
 #endif
 

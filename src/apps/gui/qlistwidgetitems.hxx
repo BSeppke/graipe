@@ -42,8 +42,16 @@
 
 #include <QListWidgetItem>
 
-
-
+namespace graipe {
+    
+/**
+ * @addtogroup graipe_gui
+ * @{
+ *
+ * @file
+ * @brief Implementation file to the graipe gui list items.
+ */
+ 
 
 /**
  * This file contains some specialized classes of QListWidget. They
@@ -55,10 +63,6 @@
  */
 
 
-
-
-namespace graipe {
-    
 /**
  * This class extends the basic QListWidgetItem class to have another member
  * variable: an assigned Model pointer. This can be used by the
@@ -95,7 +99,7 @@ public:
     Model* model() const;
     
 protected:
-    //The Model pointer
+    /** The Model pointer **/
     Model* m_model;
 };
 
@@ -113,10 +117,10 @@ public:
     /**
      * Default constructor of the QListWidgetViewItem class.
      *
-     * \param text A QString determining the text of this item. Dafaults to "".
-     * \param view A View pointer to the View attached to this item.
-     *             Note, that the ownership changes here - the View
-     *             will belong to the item after creation.
+     * \param text            A QString determining the text of this item. Dafaults to "".
+     * \param viewController  A View pointer to the View attached to this item.
+     *                        Note, that the ownership changes here - the View
+     *                        will belong to the item after creation.
      */
     QListWidgetViewControllerItem(QString text="", ViewController* viewController=NULL);
     
@@ -135,7 +139,7 @@ public:
     ViewController* viewController() const;
     
 protected:
-    //The View pointer
+    /** The ViewController pointer **/
     ViewController* m_viewController;
 };
 
@@ -168,10 +172,14 @@ public:
     Algorithm* algorithm() const;
 	
 protected:
-    //The algorithm pointer
+    /** The algorithm pointer **/
 	Algorithm* m_algorithm;
 };
     
+/**
+ * @}
+ */
+ 
 }//end of namespace graipe
 
 #endif //GRAIPE_GUI_QLISTWIDGETITEMS_HXX

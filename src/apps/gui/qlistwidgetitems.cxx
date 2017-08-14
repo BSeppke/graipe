@@ -38,27 +38,20 @@
 #include <QtDebug>
 
 namespace graipe {
-
 /**
- * Default constructor of the QListWidgetModelItem class.
- *
- * \param text  A QString determining the text of this item. Dafaults to "".
- * \param model A Model pointer to the model attached to this item.
- *              Note, that the ownership changes here - the model pointer
- *              will belong to the item after creation.
+ * @addtogroup graipe_gui
+ * @{
+ *     @file
+ *     @brief Implementation file to the graipe gui list items.
+ * @}
  */
+ 
 QListWidgetModelItem::QListWidgetModelItem(QString text, Model* model)
 :	QListWidgetItem(text),
     m_model(model)
 {
 }
 
-/**
- * Destructor of the QListWidgetModelItem class.
- * Since the item owns the model pointer, it will be deleted if the model is
- * not locked. If the model is locked, it will be kept alive but a debug 
- * message will be printed out.
- */
 QListWidgetModelItem::~QListWidgetModelItem()
 {
     if(m_model!=NULL)
@@ -75,29 +68,20 @@ QListWidgetModelItem::~QListWidgetModelItem()
     }
 }
 
-/**
- * Const accessor to the models pointer. You may change the model, but not 
- * pointer itself.
- *
- * \return the assigned Model pointer.
- */
 Model* QListWidgetModelItem::model() const
 {
     return m_model;
 }
 
-    
-    
-    
 
-/**
- * Default constructor of the QListWidgetViewControllerItem class.
- *
- * \param text A QString determining the text of this item. Dafaults to "".
- * \param viewController   A ViewController pointer to the View attached to this item.
- *                         Note, that the ownership changes here - the ViewController
- *                         will belong to the item after creation.
- */
+
+
+
+
+
+
+
+
 QListWidgetViewControllerItem::QListWidgetViewControllerItem(QString text, ViewController* viewController)
 :	QListWidgetItem(text),
     m_viewController(viewController)
@@ -108,10 +92,6 @@ QListWidgetViewControllerItem::QListWidgetViewControllerItem(QString text, ViewC
     }
 }
 
-/**
- * Destructor of the QListWidgetViewItem class.
- * Since the item owns the ViewController pointer, it will be deleted at destruction
- */
 QListWidgetViewControllerItem::~QListWidgetViewControllerItem()
 {
     if(m_viewController != NULL)
@@ -121,12 +101,6 @@ QListWidgetViewControllerItem::~QListWidgetViewControllerItem()
     }
 }
 
-/**
- * Const accessor to the ViewController pointer. You may change the ViewController, but not
- * the pointer itself.
- *
- * \return the assigned ViewController pointer.
- */
 ViewController* QListWidgetViewControllerItem::viewController() const
 {
     return m_viewController;
@@ -135,24 +109,17 @@ ViewController* QListWidgetViewControllerItem::viewController() const
 
 
 
-/**
- * Default constructor of the QListWidgetAlgorithmItem class.
- *
- * \param text A QString determining the text of this item. Dafaults to "".
- * \param alg  A Algorithm pointer to the Algorithm attached to this item.
- *             Note, that the ownership does not changes here.
- */
+
+
+
+
+
 QListWidgetAlgorithmItem::QListWidgetAlgorithmItem(QString text, Algorithm* alg )
 :	QListWidgetItem(text),
     m_algorithm(alg)
 {
 }
-/**
- * Const accessor to the Algorithm pointer. You may edit the Algorithm, but not
- * the pointer itself.
- *
- * \return the assigned Algorithm pointer.
- */
+
 Algorithm* QListWidgetAlgorithmItem::algorithm() const
 {
     return m_algorithm;

@@ -53,12 +53,13 @@
 namespace graipe {
 
 /**
- * Constructor of main window.
- *
- * \param parent The parent of this window. None by default.
- * \param name The name of this window. None by default.
- * \param flags Additional flags of this window. None by default.
+ * @addtogroup graipe_gui
+ * @{
+ *     @file
+ *     @brief Implementation file to the graipe gui mainwindow.
+ * @}
  */
+ 
 MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     QMainWindow(parent,f),
 	m_scene(NULL),
@@ -219,11 +220,6 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
 	
 }
 
-
-/** 
- * Destructor of the main window
- * Here we need to free all alocated memory
- */
 MainWindow::~MainWindow()
 {
     QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
@@ -260,9 +256,6 @@ MainWindow::~MainWindow()
     delete m_workspace;
 }
 
-/**
- * Resets the main window to an empty state witout any ViewControllers or Models
- */
 void MainWindow::reset()
 {
     //If at least one model is locked, give up:
@@ -289,9 +282,6 @@ void MainWindow::reset()
     m_workspace->clear();
 }
 
-/**
- * This slot is called to load a Model from file system.
- */
 void MainWindow::loadModel()
 {	
 	QFileDialog dialog(this, "Load models", m_default_dir, "GRAIPE models (*.xgz *.xml)");
@@ -322,9 +312,6 @@ void MainWindow::loadModel()
 	}		
 }
 
-/**
- * This slot is called to load a Model from the "Recent Models" list.
- */
 void MainWindow::loadRecentModel()
 {	
     QAction *action = qobject_cast<QAction *>(sender());
@@ -342,9 +329,6 @@ void MainWindow::loadRecentModel()
     }
 }
 
-/**
- * This slot is called by menu item: File->Print.
- */
 void MainWindow::print()
 {
     if ( !m_printer )
@@ -361,9 +345,6 @@ void MainWindow::print()
     }
 }
 
-/**
- * This slot is called by menu item: File->"Save as PDF".
- */
 void MainWindow::saveAsPDF()
 {
 	QString s = QFileDialog::getSaveFileName(this, QString("Save Image As PDF"),".",tr("Portable Document Format (*.pdf)"));
@@ -390,9 +371,6 @@ void MainWindow::saveAsPDF()
 	}	
 }
 
-/**
- * This slot is called by menu item: File->"Save as SVG".
- */
 void MainWindow::saveAsSVG()
 {
 	QString s = QFileDialog::getSaveFileName(this, QString("Save Image As SVG"),".",tr("Scalable Vector Format (*.svg)"));
@@ -422,41 +400,26 @@ void MainWindow::saveAsSVG()
 	}	
 }
 
-/**
- * This slot is called by menu item: View->"Zoom in".
- */
 void MainWindow::zoomIn()
 {
 	m_view->scale( 1.1, 1.1);
 }
 
-/**
- * This slot is called by menu item: View->"Zoom in".
- */
 void MainWindow::zoomOut()
 {
 	m_view->scale( 1.0/1.1, 1.0/1.1);
 }
 
-/**
- * This slot is called by menu item: View->"Normal size".
- */
 void MainWindow::normalSize()
 {	
 	m_view->setTransform(QTransform());
 }
 
-/**
- * This slot is called by menu item: Help->Help.
- */
 void MainWindow::help()
 {
     m_status_window->show(); 
 }
 
-/**
- * This slot is called by menu item: Help->About.
- */
 void MainWindow::about()
 {
     QMessageBox::about(this, "About GRAIPE",
@@ -469,11 +432,6 @@ void MainWindow::about()
                 "as the log under the menu item: Help.</p>");
 }
 
-/**
- * This slot is called every time a new data item / Model shall be created.
- *
- * \param inxed The model's index in the modelFactory.
- */
 void MainWindow::newModel(int index)
 {
     ModelFactoryItem item = m_workspace->modelFactory()[index];
@@ -504,12 +462,6 @@ void MainWindow::newModel(int index)
     }
 }
 
-/**
- * This slot is called by all registered algorithms. The parameter
- * (int id) corresponds to the index at the algorithm_factory.
- *
- * \param index The index of the algorithm at the algorithm_factory.
- */
 void MainWindow::runAlgorithm(int index)
 {
     using namespace ::std;
@@ -564,12 +516,6 @@ void MainWindow::runAlgorithm(int index)
     }
 }
 
-
-/**
- * This slot is called by changing the current irem in the ListView of active views.
- *
- * \param item The item, which is links to the next active ViewController.
- */
 void MainWindow::currentModelChanged(QListWidgetItem * item)
 {
     if(!item || !item->flags())
@@ -600,11 +546,6 @@ void MainWindow::currentModelChanged(QListWidgetItem * item)
     }
 }
 
-/**
- * This slot is called by changing the current irem in the ListView of active views.
- *
- * \param item The item, which is links to the next active ViewController.
- */
 void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
 {
     QListWidgetViewControllerItem* new_item  = static_cast<QListWidgetViewControllerItem*>(item);
@@ -643,9 +584,6 @@ void MainWindow::currentViewControllerChanged(QListWidgetItem * item)
 	}
 }
 
-/**
- * This slot is called by layer drag and drop inside the ListView of active views.
- */
 void MainWindow::layerPositionChange()
 {
 	for(int i=0; i< m_ui.listViews->count(); ++i)
@@ -672,9 +610,6 @@ void MainWindow::layerPositionChange()
 	}
 }
 
-/**
- * This slot updates the names of the models, if changed from the Models' properties.
- */
 void MainWindow::refreshModelNames()
 {
     for(int i=0; i!=m_ui.listModels->count(); i++)
@@ -716,9 +651,6 @@ void MainWindow::refreshModelNames()
     }
 }
 
-/**
- * This slot is called to show a Model using a ViewController.
- */
 void MainWindow::showCurrentModel()
 {
     using namespace ::std;
@@ -775,9 +707,6 @@ void MainWindow::showCurrentModel()
     }
 }
 
-/**
- * This slot is called to save the current Model.
- */
 void MainWindow::saveCurrentModel()
 {
 	using namespace std;
@@ -812,9 +741,6 @@ void MainWindow::saveCurrentModel()
 	}
 }
 
-/**
- * This slot is called to remove the current Model.
- */
 void MainWindow::removeCurrentModel()
 {
 	Model* model = currentModel();
@@ -851,9 +777,6 @@ void MainWindow::removeCurrentModel()
 	}
 }
 
-/**
- * This slot is called to center the graphicsview on the current ViewController.
- */
 void MainWindow::centerOnCurrentView()
 {
 	ViewController* view = currentViewController();
@@ -863,10 +786,7 @@ void MainWindow::centerOnCurrentView()
         m_view->centerOn(view);
     }
 }
-    
-/**
- * This slot is called to remove the current Model ViewController.
- */
+
 void MainWindow::removeCurrentViewController()
 {
 	ViewController* viewController = currentViewController();
@@ -889,9 +809,6 @@ void MainWindow::removeCurrentViewController()
 	}
 }
 
-/**
- * This slot is called to update the Model ViewController.
- */
 void MainWindow::updateView()
 {
 	for(int i=0;  i < m_ui.listViews->count(); ++i)
@@ -932,10 +849,7 @@ void MainWindow::updateView()
 	m_view->centerOn(scene_rect.center());
 	m_view->updateSceneRect(scene_rect);
 }
-    
-/**
- * This slot is called to save the complete workspace as a folder to the file system.
- */
+
 void MainWindow::saveWorkspace()
 {
     QString suggested_xmlFilename = QString("workspace_") + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm") + ".xgz";
@@ -947,11 +861,6 @@ void MainWindow::saveWorkspace()
     }
 }
 
-/**
- * This slot is called to save the complete workspace as a folder to the file system.
- *
- * \param dirname The dirname of the Workspace serialization.
- */
 void MainWindow::saveWorkspace(const QString& xmlFilename)
 {
     try
@@ -978,9 +887,6 @@ void MainWindow::saveWorkspace(const QString& xmlFilename)
     }
 }
 
-/**
- * This slot is called to restore the last workspace from a folder in the file system.
- */
 void MainWindow::restoreLastWorkspace()
 {
     if(     QFile(m_settings_dir).exists()
@@ -1019,9 +925,6 @@ void MainWindow::restoreLastWorkspace()
     }
 }
 
-/**
- * This slot is called to restore the complete workspace from a folder in the file system.
- */
 void MainWindow::restoreWorkspace()
 {
     QString xmlFilename = QFileDialog::getOpenFileName(this, tr("Open Workspace from file"));
@@ -1032,11 +935,6 @@ void MainWindow::restoreWorkspace()
     }
 }
 
-/**
- * This slot is called to restore the complete  from a folder in the file system.
- *
- * \param dirname The dirname of the Workspace serialization.
- */
 void MainWindow::restoreWorkspace(const QString& xmlFilename)
 {
     try
@@ -1072,14 +970,7 @@ void MainWindow::restoreWorkspace(const QString& xmlFilename)
         QMessageBox::about(this, tr("Error"),QString("Workspace was not restored!\n"));
     }
 }
-    
-/**
- * The slot creates a new Algorithm item on the Model list for an algorithm instance.
- * This item will persist until the processing is finished.
- *
- * \param alg An instance of teh algorithm to be performed.
- * \return The QListWidgetAlgorithmItem for the model list.
- */
+
 QListWidgetAlgorithmItem* MainWindow::getAlgorithmItem(Algorithm* alg)
 {
 	for(int i=0; i<m_ui.listModels->count(); i++)
@@ -1095,13 +986,6 @@ QListWidgetAlgorithmItem* MainWindow::getAlgorithmItem(Algorithm* alg)
 	return NULL;	
 }
 
-/**
- * This slot is called from a running algorithm to update its percentage and
- * status text.
- *
- * \param p The current percentage of execution.
- * \param str Status text.
- */
 void MainWindow::algorithmStateChanged(float p, QString str)
 {
 	Algorithm* alg = static_cast<Algorithm*> (sender());
@@ -1111,12 +995,6 @@ void MainWindow::algorithmStateChanged(float p, QString str)
 	item->setText(QString("%1: %2 (%3%)").arg(item->toolTip()).arg(str).arg(p));
 }
 
-/**
- * This slot is called from a running algorithm to indicate that it has reached a
- * critical error state.
- *
- * \param str The error text.
- */
 void MainWindow::algorithmErrorState(QString str)
 {
 	Algorithm* alg = static_cast<Algorithm*> (sender());
@@ -1130,10 +1008,6 @@ void MainWindow::algorithmErrorState(QString str)
     delete item;
 }
 
-/**
- * This slot is called from a running algorithm to indicate that it has
- * finished successfully.
- */
 void MainWindow::algorithmFinished()
 {
 	Algorithm* alg = static_cast<Algorithm*> (sender());
@@ -1148,37 +1022,21 @@ void MainWindow::algorithmFinished()
     delete item;
 }
 
-/**
- * This slot is called, whenever the text in the status bar needs to be updated.
- *
- * \param str The new text, to be displayed in the status bar.
- */
 void MainWindow::updateStatusText(QString str)
 {
 	this->statusBar()->showMessage(str);
 }
 
-/**
- * This slot is called, whenever the text in the lower right dockWidget needs to be updated.
- *
- * \param str The new text, to be displayed in the lower right dockWidget.
- */
 void MainWindow::updateStatusDescription(QString str)
 {
 	m_ui.lblStatusInformation->setText(str);
 }
 
-/**
- * Updates the display of the currently used memory.
- */
 void MainWindow::updateMemoryUsage()
 {
     m_lblMemoryUsage->setText(QString("%1 Models, %2 Views (Memory: %3 MB, max: %4 MB)").arg(m_workspace->models.size()).arg(m_workspace->viewControllers.size()).arg((float)(getCurrentRSS()>>10)/1024).arg((float)(getPeakRSS()>>10)/1024));
 }
 
-/**
- * Updates the recently used models list from GRAIPE settings file.
- */
 void MainWindow::updateRecentActionList()
 {
     QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
@@ -1211,11 +1069,6 @@ void MainWindow::updateRecentActionList()
     }
 }
 
-/**
- * Adds a filename to the recently used models list.
- * 
- * \param filename The filename of the model.
- */
 void MainWindow::addToRecentActionList(const QString &filename)
 {
     QSettings settings(m_settings_dir + "graipe.ini",QSettings::IniFormat);
@@ -1233,11 +1086,6 @@ void MainWindow::addToRecentActionList(const QString &filename)
     updateRecentActionList();
 }
 
-/**
- * Load a Model, given by its filename, from the file system.
- * 
- * \param filename The filename of the model.
- */
 void MainWindow::loadModel(const QString& filename)
 {
     if(!QFile(filename).exists())
@@ -1258,10 +1106,6 @@ void MainWindow::loadModel(const QString& filename)
     }
 }
 
-/**
- * Uses the graipe::core function to find and load all modules into the global factories.
- * Afterwards, it connects to all loaded models and algorithms in the factories.
- */
 void MainWindow::initializeFactories()
 {
     QString status;
@@ -1331,11 +1175,6 @@ void MainWindow::initializeFactories()
 	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));
 }
 
-/**
- * Accessor for the current Model.
- *
- * \return Pointer of the current model. NULL if none.
- */
 Model* MainWindow::currentModel()
 {
 	QListWidgetModelItem* item  = dynamic_cast<QListWidgetModelItem*>(m_ui.listModels->currentItem());
@@ -1350,11 +1189,6 @@ Model* MainWindow::currentModel()
     }
 }
 
-/**
- * The type of the current Model.
- *
- * \return The type of the current model. Empt if none.
- */
 QString MainWindow::currentModelType()
 {
     Model * model = currentModel();
@@ -1369,11 +1203,6 @@ QString MainWindow::currentModelType()
     }
 }
 
-/**
- * Accessor for the current ViewController.
- *
- * \return Pointer of the current ViewController. NULL if none.
- */
 ViewController* MainWindow::currentViewController()
 {
 	QListWidgetViewControllerItem* vc_item  = static_cast<QListWidgetViewControllerItem*>(m_ui.listViews->currentItem());
@@ -1388,11 +1217,6 @@ ViewController* MainWindow::currentViewController()
     }
 }
 
-/**
- * Accessor for the Model of the current ViewController.
- *
- * \return Pointer of the Model of the current ViewController. NULL if none.
- */
 Model* MainWindow::currentViewControllerModel()
 {
 	QListWidgetViewControllerItem* vc_item  = dynamic_cast<QListWidgetViewControllerItem*>(m_ui.listViews->currentItem());
@@ -1407,11 +1231,6 @@ Model* MainWindow::currentViewControllerModel()
     }
 }
 
-/**
- * The type of the Model of the current ViewController.
- *
- * \return  The type of the Model of the current ViewController. Empty if none.
- */
 QString MainWindow::currentViewControllerModelType()
 {
     Model * model = currentViewControllerModel();
@@ -1426,11 +1245,6 @@ QString MainWindow::currentViewControllerModelType()
     }
 }
 
-/**
- * Adds a given Model to the list of models.
- * 
- * \param model The model, which shall be added.
- */
 void MainWindow::addModelItemToList(Model* model)
 {
 	if(model)
@@ -1454,11 +1268,6 @@ void MainWindow::addModelItemToList(Model* model)
 	}
 }
 
-/**
- * Adds a given ViewController to the list of models.
- * 
- * \param viewController The ViewController, which shall be added.
- */
 void MainWindow::addViewControllerItemToSceneAndList(ViewController* viewController)
 {
     if (viewController && viewController->model())
@@ -1501,15 +1310,7 @@ void MainWindow::addViewControllerItemToSceneAndList(ViewController* viewControl
 	}
 }
 
-/**
- * To enable drag and drop of listwidget-entries, we use a global EventFilter
- * and the global timer, which checks for drags and drops.
- * From the design side, this is really ugly - but it works...
- *
- * \param evt The event itself
- * \return Always false.
- */
- bool MainWindow::eventFilter(QObject *, QEvent *evt)
+bool MainWindow::eventFilter(QObject *, QEvent *evt)
 {
     if( evt->type() == QEvent::Timer)
     {

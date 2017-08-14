@@ -90,16 +90,18 @@ static const QString full_version_name = QString("%1.%2.%3").arg(version_major).
  * such a configuration. It also includes commonly needed math functions.
  */
 
-
 #ifdef GRAIPE_CORE_BUILD
 	#if (defined(QT_DLL) || defined(QT_SHARED)) && !defined(QT_PLUGIN)
+        /** Set GRAIPE_CORE_EXPORT to export functions **/
 		#define GRAIPE_CORE_EXPORT Q_DECL_EXPORT
 	#else
+        /** Unset GRAIPE_CORE_EXPORT **/
 		#define GRAIPE_CORE_EXPORT
 	#endif
 #else
+    /** Set GRAIPE_CORE_EXPORT to import functions **/
 	#define GRAIPE_CORE_EXPORT Q_DECL_IMPORT
-#endif //GRAIPE_CORE_BUILD
+#endif
 
 /**
  * @}

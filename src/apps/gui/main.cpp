@@ -40,6 +40,14 @@
 #include <QDesktopWidget>
 
 /**
+ * @addtogroup graipe_gui
+ * @{
+ *
+ * @file
+ * @brief Main file of the graipe gui
+ */
+
+/**
  * This is the main method of the complete GRAIPE GUI application
  * everything starts here...
  *
@@ -75,3 +83,7 @@ int main(int argc, char** argv)
     QObject::connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
     return app.exec();
 }
+
+/**
+ * @}
+ */

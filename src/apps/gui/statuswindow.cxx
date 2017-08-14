@@ -41,12 +41,13 @@
 namespace graipe {
 
 /**
- * Default constructor of the status window.
- * 
- * \param parent The parent of the status window. If set,
- *               the window will be displayed modally.
- * \param flags  Other window flags.
+ * @addtogroup graipe_gui
+ * @{
+ *     @file
+ *     @brief Implementation file to the graipe gui statuswindow.
+ * @}
  */
+ 
 StatusWindow::StatusWindow(QWidget* parent, Qt::WindowFlags flags)
  :  QDialog(parent,flags),
     m_log_watcher(new QFileSystemWatcher)
@@ -60,31 +61,16 @@ StatusWindow::StatusWindow(QWidget* parent, Qt::WindowFlags flags)
 	connect(m_log_watcher, SIGNAL(fileChanged(const QString &)), this, SLOT(updateLog(const QString &)));
 }
 
-/**
- * Default destructor. We need to destroy all "new"ly-created
- * pointers of this class in here.
- */
 StatusWindow::~StatusWindow()
 {
     delete m_log_watcher;
 }
 
-/**
- * Slot to set or update the module status of GRAIPE.
- *
- * \param str the new status string.
- */
 void StatusWindow::updateStatus(const QString & str)
 {
 	m_ui.txtStatus->setText(str);
 }
 
-/**
- * Slot to set or update the log of GRAIPE.
- *
- * \param path The path to the file, where the FileSystemWatcher
- *             detected a change. Should always be the systems log-file.
- */
 void StatusWindow::updateLog(const QString & path)
 {
     QFile file(path);

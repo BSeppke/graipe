@@ -45,6 +45,13 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_gui
+ * @{
+ *
+ * @file
+ * @brief Header file to the graipe gui statuswindow.
+ */
 
 /**
  * A very basic status window wich is able to display a progress bar in
@@ -90,13 +97,17 @@ class StatusWindow
 		void updateLog(const QString & path);
 	
 	private:
-		//GUI elements of this window (auto-created by Qtdesigner)
+		/** GUI elements of this window (auto-created by Qtdesigner) **/
 		Ui::StatusWindowBase m_ui;
     
-        //Filesystem watcher to update the log view
+        /** Filesystem watcher to update the log view **/
         QFileSystemWatcher* m_log_watcher;
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_GUI_STATUSWINDOW_HXX

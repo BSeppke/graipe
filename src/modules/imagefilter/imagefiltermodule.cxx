@@ -43,6 +43,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_imagefilters
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the image filters' module
+ */
+ 
+/**
  * This class is the base class for all (window/convolution-based)
  * Image filters. It provides the selection of a border mode, but does
  * not implement any specific running phase.
@@ -93,7 +101,7 @@ class ImageFilter
         }
     
     protected:
-       //Class member for the reatment modes
+       /** Class member for the reatment modes **/
        QStringList m_border_treatment_modes;
 };
 
@@ -120,6 +128,12 @@ class FrostFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+        
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "FrostFilter"
+         */
         QString typeName() const
         {
             return "FrostFilter";
@@ -230,6 +244,12 @@ class EnhancedFrostFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+        
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "EnhancedFrostFilter"
+         */
         QString typeName() const
         {
             return "EnhancedFrostFilter";
@@ -342,6 +362,12 @@ class GammaMAPFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "GammaMAPFilter"
+         */
         QString typeName() const
         {
             return "GammaMAPFilter";
@@ -451,6 +477,12 @@ class KuanFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "KuanFilter"
+         */
         QString typeName() const
         {
             return "KuanFilter";
@@ -560,6 +592,12 @@ class LeeFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+        
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "LeeFilter"
+         */
         QString typeName() const
         {
             return "LeeFilter";
@@ -673,6 +711,12 @@ class EnhancedLeeFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "EnhancedLeeFilter"
+         */
         QString typeName() const
         {
             return "EnhancedLeeFilter";
@@ -782,6 +826,12 @@ class MedianFilter
             m_parameters->addParameter("bt", new EnumParameter("Border treatment", m_border_treatment_modes, 2));
             m_results.push_back(new Image<float>(wsp));
         }
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "MedianFilter"
+         */
         QString typeName() const
         {
             return "MedianFilter";
@@ -890,7 +940,12 @@ class ShockFilter
             m_parameters->addParameter("iterations", new IntParameter("Iterations", 1, 9999, 10));
             m_results.push_back(new Image<float>(wsp));
         }
-        
+    
+        /**
+         * Returns the name of this algorithm.
+         * 
+         * \return Always: "ShockFilter"
+         */
         QString typeName() const
         {
             return "ShockFilter";
@@ -1093,27 +1148,32 @@ class ImageFilterModule
         }
 };
 
-} //end of namespace graipe
-
 /**
- *Interface to the ModuleHandler
+ * @}
  */
 
+} //end of namespace graipe
+
+
 /**
- *  The initialization procedure returns a pointer to the
- *  ImageFilterModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
+ * @addtogroup graipe_imagefilters
+ * @{
  */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     *  The initialization procedure returns a pointer to the
+     *  ImageFilterModule (which inherits from Module) acutal
+     *  implementation of the class above
+     *
+     *	\return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::ImageFilterModule;
 	}
-}
+} //extern "C"
 
-
-
-
+/**
+ * @}
+ */

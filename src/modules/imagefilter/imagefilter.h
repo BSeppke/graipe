@@ -36,9 +36,22 @@
 #ifndef GRAIPE_IMAGEFILTER_H
 #define GRAIPE_IMAGEFILTER_H
 
+/**
+ * @defgroup graipe_imagefilters Image filters module
+ *
+ * @addtogroup graipe_imagefilters
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's image filters module
+ */
+
 //All filters have been pulled into VIGRA (since v.1.11.0):
 // #include <vigra/specklefilters.hsx>
 // #include <vigra/shockfilter.hxx>
 // #include <vigra/medianfilter.hxx>
 
+/**
+ * @}
+ */
 #endif

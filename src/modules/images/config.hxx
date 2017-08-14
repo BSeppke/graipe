@@ -50,11 +50,14 @@
 
 #ifdef GRAIPE_IMAGES_BUILD
 	#if (defined(QT_DLL) || defined(QT_SHARED)) && !defined(QT_PLUGIN)
+        /** Set GRAIPE_IMAGES_EXPORT to export functions **/
 		#define GRAIPE_IMAGES_EXPORT Q_DECL_EXPORT
 	#else
+        /** Unset GRAIPE_IMAGES_EXPORT **/
 		#define GRAIPE_IMAGES_EXPORT
 	#endif
 #else
+    /** Set GRAIPE_IMAGES_EXPORT to import functions **/
 	#define GRAIPE_IMAGES_EXPORT Q_DECL_IMPORT
 #endif
 

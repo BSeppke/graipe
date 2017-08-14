@@ -45,11 +45,14 @@
 
 #ifdef GRAIPE_RACERCLIENT_BUILD
 	#if (defined(QT_DLL) || defined(QT_SHARED)) && !defined(QT_PLUGIN)
+        /** Set GRAIPE_RACERCLIENT_EXPORT to export functions **/
 		#define GRAIPE_RACERCLIENT_EXPORT Q_DECL_EXPORT
 	#else
+        /** Unset GRAIPE_RACERCLIENT_EXPORT **/
 		#define GRAIPE_RACERCLIENT_EXPORT
 	#endif
 #else
+    /** Set GRAIPE_RACERCLIENT_EXPORT to import functions **/
 	#define GRAIPE_RACERCLIENT_EXPORT Q_DECL_IMPORT
 #endif
 
