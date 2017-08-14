@@ -56,6 +56,11 @@ namespace graipe {
  * @brief Header file for drawing single vectors
  */
 
+/**
+ * This class encapsulates the drawing of vectors by means of arrows with a triangle
+ * as arrow head. The line width and the head size might be set and the painting is
+ * carried out on arbitrary origin and target using a QPainter
+ */
 class GRAIPE_VECTORFIELDS_EXPORT VectorDrawer
 {
 public:

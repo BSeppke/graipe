@@ -69,6 +69,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameterBase
          * \param parent         If given (!= NULL), this parameter has a parent and will
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
+         * \param wsp            The workspace of this Parameter.
          */
         ImageBandParameterBase(QString name, Parameter* parent, bool invert_parent, Workspace* wsp);
             
@@ -127,13 +128,13 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameterBase
          */
         virtual void handleUpdateBandId() = 0;
     
-        //The parent delegate
+        /** The parent delegate **/
         QWidget* m_delegate;
     
-        //The delegate to select the image
+        /** The delegate to select the image **/
         QComboBox* m_cmbImage;
     
-        //The delegate to the select the image's band
+        /** The delegate to the select the image's band **/
         QSpinBox* m_spbBand;
 };
 
@@ -157,6 +158,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          * \param parent         If given (!= NULL), this parameter has a parent and will
          *                       be enabled/disabled, if the parent is a BoolParameter.
          * \param invert_parent  If true, the enables/disabled dependency to the parent will be swapped.
+         * \param wsp            The workspace of this Parameter.
          */
         ImageBandParameter(QString name, Parameter* parent, bool invert_parent, Workspace* wsp);
             
@@ -200,14 +202,14 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
         /**
          * Writing accessor of the current value of this parameter.
          *
-         * \param value The new value of this parameter.
+         * \param image The new image of this parameter.
          */
         void setImage(Image<T> * image);
     
         /**
          * Writing accessor of the current value of this parameter.
          *
-         * \param value The new value of this parameter.
+         * \param bandid The band id of the image of this parameter.
          */
         void setBandId(unsigned int bandid);
     
@@ -233,7 +235,7 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
         /**
          * Deserialization of a parameter's state from a string.
          *
-         * \param str The serialization of this parameter's state.
+         * \param xmlReader The xmlReader to read the serialization of this parameter's state from.
          * \return True, if the deserialization was successful, else false.
          */
         bool deserialize(QXmlStreamReader& xmlReader);
@@ -295,15 +297,18 @@ class GRAIPE_IMAGES_EXPORT ImageBandParameter
          */
         void handleUpdateBandId();
     
-        //The list of all available images (currently)
+        /** The list of all available images (currently) **/
         std::vector<Image<T>*>	m_allowed_images;
     
+        /** The selected image (or NULL if none) **/
         Image<T> * m_image;
+        /** The selected band id of the image (or -1 if none) **/
         unsigned int m_bandId;
 	
-        //The lock (if locked)
+        /** The lock (if locked) **/
         unsigned int m_lock;
-        
+    
+        /** The empty image, which will be returned if none is available **/
         vigra::MultiArray<2,T> m_empty_image;
 };
 

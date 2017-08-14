@@ -44,6 +44,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_analysis
+ * @{
+ *
+ * @file
+ * @brief Comparison functors and functions for the (vectorfields) analysis module
+ */
+
+/**
  * A small helper class to define weighted indexes.
  */
 class WeightedIndex
@@ -61,7 +69,10 @@ class WeightedIndex
 		}
     
         //Members, directly accessible from outside
+    
+        /** The index **/
         unsigned int idx;
+        /** the weight **/
 		double weight;
 };
 
@@ -170,6 +181,13 @@ class AverageAngularErrorFunctor
         }
 };
 
+
+
+
+/** 
+ * A functor class for comparison of directions with
+ * respect to their average velocity error.
+ */
 class AverageVelocityErrorFunctor
 :   public VectorDirectionErrorFunctor
 {
@@ -407,5 +425,10 @@ WeightedPointFeatureList2D* compareVectorfieldsGeneric( Vectorfield2D* vf,
 	return comparison;
 }
 
+/**
+ * @}
+ */
+
 } //end of namespace graipe
-#endif
+
+#endif //GRAIPE_ANALYSIS_VECTORFIELDCOMPARISON

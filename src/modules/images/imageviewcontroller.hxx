@@ -111,10 +111,14 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
         void hoverMoveEvent (QGraphicsSceneHoverEvent * event);
         
     private:
-        //Statistics
+        /** Statistics **/
         ImageStatistics<T>* m_stats;
     
-        //Additional parameters
+        /**
+         * @{
+         *
+         * Additional parameters
+         */
         FloatParameter*  m_minValue;
         BoolParameter*   m_transparentBelowMin;
         FloatParameter*  m_maxValue;
@@ -125,16 +129,20 @@ class GRAIPE_IMAGES_EXPORT ImageSingleBandViewController
         StringParameter* m_legendCaption;
         IntParameter*    m_legendTicks;
         IntParameter*    m_legendDigits;
+        /**
+         * @}
+         */
     
-        //Legend stuff
+        /** The intensity legend **/
         QLegend* m_intensity_legend;
-        QLinearGradient* m_gradient;
     
-        //Pointer to image (to avoid casts)
+        /** Pointer to image (to avoid casts) **/
         Image<T>* m_img;
     
-        //Qt image representation and used color table
+        /** Qt image representation **/
         QImage m_image;
+    
+        /** Qt representation of the used color table **/
         QVector<QRgb> m_ct;
 };
 
@@ -154,9 +162,7 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
          * Implementation/specialization of the ViewController's
          * constructor.
          *
-         * \param scene The scene, where this View shall be carried out.
-         * \param img The image, which we want to show.
-         * \param z_value The layer (z-coordinate) of our view. Defaults to zero.
+         * \param image The image, which we want to show.
          */
         ImageRGBViewController(Image<T>* image);
         
@@ -203,7 +209,11 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
         void hoverMoveEvent (QGraphicsSceneHoverEvent * event);
         
     private:
-        //Aditional parameters
+        /**
+         * @{
+         * 
+         * Aditional parameters
+         */
         FloatParameter* m_minValue;
         BoolParameter*  m_transparentBelowMin;
         FloatParameter* m_maxValue;
@@ -211,11 +221,14 @@ class GRAIPE_IMAGES_EXPORT ImageRGBViewController
         IntParameter*   m_redBandId;
         IntParameter*   m_greenBandId;
         IntParameter*   m_blueBandId;
+        /**
+         * @}
+         */
     
-        //Pointer to the image (to avoid casts)
+        /** Pointer to the image (to avoid casts) **/
         Image<T> * m_img;
         
-        //Qt image representation
+        /** Qt image representation **/
         QImage m_image;
 };
 

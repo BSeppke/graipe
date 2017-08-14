@@ -36,7 +36,21 @@
 #ifndef GRAIPE_ANALYSIS_H
 #define GRAIPE_ANALYSIS_H
 
+/**
+ * @defgroup graipe_analysis (Vectorfields) analysis module
+ *
+ * @addtogroup graipe_analysis
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's (vectorfields) analysis module
+ */
+
 #include "vectorfieldcomparison.hxx"
 #include "vectorfieldseparation.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_ANALYSIS_H

@@ -51,22 +51,55 @@ class QNetworkSession;
 
 namespace graipe {
 
-class Client : public QMainWindow
+/**
+ * This class implements a client for the graipe::server class.
+ * The client can log onto the server, load models and run algorithms on the models.
+ */
+class Client
+:   public QMainWindow
 {
     Q_OBJECT
 
 public:
+    /**
+     * Construction of a Client (to be used with a graipe::Server.
+     *
+     * \param parent Pointer to the QWidget parent, NULL on default.
+     */
     explicit Client(QWidget *parent = Q_NULLPTR);
 
 signals:
+    /** Signal, which is mapped by signalMapper after each algorithm click. **/
     void clickedAlgorithm(int);
 
 private slots:
+    /**
+     * Sends a model to the server.
+     *
+     * \param m The model to be sent.
+     */
     void sendModel(Model* m);
+    
+    /**
+     * Sends an algorithm to the server.
+     *
+     * \param alg The algorithm to be sent.
+     */
     void sendAlgorithm(Algorithm* alg);
     
+    /**
+     * Handler for reading incoming data.
+     */
     void readHandler();
+    
+    /**
+     * Handler for displaying socket errors.
+     */
     void displayError(QAbstractSocket::SocketError socketError);
+    
+    /**
+     * Registration of this client at a graipe::Server.
+     */
     void registerAtServer();
     
     /**
@@ -78,7 +111,20 @@ private slots:
     void runAlgorithm(int index);
 
 private:
+    /**
+     * Inline function to read a received Model, which will be send over TCP
+     *
+     * \param bytesToRead The total number of bytes for this model. This is 
+     *                    important, because Models are usually too large to fit 
+     *                    into one TCP package.
+     */
     inline void readModel(int bytesToRead);
+    
+    /**
+     * @{
+     *
+     * GUI stuff for the client
+     */
     QComboBox *m_cmbHost;
     QLineEdit *m_lnePort;
     
@@ -87,16 +133,23 @@ private:
     
     QLabel *m_lblStatus;
     QPushButton *m_btnLogin;
-
+    /** 
+     * @}
+     */
+    
+    /** The TCP socket of the client **/
     QTcpSocket *m_tcpSocket;
     
-    //signal mapping for dynamically loaded algorithms (and their dynamically created actions)
+    /** 
+     * Signal mapping for dynamically loaded algorithms
+     * (and their dynamically created actions)
+     */
     QSignalMapper* m_algSignalMapper;
     
-    //Env
+    /** The workspace of the client **/
     Workspace* m_workspace;
 };
 
 } //namespace graipe
 
-#endif
+#endif //GRAIPE_CLIENT_CLIENT_HXX

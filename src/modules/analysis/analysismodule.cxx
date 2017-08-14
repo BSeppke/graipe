@@ -43,6 +43,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_analysis
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the (vectorfield) analysis module
+ */
+
+/**
  * Simple algorithm to compute the mean of several dense vectorfields
  */
 class MeanVectorfield
@@ -52,6 +60,8 @@ class MeanVectorfield
         /**
          * Default constructor for the dense mean vectorfield computation.
          * Initializes only one parameter - the vectorfield selection
+         *
+         * \param wsp The workspace of this algorithm.
          */
         MeanVectorfield(Workspace* wsp)
         : Algorithm(wsp)
@@ -59,6 +69,11 @@ class MeanVectorfield
             m_parameters->addParameter("vf", new MultiModelParameter("(Dense) Vectorfields",  "DenseVectorfield2D", NULL, false, wsp));
         }
     
+        /**
+         * Returns the name of this Algorithm.
+         * 
+         * \return Always: "MeanVectorfield"
+         */
         QString typeName() const
         {
             return "MeanVectorfield";
@@ -144,6 +159,7 @@ class MeanVectorfield
             }
         }
 };
+
 /**
  * Creates a dense mean vectorfield algorithm instance.
  *
@@ -167,6 +183,8 @@ class Vectorfield2DDenseModelComparison
     public:
         /**
          * Default constructor. Initialized additional parameters.
+         *
+         * \param wsp The workspace of this algorithm.
          */
         Vectorfield2DDenseModelComparison(Workspace* wsp)
         : Algorithm(wsp)
@@ -176,6 +194,11 @@ class Vectorfield2DDenseModelComparison
             m_parameters->addParameter("degree", new IntParameter("Use spline interpolation of degree", 0, 5,1));
         }
     
+        /**
+         * Returns the name of this Algorithm.
+         * 
+         * \return Always: "Vectorfield2DDenseModelComparison"
+         */
         QString typeName() const
         {
             return "Vectorfield2DDenseModelComparison";
@@ -326,6 +349,8 @@ class Vectorfield2DGenericComparison
     public:
         /**
          * Default constructor. Initialized additional parameters.
+         *
+         * \param wsp The workspace of this algorithm.
          */
         Vectorfield2DGenericComparison(Workspace* wsp)
         : Algorithm(wsp)
@@ -335,6 +360,11 @@ class Vectorfield2DGenericComparison
             m_parameters->addParameter("n", new IntParameter("use n nearest neighbors in reference vf", 0, 100));
         }
     
+        /**
+         * Returns the name of this Algorithm.
+         * 
+         * \return Always: "Vectorfield2DGenericComparison"
+         */
         QString typeName() const
         {
             return "Vectorfield2DGenericComparison";
@@ -441,6 +471,8 @@ class Vectorfield2DSeparation
     public:
         /**
          * Default constructor. Initializes only one additional parameter, the vectorfield.
+         *
+         * \param wsp The workspace of this algorithm.
          */
         Vectorfield2DSeparation(Workspace* wsp)
         : Algorithm(wsp)
@@ -448,6 +480,11 @@ class Vectorfield2DSeparation
             m_parameters->addParameter("vf", new ModelParameter("Vectorfield", "SparseVectorfield2D | SparseWeightedVectorfield2D | SparseMultiVectorfield2D | SparseWeightedMultiVectorfield2D | DenseVectorfield2D | DenseWeightedVectorfield2D", NULL, false, wsp));
         }
     
+        /**
+         * Returns the name of this Algorithm.
+         * 
+         * \return Always: "Vectorfield2DSeparation"
+         */
         QString typeName() const
         {
             return "Vectorfield2DSeparation";
@@ -545,6 +582,8 @@ class Vectorfield2DCurl
     public:
         /**
          * Default constructor. Initializes only one additional parameter, the vectorfield.
+         *
+         * \param wsp The workspace of this algorithm.
          */
         Vectorfield2DCurl(Workspace* wsp)
         : Algorithm(wsp)
@@ -553,6 +592,11 @@ class Vectorfield2DCurl
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
     
+        /**
+         * Returns the name of this Algorithm.
+         * 
+         * \return Always: "Vectorfield2DCurl"
+         */
         QString typeName() const
         {
             return "Vectorfield2DCurl";
@@ -650,6 +694,8 @@ class Vectorfield2DDiv
     public:
         /**
          * Default constructor. Initializes only one additional parameter, the vectorfield.
+         *
+         * \param wsp The workspace of this algorithm.
          */
         Vectorfield2DDiv(Workspace* wsp)
         : Algorithm(wsp)
@@ -658,6 +704,11 @@ class Vectorfield2DDiv
             m_parameters->addParameter("sigma", new FloatParameter("Sigma for gaussian gradient:",	0.5, 100, 1));
         }
     
+        /**
+         * Returns the name of this Algorithm.
+         * 
+         * \return Always: "Vectorfield2DCurl"
+         */
         QString typeName() const
         {
             return "Vectorfield2DDiv";
@@ -849,27 +900,33 @@ class AnalysisModule
         }
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 
 /**
- *Interface to the ModuleHandler
- */
-
-/**
- *  The initialization procedure returns a pointer to the
- *  FeatureDetectionModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	@return the pointer to the plugin 
+ * @addtogroup graipe_analysis
+ * @{
  */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     * The initialization procedure returns a pointer to the
+     * FeatureDetectionModule (which inherits from Module) acutal
+     * implementation of the class above
+     *
+     *	\return the pointer to the plugin 
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::AnalysisModule;
 	}
-}
+} //extern "C"
 
-
+/**
+ * @}
+ */
 

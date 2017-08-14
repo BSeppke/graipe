@@ -54,19 +54,22 @@ namespace graipe {
  * @brief Implementation file for image import and export functionality
  */
 
-/** 
- * @{
+/**
  * Type traits for converting standard C++ types
  * to GDAL type identifier using templates only.
  * The template parameter T is denotes the C++ type here.
  */
-template <class T> struct GDALTraits                { static GDALDataType gdalTypeID() { return GDT_Unknown; } };
-template <>        struct GDALTraits<float>         { static GDALDataType gdalTypeID() { return GDT_Float32; } };
-template <>        struct GDALTraits<int>           { static GDALDataType gdalTypeID() { return GDT_Int32;   } };
-template <>        struct GDALTraits<unsigned char> { static GDALDataType gdalTypeID() { return GDT_Byte;    } };
-/**
- * @}
- */
+template <class T> struct GDALTraits                { /** the corresponding GDAL type **/ static GDALDataType gdalTypeID() { return GDT_Unknown; } };
+
+/** Spacialization for floats **/
+template <>        struct GDALTraits<float>         { /** the corresponding GDAL type **/  static GDALDataType gdalTypeID() { return GDT_Float32; } };
+
+/** Spacialization for ints **/
+template <>        struct GDALTraits<int>           { /** the corresponding GDAL type **/  static GDALDataType gdalTypeID() { return GDT_Int32;   } };
+
+/** Spacialization for unsigned chars **/
+template <>        struct GDALTraits<unsigned char> { /** the corresponding GDAL type **/  static GDALDataType gdalTypeID() { return GDT_Byte;    } };
+
 
 /**
  * Template function for the filling of image contents using the data that are

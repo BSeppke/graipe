@@ -342,24 +342,21 @@ class ImagesModule
 /**
  * @addtogroup graipe_images
  * @{
- *
- * Interface to the ModuleHandler
- */
-
-/**
- *  The initialization procedure returns a pointer to the
- *  ImagesModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
  */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     * The initialization procedure returns a pointer to the
+     * ImagesModule (which inherits from Module) acutal
+     * implementation of the class above
+     *
+     * \return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::ImagesModule;
 	}
-}
+} //extern "C"
 
 /**
  * @}

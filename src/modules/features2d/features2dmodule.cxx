@@ -44,6 +44,8 @@ namespace graipe {
  *
  * @file
  * @brief Implementation file for the 2d feature's module
+ *
+ * The 2d feature's module, which contains all feature types and their visiualizations.
  */
  
 /**
@@ -420,26 +422,23 @@ class Features2DModule
  * @addtogroup graipe_features2d
  * @{
  *
- * Interface to the ModuleHandler
- */
-
-/**
- *  The initialization procedure returns a pointer to the
- *  ImageModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return the pointer to the module 
  */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     * The initialization procedure returns a pointer to the
+     * ImageModule (which inherits from Module) acutal
+     * implementation of the class above
+     *
+     * \return the pointer to the module
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::Features2DModule;
 	}
-}
-
+} //extern "C"
 
 /**
  * @}
  */
-
+ 

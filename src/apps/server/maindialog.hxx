@@ -44,23 +44,48 @@ class QLabel;
 
 namespace graipe {
 
-class MainDialog : public QWidget
+/**
+ * GUI class for the server.
+ */
+class MainDialog
+:   public QWidget
 {
     Q_OBJECT
 
 public:
+    /** 
+     * Creates a new GUI class for the server.
+     * 
+     * \param parent the parent of this dialog. NULL by default.
+     */
     MainDialog(QWidget *parent = 0);
 
 public slots:
+    /**
+     * This slot is called on every update of a client (e.g. after a successful login).
+     */
     void updateClientStatus();
+    
+    /**
+     * This slot updates the server log.
+     */
     void updateLog();
 
 private:
+    /** 
+     * @{
+     *
+     * GUI Widgets
+     */
     QLabel* m_lblClientStatus;
     QTextEdit* m_txtLog;
     
     QPushButton *m_btnQuit;
+    /**
+     * @}
+     */
     
+    /** The server **/
     Server* m_server;
 };
 

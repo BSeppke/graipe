@@ -514,18 +514,18 @@ void SparseMultiVectorfield2D::addVector(const PointType& orig, const PointType&
     addVector(orig, dir, std::vector<PointType>(alternatives()));
 }
 
-void SparseMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, const std::vector<SparseMultiVectorfield2D::PointType>& dirs)
+void SparseMultiVectorfield2D::addVector(const PointType& orig, const PointType& dir, const std::vector<PointType>& alt_dirs)
 {
 	if(locked())
         return;
     
     std::vector<PointType> new_vec(alternatives());
     
-    unsigned int min_count = std::min(alternatives(), (unsigned int)dirs.size());
+    unsigned int min_count = std::min(alternatives(), (unsigned int)alt_dirs.size());
     
     for (unsigned int alt_index=0; alt_index<min_count; ++alt_index)
     {
-        new_vec[alt_index] = dirs[alt_index];
+        new_vec[alt_index] = alt_dirs[alt_index];
     }
     m_alt_directions.push_back(new_vec);
     

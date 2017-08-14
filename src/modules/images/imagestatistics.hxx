@@ -79,9 +79,10 @@ class GRAIPE_IMAGES_EXPORT ImageStatistics
         std::vector<BasicStatistics<double> > intensityStats() const;
     
     protected:
-        //The image
+        /** The image **/
         const Image<T>* m_image;
-        //The intensity statistics (band-wise)
+    
+        /** The intensity statistics (band-wise) **/
         std::vector<BasicStatistics<double> > m_intensityStats;
 };
 

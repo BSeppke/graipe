@@ -42,6 +42,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_analysis
+ * @{
+ *
+ * @file
+ * @brief Vectorfield splitting functions for the (vectorfields) analysis module
+ */
+
+/**
  * Estimate a global motion matrix (rotation and translation) from a 
  * vectorfield of any kind by using mean square error solution of the 
  * corresponding system of linear equations.
@@ -114,6 +122,10 @@ VECTORFIELD_CLASS* computeGlobalMotionOfVectorfield(const VECTORFIELD_CLASS* vf)
 							  
 	return result_vf;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

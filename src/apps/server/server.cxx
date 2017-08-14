@@ -74,7 +74,7 @@ void Server::connectionUserAuth(qintptr socketDescriptor, QString user)
         if(m_connections[i].socketDescriptor == socketDescriptor)
         {
             m_connections[i].user = user;
-    emit statusChanged();
+            emit statusChanged();
             break;
         }
     }
