@@ -38,7 +38,6 @@
 
 namespace graipe {
 
-
 /**
  * @addtogroup graipe_vectorfields
  * @{

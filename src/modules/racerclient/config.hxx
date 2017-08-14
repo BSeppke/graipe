@@ -35,6 +35,14 @@
 
 #include <QtCore/QtGlobal>
 
+/**
+ * @addtogroup graipe_racerclient
+ * @{
+ *
+ * @file
+ * @brief Configuration file to the racerclient module
+ */
+
 #ifdef GRAIPE_RACERCLIENT_BUILD
 	#if (defined(QT_DLL) || defined(QT_SHARED)) && !defined(QT_PLUGIN)
 		#define GRAIPE_RACERCLIENT_EXPORT Q_DECL_EXPORT
@@ -44,3 +52,7 @@
 #else
 	#define GRAIPE_RACERCLIENT_EXPORT Q_DECL_IMPORT
 #endif
+
+/**
+ * @}
+ */

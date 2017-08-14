@@ -1436,7 +1436,9 @@ Algorithm* createImageResizer(Workspace* wsp)
 	return new ImageResizer(wsp);
 }
 
-
+/**
+ * This algorithm computes a simple image inversion w.r.t. a given value.
+ */
 class ImageInverter
 :   public Algorithm
 {

@@ -48,7 +48,7 @@ namespace graipe {
  * @{
  *
  * @file
- * @brief Header file for a coneection with the Racer DL
+ * @brief Header file for a connection with the Racer DL
  */
  
 /**

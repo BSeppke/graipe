@@ -15,12 +15,28 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_featuredetection
+ * @{
+ *
+ * @file
+ * @brief Header file for the implementation SIFT feature detection
+ */
+ 
+/** 
+ * A simple struct holding a SIFT feature
+ */
 struct SIFTFeature
 {
+    /** subpixel position **/
     vigra::TinyVector<float,2> position;
+    /** interpolated scale **/
     float scale;
+    /** contrast **/
     float contrast;
+    /** orientatio **/
     float orientation;
+    /** the rotated HOG **/
     std::vector<float> descriptor;
 };
 
@@ -213,7 +229,7 @@ std::vector<float> computeOrientationHistogram(const vigra::MultiArray<2,T> & im
 /**
  * Inline function to fill the final discriptor histograms for a given feature.
  *
- * \param img Constant reference to the image.
+ * \param siv Constant reference to the image.
  * \param feature Const reference to the sift feature. Position and orientation will used.
  * \param blocks The block count (defaults to 4x4=16).
  * \param block_size The size of each block (defaults to 4x4=16)
@@ -275,6 +291,7 @@ inline std::vector<float>  computeSIFTHistograms(const vigra::SplineImageView<OR
 /**
  * The main SIFT method. Computes the feature descriptors.
  *
+ * \param image The input image.
  * \param sigma The (gaussian scale) sigma by means of a scale step. Defaults to 1.0
  * \param octaves The number of octaves. If zero (=default), it will auto-estimate using a min size of 8x8
  * \param levels The number of levels per octave, for which keypoint may be found
@@ -284,10 +301,11 @@ inline std::vector<float>  computeSIFTHistograms(const vigra::SplineImageView<OR
  * \param normalize_image It true, the image will be normalized to 0..1 first.
  * \return The representation of a vector of single SIFT features, which are vectors, too.
  *         Each vector is ordered as follows:
- *              0  1    2      3        4            5            ......           132
- *              x  y  scale  angle   contrast  hist:block0_bin0   ......  hist:block15_bin7
- *                           (deg.)
- *
+ * \verbatim
+               0  1    2      3        4            5            ......           132
+               x  y  scale  angle   contrast  hist:block0_bin0   ......  hist:block15_bin7
+                            (deg.)
+    \endverbatim
  */
 template <class T>
 std::vector<SIFTFeature> computeSIFTDescriptors(const vigra::MultiArrayView<2,T> & image,
@@ -486,6 +504,10 @@ std::vector<SIFTFeature> computeSIFTDescriptors(const vigra::MultiArrayView<2,T>
     
     return result;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

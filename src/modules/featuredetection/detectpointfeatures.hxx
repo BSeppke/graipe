@@ -51,15 +51,23 @@
 #include <algorithm>
 
 namespace graipe {
-    
+/**
+ * @addtogroup graipe_featuredetection
+ * @{
+ *
+ * @file
+ * @brief Header file for general detection of 2d features (excl. SIFT)
+ */
+
 /** 
  * Feature detection using Thresholding
  * These functions will extract a list of pointfeatures from an image.
  * A featurepoint is added each time the pixel value v=src(x,y): v>=lower and v<=upper
  *
- * \param src The source image.
- * \param lower The lower treshold. The pixel value has to be at least of this value.
- * \param upper The upper treshold. The pixel value has to be at max. of this value.
+ * \param src    The source image.
+ * \param lower  The lower treshold. The pixel value has to be at least of this value.
+ * \param upper  The upper treshold. The pixel value has to be at max. of this value.
+ * \param wsp    The workspace of the detection.
  * \return A weighted featurelist, where each passing pixels is one feature, weighted with
  *         The pixels value.
  */
@@ -92,10 +100,11 @@ WeightedPointFeatureList2D* detectFeaturesUsingThreshold(const vigra::MultiArray
  * A featurepoint is added each time if the pixel is not masked (masx(x,y)!=0),
  * and the pixel value v=src(x,y): v>=lower and v<=upper
  *
- * \param src The source image.
- * \param mask The mask image.
- * \param lower The lower treshold. The pixel value has to be at least of this value.
- * \param upper The upper treshold. The pixel value has to be at max. of this value.
+ * \param src    The source image.
+ * \param mask   The mask image.
+ * \param lower  The lower treshold. The pixel value has to be at least of this value.
+ * \param upper  The upper treshold. The pixel value has to be at max. of this value.
+ * \param wsp    The workspace of the detection.
  * \return A weighted featurelist, where each passing pixels is one feature, weighted with
  *         The pixels value.
  */
@@ -162,10 +171,11 @@ void monotony_operator(const vigra::MultiArrayView<2,T> & src, vigra::MultiArray
  * the degree of monotony of the image given a certain offset.
  * Afterwards, a featurepoint is added each time the monotony n: n>=lowest_level and n<=highest_level-
  *
- * \param src The source image.
- * \param lowest_level the lowest allowed level of monotony.
- * \param highest_level the highest allowed level of monotony.
- * \param offset The offset in x- and y-direction of the neighbors. Defaults to 1.
+ * \param src             The source image.
+ * \param lowest_level    The lowest allowed level of monotony.
+ * \param highest_level   The highest allowed level of monotony.
+ * \param monotony_offset The offset in x- and y-direction of the neighbors. Defaults to 1.
+ * \param wsp             The workspace of the detection.
  * \return Weighted Point feature list for every Monotony feature, which passes the 
  *         above thresholds. The weight is defined as the monotony class.
  */
@@ -188,10 +198,12 @@ WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperator(const vigra::Mul
  * the degree of monotony of the image given a certain offset.
  * Afterwards, a featurepoint is added each time the monotony n: n>=lowest_level and n<=highest_level-
  *
- * \param src The source image.
- * \param lowest_level the lowest allowed level of monotony.
- * \param highest_level the highest allowed level of monotony.
- * \param offset The offset in x- and y-direction of the neighbors. Defaults to 1.
+ * \param src              The source image.
+ * \param mask             The mask image.
+ * \param lowest_level     The lowest allowed level of monotony.
+ * \param highest_level    The highest allowed level of monotony.
+ * \param monotony_offset  The offset in x- and y-direction of the neighbors. Defaults to 1.
+ * \param wsp              The workspace of the detection.
  * \return Weighted Point feature list for every Monotony feature, which passes the 
  *         above thresholds. The weight is defined as the monotony class.
  */
@@ -219,9 +231,10 @@ WeightedPointFeatureList2D* detectFeaturesUsingMonotonyOperatorWithMask(const vi
  * This function will extract a list of 2d-weighted-features from an image.
  * The weight is given by the response of the corresponding pixels.
  *
- * \param src The source image.
- * \param scale The (gaussian sigma) scale used for the Harris operator.
- * \param threhsold The minimal response, for which a feaure will be created. Defaults to 0.
+ * \param src       The source image.
+ * \param scale     The (gaussian sigma) scale used for the Harris operator.
+ * \param threshold The minimal response, for which a feaure will be created. Defaults to 0.
+ * \param wsp       The workspace of the detection.
  * \return Weighted point featurelist. The list of local maxima of the Harris operator
  *         with reponses above the given threshold.
  */
@@ -267,9 +280,11 @@ WeightedPointFeatureList2D* detectFeaturesUsingHarris(const vigra::MultiArrayVie
  * This function will extract a list of 2d-weighted-features from an image part under the mask.
  * The weight is given by the response of the corresponding pixels.
  *
- * \param src The source image.
- * \param scale The (gaussian sigma) scale used for the Harris operator.
+ * \param src       The source image.
+ * \param mask      The mask image.
+ * \param scale     The (gaussian sigma) scale used for the Harris operator.
  * \param threshold The minimal response, for which a feaure will be created. Defaults to 0.
+ * \param wsp       The workspace of the detection.
  * \return Weighted point featurelist. The list of local maxima of the Harris operator
  *         with reponses above the given threshold and under the mask.
  */
@@ -320,9 +335,10 @@ WeightedPointFeatureList2D* detectFeaturesUsingHarrisWithMask(const vigra::Multi
  * Feature detection using the Canny Edge operator.
  * This functions will extract a list of 2d-edgel-features from an image.
  *
- * \param src The source image.
- * \param scale The (gaussian sigma) scale used for the Canny operator.
+ * \param src       The source image.
+ * \param scale     The (gaussian sigma) scale used for the Canny operator.
  * \param threshold The minimal response, for which a feaure will be created. Defaults to 0.
+ * \param wsp       The workspace of the detection.
  * \return Edgel point featurelist. The list of all found canny edgels at given scale over the threshold.
  */
 template <class T>
@@ -353,9 +369,11 @@ EdgelFeatureList2D* detectFeaturesUsingCanny(const vigra::MultiArrayView<2,T>& s
  * Feature detection using the Canny Edge operator and a mask.
  * This functions will extract a list of 2d-edgel-features from an image under the mask.
  *
- * \param src The source image.
- * \param scale The (gaussian sigma) scale used for the Canny operator.
+ * \param src       The source image.
+ * \param mask      The mask image.
+ * \param scale     The (gaussian sigma) scale used for the Canny operator.
  * \param threshold The minimal response, for which a feaure will be created. Defaults to 0.
+ * \param wsp       The workspace of the detection.
  * \return Edgel point featurelist. The list of all found canny edgels at given scale over the threshold.
  */
 template <class T, class M>
@@ -383,6 +401,10 @@ EdgelFeatureList2D* detectFeaturesUsingCannyWithMask(const vigra::MultiArrayView
 	return  edgels;
 }
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_FEATUREDETECTION_DETECTPOINTFEATURES_HXX

@@ -36,8 +36,21 @@
 #ifndef GRAIPE_FEATUREDETECTION_H
 #define GRAIPE_FEATUREDETECTION_H
 
+/**
+ * @defgroup graipe_featuredetection Two-dimensional feature detection module
+ *
+ * @addtogroup graipe_featuredetection
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's  2d feature detection module
+ */
+
 #include "featuredetection/detectpointfeatures.hxx"
 #include "featuredetection/detectsiftfeatures.hxx"
 #include "featuredetection/sift.hxx"
 
+/**
+ * @}
+ */
 #endif

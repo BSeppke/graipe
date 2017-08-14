@@ -43,6 +43,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_featuredetection
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the feature detection module
+ */
+
+/**
  * This algorithm computes the features as monotony class members.
  */
 class MonotonyFeatureDetector
@@ -62,11 +70,16 @@ class MonotonyFeatureDetector
             m_parameters->addParameter("hiM",    new IntParameter("Highest Monotony class", 0,8, 8));
         }
 	
-    
+        /** 
+         * The typename of this algorithm
+         *
+         * \return Always: "MonotonyFeatureDetector"
+         */
         QString typeName() const
         {
             return "MonotonyFeatureDetector";
         }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -178,11 +191,16 @@ class HarrisCornerDetector
             m_parameters->addParameter("T",     new FloatParameter("Corner response threshold", 0,999999, 0));
         }
 	
-    
+        /** 
+         * The typename of this algorithm
+         *
+         * \return Always: "HarrisCornerDetector"
+         */
         QString typeName() const
         {
             return "HarrisCornerDetector";
         }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -290,12 +308,17 @@ class CannyFeatureDetector
             m_parameters->addParameter("sigma",  new FloatParameter("Canny Scale", 0,9999999, 0));
             m_parameters->addParameter("sigmaT", new FloatParameter("Canny (gradient strength) threshold", 0,9999999, 0));
         }
-        
     
+        /** 
+         * The typename of this algorithm
+         *
+         * \return Always: "CannyFeatureDetector"
+         */
         QString typeName() const
         {
             return "CannyFeatureDetector";
         }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -400,12 +423,17 @@ class CannyFeatureLengthFilter
             m_parameters->addParameter("min-length", new FloatParameter("Minimal Edgel length", 0,9999999, 0));
             m_parameters->addParameter("radius",     new FloatParameter("Search radius for Edgel-unions", 0,9999999, 1.5));
         }
-        
-    
+	
+        /** 
+         * The typename of this algorithm
+         *
+         * \return Always: "CannyFeatureLengthFilter"
+         */
         QString typeName() const
         {
             return "CannyFeatureLengthFilter";
         }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -568,11 +596,16 @@ class SIFTFeatureDetector
             m_parameters->addParameter("norm",      new BoolParameter("normalize image to 0..1", true));
         }
 	
-    
+        /** 
+         * The typename of this algorithm
+         *
+         * \return Always: "SIFTFeatureDetector"
+         */
         QString typeName() const
         {
             return "SIFTFeatureDetector";
         }
+    
         /**
          * Specialization of the running phase of this algorithm.
          */
@@ -752,27 +785,33 @@ class FeatureDetectionModule
         }
 };
 
-} //end of namespace graipe
-    
 /**
- *Interface to the ModuleHandler
+ * @}
+ */
+ 
+} //end of namespace graipe
+   
+/**
+ * @addtogroup graipe_featuredetection
+ * @{
  */
 
-/**
- *  The initialization procedure returns a pointer to the
- *  FeatureDetectionModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
- */
 #include <QtCore/QtGlobal>
 extern "C"{
+
+    /**
+     * The initialization procedure returns a pointer to the
+     * FeatureDetectionModule (which inherits from Module) acutal
+     * implementation of the class above
+     *
+     * \return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::FeatureDetectionModule;
 	}
 }
 
-
-
-
+/**
+ * @}
+ */

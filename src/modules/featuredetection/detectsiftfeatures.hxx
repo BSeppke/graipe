@@ -51,27 +51,33 @@
 #include <QVector>
 
 namespace graipe {
+/**
+ * @addtogroup graipe_featuredetection
+ * @{
+ *
+ * @file
+ * @brief Header file for the SIFT calling fucntion
+ */
     
 /**
  * This is just a simple wrapper to keep the STL & VIGRA part of the
  * SIFT implementation away from the Qt and other stuff.
  * The STL containers will be used and converted into GRAIPE's data structures.
  *
- * \param src The image, for which we want to compute SIFT features.
- * \param sigma The sigma for one octave (sigma -> 2*sigma). Defaults to 1.
- * \param octaves The count of octaves. If zero, the number will be estimated 
- *        using the image size. Defaults to 0.
- * \param octaves The count of intra-octave levels. Defaults to 3.
- * \param contrast_threshold The minimal realtive contrast (0..1) of a feature point.
- *        Defaults to 0.03.
+ * \param src                 The image, for which we want to compute SIFT features.
+ * \param sigma               The sigma for one octave (sigma -> 2*sigma). Defaults to 1.
+ * \param octaves             The count of octaves. If zero, the number will be estimated
+ *                            using the image size. Defaults to 0.
+ * \param levels              The count of intra-octave levels. Defaults to 3.
+ * \param contrast_threshold  The minimal realtive contrast (0..1) of a feature point.
+ *                            Defaults to 0.03.
  * \param curvature_threshold The minimal curvature by means of and inner circle's 
- *        radius in pixels. Defaults to 10.
- * \param double_image_size If true, the lowest octave will start are 2*width, 2*height of the image.
- * \param normalize_image If true, the image will be normalized to 0..1 for the further computations.
+ *                            radius in pixels. Defaults to 10.
+ * \param double_image_size   If true, the lowest octave will start are 2*width, 2*height of the image.
+ * \param normalize_image     If true, the image will be normalized to 0..1 for the further computations.
+ * \param wsp                 The worskpace of the SIFT detection.
  * \return A list of all detected SIFT features.
  */
- 
- 
 
 template <class T>
 SIFTFeatureList2D* detectFeaturesUsingSIFT(const vigra::MultiArrayView<2,T>& src,
@@ -95,6 +101,11 @@ SIFTFeatureList2D* detectFeaturesUsingSIFT(const vigra::MultiArrayView<2,T>& src
     return result;
 }
     
+
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif
