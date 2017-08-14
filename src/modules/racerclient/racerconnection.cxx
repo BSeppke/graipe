@@ -37,9 +37,6 @@
 
 namespace graipe {
 
-/**
- * Default constructor. Connects to localhost (127.0.0.1) on port 8088
- */
 RacerConnection::RacerConnection()
 :	QObject(),
 	m_tcpSocket(new QTcpSocket),
@@ -75,13 +72,6 @@ RacerConnection::RacerConnection()
 	connectActions();	
 }
 
-/**
- * Constructor, which sets up the connection to a Racer server using a
- * given IP address and port number.
- *
- * \param ipAddress The IP address of the Racer server.
- * \param port The IP port number
- */
 RacerConnection::RacerConnection(QString ipAddress, int port)
 :	QObject(),
 m_tcpSocket(new QTcpSocket),
@@ -91,82 +81,42 @@ m_port(port)
 	connectActions();
 }
 
-/**
- * (Virtual) destructor of a Racer connection.
- */
 RacerConnection::~RacerConnection()
 {
 	m_tcpSocket->close();
 	delete m_tcpSocket;
 }
 
-/**
- * Getter for the IP address of the current Racer server.
- *
- * \return the IP address of the currently used Racer server
- */
 const QString & RacerConnection::ipAddress() const
 {
 	return m_ipAddress;
 }
 
-/**
- * Sets the IP address to a new one. Please note this does not force any 
- * re-connection. You should call disconnectFromServer and connectToServer
- * manually afterwards.
- * 
- * \param ipAddress The new IP address.
- */
 void RacerConnection::setIpAddress(const QString & ipAddress)
 {
 	m_ipAddress = ipAddress;
 }
 
-/**
- * Getter for the IP port of the current Racer server.
- *
- * \return the IP port of the currently used Racer server
- */
 int RacerConnection::port() const
 {
 	return m_port;
 }
 
-/**
- * Sets the IP port to a new one. Please note this does not force any
- * re-connection. You should call disconnectFromServer and connectToServer
- * manually afterwards.
- * 
- * \param port The new IP port.
- */
 void RacerConnection::setPort(int port)
 {
 	m_port = port;
 }
 
-/**
- * Returns true, if there is no connection to the Racer server.
- * \return True, if there is no connection to the Racer server.
- */
 bool RacerConnection::disconnected() const
 {
 	return (m_tcpSocket->state() & QAbstractSocket::UnconnectedState) || racerVersion().isEmpty();
 }
 
-/**
- * Returns true, if there is a connection to the Racer server.
- * \return True, if there is a connection to the Racer server.
- */
 bool RacerConnection::connected() const
 {
 	return (m_tcpSocket->state() & QAbstractSocket::ConnectedState) && !racerVersion().isEmpty() ;
 }
 
-/**
- * Initializes a connection to the Racer server.
- * 
- * \param msecs Timout for the connection. Defaults to 30.000 msecs (= 30s).
- */
 void RacerConnection::connectToServer(int msecs)
 {
 	m_tcpSocket->connectToHost(m_ipAddress, m_port);
@@ -181,11 +131,6 @@ void RacerConnection::connectToServer(int msecs)
 	}
 }
 
-/**
- * Closes a connection to the Racer server.
- * 
- * \param msecs Timout for the disconnection. Defaults to 30.000 msecs (= 30s).
- */
 void RacerConnection::disconnectFromServer(int msecs)
 {
 	m_tcpSocket->disconnectFromHost();
@@ -200,14 +145,6 @@ void RacerConnection::disconnectFromServer(int msecs)
 	}
 }
 
-/**
- * Sends a request to the Racer server, wait for a timeout and return the result
- * of the sent request.
- *
- * \param request The request string.
- * \param msecs Timout for the disconnection. Defaults to 30.000 msecs (= 30s).
- * \return the resulting string as got from the server.
- */
 QString RacerConnection::send(const QString& request,int msecs)
 {
 	
@@ -299,20 +236,11 @@ QString RacerConnection::send(const QString& request,int msecs)
 	return "";
 }
 
-/**
- * If successfully connected, this returns the Racer version, which the
- * server is currently running.
- */
 const QString & RacerConnection::racerVersion() const
 {
 	return m_racerVersion;
 }
 
-/**
- * This slot will be called by tcp Socket everytime an error occured.
- *
- * \param error The socket error.
- */
 void RacerConnection::socketError(QAbstractSocket::SocketError error)
 {
 	switch (error) {
@@ -337,10 +265,6 @@ void RacerConnection::socketError(QAbstractSocket::SocketError error)
     }	
 }
 
-/**
- * Internally connects the error-actions of the TCP socket the the
- * functions of this class.
- */
 void RacerConnection::connectActions()
 {
     connect(m_tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketError(QAbstractSocket::SocketError)));

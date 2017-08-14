@@ -45,6 +45,16 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_racerclient
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the racer client module
+ *
+ * The racer client module, which contains the connection and reasoning using Racer.
+ */
+ 
+/**
  * Small helper funtion to computer the great circle distance between two points
  * on a standard earth sphere of radium 6371 km.
  *
@@ -656,7 +666,11 @@ class RacerInterpreter
         }
 
     protected:
-        //Additional parameters
+        /** 
+         * @{
+         *
+         * Additional parameters
+         */
         ModelParameter * m_param_measured_vectorfield;
         
         FilenameParameter * m_param_tbox_filename;
@@ -677,6 +691,9 @@ class RacerInterpreter
 
         BoolParameter	* m_param_save_abox;
         FilenameParameter * m_param_abox_filename;
+        /**
+         * @}
+         */
 };
 
 /**
@@ -1289,7 +1306,11 @@ class RacerClusteredInterpreter
         }
     
     protected:
-        //Additional parameters
+        /**
+         * @{
+         *
+         * Additional parameters
+         */
         ModelParameter * m_param_measured_vectorfield;
         ModelParameter * m_param_clusters;
         
@@ -1313,6 +1334,9 @@ class RacerClusteredInterpreter
         
         BoolParameter	* m_param_save_abox;
         FilenameParameter * m_param_abox_filename;
+        /**
+         * @}
+         */
 };
 
 /** 
@@ -1784,7 +1808,11 @@ class ClusteredABox
         }
     
     protected:
-        //Additional parameters
+        /**
+         * @{
+         *
+         * Additional parameters
+         */
         ModelParameter * m_param_measured_vectorfield;
         ModelParameter * m_param_clusters;
         
@@ -1805,6 +1833,9 @@ class ClusteredABox
         ModelParameter * m_param_modelled_vectorfield;
         
         FilenameParameter * m_param_abox_filename;
+        /**
+         * @}
+         */
 };
 
 /** 
@@ -1906,27 +1937,34 @@ class RacerClientModule
         }
 };
 
+
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 /**
- *Interface to the ModuleHandler
+ * @addtogroup graipe_racerclient
+ * @{
+ *
  */
 
-/**
- *  The initialization procedure returns a pointer to the
- *  RacerClientModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
- */
 #include <QtCore/QtGlobal>
 extern "C"{
+    /**
+     *  The initialization procedure returns a pointer to the
+     *  RacerClientModule (which inherits from Module) acutal
+     *  implementation of the class above
+     *
+     *	\return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::RacerClientModule;
 	}
-}
+} //extern "C"
 
-
-
-
+/**
+ * @}
+ */

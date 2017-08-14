@@ -36,6 +36,20 @@
 #ifndef GRAIPE_RACERCLIENT_H
 #define GRAIPE_RACERCLIENT_H
 
+/**
+ * @defgroup graipe_racerclient High-level DL Racer adapter module
+ *
+ * @addtogroup graipe_racerclient
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's Racer adapter module
+ */
+
 #include "racerclient/racerconnection.hxx"
+
+/**
+ * @}
+ */
 
 #endif

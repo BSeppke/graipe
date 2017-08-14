@@ -43,6 +43,18 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_racerclient
+ * @{
+ *
+ * @file
+ * @brief Header file for a coneection with the Racer DL
+ */
+ 
+/**
+ * This class encapsulates a connection to the Racer Description Logic, which has
+ * to be run on localhost on port 8088
+ */
 class GRAIPE_RACERCLIENT_EXPORT RacerConnection
 :   public QObject
 {
@@ -157,14 +169,26 @@ class GRAIPE_RACERCLIENT_EXPORT RacerConnection
          */
         void connectActions();
     
-        //Member variables:
+        /** The used block size **/
         qint16             m_blockSize;
+    
+        /** The TCP socket **/
         QTcpSocket *       m_tcpSocket;
-        QString m_ipAddress, m_racerVersion;
+    
+        /** The ipAdress **/
+        QString m_ipAddress;
+    
+        /** The racer version **/
+        QString m_racerVersion;
+    
+        /** The port number **/
         int m_port;
-
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_RACERCLIENT_RACERCONNECTION_HXX
