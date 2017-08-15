@@ -53,7 +53,15 @@
 
 
 namespace graipe {
-    
+
+/**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for the classical global Optical Flow algorithms.
+ */
+ 
 /** 
  * Beginning of Horn & Schuck's famous optical flow algorithm (iterative)
  * The iterations be can be cut by a given number of max. iterations. 
@@ -76,8 +84,9 @@ namespace graipe {
 class OpticalFlowHSOriginalFunctor
 {
 	public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
         
         /**
@@ -292,8 +301,9 @@ class OpticalFlowHSOriginalFunctor
 class OpticalFlowHSFunctor
 {
 	public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
     
         /**
@@ -489,8 +499,9 @@ class OpticalFlowHSFunctor
 class OpticalFlowNEFunctor
 {
 	public:		
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
     
         /**
@@ -854,6 +865,10 @@ class OpticalFlowNEFunctor
 		double  m_sigma;
 		int		m_level;
 };
+
+/**
+ * @}
+ */
     
 } //end of namespace graipe
 

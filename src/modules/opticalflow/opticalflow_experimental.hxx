@@ -49,34 +49,42 @@
 
 
 //linear solving and eigenvector analysis
-#include "vigra/linear_solve.hxx"
-#include "vigra/eigensystem.hxx"
+#include <vigra/linear_solve.hxx>
+#include <vigra/eigensystem.hxx>
 
 //OFCE Spatiotemporal Gradients
 #include "opticalflowgradients.hxx"
 
 //image representation
-#include "vigra/stdimage.hxx"
+#include <vigra/stdimage.hxx>
 
 //separable filters
-#include "vigra/convolution.hxx"
-#include "vigra/stdconvolution.hxx"
+#include <vigra/convolution.hxx>
+#include <vigra/stdconvolution.hxx>
 
 //functor processing
-#include "vigra/combineimages.hxx"
+#include <vigra/combineimages.hxx>
 #include <functional>					// for plus, muliplies & minus functors
-#include "vigra/functorexpression.hxx" //for lambda-like functors
+#include <vigra/functorexpression.hxx> //for lambda-like functors
 
 //tensor stuff
-#include "vigra/boundarytensor.hxx"
-#include "vigra/tensorutilities.hxx"
-#include "vigra/orientedtensorfilters.hxx" 
-#include "vigra/gradient_energy_tensor.hxx" 
+#include <vigra/boundarytensor.hxx>
+#include <vigra/tensorutilities.hxx>
+#include <vigra/orientedtensorfilters.hxx>
+#include <vigra/gradient_energy_tensor.hxx>
 
 
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for currently not used - experimental - Optical Flow algorithms.
+ */
+ 
 /**
  * 
  * The new structure tensor approach which implement weighted sums using the gradient energy
@@ -85,33 +93,67 @@ namespace graipe {
 class OpticalFlowGETFunctor
 {
     public:
-    
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
     
+        /**
+         * Constructor for the Gradient Energy Tensor Optical Flow approach.
+         *
+         * \param sigma The sigma of the Gaussian used to estimate the partial derivatives
+         *              in space and time. Defaults to 1.0
+         * \param outer_sigma The sigma of the Gaussian used to smooth the partial derivatives
+         *              in space and time. Defaults to 3.0
+         * \param threshold The minimal gradient magnitude to count a value inside the neigborhoof. Defaults to 0.0.
+         */
         OpticalFlowGETFunctor(double sigma=2.0, double outer_sigma=1.0, double threshold=1.0)
         :	m_outer_sigma(outer_sigma),
             m_sigma(sigma),
             m_threshold(threshold),
             m_level(0.0)
-        { }
-        
-        void setLevel(int level)
         {
-            m_level=level;
-            //we assume the same m_sigma for all levels, thus nothing is done here!
-        };
-        
-        static std::string name()
-        {
-            return "Gradient Energy Tensor filtered Structure Tensor OFCE";
-        };
-        static std::string shortName()
-        {
-            return "GET ST OFCE";
-        };
-        
-        //The optical flow calculation according to the gradient energy filtered structure tensor
+        }
+    
+        /**
+         * When applied on a pyramidal processing model, this function is called on 
+         * every layer/octave change.
+         *
+         * \param level The level of the current octave.
+         */
+		void setLevel(int level)
+		{
+			m_level=level;
+			//we assume the same m_sigma for all levels, thus nothing is done here!
+		}
+ 
+        /**
+         * Returns the full name of the functor.
+         *
+         * \return Always "Gradient Energy Tensor filtered Structure Tensor OFCE".
+         */
+		static std::string name()
+		{
+			return "Gradient Energy Tensor filtered Structure Tensor OFCE";
+		}
+	
+        /**
+         * Returns the short (abbrv.) name of the functor.
+         *
+         * \return Always "GET ST OFCE".
+         */
+		static std::string shortName()
+		{
+			return "GET ST OFCE";
+		}
+
+		/**
+         * The optical flow calculation according  to the gradient energy filtered structure tensor.
+         *
+         * \param[in] src1 First image of the series.
+         * \param[in] src2 Second image of the series.
+         * \param[out] flow The resulting Optical Flow field.
+         */
         template <class T1, class T2>
         void operator()(const vigra::MultiArrayView<2, T1> & src1,
                         const vigra::MultiArrayView<2, T2> & src2,
@@ -188,6 +230,15 @@ class OpticalFlowGETFunctor
             }
         }
     
+		/**
+         * Masked optical flow calculation according to the gradient energy filtered structure tensor.
+         * Currently not implemented.
+         *
+         * \param[in] src1 First image of the series.
+         * \param[in] src2 Second image of the series.
+         * \param[in] mask The masked area under the series.
+         * \param[out] flow The resulting Optical Flow field.
+         */
         template <	class T1, class T2, class T3>
         void operator()(const vigra::MultiArrayView<2, T1> & src1,
                         const vigra::MultiArrayView<2, T2> & src2,
@@ -212,10 +263,20 @@ class OpticalFlowGETFunctor
 class OpticalFlowHGFunctor
 {
     public:
-    
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
-    
+        
+        /**
+         * Constructor for the Hourglass filtered Tensor Optical Flow approach.
+         *
+         * \param sigma The sigma of the Gaussian used to estimate the partial derivatives
+         *              in space and time. Defaults to 1.0
+         * \param outer_sigma The sigma of the Gaussian used to smooth the partial derivatives
+         *              in space and time. Defaults to 3.0
+         * \param threshold The minimal gradient magnitude to count a value inside the neigborhoof. Defaults to 0.0.
+         */
         OpticalFlowHGFunctor(double sigma=2.0, double outer_sigma=1.0, double threshold=1.0)
         :	m_outer_sigma(outer_sigma),
             m_sigma(sigma),
@@ -223,24 +284,46 @@ class OpticalFlowHGFunctor
             m_level(0.0)
         {
         }
-        
-        void setLevel(int level)
-        {
-            m_level=level;
-            //we assume the same m_sigma for all levels, thus nothing is done here!
-        }
-        
-        static std::string name()
-        {
-            return "Hourglass filtered Structure Tensor OFCE";
-        }
-        
-        static std::string shortName()
-        {
-            return "HG ST OFCE";
-        }
-        
-        //The optical flow calculation according to the hourglass filtered structure tensor
+    
+        /**
+         * When applied on a pyramidal processing model, this function is called on 
+         * every layer/octave change.
+         *
+         * \param level The level of the current octave.
+         */
+		void setLevel(int level)
+		{
+			m_level=level;
+			//we assume the same m_sigma for all levels, thus nothing is done here!
+		}
+ 
+        /**
+         * Returns the full name of the functor.
+         *
+         * \return Always "Hourglass filtered Structure Tensor OFCE".
+         */
+		static std::string name()
+		{
+			return "Hourglass filtered Structure Tensor OFCE";
+		}
+	
+        /**
+         * Returns the short (abbrv.) name of the functor.
+         *
+         * \return Always "HG ST OFCE".
+         */
+		static std::string shortName()
+		{
+			return "HG ST OFCE";
+		}
+
+		/**
+         * The optical flow calculation according to the hourglass filtered structure tensor.
+         *
+         * \param[in] src1 First image of the series.
+         * \param[in] src2 Second image of the series.
+         * \param[out] flow The resulting Optical Flow field.
+         */
         template <	class T1, class T2>
         void operator()(const vigra::MultiArrayView<2, T1> & src1,
                         const vigra::MultiArrayView<2, T2> & src2,
@@ -319,7 +402,16 @@ class OpticalFlowHGFunctor
             }
         }
     
-        //No masked version available:
+        
+		/**
+         * Masked optical flow calculation according to the hourglass filtered structure tensor.
+         * Currently not implemented.
+         *
+         * \param[in] src1 First image of the series.
+         * \param[in] src2 Second image of the series.
+         * \param[in] mask The masked area under the series.
+         * \param[out] flow The resulting Optical Flow field.
+         */
         template <	class T1, class T2, class T3>
         void operator()(const vigra::MultiArrayView<2, T1> & src1,
                         const vigra::MultiArrayView<2, T2> & src2,
@@ -336,6 +428,13 @@ class OpticalFlowHGFunctor
         int		m_level;
 };
 
+/**
+ * @}
+ */
+
+    
+} //end of namespace graipe
+
 /************************************************************************/
 /************************************************************************/
 /*****                                                              *****/
@@ -343,7 +442,5 @@ class OpticalFlowHGFunctor
 /*****                                                              *****/
 /************************************************************************/
 /************************************************************************/
-    
-} //end of namespace graipe
 
 #endif //GRAIPE_OPTICALFLOW_OPTICALFLOW_EXPERIMENTAL_HXX

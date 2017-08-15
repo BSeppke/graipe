@@ -43,14 +43,22 @@
 #include "registration/registration.h"
 
 //image representation
-#include "vigra/stdimage.hxx"
+#include <vigra/stdimage.hxx>
 
 //separable filters
-#include "vigra/convolution.hxx"
-#include "vigra/stdconvolution.hxx"
+#include <vigra/convolution.hxx>
+#include <vigra/stdconvolution.hxx>
 #include <vigra/affine_registration_fft.hxx>
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for the general Optical Flow framework.
+ */
 
 /**
  * Calculation of a single OFCE Algorithm run. Maybe with GME and correction.
@@ -85,7 +93,7 @@ void correctOFCEWithGlobalDisplacement(vigra::MultiArrayView<2,vigra::TinyVector
  * \param[in] src1 First image of the series.
  * \param[in] src2 Second image of the series.
  * \param[out] flow The resulting Optical Flow field.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
+ * \param[in] flow_func The used functor to compute the Optical Flow.
  * \param[in] use_global If true, the global motion estimation be used prior.
  * \param[out] mat If use_global is true, this contains the global motion estimation matrix (rot+trans).
  * \param[out] rotation_correlation If use_global is true, this contains the rotation correlation.
@@ -95,7 +103,7 @@ template <class T1, class T2, class OpticalFlowFunctor>
 void calculateOFCE(const vigra::MultiArrayView<2,T1> & src1,
                    const vigra::MultiArrayView<2,T2> & src2,
 				   vigra::MultiArrayView<2,typename OpticalFlowFunctor::FlowValueType> flow,
-				   OpticalFlowFunctor flowFunc,
+				   OpticalFlowFunctor flow_func,
                    bool use_global,
                    vigra::Matrix<double>& mat,
                    double & rotation_correlation, double & translation_correlation)
@@ -122,7 +130,7 @@ void calculateOFCE(const vigra::MultiArrayView<2,T1> & src1,
 	}
 	
 	//2. step: Perform the OFCE computiation
-	flowFunc(src1_t, src2, flow);
+	flow_func(src1_t, src2, flow);
 	
 	//3. step: "add" the global displacement back to the result
 	if(use_global)
@@ -151,7 +159,7 @@ void calculateOFCE(const vigra::MultiArrayView<2,T1> & src1,
  * \param[in] src2 Second image of the series.
  * \param[in] mask THe mask, where pixel values are assumed to be valid.
  * \param[out] flow The resulting Optical Flow field.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
+ * \param[in] flow_func The used functor to compute the Optical Flow.
  * \param[in] use_global If true, the global motion estimation be used prior.
  * \param[out] mat If use_global is true, this contains the global motion estimation matrix (rot+trans).
  * \param[out] rotation_correlation If use_global is true, this contains the rotation correlation.
@@ -162,7 +170,7 @@ void calculateOFCE(const vigra::MultiArrayView<2,T1> & src1,
                   const vigra::MultiArrayView<2,T2> & src2,
                   const vigra::MultiArrayView<2,T3> & mask,
 				  vigra::MultiArrayView<2,typename OpticalFlowFunctor::FlowValueType> flow,
-                  OpticalFlowFunctor flowFunc,
+                  OpticalFlowFunctor flow_func,
                   bool use_global,
                   vigra::Matrix<double>& mat,
                   double & rotation_correlation, double & translation_correlation)
@@ -190,7 +198,7 @@ void calculateOFCE(const vigra::MultiArrayView<2,T1> & src1,
 	}
 	
 	//2. step: Perform the OFCE computiation
-	flowFunc(src1_t, src2, mask, flow);
+	flow_func(src1_t, src2, mask, flow);
 	
 	//3. step: "add" the global displacement back to the result
 	if(use_global)
@@ -310,10 +318,9 @@ std::list<unsigned int> buildStepList(unsigned int steps, unsigned int break_lev
  *
  * \param[in] src1 First image of the series.
  * \param[in] src2 Second image of the series.
- * \param[in] mask THe mask, where pixel values are assumed to be valid.
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in] flow_func The used functor to compute the Optical Flow.
+ * \param[in] use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
@@ -412,8 +419,8 @@ void calculateOFCEHierarchicallyInitialiser(const vigra::MultiArrayView<2,T1> & 
  * \param[in] src2 Second image of the series.
  * \param[in] mask THe mask, where pixel values are assumed to be valid.
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in] flow_func The used functor to compute the Optical Flow.
+ * \param[in] use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
@@ -524,10 +531,10 @@ void calculateOFCEHierarchicallyInitialiser(const vigra::MultiArrayView<2,T1> & 
  *
  * \param[in] src1 First image of the series.
  * \param[in] src2 Second image of the series.
- * \param[in] mask THe mask, where pixel values are assumed to be valid.
+ * \param[out] img_list The resulting warped images during the steps.
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in] flow_func The used functor to compute the Optical Flow.
+ * \param[in] use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
@@ -673,9 +680,10 @@ void calculateOFCEHierarchicallyWarping(const vigra::MultiArrayView<2,T1> & src1
  * \param[in] src1 First image of the series.
  * \param[in] src2 Second image of the series.
  * \param[in] mask THe mask, where pixel values are assumed to be valid.
+ * \param[out] img_list The resulting warped images during the steps.
  * \param[out] flow_list The resulting Optical Flow fields during the steps.
- * \param[in] flowFunc The used functor to compute the Optical Flow.
- * \param[in] use_global If true, the global motion estimation be used prior to each computation.
+ * \param[in] flow_func The used functor to compute the Optical Flow.
+ * \param[in] use_gme If true, the global motion estimation be used prior to each computation.
  * \param[out] mat_list If use_global is true, this contains the global motion estimation matrices (rot+trans).
  * \param[out] rotation_correlation_list If use_global is true, this contains the rotation correlations.
  * \param[out] translation_correlation_list If use_global is true, this contains the transflation correlations.
@@ -816,6 +824,10 @@ void calculateOFCEHierarchicallyWarping(const vigra::MultiArrayView<2,T1> & src1
 	flow_list[0] = flow_res;
 }
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 #endif //GRAIPE_OPTICALFLOW_OPTICALFLOWFRAMEWORK_HXX

@@ -44,6 +44,14 @@
 
 
 namespace graipe {
+
+/**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for the modern hybrid Optical Flow algorithms.
+ */
     
 /**
  * The linear combined local global approach as described by Bruhn, Weickert, Schnörr et. al 2004
@@ -51,8 +59,9 @@ namespace graipe {
 class OpticalFlowCLGFunctor
 {
 	public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
     
         /**
@@ -300,9 +309,10 @@ class OpticalFlowCLGFunctor
  */
 class OpticalFlowCLGNonlinearFunctor
 {
-	public:		
-        //Typedefs for the resulting flow field
+	public:
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 2 elements: u,v **/
         typedef vigra::TinyVector<ValueType,2> FlowValueType;
     
     
@@ -628,6 +638,10 @@ class OpticalFlowCLGNonlinearFunctor
 		int		m_iterations;
 		int		m_level;
 };
+
+/**
+ * @}
+ */
     
 } //end of namespace graipe
 

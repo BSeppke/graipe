@@ -44,8 +44,21 @@
 #include "opticalflow_global.hxx"
 #include "opticalflow_hybrid.hxx"
 
+//Experimental algorithms are not working right now.
+//TODO: If possible, fix them. If not, discard them.
+// #include "opticalflow_experimental.hxx"
+
 namespace graipe {
 
+/**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for internally used Optical Flow algorithms.
+ */
+ 
+ 
 /**
  * The different hierarchical traversal strategies on the scale space. 
  * This is used inside the general Optical Flow framework to define the step
@@ -104,6 +117,11 @@ class OpticalFlowAlgorithm
         {
         }
     
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Always: "OpticalFlowAlgorithm"
+         */
         QString typeName() const
         {
             return "OpticalFlowAlgorithm";
@@ -358,6 +376,11 @@ class OpticalFlowAlgorithm
         }
             
     protected:
+        /**
+         * @{
+         *  
+         * Parameters
+         */
         ImageBandParameter<float> * m_param_imageBand1;
         ImageBandParameter<float> * m_param_imageBand2;
         
@@ -377,6 +400,9 @@ class OpticalFlowAlgorithm
         
         BoolParameter	* m_param_saveIntermediateImages;
         BoolParameter	* m_param_saveIntermediateFlow;
+        /**
+         * @}
+         */
 };
 
 
@@ -411,6 +437,11 @@ class OpticalFlowHSEstimator
 			addFrameworkProcessingParameters();
 		}
     
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Unless partially specialized: "OpticalFlowHSEStimator"
+         */
         QString typeName() const
         {
             return "OpticalFlowHSEstimator";
@@ -458,23 +489,46 @@ class OpticalFlowHSEstimator
         }
     
     protected:
+        /**
+         * @{
+         *  
+         * Additional parameters
+         */
         FloatParameter * m_param_sigma;
         FloatParameter * m_param_alpha;
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
+/**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowHSOriginalEstimator"
+ */
 template<>
 QString OpticalFlowHSEstimator<OpticalFlowHSOriginalFunctor>::typeName() const
 {
     return "OpticalFlowHSOriginalEstimator";
 }
 
+/**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowHSEstimator"
+ */
 template<>
 QString OpticalFlowHSEstimator<OpticalFlowHSFunctor>::typeName() const
 {
     return "OpticalFlowHSEstimator";
 }
 
+/**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowNEEstimator"
+ */
 template<>
 QString OpticalFlowHSEstimator<OpticalFlowNEFunctor>::typeName() const
 {
@@ -517,11 +571,15 @@ class OpticalFlowBruhnEstimator
             addFrameworkProcessingParameters();
         }
     
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Unless partially specialized: "OpticalFlowBruhnEstimator"
+         */
         QString typeName() const
         {
             return "OpticalFlowBruhnEstimator";
         }
-    
  
         /**
          * Specialization of the running phase of this algorithm.
@@ -566,19 +624,37 @@ class OpticalFlowBruhnEstimator
         }
     
     protected:
+        /**
+         * @{
+         *  
+         * Additional parameters
+         */
         FloatParameter * m_param_inner_sigma;
         FloatParameter * m_param_outer_sigma;
         FloatParameter * m_param_alpha;
         FloatParameter * m_param_omega;	
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
+/**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "createOpticalFlowCLGEstimator"
+ */
 template<>
 QString OpticalFlowBruhnEstimator<OpticalFlowCLGFunctor>::typeName() const
 {
     return "createOpticalFlowCLGEstimator";
 }
 
+/**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowCLGNonlinearFunctor"
+ */
 template<>
 QString OpticalFlowBruhnEstimator<OpticalFlowCLGNonlinearFunctor>::typeName() const
 {
@@ -615,6 +691,11 @@ class OpticalFlowLKEstimator
             addFrameworkProcessingParameters();
         }
     
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Always: "OpticalFlowLKEstimator"
+         */
         QString typeName() const
         {
             return "OpticalFlowLKEstimator";
@@ -664,10 +745,18 @@ class OpticalFlowLKEstimator
         }
         
     protected:
+        /**
+         * @{
+         *  
+         * Additional parameters
+         */
         FloatParameter * m_param_sigma;
         IntParameter * m_param_mask_size;
         FloatParameter * m_param_threshold;	
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
 
@@ -702,6 +791,11 @@ class OpticalFlowFBEstimator
             addFrameworkProcessingParameters();
         }
     
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Always: "OpticalFlowFBEstimator"
+         */
         QString typeName() const
         {
             return "OpticalFlowFBEstimator";
@@ -750,10 +844,18 @@ class OpticalFlowFBEstimator
         }
     
     protected:
+        /**
+         * @{
+         *  
+         * Additional parameters
+         */
         FloatParameter * m_param_sigma;
         IntParameter * m_param_mask_size;
         FloatParameter * m_param_threshold;
-        IntParameter* m_param_iterations;	
+        IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
 
@@ -793,11 +895,15 @@ class OpticalFlowTensorEstimator
             addFrameworkProcessingParameters();
         }
     
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Unless partially specialized: "OpticalFlowTensorEstimator"
+         */
         QString typeName() const
         {
             return "OpticalFlowTensorEstimator";
         }
-    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -842,31 +948,31 @@ class OpticalFlowTensorEstimator
         }
     
     protected:
+        /**
+         * @{
+         *  
+         * Additional parameters
+         */
         FloatParameter * m_param_inner_sigma;
         FloatParameter * m_param_outer_sigma;
         IntParameter* m_param_mask_size;
         FloatParameter * m_param_threshold;	
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
+/**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowSTEstimator"
+ */
 template<>
 QString OpticalFlowTensorEstimator<OpticalFlowSTFunctor>::typeName() const
 {
     return "OpticalFlowSTEstimator";
 }
-/*
-template<>
-QString OpticalFlowTensorEstimator<OpticalFlowGETTFunctor>::typeName() const
-{
-    return "OpticalFlowGETEstimator";
-}
-
-template<>
-QString OpticalFlowTensorEstimator<OpticalFlowHGFunctor>::typeName() const
-{
-    return "OpticalFlowHGEstimator";
-}
-*/
 
 
 /**
@@ -895,12 +1001,16 @@ class OpticalFlowCCEstimator
             
             addFrameworkProcessingParameters();
         }
-    
+
+        /**
+         * Type identifier of this algorihm.
+         *
+         * \return Always: "OpticalFlowCCEstimator"
+         */
         QString typeName() const
         {
             return "OpticalFlowCCEstimator";
         }
-    
 
         /**
          * Specialization of the running phase of this algorithm.
@@ -943,26 +1053,28 @@ class OpticalFlowCCEstimator
         }
     
     protected:
+        /**
+         * @{
+         *  
+         * Additional parameters
+         */
         FloatParameter * m_param_sigma;
         FloatParameter * m_param_threshold;	
         IntParameter* m_param_iterations;
+        /**
+         * @}
+         */
 };
 
-
-
-
-/**
- * Experimental algorithms are not working right now.
- * 
- * TODO: If possible, fix them. If not, discard them.
- */
+//Experimental algorithms are not working right now.
+//TODO: If possible, fix them. If not, discard them.
 /*
 template<class OPTICALFLOW_FUNCTOR>
 class OpticalFlowExperimentalEstimator
 :   public OpticalFlowAlgorithm
 {	
     public:
-         **
+        **
          * Default constructor. Adds all neccessary parameters for this algorithm to run.
          *
         OpticalFlowExperimentalEstimator()
@@ -979,14 +1091,19 @@ class OpticalFlowExperimentalEstimator
             
             addFrameworkProcessingParameters();
         }
-    
+
+        **
+         * Type identifier of this algorihm.
+         *
+         * \return Unless partially specialized: "OpticalFlowExperimentalEstimator"
+         *
         QString typeName() const
         {
             return "OpticalFlowExperimentalEstimator";
         }
  
 
-         **
+        **
          * Specialization of the running phase of this algorithm.
          *
         void run()
@@ -1026,12 +1143,45 @@ class OpticalFlowExperimentalEstimator
             }
         }
     protected:
+        **
+         * @{
+         *  
+         * Additional parameters
+         *
         FloatParameter * m_param_inner_sigma;
         FloatParameter * m_param_outer_sigma;
         FloatParameter * m_param_threshold;
+        **
+         * @}
+         *
 };
+
+**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowGETEstimator"
+ *
+template<>
+QString OpticalFlowTensorEstimator<OpticalFlowGETFunctor>::typeName() const
+{
+    return "OpticalFlowGETEstimator";
+}
+
+**
+ * Type identifier of this algorihm.
+ *
+ * \return Always: "OpticalFlowHGEstimator"
+ *
+template<>
+QString OpticalFlowTensorEstimator<OpticalFlowHGFunctor>::typeName() const
+{
+    return "OpticalFlowHGEstimator";
+}
 */
 
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

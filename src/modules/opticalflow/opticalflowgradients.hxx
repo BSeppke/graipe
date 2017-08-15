@@ -46,6 +46,14 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for the generic image series' gradients for Optical Flow approaches.
+ */
+ 
+/**
  * The generic version of a spatio-temporal Gradient estimator based on two images.
  * To avoid noise-addictiveness, one can give a gaussian sigma value to smooth
  * both images before differencing (which is indeed a subtraction of smoothed (I2-I1).
@@ -342,6 +350,10 @@ void spatioTemporalGradientWithMask(const vigra::MultiArrayView<2, T1> & src1,
 	gaussianSmoothingWithMask(src2, mask, temp, sigma, btmode);
     gT = temp - gT;
 }
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

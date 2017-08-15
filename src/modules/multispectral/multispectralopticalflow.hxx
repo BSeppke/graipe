@@ -60,7 +60,7 @@ class OpticalFlow2BandsFunctor
     public:
         /** The single value type of a flow field **/
         typedef float ValueType;
-        /** The flow vector type. 3 Eleents: u,v, weight **/
+        /** The flow vector type. 3 elements: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
@@ -333,7 +333,7 @@ class OpticalFlowHS2BandsFunctor
     public:
         /** The single value type of a flow field **/
         typedef float ValueType;
-        /** The flow vector type. 3 Eleents: u,v, weight **/
+        /** The flow vector type. 3 elements: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**

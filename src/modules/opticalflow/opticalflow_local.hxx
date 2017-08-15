@@ -49,6 +49,15 @@
 namespace graipe {
 
 /**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for the classical local Optical Flow algorithms.
+ */
+ 
+ 
+/**
  * Optical Flow computation according to the Lucas & Kanade approach
  * These algorithms try to solve the aperture problem by postulating
  * the same flow inside a local neighborhood of the image which leads
@@ -73,9 +82,10 @@ namespace graipe {
 class OpticalFlowLKFunctor
 {
 	public:
-        //Typedefs for the resulting flow field
-       typedef float ValueType;
-       typedef vigra::TinyVector<ValueType,3> FlowValueType;
+        /** The single value type of a flow field **/
+        typedef float ValueType;
+        /** The flow vector type. 3 elements: u,v, weight **/
+        typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
          * Constructor for the "Gaussian-pimped" Lucas and Kanade Optical Flow approach.
@@ -364,8 +374,9 @@ class OpticalFlowLKFunctor
 class OpticalFlowSTFunctor
 {
 	public:		
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 3 elements: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
@@ -670,8 +681,9 @@ class OpticalFlowSTFunctor
 class OpticalFlowCCFunctor
 {
 	public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 3 elements: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
@@ -899,8 +911,9 @@ class OpticalFlowCCFunctor
 class OpticalFlowFBFunctor
 {
     public:
-        //Typedefs for the resulting flow field
+        /** The single value type of a flow field **/
         typedef float ValueType;
+        /** The flow vector type. 3 elements: u,v, weight **/
         typedef vigra::TinyVector<ValueType,3> FlowValueType;
     
         /**
@@ -1263,6 +1276,7 @@ class OpticalFlowFBFunctor
          * \param[out] dest The polynomial expansion of src given as an image of type vigra::TinyVector<T2,5>.
          * \param[in] n Radius of the used kernels
          * \param[in] sigma scale for the derivation of the polynomial expansion.
+         * \param[in] btmode The boarder treatment mode
          */
         template <class T1, class T2, class T3>
         void polynomialExpansionWithMask(const vigra::MultiArrayView<2, T1> & src,
@@ -1380,6 +1394,10 @@ class OpticalFlowFBFunctor
         
         unsigned int	m_level;
 };
+
+/**
+ * @}
+ */
 
 } //end of namespace graipe
 

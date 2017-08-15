@@ -37,13 +37,18 @@
 #define GRAIPE_OPTICALFLOW_H
 
 /**
- * Experimental algorithms are not working right now.
- * 
- * TODO: If possible, fix them. If not, discard them.
+ * @defgroup graipe_opticalflow Optical Flow estimation module
+ *
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Header file for the outer API of GRAIPE's Optical Flow estimation module
  */
-/*
- #include "opticalflow_experimental.hxx
-*/
+
+//Experimental algorithms are not working right now.
+//TODO: If possible, fix them. If not, discard them.
+//#include "opticalflow_experimental.hxx
 
 #include "opticalflow_global.hxx"
 #include "opticalflow_hybrid.hxx"
@@ -51,5 +56,9 @@
 #include "opticalflowalgorithms.hxx"
 #include "opticalflowframework.hxx"
 #include "opticalflowgradients.hxx"
+
+/**
+ * @}
+ */
 
 #endif //GRAIPE_OPTICALFLOW_H

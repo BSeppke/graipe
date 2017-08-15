@@ -340,48 +340,45 @@ bool ViewController::deserialize(QXmlStreamReader& xmlReader)
     try
     {
         //Assume, that the deserialized has already read the start node:
-        //if (xmlReader.readNextStartElement())
-        //{
-            if(     xmlReader.name() == typeName()
-                &&  xmlReader.attributes().hasAttribute("ID"))
+        if(     xmlReader.name() == typeName()
+            &&  xmlReader.attributes().hasAttribute("ID"))
+        {
+            setID(xmlReader.attributes().value("ID").toString());
+            
+            if(xmlReader.attributes().hasAttribute("visible"))
             {
-                setID(xmlReader.attributes().value("ID").toString());
-                
-                if(xmlReader.attributes().hasAttribute("visible"))
-                {
-                    setVisible(xmlReader.attributes().value("visible").toString() == "true");
-                }
-                else
-                {
-                    setVisible(false);
-                }
-                
-                
-                bool success = m_parameters->deserialize(xmlReader);
-                 
-                while(true)
-                {
-                    if(xmlReader.tokenType()==QXmlStreamReader::EndElement && xmlReader.name() == typeName())
-                    {
-                        return true;
-                    }
-                    if(!xmlReader.readNext())
-                    {
-                        throw std::runtime_error("End of XML file reached before closing tag for ViewController.");
-                    }
-                }
-                
-                return success;
+                setVisible(xmlReader.attributes().value("visible").toString() == "true");
             }
             else
             {
-                throw std::runtime_error("Did not find typeName() or id() in XML tree");
+                setVisible(false);
             }
-        //}
-        //else
-        //{
-        //  throw std::runtime_error("Did not find any start element in XML tree");
-        //}
+            
+            
+            bool success = m_parameters->deserialize(xmlReader);
+            
+            if(!success)
+            {
+                return false;
+            }
+            
+            while(true)
+            {
+                if(xmlReader.tokenType()==QXmlStreamReader::EndElement && xmlReader.name() == typeName())
+                {
+                    return true;
+                }
+                if(!xmlReader.readNext())
+                {
+                    throw std::runtime_error("End of XML file reached before closing tag for ViewController.");
+                }
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Did not find typeName() or id() in XML tree");
+        }
+        return false;
     }
     catch(std::runtime_error & e)
     {

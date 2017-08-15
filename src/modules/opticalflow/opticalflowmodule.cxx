@@ -39,6 +39,13 @@
 
 namespace graipe {
 
+/**
+ * @addtogroup graipe_opticalflow
+ * @{
+ *
+ * @file
+ * @brief Implementation file for the Optical Flow estimation module
+ */
 
 /** 
  * Creates one instance of the original Horn & Schunck Optical Flow
@@ -267,21 +274,18 @@ class OpticalFlowModule
 			alg_item.algorithm_fptr = &createOpticalFlowCLGNonlinearEstimator;
 			alg_factory.push_back(alg_item);
 			
-			/**
-             * Experimental algorithms are not working right now.
-             * 
-             * TODO: If possible, fix them. If not, discard them.
-             */
-			 /*
-             //9. Gradient energy tensor method
-			 alg_item.algorithm_name = "Gradient energy tensor method";
-			 alg_item.algorithm_fptr = &createOpticalFlowGETEstimator;
-			 alg_factory.push_back(alg_item);
+			//Experimental algorithms are not working right now.
+            //TODO: If possible, fix them. If not, discard them.
+            /*
+                //9. Gradient energy tensor method
+                alg_item.algorithm_name = "Gradient energy tensor method";
+                alg_item.algorithm_fptr = &createOpticalFlowGETEstimator;
+                alg_factory.push_back(alg_item);
 			 
-			 //10. Hourglass filtered structure tensor method
-			 alg_item.algorithm_name = "Hourglass filtered structure tensor method";
-			 alg_item.algorithm_fptr = &createOpticalFlowHGEstimator;
-			 alg_factory.push_back(alg_item);
+                //10. Hourglass filtered structure tensor method
+                alg_item.algorithm_name = "Hourglass filtered structure tensor method";
+                alg_item.algorithm_fptr = &createOpticalFlowHGEstimator;
+                alg_factory.push_back(alg_item);
 			 */
 			
 			return alg_factory;
@@ -298,26 +302,34 @@ class OpticalFlowModule
 		}		
 };
 
+/**
+ * @}
+ */
+ 
 } //end of namespace graipe
 
 /**
- *Interface to the ModuleHandler
- */
-
-/**
- *  The initialization procedure returns a pointer to the
- *  OpticalFlowModule (which inherits from Module) acutal
- *  implementation of the class above
- *
- *	\return The pointer to a new instance of this module.
+ * @addtogroup graipe_opticalflow
+ * @{
  */
 #include <QtCore/QtGlobal>
 extern "C"{
+
+    /**
+     * The initialization procedure returns a pointer to the
+     * OpticalFlowModule (which inherits from Module) acutal
+     * implementation of the class above
+     *
+     * \return The pointer to a new instance of this module.
+     */
     Q_DECL_EXPORT graipe::Module* initialize()
 	{
         return new graipe::OpticalFlowModule;
 	}
 }
+/**
+ * @}
+ */
 
 
 
