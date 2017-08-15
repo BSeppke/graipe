@@ -151,7 +151,7 @@ void PolygonList2D::serialize_item(unsigned int index, QXmlStreamWriter& xmlWrit
 	
     PolygonType poly = polygon(index);
     
-    for(unsigned int i=0; i < poly.size(); ++i)
+    for(int i=0; i < poly.size(); ++i)
     {
         xmlWriter.writeStartElement("Point");
             xmlWriter.writeAttribute("ID", QString::number(i));

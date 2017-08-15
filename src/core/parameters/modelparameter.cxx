@@ -112,7 +112,7 @@ void ModelParameter::setValue(Model* value)
     
     if (!found)
     {
-        qDebug() << "ModelParameter::setValue() failed due to unknown/not allowed model value: " << (long int) value;
+        qDebug() << "ModelParameter::setValue() failed due to unknown/not allowed model value: " << reinterpret_cast<long long>(value);
     }
 }
 

@@ -240,11 +240,11 @@ void Workspace::serialize(QXmlStreamWriter& xmlWriter) const
         //Transform memory address to ID for models and viewControllers:
         for(Model* model : models)
         {
-            model->setID(QString::number((long int) model));
+            model->setID(QString::number(reinterpret_cast<long long>(model)));
         }
         for(ViewController* vc : viewControllers)
         {
-            vc->setID(QString::number((long int) vc));
+            vc->setID(QString::number(reinterpret_cast<long long>(vc)));
         }
         
         xmlWriter.setAutoFormatting(true);
@@ -255,9 +255,9 @@ void Workspace::serialize(QXmlStreamWriter& xmlWriter) const
             
             xmlWriter.writeStartElement("Header");
                 ParameterGroup w_settings;
-                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, modules_names().size()));
-                w_settings.addParameter("models", new IntParameter("Model count:", 0, 1e10, models.size()));
-                w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, viewControllers.size()));
+                w_settings.addParameter("modules", new IntParameter("Module count:", 0, 1e10, (int)modules_names().size()));
+                w_settings.addParameter("models", new IntParameter("Model count:",   0 ,1e10, (int)models.size()));
+                w_settings.addParameter("viewControllers", new IntParameter("ViewController count:", 0, 1e10, (int)viewControllers.size()));
                 w_settings.addParameter("currentModel",
                                         new StringParameter("Current Model:", (m_currentModel == NULL) ? "0" : m_currentModel->id()));
                 w_settings.addParameter("currentViewController",

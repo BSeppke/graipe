@@ -89,7 +89,7 @@ std::vector<TriangleTransformationType> computePiecewiseAffineTransformations(Sr
     VertexVector vertices(point_count);
     TriangleSet triangles;
     
-    int i=0;
+    unsigned int i=0;
     
     for (i=0; i<point_count;++i)
     {

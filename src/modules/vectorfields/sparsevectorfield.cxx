@@ -924,7 +924,7 @@ void SparseWeightedMultiVectorfield2D::serialize_item(unsigned int index, QXmlSt
     xmlWriter.writeTextElement("w", QString::number(weight(index), 'g', 10));
     xmlWriter.writeTextElement("altDirections", QString::number(alternatives()));
     
-    for(int i = 1; i<=alternatives(); ++i)
+    for(unsigned int i = 1; i<=alternatives(); ++i)
 	{
         const PointType & dir = altDirection(index, i);
         

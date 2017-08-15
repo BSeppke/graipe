@@ -191,7 +191,7 @@ QString  ColorTableParameter::toString() const
     {
         res= QColor(ct[0]).name(QColor::HexArgb);
     
-        for(unsigned int i=0; i<ct.size(); ++i)
+        for(int i=0; i<ct.size(); ++i)
         {
             res += ", " + QColor(ct[i]).name(QColor::HexArgb);
         }
@@ -211,7 +211,7 @@ void ColorTableParameter::serialize(QXmlStreamWriter& xmlWriter) const
         xmlWriter.writeTextElement("Name", name());
         xmlWriter.writeTextElement("Colors", QString::number(ct.size()));
     
-    for(unsigned int i=0; i<ct.size(); ++i)
+    for(int i=0; i<ct.size(); ++i)
     {
         xmlWriter.writeStartElement("Color");
             xmlWriter.writeAttribute("ID", QString::number(i));

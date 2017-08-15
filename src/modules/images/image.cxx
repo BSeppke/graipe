@@ -368,7 +368,7 @@ bool Image<T>::deserialize_content(QXmlStreamReader& xmlReader)
             {
                 int id = xmlReader.attributes().value("ID").toInt();
                 
-                if (id < 0 || id >= numBands())
+                if (id < 0 || (unsigned int)id >= numBands())
                 {
                     throw std::runtime_error("Channel id not found in image");
                 }
@@ -418,7 +418,7 @@ void Image<T>::updateModel()
         {
         
             vigra::MultiArray<2,T> band(width(), height());
-            band.init(0.0);
+            band.init(vigra::NumericTraits<T>::zero());
             
             while (m_imagebands.size() != numBands())
             {
@@ -434,7 +434,7 @@ void Image<T>::updateModel()
             for(vigra::MultiArray<2,T> & band: m_imagebands)
             {
                 band.reshape(vigra::Shape2(width(),height()));
-                band.init(0.0);
+                band.init(vigra::NumericTraits<T>::zero());
             }
         }
         

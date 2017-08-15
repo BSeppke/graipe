@@ -371,7 +371,7 @@ SparseWeightedVectorfield2D * relaxVectorfield(SparseWeightedMultiVectorfield2D 
 				sum_g           += g;
 			}
 			
-			if (sum_g != 0.0)
+			if (sum_g != 0.0 && sum_wg != 0.0)
 			{
 				//save the new vector at current step
 				mean_direction	/= sum_wg;

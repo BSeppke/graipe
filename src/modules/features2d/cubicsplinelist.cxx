@@ -110,7 +110,7 @@ QString CubicSplineList2D::itemToCSV(unsigned int index) const
     
     QString result = QString::number(first_derivative.x(), 'g', 10) + ", " + QString::number(first_derivative.y(), 'g', 10);
 	
-	for(unsigned int i=0; i < points.size(); ++i)
+	for(int i=0; i < points.size(); ++i)
     {
 		result +=    ", " + QString::number(points[i].x(), 'g', 10)
                    + ", " + QString::number(points[i].y(), 'g', 10);
@@ -176,7 +176,7 @@ void CubicSplineList2D::serialize_item(unsigned int index, QXmlStreamWriter& xml
             xmlWriter.writeTextElement("y", QString::number(first_derivative.y(), 'g', 10));
         xmlWriter.writeEndElement();
     
-	for(unsigned int i=0; i < points.size(); ++i)
+	for(int i=0; i < points.size(); ++i)
     {
         xmlWriter.writeStartElement("Point");
             xmlWriter.writeAttribute("ID", QString::number(i));

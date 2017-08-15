@@ -211,7 +211,7 @@ void Client::sendModel(Model* model)
     }
     
     QXmlStreamWriter xmlWriter(compressor);
-    model->setID(QString::number((long int)model));
+    model->setID(QString::number(reinterpret_cast<long long>(model)));
     model->serialize(xmlWriter);
     compressor->close();
     
