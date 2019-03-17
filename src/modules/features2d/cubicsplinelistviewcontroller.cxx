@@ -67,7 +67,7 @@ void CubicSplineList2DViewController::paint(QPainter *painter, const QStyleOptio
         
         QPen new_pen;
         
-        if(m_lineWidth > 0)
+        if(m_lineWidth->value() > 0)
         {
             new_pen.setColor(Qt::black);
             new_pen.setWidthF(m_lineWidth->value());
@@ -283,7 +283,7 @@ void WeightedCubicSplineList2DViewController::paint(QPainter *painter, const QSt
         
         QPen new_pen;
         
-        if(m_lineWidth > 0)
+        if(m_lineWidth->value() > 0)
         {
             new_pen.setColor(Qt::black);
             new_pen.setWidthF(m_lineWidth->value());

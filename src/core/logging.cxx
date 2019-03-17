@@ -138,6 +138,11 @@ Logging::Logging(QString filename)
 
 void Logging::logMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    if(m_textStream == nullptr)
+    {
+        return;
+    }
+    
     QByteArray localMsg = msg.toLocal8Bit();
     
     QString txt = QString("[%1] ").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz"));

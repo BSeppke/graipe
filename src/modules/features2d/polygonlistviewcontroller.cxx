@@ -61,7 +61,7 @@ void PolygonList2DViewController::paint(QPainter *painter, const QStyleOptionGra
         
         QPen new_pen;
         
-        if(m_lineWidth > 0)
+        if(m_lineWidth->value() > 0)
         {
             new_pen.setColor(Qt::black);
             new_pen.setWidthF(m_lineWidth->value());
@@ -229,7 +229,7 @@ void WeightedPolygonList2DViewController::paint(QPainter *painter, const QStyleO
         
         QPen new_pen;
         
-        if(m_lineWidth > 0)
+        if(m_lineWidth->value() > 0)
         {
             new_pen.setColor(Qt::black);
             new_pen.setWidthF(m_lineWidth->value());
