@@ -193,7 +193,8 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 					//Check if there is a proper Geometrical transformation matrix
 					if(	poDataset->GetGeoTransform( adfGeoTransform ) == CE_None )
                     {
-						char* ang_unitnames, *lin_unitnames;
+						const char* ang_unitnames;
+                        const char* lin_unitnames;
 						OGRSpatialReference  	spaRef(  poDataset->GetProjectionRef() );
 						double ang = spaRef.GetAngularUnits (&ang_unitnames);
 						double lin = spaRef.GetLinearUnits (&lin_unitnames);
@@ -275,7 +276,8 @@ bool ImageImpex::importImage(const QString & filename, Image<T>& image)
 					//Checking Geometrical transformation matrix
 					if(	GDALGCPsToGeoTransform( poDataset->GetGCPCount(), poDataset->GetGCPs(), adfGeoTransform, 0) == CE_None)
                     {
-						char* ang_unitnames, *lin_unitnames;
+						const char* ang_unitnames;
+                        const char* lin_unitnames;
 						OGRSpatialReference  	spaRef( poDataset->GetGCPProjection() );
 						double ang = spaRef.GetAngularUnits (&ang_unitnames);
 						double lin = spaRef.GetLinearUnits (&lin_unitnames);
