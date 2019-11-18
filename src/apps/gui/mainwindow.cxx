@@ -64,8 +64,6 @@ MainWindow::MainWindow(QWidget* parent, const char* name, Qt::WindowFlags f) :
     QMainWindow(parent,f),
 	m_scene(NULL),
 	m_view(NULL),
-	m_modSignalMapper(new QSignalMapper),
-	m_algSignalMapper(new QSignalMapper),
 	m_status_window(new StatusWindow),
     m_lblMemoryUsage(new QLabel("(Memory: 0 MB, max: 0 MB)")),
     m_recentFileCount(10),
@@ -1124,12 +1122,9 @@ void MainWindow::initializeFactories()
         QAction* newAct = new QAction(item.model_type, this);
         m_ui.menuCreate->addAction(newAct);
         //connect everything
-        connect(newAct, SIGNAL(triggered()), m_modSignalMapper, SLOT(map()));
-        m_modSignalMapper->setMapping(newAct, i++);
+        connect(newAct, &QAction::triggered, [=](){newModel(i);});
+        i++;
     }
-    
-	connect(m_modSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedNewModel(int)));
-	connect(this, SIGNAL(clickedNewModel(int)), this, SLOT(newModel(int)));
     
     //Connect the algorithm factory to the GUI
 	QList<QMenu*> added_menus;
@@ -1167,12 +1162,9 @@ void MainWindow::initializeFactories()
             algorithm_menu->addAction(newAct);
         }
         //connect everything
-        connect(newAct, SIGNAL(triggered()), m_algSignalMapper, SLOT(map()));
-        m_algSignalMapper->setMapping(newAct, i++);
+        connect(newAct, &QAction::triggered, [=](){runAlgorithm(i);});
+        i++;
     }
-    
-	connect(m_algSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedAlgorithm(int)));
-	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));
 }
 
 Model* MainWindow::currentModel()

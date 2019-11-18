@@ -67,11 +67,7 @@ public:
      * \param parent Pointer to the QWidget parent, NULL on default.
      */
     explicit Client(QWidget *parent = Q_NULLPTR);
-
-signals:
-    /** Signal, which is mapped by signalMapper after each algorithm click. **/
-    void clickedAlgorithm(int);
-
+    
 private slots:
     /**
      * Sends a model to the server.
@@ -139,12 +135,6 @@ private:
     
     /** The TCP socket of the client **/
     QTcpSocket *m_tcpSocket;
-    
-    /** 
-     * Signal mapping for dynamically loaded algorithms
-     * (and their dynamically created actions)
-     */
-    QSignalMapper* m_algSignalMapper;
     
     /** The workspace of the client **/
     Workspace* m_workspace;

@@ -44,7 +44,6 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QSignalMapper>
 #include <QPrinter>
 #include <QList>
 #include <QMenu>
@@ -94,18 +93,6 @@ public:
      */
     void reset();
 
-signals:
-    /**
-     * This signal is mapped to call the right new model creation each time the
-     * corresponding (menu-)action is triggered.
-     */
-    void clickedNewModel(int);
-    
-    /**
-     * This signal is mapped to call the right algorithm each time the
-     * corresponding (menu-)action is triggered.
-     */
-    void clickedAlgorithm(int);
 
 protected slots:
     /**
@@ -405,12 +392,6 @@ private:
 
     /** a printer (of the view) **/
     QPrinter* m_printer;
-
-    /** Signal mapping for dynamically created models **/
-    QSignalMapper* m_modSignalMapper;
-    
-    /** Signal mapping for dynamically loaded algorithms (and their dynamically created actions) **/
-    QSignalMapper* m_algSignalMapper;
 
     /** Enum for easy handling of current view type: **/
     enum DisplayMode

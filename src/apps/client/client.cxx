@@ -51,7 +51,6 @@ Client::Client(QWidget *parent)
     m_lnePassword(new QLineEdit),
     m_btnLogin(new QPushButton(tr("Login"))),
     m_tcpSocket(new QTcpSocket(this)),
-    m_algSignalMapper(new QSignalMapper),
     m_workspace(new Workspace)
 {
     m_workspace->loadModel("/Users/seppke/Desktop/Lenna_face.xgz");
@@ -106,12 +105,9 @@ Client::Client(QWidget *parent)
             algorithm_menu->addAction(newAct);
         }
         //connect everything
-        connect(newAct, SIGNAL(triggered()), m_algSignalMapper, SLOT(map()));
-        m_algSignalMapper->setMapping(newAct, i++);
+        connect(newAct, &QAction::triggered, [=](){runAlgorithm(i);});
+        i++;
     }
-    
-	connect(m_algSignalMapper, SIGNAL(mapped(int)), this, SIGNAL(clickedAlgorithm(int)));
-	connect(this, SIGNAL(clickedAlgorithm(int)), this, SLOT(runAlgorithm(int)));
 
 
 

@@ -100,7 +100,7 @@ QWidget*  LongStringParameter::delegate()
     {
         m_delegate = new QPlainTextEdit;
     
-        m_delegate->setMinimumWidth(m_columns * m_delegate->fontMetrics().width("X"));
+        m_delegate->setMinimumWidth(m_columns * m_delegate->fontMetrics().horizontalAdvance("X"));
         m_delegate->setMinimumHeight(m_lines * m_delegate->fontMetrics().lineSpacing());
         m_delegate->setPlainText(m_value);
     

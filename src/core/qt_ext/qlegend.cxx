@@ -278,15 +278,15 @@ void QLegend::updateRect(const QRectF& new_rect)
     m_scale_rect.setHeight(rect().height()/3.0);
     
     QFontMetrics fm_scale(QFont(QString("Arial"), 1.0));
-    float scale_w = std::max(fm_scale.width(QString::number(m_lower_val, 'f', m_digits)),
-                             fm_scale.width(QString::number(m_upper_val, 'f', m_digits)));
+    float scale_w = std::max(fm_scale.horizontalAdvance(QString::number(m_lower_val, 'f', m_digits)),
+                             fm_scale.horizontalAdvance(QString::number(m_upper_val, 'f', m_digits)));
     float scale_h = fm_scale.height();
     
     float scale_pts = 0.9*std::min(text_interval_width()/scale_w, float(rect().height()/5.0)/scale_h);
     m_scale_font = QFont(QString("Arial"), scale_pts);
     
     QFontMetrics fm_caption(QFont(QString("Arial"), 1.0));
-    float caption_w = fm_caption.width(caption());
+    float caption_w = fm_caption.horizontalAdvance(caption());
     float caption_h = fm_caption.height();
     
     float caption_pts = 0.9*std::min(float(rect().width()/caption_w), float(rect().height()/3.0)/caption_h);

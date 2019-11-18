@@ -98,7 +98,7 @@ QWidget*  StringParameter::delegate()
     if(m_delegate == NULL)
     {
         m_delegate = new QLineEdit;
-        m_delegate->setMinimumWidth(m_columns * m_delegate->fontMetrics().width("X"));
+        m_delegate->setMinimumWidth(m_columns * m_delegate->fontMetrics().horizontalAdvance("X"));
         m_delegate->setText(value());
         
         connect(m_delegate, SIGNAL(textChanged(const QString&)), this, SLOT(updateValue()));
