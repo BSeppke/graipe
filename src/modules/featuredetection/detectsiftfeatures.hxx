@@ -95,7 +95,7 @@ SIFTFeatureList2D* detectFeaturesUsingSIFT(const vigra::MultiArrayView<2,T>& src
                            sift.contrast,
                            sift.orientation,
                            sift.scale,
-                           QVector<float>::fromStdVector(sift.descriptor));
+                           QVector<float>(sift.descriptor.begin(), sift.descriptor.end()));
     }
     
     return result;
